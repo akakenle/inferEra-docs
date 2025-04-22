@@ -28,10 +28,9 @@ Using the familiar `v1/completions` endpoint, we provide support, which is fully
 <CodeGroup>
 ```py Text-to-Image
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key Here
     base_url="https://aihubmix.com/v1"
 )
 
@@ -67,7 +66,6 @@ for chunk in stream:
 
 ```py Text-to-Image with Image
 from openai import OpenAI
-import os
 import base64
 
 # Function to encode the image
@@ -82,7 +80,7 @@ image_path = "Portland_Head_Light__Maine.jpg"
 base64_image = encode_image(image_path)
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key Here
     base_url="https://aihubmix.com/v1"
 )
 
@@ -118,7 +116,6 @@ for chunk in stream:
 
 ```py Multi-Image with Text
 from openai import OpenAI
-import os
 import base64
 
 # Function to encode the image
@@ -139,7 +136,7 @@ image_path2 = "ref.jpeg"
 base64_image2 = encode_image(image_path2)
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key Here
     base_url="https://aihubmix.com/v1"
 )
 
@@ -171,7 +168,6 @@ stream = client.chat.completions.create(
     stream=True
 )
 
-# 使用 for 循环处理流式响应
 for chunk in stream:
     try:
         if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
