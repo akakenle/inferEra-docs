@@ -5,7 +5,7 @@ icon: "palette"
 ---
 
 ## Interface Description
-As OpenAI has yet to officially release a GPT-4 image generation API, we've temporarily made two reverse-engineered endpoints—`gpt-4o-image` and `gpt-4o-image-vip`—available, enabling users to preview GPT-4o's powerful image creation capabilities.
+As OpenAI has yet to officially release a GPT-4 image generation API, we've temporarily made two reverse-engineered endpoints—`gpt-4o-image` and `gpt-4o-image-vip`—available, enabling users to preview GPT-4o's powerful image creation capabilities.  
 Please note, these reverse-engineered endpoints do not guarantee consistent stability and are intended solely for early access and exploratory use.
 Once OpenAI officially launches the GPT-4 image API, we will immediately discontinue these unofficial endpoints and seamlessly transition to the official stable release.
 
@@ -58,9 +58,118 @@ for chunk in stream:
 ```
 
 ```py Text-to-Image with Image
+from openai import OpenAI
+import os
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the image
+base64_image = encode_image(image_path)
+
+client = OpenAI(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image, gpt-4o-dall-vip, gpt-4o-dall, gpt-4o-mini-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert the image into the style of ghibli，bright tone. 3:2"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\nError occurred while processing the response: {str(e)}")
 ```
 
 ```py Multi-Image with Text
+from openai import OpenAI
+import os
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the first image
+base64_image1 = encode_image(image_path)
+
+# Get the second image path
+image_path2 = "ref.jpeg"
+
+# Encode the second image
+base64_image2 = encode_image(image_path2)
+
+client = OpenAI(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert image 1 into the style of image 2, bright tone. 2:3"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image1}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image2}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# 使用 for 循环处理流式响应
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\nError occurred while processing the response: {str(e)}")
 ```
 </CodeGroup>
 
