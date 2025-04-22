@@ -9,6 +9,14 @@ As OpenAI has yet to officially release a GPT-4 image generation API, we've temp
 Please note, these reverse-engineered endpoints do not guarantee consistent stability and are intended solely for early access and exploratory use.
 Once OpenAI officially launches the GPT-4 image API, we will immediately discontinue these unofficial endpoints and seamlessly transition to the official stable release.
 
+## Notes
+<Warning>
+- **Special Note**: Regardless of the cause, once the API call is initiated, charges will apply even if the generation fails.
+- The name of living artists (such as "Ghibli" and "Makoto Shinkai") will trigger `input_moderation` error, **causing generation failure**. You can avoid this by using non-sensitive words like "Ghibli" and "Bright Modern Japanese Anime Style".
+- In general, "style" is safer than "artist", like "Pixar" is also supported.
+- A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
+</Warning>
+
 ## Model and Pricing
 | Model               | Price ($/IMG) |
 | ------------------ | ------------ |
@@ -219,13 +227,6 @@ for chunk in stream:
 - Upload images can be compressed for pre-processing, improve speed.
 - Support transparent background, no need to remove the background.——just add the requirement in the prompt.
 </Tip>
-
-## Notes
-<Warning>
-- The name of living artists (such as "Ghibli" and "Makoto Shinkai") will trigger `input_moderation` error, **causing generation failure but will be charged**. You can avoid this by using non-sensitive words like "Ghibli" and "Bright Modern Japanese Anime Style".
-- In general, "style" is safer than "artist", like "Pixar" is also supported.
-- A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
-</Warning>
 
 
 
