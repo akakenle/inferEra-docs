@@ -1,0 +1,122 @@
+---
+title: "GPT-4o 绘图尝鲜"
+description: " "
+icon: "palette"
+---
+
+## 接口说明
+由于 OpenAI 官方迟迟不开放 GPT-4o 绘图接口，为满足广大用户的强烈期待，我们特别上线了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能与稳定性上更具优势。
+请注意，逆向接口在稳定性方面无法提供完全保障，建议仅用于尝鲜体验与功能测试。
+未来，一旦 OpenAI 官方正式发布 GPT-4o 绘图 API，我们将立即下线当前逆向接口，并无缝迁移至官方稳定版本。
+
+## 模型和费率
+| 模型               | 费率 (人民币/次)         |
+| ------------------ | ------------ |
+| `gpt-40-image-vip` | 折合约 ¥0.05 |
+| `gpt-40-image`     | 折合约 ¥0.02 |
+
+## Python 调用示例
+使用大家熟悉的 `v1/completions` 端点来提供支持，完美兼容，具体使用可以参考：
+<CodeGroup>
+```py 文生图
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    base_url="https://aihubmix.com/v1"
+)
+
+# 创建聊天完成请求
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #list: gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """Redesign [Girl wearing a pearl earring] as an anime-style illustrated cover. Preserve original essence and composition. Render in refined Kyoto Anime-inspired style—soft brushwork, cinematic lighting, progressive depth. 
+Format in AV cover layout: 
+Japanese-English mixed typography, serif title with significant visual hierarchy - sense of design is the key.
+Extract words tha conveys profound meanings as title, then creative slogan, the original name can be a smaller information ONLY if necessary.
+Subtly embed watermark “jerlin” in clothing or background. Maintain emotional tone and posture, soften only when necessary. 2:3 portrait"""
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# 使用 for 循环处理流式响应
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n处理响应时出现错误：{str(e)}")
+```
+
+```py 图文生图
+```
+
+```py 多图+文生图
+```
+</CodeGroup>
+
+## 输出示例
+```
+{
+  "prompt": "Redesign 'Girl with a Pearl Earring' as an anime-style illustrated cover. Preserve the original essence and composition: the iconic side-glance pose, serene expression, and intimate framing. Render in refined Kyoto Anime-inspired style with soft brushwork, cinematic lighting, and progressive depth. Create an AV cover layout with Japanese-English mixed typography, using a prominent serif title with strong visual hierarchy. Extract profound words for the title and include a creative slogan. The original name 'Girl with a Pearl Earring' should appear as smaller text if needed. Subtly embed the watermark 'jerlin' in clothing or background. For modesty, replace any potential nudity with flowing fabric, hair, or veils while maintaining the emotional tone and posture. Soften details only when necessary.",
+  "ratio": "2:3"
+}
+
+>🕐 Queuing.
+
+>⚡ Generating.....
+
+>🏃‍ Progress 11....19....27...34....42....50....57...64....[100](https://videos.openai.com/vg-assets/assets%2Ftask_01jsccq77nfcsab7dn8bx7z230%2Fsrc_1.png?st=2025-04-21T13%3A08%3A48Z&se=2025-04-27T14%3A08%3A48Z&sks=b&skt=2025-04-21T13%3A08%3A48Z&ske=2025-04-27T14%3A08%3A48Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=xm6K6M7au3F3Vd9qcYxR3mYWrqAHsgbagbUV5GQo39w%3D&az=oaivgprodscus)
+
+> ✅ Generation complete
+
+
+![gen_01jsccq83pfg6ssfqf3pzfaytj](https://filesystem.site/cdn/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+![gen_01jsccq83nf6ftmtx8y48h383y](https://filesystem.site/cdn/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
+```
+
+## 效果展示
+<Card title="戴珍珠项链的女孩" img="https://docs.aihubmix.com/cn/media/Girl-with-a-Pearl-Earring.PNG">
+1. 名画重演绎，带排版和水印直出。
+</Card>
+
+<Card title="皮克斯卡通" img="https://docs.aihubmix.com/cn/media/pixar.png">
+2. 皮克斯 3D 卡通风格，稳如老狗。
+</Card>
+
+<Card title="3D" img="https://docs.aihubmix.com/cn/media/ghibli.png">
+3. 最受欢迎的吉卜力
+</Card>
+
+## 实用提示
+<Tip>
+- 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本。
+- 画幅比例在 prompt 中指定，否则 4o 自动判断。支持 16:9、9:16、2:3、3:2、1:1。
+- 没有灵感就给参考图，支持单图和多图。
+- 上传的图片可以做压缩预处理，提升速度。
+- 支持透明背景，免抠图。——只需要在 Prompt 中补充要求。
+</Tip>
+
+## 注意事项
+<Warning>
+- 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `input_moderation` 报错，**导致生成失败，但会被扣取费用**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避。
+- 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的。
+- 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等。
+</Warning>
+
+
+

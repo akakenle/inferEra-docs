@@ -31,6 +31,7 @@
                   "cn/api/Model-List",
                   "cn/api/OpenAI-library", 
                   "cn/api/Responses-API",  
+                  "cn/api/GPT-4o-image",
                   "cn/api/FIM",
                   "cn/api/Codex-CLI",
                   "cn/api/Non-OpenAI-Models",
@@ -45,7 +46,7 @@
                 ]
               },
               {
-                "group": "隐私&条款",
+                "group": "隐私和条款",
                 "pages": [
                   "cn/terms-and-privacy/Terms",
                   "cn/terms-and-privacy/Privacy"
