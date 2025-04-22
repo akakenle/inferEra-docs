@@ -128,6 +128,7 @@
                   "en/api/Model-List",
                   "en/api/OpenAI-library",  
                   "en/api/Responses-API",  
+                  "en/api/GPT-4o-image",
                   "en/api/FIM",
                   "en/api/Codex-CLI",
                   "en/api/Non-OpenAI-Models",
