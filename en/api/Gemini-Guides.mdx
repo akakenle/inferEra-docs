@@ -15,7 +15,7 @@ from openai import OpenAI
 import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
     base_url="https://aihubmix.com/v1",
 )
 
@@ -62,7 +62,6 @@ By using the openai compatible way to call Gemini's function calling, you need t
 <CodeGroup>
 ```py Python
 from openai import OpenAI
-import os
 
 # Define the function declaration for the model
 schedule_meeting_function = {
@@ -95,7 +94,7 @@ schedule_meeting_function = {
 
 # Configure the client
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
     base_url="https://aihubmix.com/v1",
 )
 

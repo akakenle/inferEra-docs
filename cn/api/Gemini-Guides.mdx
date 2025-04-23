@@ -12,10 +12,9 @@ icon: 'google'
 <CodeGroup>
 ```py Python
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
     base_url="https://aihubmix.com/v1",
 )
 
@@ -62,7 +61,6 @@ Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范
 <CodeGroup>
 ```py Python
 from openai import OpenAI
-import os
 
 # Define the function declaration for the model
 schedule_meeting_function = {
@@ -95,7 +93,7 @@ schedule_meeting_function = {
 
 # Configure the client
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
     base_url="https://aihubmix.com/v1",
 )
 

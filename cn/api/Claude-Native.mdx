@@ -22,7 +22,7 @@ pip install -U anthropic
 <CodeGroup>
 ```shell Curl
 curl https://aihubmix.com/v1/messages \
-     --header "x-api-key: $ANTHROPIC_API_KEY" \ #里换成 aihubmix 密钥
+     --header "x-api-key: $ANTHROPIC_API_KEY" \ # 换成你在 AiHubMix 生成的密钥
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --data \
@@ -39,8 +39,7 @@ curl https://aihubmix.com/v1/messages \
 import anthropic
 
 client = anthropic.Anthropic(
-    #将这里换成你在 aihubmix api keys 拿到的密钥
-    api_key="ANTHROPIC_API_KEY",
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
     base_url="https://aihubmix.com"
 )
 message = client.messages.create(

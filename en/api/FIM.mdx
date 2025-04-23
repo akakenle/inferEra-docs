@@ -26,10 +26,9 @@ In the chat/completions interface, simply set the `model id` to the model id on 
 
 ```py Python
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
     base_url="https://aihubmix.com/v1"
 )
 

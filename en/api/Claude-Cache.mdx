@@ -41,12 +41,11 @@ curl https://aihubmix.com/v1/messages \
 
 ```py Python
 import requests
-import os
 
 url = "https://aihubmix.com/v1/messages"
 headers = {
     "content-type": "application/json",
-    "x-api-key": os.getenv("AIHUBMIX_API_KEY"),
+    "x-api-key": "AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
     "anthropic-version": "2023-06-01"
 }
 data = {
