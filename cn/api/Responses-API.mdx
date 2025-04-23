@@ -20,19 +20,19 @@ icon: "o"
 
 ```py
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 ```
 
 <CodeGroup>
 
-```py Text input
+```py 文本
 from openai import OpenAI
 import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -45,12 +45,11 @@ print(response)
 ```
 
 
-```py Image input
+```py 图文
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -74,12 +73,11 @@ print(response)
 ```
 
 
-```py Streaming
+```py 流式
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -95,12 +93,11 @@ for event in response:
 ```
 
 
-```py Web search
+```py 搜索
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -114,12 +111,11 @@ print(response)
 ```
 
 
-```py Functions
+```py 函数调用
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -153,12 +149,11 @@ print(response)
 ```
 
 
-```py ⏳ Reasoning
+```py ⏳ 推理
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
     base_url="https://aihubmix.com/v1/"
 )
 

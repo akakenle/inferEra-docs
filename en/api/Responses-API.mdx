@@ -20,7 +20,7 @@ Mainland China can access directly.
 
 ```py
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 ```
@@ -29,10 +29,9 @@ client = OpenAI(
 
 ```py Text input
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -47,10 +46,9 @@ print(response)
 
 ```py Image input
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -76,10 +74,9 @@ print(response)
 
 ```py Streaming
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -97,10 +94,9 @@ for event in response:
 
 ```py Web search
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -116,10 +112,9 @@ print(response)
 
 ```py Functions
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -155,10 +150,9 @@ print(response)
 
 ```py ⏳ Reasoning
 from openai import OpenAI
-import os
 
 client = OpenAI(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1/"
 )
 
