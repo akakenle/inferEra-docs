@@ -183,7 +183,6 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
-
 </CodeGroup>
 
 ## 输出示例
@@ -219,7 +218,6 @@ for chunk in stream:
 2. 不支持打印追踪 Token 用量的 usage 字段
 3. 输出结果是 URL 链接，不是图片，用例已经做了自动保存
 
-<CodeGroup>
 ```py Python
 from openai import OpenAI
 import os
@@ -290,8 +288,6 @@ for i, image_data in enumerate(result.data):
         # 如果 URL 也不存在，则提示
         print(f"第 {i} 张图片数据中既无 b64_json 也无 url，跳过保存。")
 ```
-</CodeGroup>
-
 
 ## 效果展示
 
