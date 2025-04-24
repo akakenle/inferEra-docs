@@ -38,11 +38,7 @@ Jina AI's Embedding supports both plain text and multi-modal images, and perform
   Input text or image, different models support different input formats. For text, provide an array of strings; for multi-modal models, provide an array of objects containing text or image fields.
 </ParamField>
 
-<ParamField body="normalized" type="boolean" default="true">
-  Whether to perform L2 normalization. L2 normalization scales the Euclidean norm of the embedding vector to 1 while preserving the direction. It is useful when the downstream task involves dot product, classification, or visualization.
-</ParamField>
-
-<ParamField body="embedding_type" type="string" default="float">
+<ParamField body="embedding_format" type="string" default="float">
   Data type returned, optional values:
   - `float`：Default, return a float array. The most common and easy-to-use format, return a list of floats
   - `binary_int8`：Return as int8 packed binary format. More efficient storage, search, and transmission
@@ -50,18 +46,10 @@ Jina AI's Embedding supports both plain text and multi-modal images, and perform
   - `base64`：Return as base64 encoded string. More efficient transmission
 </ParamField>
 
-
-<ParamField body="embed_as" type="string" default="query">
-  Specify the role of the input text in the search, optional values:
-  - `query`：Query embedding, used for search queries
-  - `document`：Document embedding, used for indexed content
-  
-  The same input text can be used as a query or document embedding, depending on its role in the search
-</ParamField>
-
-<ParamField body="compatible_mode" type="boolean" default="false">
-  Whether to use the request format compatible with the pure text embedding model. This allows you to switch between models without changing the request format.
-  Note: This mode does not support image input
+<ParamField body="dimensions" default="1024" type="integer">
+  The number of dimensions used in computation. Supported values:
+  - 1024  
+  - 768
 </ParamField>
 
 ### 1. Multimodal Usage
@@ -293,8 +281,9 @@ Reranker aims to improve search relevance and RAG accuracy. It deep analyzes the
   Array of candidate documents, will be reordered based on relevance to the query
 </ParamField>
 
-<ParamField body="return_documents" type="boolean" default="false">
-  Whether to return the reordered document content in the response. Setting to true will return the document text, false will only return the index and score
+<ParamField body="max_chunk_per_doc" default="4096" type="integer">
+  Maximum chunk length per document, applicable **only** to Cohere (not supported by Jina). Defaults to 4096.  
+  Long documents will be automatically truncated to the specified number of tokens.
 </ParamField>
 
 ### 1. Multimodal Usage
@@ -335,8 +324,7 @@ curl https://aihubmix.com/v1/rerank \
         {
             "image": "iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWoBoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns83rC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGsesuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYIABJjmY74+E/ODnMz8fbZyfrAHrh1j6XQvmxemeP4uTs70Nszg5E0tfaMIIJ4phn2l6pcAAAwwwwAADDDBRYvYWfz6Mr3Bv6U9V4MP46jVhMnXUfCTMkN9NnG82b76/vzRx7rWLkzNggAEGmCxg/gAcTwKRD+vGjgAAAABJRU5ErkJggg=="
         }
-    ],
-    "return_documents": false
+    ]
   }
 EOFEOF
 ```
@@ -380,8 +368,7 @@ data = {
         {
             "image": "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"
         }
-    ],
-    "return_documents": False
+    ]
 }
 
 response = requests.post(url, headers=headers, json=data)
@@ -432,8 +419,7 @@ const options = {
       {
         image: 'iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWoBoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns83rC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGsesuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYIABJjmY74+E/ODnMz8fbZyfrAHrh1j6XQvmxemeP4uTs70Nszg5E0tfaMIIJ4phn2l6pcAAAwwwwAADDDBRYvYWfz6Mr3Bv6U9V4MP46jVhMnXUfCTMkN9NnG82b76/vzRx7rWLkzNggAEGmCxg/gAcTwKRD+vGjgAAAABJRU5ErkJggg=='
       }
-    ],
-    return_documents: false
+    ]
   })
 };
 
@@ -501,8 +487,7 @@ curl https://aihubmix.com/v1/rerank \
         "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
         "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
         "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
-    ],
-    "return_documents": false
+    ]
   }
 EOFEOF
 ```
@@ -530,8 +515,7 @@ data = {
         "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
         "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
         "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
-    ],
-    "return_documents": False
+    ]
 }
 
 response = requests.post(url, headers=headers, json=data)
@@ -557,8 +541,7 @@ const requestData = {
     "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
     "敏感肌のために特別に設計された天然有機スキンケア製品：アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
     "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています：今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
-  ],
-  return_documents: false
+  ]
 };
 
 const options = {
@@ -601,43 +584,8 @@ The stream will return the thinking process.
   Whether to enable streaming response. It is strongly recommended to keep this option enabled, DeepSearch requests may take a long time to complete, disabling streaming may result in a '524 Timeout' error
 </ParamField>
 
-<ParamField body="reasoning_effort" type="string" default="medium">
-  Limit the reasoning effort of the reasoning model. The current supported values are `low` (low), `medium` (medium), and `high` (high). Reducing reasoning effort can speed up the response time, reduce the number of tokens used for reasoning in the response, where:
-  - `low`：Basic reasoning and search simple queries (maximum 500K tokens/req)
-  - `medium`：Medium reasoning and search depth (maximum 1M tokens/req)
-  - `high`：Maximum reasoning and search complex queries (maximum 2M tokens/req)
-</ParamField>
-
-<ParamField body="budget_tokens" type="integer">
-  Determine the maximum number of tokens allowed for the DeepSearch processing process. A larger budget can improve response quality by conducting more comprehensive searches for complex queries. This parameter overrides the `reasoning_effort` parameter
-</ParamField>
-
-<ParamField body="max_attempts" type="integer" default="1">
-  The maximum number of retries for solving problems during the DeepSearch process. A larger value allows DeepSearch to retry solving problems by using different reasoning methods and strategies. This parameter overrides the `reasoning_effort` parameter
-</ParamField>
-
 <ParamField body="no_direct_answer" type="boolean" default="false">
   Force the model to perform further thinking/search steps, even if the query appears simple. This is useful in scenarios where it is determined that a query always requires DeepSearch rather than a trivial problem (such as "1+1=?")
-</ParamField>
-
-<ParamField body="max_returned_urls" type="integer">
-  The maximum number of URLs included in the final answer/block. URLs are sorted by relevance and other important factors
-</ParamField>
-
-<ParamField body="structured_output" type="boolean" default="false">
-  Enable structured output to ensure that the model's final answer matches the JSON schema you provided
-</ParamField>
-
-<ParamField body="good_domains" type="array">
-  The list of domains that are given higher priority during content retrieval. Useful for specific domains with high-quality sources
-</ParamField>
-
-<ParamField body="bad_domains" type="array">
-  The list of domains that are strictly excluded during content retrieval. Typically used to filter known spam sites, low-quality or irrelevant websites
-</ParamField>
-
-<ParamField body="only_domains" type="array">
-  The list of domains that are specifically included during content retrieval. All other domains will be ignored. Useful for specific domain searches
 </ParamField>
 
 <ParamField body="messages" type="array" required>
@@ -720,8 +668,6 @@ curl https://aihubmix.com/v1/chat/completions \
         }
     ],
     "stream": true,
-    "reasoning_effort": "medium",
-    "max_attempts": 1,
     "no_direct_answer": false
   }
 EOFEOF
@@ -754,8 +700,6 @@ data = {
         }
     ],
     "stream": True,
-    "reasoning_effort": "medium",
-    "max_attempts": 1,
     "no_direct_answer": False
 }
 
@@ -827,8 +771,6 @@ const data = JSON.stringify({
     }
   ],
   stream: true,
-  reasoning_effort: "low",
-  max_attempts: 1,
   no_direct_answer: false
 });
 
@@ -861,154 +803,98 @@ req.end();
 </CodeGroup>
 
 ### Response Description
-The response of DeepSearch is streaming, including reasoning steps and final answers. The last block contains the final answer, visited URLs, and token usage.
+The response of DeepSearch is streaming, including reasoning steps and final answers. The last block contains the final answer, visited URLs, and token usage.  
+Note: This JSON object differs from the format used by Jina AI.
 
 ```json
 {
-  "id": "1742181758589",
+  "id": "1745506101379",
   "object": "chat.completion.chunk",
-  "created": 1742181758,
+  "created": 1745506101,
   "model": "jina-deepsearch-v1",
-  "system_fingerprint": "fp_1742181758589",
   "choices": [
     {
       "index": 0,
       "delta": {
-        "content": "The latest blog post from Jina AI is titled \"Snippet Selection and URL Ranking in DeepSearch/DeepResearch,\" published on March 12, 2025 [^1]. This post discusses how to improve the quality of DeepSearch by using late-chunking embeddings for snippet selection and rerankers to prioritize URLs before crawling. You can read the full post here: https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch\n\n[^1]: Since our DeepSearch release on February 2nd 2025 we ve discovered two implementation details that greatly improved quality In both cases multilingual embeddings and rerankers are used in an in context manner operating at a much smaller scale than the traditional pre computed indices these models typically require  [jina.ai](https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch)",
+        "role": "assistant",
+        "reasoning_content": "<think>"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// Streaming reason
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "thinking parts"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// Reasoning finished
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "</think>\n\n"
+      },
+      "finish_reason": "thinking_end"
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// The Final Response with URL
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "Response content",
         "type": "text",
         "annotations": [
           {
             "type": "url_citation",
             "url_citation": {
-              "title": "Snippet Selection and URL Ranking in DeepSearch/DeepResearch",
-              "exactQuote": "Since our DeepSearch release on February 2nd 2025, we've discovered two implementation details that greatly improved quality. In both cases, multilingual embeddings and rerankers are used in an _\"in-context\"_ manner - operating at a much smaller scale than the traditional pre-computed indices these models typically require.",
-              "url": "https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch",
-              "dateTime": "2025-03-13 06:48:01"
+              "url": "https://example.com",
+              "title": "Page Title",
+              "start_index": 0,
+              "end_index": 0
             }
           }
         ]
       },
-      "logprobs": null,
       "finish_reason": "stop"
     }
   ],
+  "system_fingerprint": "fp_1745506101379",
   "usage": {
-    "prompt_tokens": 169670,
-    "completion_tokens": 27285,
-    "total_tokens": 196526
-  },
-  "visitedURLs": [
-    "https://github.com/jina-ai/node-DeepResearch/blob/main/src/utils/url-tools.ts",
-    "https://huggingface.co/jinaai/jina-embeddings-v3",
-    "https://github.com/jina-ai/reader",
-    "https://zilliz.com/blog/training-text-embeddings-with-jina-ai",
-    "https://threads.net/@unwind_ai/post/DGmhWCVswbe/media",
-    "https://twitter.com/JinaAI_/status/1899840196507820173",
-    "https://jina.ai/news?tag=tech-blog",
-    "https://docs.llamaindex.ai/en/stable/examples/embeddings/jinaai_embeddings",
-    "https://x.com/jinaai_",
-    "https://x.com/JinaAI_/status/1899840202358784170",
-    "https://tracxn.com/d/companies/jina-ai/__IQ81fOnU0FsDpagFjG-LrG0DMWHELqI6znTumZBQF-A/funding-and-investors",
-    "https://jina.ai/models",
-    "https://linkedin.com/posts/imohitmayank_jinaai-has-unveiled-the-ultimate-developer-activity-7300401711242711040-VD64",
-    "https://medium.com/@tossy21/trying-out-jina-ais-node-deepresearch-c5b55d630ea6",
-    "https://huggingface.co/jinaai/jina-clip-v2",
-    "https://arxiv.org/abs/2409.10173",
-    "https://milvus.io/docs/embed-with-jina.md",
-    "https://seedtable.com/best-startups-in-china",
-    "https://threads.net/@sung.kim.mw/post/DGhG-J_vREu/jina-ais-a-practical-guide-to-implementing-deepsearchdeepresearchthey-cover-desi",
-    "https://elastic.co/search-labs/blog/jina-ai-embeddings-rerank-model-open-inference-api",
-    "http://status.jina.ai/",
-    "https://apidog.com/blog/recreate-openai-deep-research",
-    "https://youtube.com/watch?v=QxHE4af5BQE",
-    "https://sdxcentral.com/articles/news/cisco-engages-businesses-on-ai-strategies-at-greater-bay-area-2025/2025/02",
-    "https://aws.amazon.com/blogs/machine-learning/build-rag-applications-using-jina-embeddings-v2-on-amazon-sagemaker-jumpstart",
-    "https://reddit.com/r/perplexity_ai/comments/1ejbdqa/fastest_open_source_ai_search_engine",
-    "https://search.jina.ai/",
-    "https://sebastian-petrus.medium.com/build-openais-deep-research-open-source-alternative-4f21aed6d9f0",
-    "https://medium.com/@elmo92/jina-reader-transforming-web-content-to-feed-llms-d238e827cc27",
-    "https://openai.com/index/introducing-deep-research",
-    "https://python.langchain.com/docs/integrations/tools/jina_search",
-    "https://varindia.com/news/meta-is-in-talks-for-usd200-billion-ai-data-center-project",
-    "https://varindia.com/news/Mira-Murati%E2%80%99s-new-AI-venture-eyes-$9-billion-valuation",
-    "https://53ai.com/news/RAG/2025031401342.html",
-    "https://arxiv.org/abs/2409.04701",
-    "https://bigdatawire.com/this-just-in/together-ai-raises-305m-series-b-to-power-ai-model-training-and-inference",
-    "https://github.blog/",
-    "https://cdn-uploads.huggingface.co/production/uploads/660c3c5c8eec126bfc7aa326/MvwT9enRT7gOESHA_tpRj.jpeg",
-    "https://cdn-uploads.huggingface.co/production/uploads/660c3c5c8eec126bfc7aa326/JNs_DrpFbr6ok_pSRUK4j.jpeg",
-    "https://app.dealroom.co/lists/33530",
-    "https://api-docs.deepseek.com/news/news250120",
-    "https://sdxcentral.com/articles/news/ninjaone-raises-500-million-valued-at-5-billion/2025/02",
-    "https://linkedin.com/sharing/share-offsite?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
-    "https://twitter.com/intent/tweet?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
-    "https://platform.openai.com/docs/api-reference/chat/create",
-    "https://mp.weixin.qq.com/s/-pPhHDi2nz8hp5R3Lm_mww",
-    "https://huggingface.us17.list-manage.com/subscribe?id=9ed45a3ef6&u=7f57e683fa28b51bfc493d048",
-    "https://automatio.ai/",
-    "https://sdk.vercel.ai/docs/introduction",
-    "https://app.eu.vanta.com/jinaai/trust/vz7f4mohp0847aho84lmva",
-    "https://apply.workable.com/huggingface/j/AF1D4E3FEB",
-    "https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
-    "https://facebook.com/sharer/sharer.php?u=http%3A%2F%2F127.0.0.1%3A3000%2Fen-US%2Fnews%2Fsnippet-selection-and-url-ranking-in-deepsearch-deepresearch%2F",
-    "https://reddit.com/submit?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
-    "https://apply.workable.com/huggingface",
-    "https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
-    "https://news.ycombinator.com/submitlink?u=http%3A%2F%2F127.0.0.1%3A3000%2Fen-US%2Fnews%2Fsnippet-selection-and-url-ranking-in-deepsearch-deepresearch%2F",
-    "https://docs.github.com/site-policy/privacy-policies/github-privacy-statement",
-    "https://discord.jina.ai/",
-    "https://docs.github.com/site-policy/github-terms/github-terms-of-service",
-    "https://bigdatawire.com/this-just-in/qumulo-announces-30-million-funding",
-    "https://x.ai/blog/grok-3",
-    "https://m-ric-open-deep-research.hf.space/",
-    "https://youtu.be/sal78ACtGTc?feature=shared&t=52",
-    "https://mp.weixin.qq.com/s/apnorBj4TZs3-Mo23xUReQ",
-    "https://perplexity.ai/hub/blog/introducing-perplexity-deep-research",
-    "https://githubstatus.com/",
-    "https://github.blog/changelog/2021-09-30-footnotes-now-supported-in-markdown-fields",
-    "https://openai.com/index/introducing-operator",
-    "mailto:support@jina.ai",
-    "https://resources.github.com/learn/pathways",
-    "https://status.jina.ai/",
-    "https://reuters.com/technology/artificial-intelligence/tencents-messaging-app-weixin-launches-beta-testing-with-deepseek-2025-02-16",
-    "https://scmp.com/tech/big-tech/article/3298981/baidu-adopts-deepseek-ai-models-chasing-tencent-race-embrace-hot-start",
-    "https://microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks",
-    "javascript:UC_UI.showSecondLayer();",
-    "https://resources.github.com/",
-    "https://storm-project.stanford.edu/research/storm",
-    "https://blog.google/products/gemini/google-gemini-deep-research",
-    "https://youtu.be/vrpraFiPUyA",
-    "https://chat.baidu.com/search?extParamsJson=%7B%22enter_type%22%3A%22ai_explore_home%22%7D&isShowHello=1&pd=csaitab&setype=csaitab&usedModel=%7B%22modelName%22%3A%22DeepSeek-R1%22%7D",
-    "https://app.dover.com/jobs/jinaai",
-    "http://localhost:3000/",
-    "https://docs.cherry-ai.com/",
-    "https://en.wikipedia.org/wiki/Delayed_gratification",
-    "https://support.github.com/?tags=dotcom-footer",
-    "https://docs.jina.ai/",
-    "https://skills.github.com/",
-    "https://partner.github.com/",
-    "https://help.x.com/resources/accessibility",
-    "https://business.twitter.com/en/help/troubleshooting/how-twitter-ads-work.html",
-    "https://business.x.com/en/help/troubleshooting/how-twitter-ads-work.html",
-    "https://support.twitter.com/articles/20170514",
-    "https://support.x.com/articles/20170514",
-    "https://t.co/jnxcxPzndy",
-    "https://t.co/6EtEMa9P05",
-    "https://help.x.com/using-x/x-supported-browsers",
-    "https://legal.twitter.com/imprint.html"
-  ],
-  "readURLs": [
-    "https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch",
-    "https://github.com/jina-ai/node-DeepResearch",
-    "https://huggingface.co/blog/open-deep-research",
-    "https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch",
-    "https://x.com/jinaai_?lang=en",
-    "https://jina.ai/news",
-    "https://x.com/joedevon/status/1896984525210837081",
-    "https://github.com/jina-ai/node-DeepResearch/blob/main/src/tools/jina-latechunk.ts"
-  ],
-  "numURLs": 98
+    "prompt_tokens": 673423,
+    "completion_tokens": 109286,
+    "total_tokens": 583555
+  }
 }
+
+data: [DONE]
 ```
 
 **Python Return Example:**
