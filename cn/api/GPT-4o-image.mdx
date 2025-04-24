@@ -5,28 +5,32 @@ icon: "palette"
 ---
 
 ## 接口说明
-由于 OpenAI 官方迟迟不开放 GPT-4o 绘图接口，为满足广大用户的强烈期待，我们特别上线了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能与稳定性上更具优势。  
-请注意，逆向接口在稳定性方面无法提供完全保障，**可能陷入 `🕐 Queuing...` 排队状态或生成失败**，建议仅用于尝鲜体验与功能测试。
+
+由于 OpenAI 官方迟迟不开放 GPT-4o 绘图接口，为满足广大用户的强烈期待，我们特别上线了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能与稳定性上更具优势。\
+请注意，逆向接口在稳定性方面无法提供完全保障，**`可能陷入 🕐 Queuing... 排队状态或生成失败`**，建议仅用于尝鲜体验与功能测试。
 未来，一旦 OpenAI 官方正式发布 GPT-4o 绘图 API，我们将立即下线当前逆向接口，并无缝迁移至官方稳定版本。
 
 ## 注意事项
+
 <Warning>
-- 特别注意：生成过程中无论任何情况导致的失败，**接口调用一经发出，都会被扣取费用**
-- 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `input_moderation` 报错，**导致生成失败**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避
-- 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的
-- 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等
+  - 特别注意：生成过程中无论任何情况导致的失败，**接口调用一经发出，都会被扣取费用**
+  - 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `input_moderation` 报错，**导致生成失败**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避
+  - 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的
+  - 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等
 </Warning>
 
 ## 模型和费率
-| 模型               | 费用 (人民币/次)         |
-| ------------------ | ------------ |
-| `gpt-4o-image-vip` | 折合约 ¥0.05 |
-| `gpt-4o-image`     | 折合约 ¥0.02 |
-后台费率以美元为准
+
+<table style="min-width: 50px">
+<colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p>模型</p></th><th colspan="1" rowspan="1"><p>费用 (人民币/次)</p></th></tr><tr><td colspan="1" rowspan="1"><p><code spellcheck="false">gpt-4o-image-vip</code></p></td><td colspan="1" rowspan="1"><p>折合约 ¥0.05</p></td></tr><tr><td colspan="1" rowspan="1"><p><code spellcheck="false">gpt-4o-image</code></p></td><td colspan="1" rowspan="1"><p>折合约 ¥0.02</p></td></tr><tr><td colspan="1" rowspan="1"><p>后台费率以美元为准</p></td></tr></tbody>
+</table>
 
 ## Python 调用示例
+
 使用大家熟悉的 `v1/completions` 端点来提供支持，完美兼容，具体使用可以参考：
+
 <CodeGroup>
+
 ```py 文生图
 from openai import OpenAI
 
@@ -64,6 +68,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 
 ```py 图文生图
 from openai import OpenAI
@@ -114,6 +119,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 
 ```py 多图+文生图
 from openai import OpenAI
@@ -177,9 +183,11 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 </CodeGroup>
 
 ## 输出示例
+
 ```
 {
   "prompt": "Redesign 'Girl with a Pearl Earring' as an anime-style illustrated cover. Preserve the original essence and composition: the iconic side-glance pose, serene expression, and intimate framing. Render in refined Kyoto Anime-inspired style with soft brushwork, cinematic lighting, and progressive depth. Create an AV cover layout with Japanese-English mixed typography, using a prominent serif title with strong visual hierarchy. Extract profound words for the title and include a creative slogan. The original name 'Girl with a Pearl Earring' should appear as smaller text if needed. Subtly embed the watermark 'jerlin' in clothing or background. For modesty, replace any potential nudity with flowing fabric, hair, or veils while maintaining the emotional tone and posture. Soften details only when necessary.",
@@ -204,26 +212,107 @@ for chunk in stream:
 [Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
 ```
 
+## OpenAI 正式接口兼容
+
+如果你更偏好 OpenAI 最新发布的 Image generation 调用，可以参考以下处理，注意 3 点即可：
+1. 不能传质量参数，模型 `gpt-4o-image-vip` 和 `gpt-4o-image` 自身捆绑了
+2. 不支持打印追踪 Token 用量的 usage 字段
+3. 输出结果是 URL 链接，不是图片，用例已经做了自动保存
+
+<CodeGroup>
+```py Python
+from openai import OpenAI
+import os
+import requests
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 替换成你的 AiHubMix 密钥
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+a cute cat in garden, pixar, 16:9.
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # 单次数量
+    size="auto", # 1024x1024 (square), 1536x1024 (portrait), 1024x1536 (landscape), auto (default)
+    #quality="high" # 逆向模型不能传质量参数，模型捆绑了 📍
+)
+
+print(result) # 打印完整的 API 响应，逆向接口不支持 usage 📍
+
+# 定义文件名前缀和保存目录
+output_dir = "." # 可以指定其他目录
+file_prefix = "image_gen-逆向"
+
+# 确保输出目录存在
+os.makedirs(output_dir, exist_ok=True)
+
+# 遍历所有返回的图片数据，逆向接口的结果是链接 📍
+for i, image_data in enumerate(result.data):
+    image_url = image_data.url # 获取图片 URL
+    if image_url: # 检查 URL 是否存在
+        try:
+            # 下载图片内容
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status() # 检查请求是否成功
+
+            image_bytes = response.content # 获取图片字节
+
+            # --- 文件名冲突处理逻辑 ---
+            current_index = i
+            while True:
+                # 构建带自增序号的文件名
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name) # 构建完整文件路径
+
+                # 检查文件是否存在
+                if not os.path.exists(file_path):
+                    break # 文件名不冲突，跳出循环
+
+                # 文件名冲突，增加序号
+                current_index += 1
+
+            # 使用找到的唯一 file_path 保存图片到文件
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"图片已保存至：{file_path}")
+
+        except requests.exceptions.RequestException as e:
+            print(f"下载第 {i} 张图片失败：{e}")
+        except Exception as e:
+            print(f"处理第 {i} 张图片时发生错误：{e}")
+
+    else:
+        # 如果 URL 也不存在，则提示
+        print(f"第 {i} 张图片数据中既无 b64_json 也无 url，跳过保存。")
+```
+</CodeGroup>
+
+
 ## 效果展示
+
 <Card title="戴珍珠项链的女孩" img="../media/Girl-with-a-Pearl-Earring.PNG">
-1. 名画重演绎，带排版和水印直出。
+  1. 名画重演绎，带排版和水印直出。
 </Card>
 
 <Card title="皮克斯卡通" img="../media/pixar.png">
-2. 皮克斯 3D 卡通风格，稳如老狗。
+  1. 皮克斯 3D 卡通风格，稳如老狗。
 </Card>
 
 <Card title="3D" img="../media/ghibli.png">
-3. 最受欢迎的吉卜力
+  1. 最受欢迎的吉卜力
 </Card>
 
 ## 实用提示
+
 <Tip>
-- 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本。
-- 画幅比例在 prompt 中指定，否则 4o 自动判断。支持 16:9、9:16、2:3、3:2、1:1。
-- 没有灵感就给参考图，支持单图和多图。
-- 上传的图片可以做压缩预处理，提升速度。
-- 支持透明背景，免抠图。——只需要在 Prompt 中补充要求。
+  - 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本。
+  - 画幅比例在 prompt 中指定，否则 4o 自动判断。支持 16:9、9:16、2:3、3:2、1:1。
+  - 没有灵感就给参考图，支持单图和多图。
+  - 上传的图片可以做压缩预处理，提升速度。
+  - 支持透明背景，免抠图。——只需要在 Prompt 中补充要求。
 </Tip>
-
-
