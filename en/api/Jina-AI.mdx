@@ -1,0 +1,1053 @@
+---
+title: "Jina AI Integration"
+description: ""
+icon: "j"
+---
+
+## Description
+We have integrated the three core interfaces of Jina AI, helping you easily build powerful intelligent agents. These interfaces are primarily suitable for the following scenarios:
+- **Vector Embeddings (Embeddings)**：Applicable to multi-modal RAG question-answering scenarios, such as smart customer service, smart recruitment, and knowledge base question-answering.
+- **Reranking (Rerank)**：By optimizing the Embedding candidate results, sorting them based on topic relevance, significantly improving the quality of the answers from large language models.
+- **Deep Search (DeepSearch)**：Perform deep search and reasoning until the optimal answer is found, particularly suitable for complex tasks such as research projects and product solution development.
+
+## Quick Start
+Replace the `API_KEY` with [AiHubMIX_API_KEY](https://aihubmix.com/token) and the model endpoint link, and the other parameters and usage are fully consistent with [Jina AI official](https://jina.ai/).
+
+**Endpoint Replacement:**  
+- **Vector Embeddings (Embeddings)**：`https://jina.ai/embeddings` -> `https://aihubmix.com/v1/embeddings`
+- **Reranking (Rerank)**：`https://api.jina.ai/v1/rerank` -> `https://aihubmix.com/v1/rerank`
+- **Deep Search (DeepSearch)**：`https://deepsearch.jina.ai/v1/chat/completions` -> `https://aihubmix.com/v1/chat/completions`
+
+## Embeddings
+Jina AI's Embedding supports both plain text and multi-modal images, and performs excellently in handling multi-language tasks.
+
+### Request Parameters
+<ParamField body="model" type="string" required>
+  Model name, available model list:
+  - `jina-clip-v2`：Multi-modal, multilingual, 1024-dimensional, 8K context window, 865M parameters
+  - `jina-embeddings-v3`：Text model, multilingual, 1024-dimensional, 8K context window, 570M parameters
+  - `jina-colbert-v2`：Multi-language ColBERT model, 8K token context, 560M parameters, used for embedding and reranking
+  - `jina-clip-v1`：Multi-modal model, supports images and English text, 768-dimensional, 8K context window, 223M parameters
+  - `jina-colbert-v1-en`：English ColBERT model, 8K token context, 137M parameters, used for embedding and reranking
+  - `jina-embeddings-v2-base-es`：Spanish-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
+  - `jina-embeddings-v2-base-code`：Model optimized for code and document search, 768-dimensional, 8K context window, 137M parameters
+  - `jina-embeddings-v2-base-de`：German-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
+  - `jina-embeddings-v2-base-zh`：Chinese-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
+  - `jina-embeddings-v2-base-en`：English embedding model, comparable to OpenAI's text-embedding-ada002, 768-dimensional, 8K context window, 137M parameters
+</ParamField>
+
+<ParamField body="input" type="array" required>
+  Input text or image, different models support different input formats. For text, provide an array of strings; for multi-modal models, provide an array of objects containing text or image fields.
+</ParamField>
+
+<ParamField body="normalized" type="boolean" default="true">
+  Whether to perform L2 normalization. L2 normalization scales the Euclidean norm of the embedding vector to 1 while preserving the direction. It is useful when the downstream task involves dot product, classification, or visualization.
+</ParamField>
+
+<ParamField body="embedding_type" type="string" default="float">
+  Data type returned, optional values:
+  - `float`：Default, return a float array. The most common and easy-to-use format, return a list of floats
+  - `binary_int8`：Return as int8 packed binary format. More efficient storage, search, and transmission
+  - `binary_uint8`：Return as uint8 packed binary format. More efficient storage, search, and transmission
+  - `base64`：Return as base64 encoded string. More efficient transmission
+</ParamField>
+
+
+<ParamField body="embed_as" type="string" default="query">
+  Specify the role of the input text in the search, optional values:
+  - `query`：Query embedding, used for search queries
+  - `document`：Document embedding, used for indexed content
+  
+  The same input text can be used as a query or document embedding, depending on its role in the search
+</ParamField>
+
+<ParamField body="compatible_mode" type="boolean" default="false">
+  Whether to use the request format compatible with the pure text embedding model. This allows you to switch between models without changing the request format.
+  Note: This mode does not support image input
+</ParamField>
+
+### 1. Multimodal Usage
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "A beautiful sunset over the beach"
+        },
+        {
+            "text": "Un beau coucher de soleil sur la plage"
+        },
+        {
+            "text": "海滩上美丽的日落"
+        },
+        {
+            "text": "浜辺に沈む美しい夕日"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # Replace it by your AiHubMix Key
+}
+
+data = {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "A beautiful sunset over the beach"
+        },
+        {
+            "text": "Un beau coucher de soleil sur la plage"
+        },
+        {
+            "text": "海滩上美丽的日落"
+        },
+        {
+            "text": "浜辺に沈む美しい夕日"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+print(response.json())
+```
+
+```ts TypeScript
+import fetch from 'node-fetch';
+
+const url = 'https://aihubmix.com/v1/embeddings';
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer sk-***' // Replace it by your AiHubMix Key
+};
+const data = {
+  "model": "jina-clip-v2",
+  "input": [
+    {
+      "text": "A beautiful sunset over the beach"
+    },
+    {
+      "text": "Un beau coucher de soleil sur la plage"
+    },
+    {
+      "text": "海滩上美丽的日落"
+    },
+    {
+      "text": "浜辺に沈む美しい夕日"
+    },
+    {
+      "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+    },
+    {
+      "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+    },
+    {
+      "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+    }
+  ]
+};
+
+fetch(url, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify(data)
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+
+```
+</CodeGroup>
+
+### 2. Pure Text Usage
+Only provide an array of text strings, do not provide the `image` field.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-embeddings-v3",
+    "input": [
+        "A beautiful sunset over the beach",
+        "Un beau coucher de soleil sur la plage",
+        "海滩上美丽的日落",
+        "浜辺に沈む美しい夕日"
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # Replace it by your AiHubMix Key
+}
+data = {
+    'model': 'jina-embeddings-v3',
+    'input': [
+        'A beautiful sunset over the beach',
+        'Un beau coucher de soleil sur la plage',
+        '海滩上美丽的日落',
+        '浜辺に沈む美しい夕日'
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+```ts TypeScript
+import * as https from 'https';
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/embeddings',   
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' // Replace it by your AiHubMix Key
+  }
+};
+
+const data = JSON.stringify({
+  "model": "jina-embeddings-v3",
+  "input": [
+    "A beautiful sunset over the beach",
+    "Un beau coucher de soleil sur la plage",
+    "海滩上美丽的日落",
+    "浜辺に沈む美しい夕日"
+  ]
+});
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(data);
+req.end();
+
+```
+</CodeGroup>
+
+## Rerank
+Reranker aims to improve search relevance and RAG accuracy. It deep analyzes the initial search results, considers the subtle interactions between the query and document content, and reorders the search results to place the most relevant results at the top.
+
+### Request Parameters
+<ParamField body="model" type="string" required>
+  Model name, available model list:
+  - `jina-reranker-v2-base-multilingual`：The latest multilingual reranker, 278M parameters, 8K context
+  - `jina-reranker-m0`：Multimodal multilingual document reranker, 10K context, 2.4B parameters, for visual document sorting
+  - `jina-colbert-v2`：Multilingual ColBERT model, 8K context, 560M parameters, for embedding and reranking
+  - `jina-reranker-v1-tiny-en`：The fastest reranking model, suitable for reliably sorting a large number of documents, 8K context, 33M parameters
+  - `jina-reranker-v1-turbo-en`：The best combination of fast inference speed and accurate relevance scores, 8K context, 37.8M parameters
+  - `jina-reranker-v1-base-en`：Our first reranking model, maximizing search and RAG relevance, 8K context, 137M parameters
+  - `jina-colbert-v1-en`：English ColBERT model, 8K context, 137M parameters
+</ParamField>
+
+<ParamField body="query" type="string" required>
+  Search query text, used to compare with candidate documents
+</ParamField>
+
+<ParamField body="top_n" type="integer">
+  The number of most relevant documents to return. Default returns all documents
+</ParamField>
+
+<ParamField body="documents" type="array" required>
+  Array of candidate documents, will be reordered based on relevance to the query
+</ParamField>
+
+<ParamField body="return_documents" type="boolean" default="false">
+  Whether to return the reordered document content in the response. Setting to true will return the document text, false will only return the index and score
+</ParamField>
+
+### 1. Multimodal Usage
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-m0",
+    "query": "small language model data extraction",
+    "documents": [
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png"
+        },
+        {
+            "text": "We present ReaderLM-v2, a compact 1.5 billion parameter language model designed for efficient web content extraction. Our model processes documents up to 512K tokens, transforming messy HTML into clean Markdown or JSON formats with high accuracy -- making it an ideal tool for grounding large language models. The models effectiveness results from two key innovations: (1) a three-stage data synthesis pipeline that generates high quality, diverse training data by iteratively drafting, refining, and critiquing web content extraction; and (2) a unified training framework combining continuous pre-training with multi-objective optimization. Intensive evaluation demonstrates that ReaderLM-v2 outperforms GPT-4o-2024-08-06 and other larger models by 15-20% on carefully curated benchmarks, particularly excelling at documents exceeding 100K tokens, while maintaining significantly lower computational requirements."
+        },
+        {
+            "image": "https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp"
+        },
+        {
+            "text": "数据提取么？为什么不用正则啊，你用正则不就全解决了么？"
+        },
+        {
+            "text": "During the California Gold Rush, some merchants made more money selling supplies to miners than the miners made finding gold."
+        },
+        {
+            "text": "Die wichtigsten Beiträge unserer Arbeit sind zweifach: Erstens führen wir eine neuartige dreistufige Datensynthese-Pipeline namens Draft-Refine-Critique ein, die durch iterative Verfeinerung hochwertige Trainingsdaten generiert; und zweitens schlagen wir eine umfassende Trainingsstrategie vor, die kontinuierliches Vortraining zur Längenerweiterung, überwachtes Feintuning mit spezialisierten Kontrollpunkten, direkte Präferenzoptimierung (DPO) und iteratives Self-Play-Tuning kombiniert. Um die weitere Forschung und Anwendung der strukturierten Inhaltsextraktion zu erleichtern, ist das Modell auf Hugging Face öffentlich verfügbar."
+        },
+        {
+            "image": "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"
+        }
+    ],
+    "return_documents": false
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/rerank'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # Replace it by your AiHubMix Key 
+}
+data = {
+    "model": "jina-reranker-m0",
+    "query": "small language model data extraction",
+    "documents": [
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png"
+        },
+        {
+            "text": "We present ReaderLM-v2, a compact 1.5 billion parameter language model designed for efficient web content extraction. Our model processes documents up to 512K tokens, transforming messy HTML into clean Markdown or JSON formats with high accuracy -- making it an ideal tool for grounding large language models. The models effectiveness results from two key innovations: (1) a three-stage data synthesis pipeline that generates high quality, diverse training data by iteratively drafting, refining, and critiquing web content extraction; and (2) a unified training framework combining continuous pre-training with multi-objective optimization. Intensive evaluation demonstrates that ReaderLM-v2 outperforms GPT-4o-2024-08-06 and other larger models by 15-20% on carefully curated benchmarks, particularly excelling at documents exceeding 100K tokens, while maintaining significantly lower computational requirements."
+        },
+        {
+            "image": "https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp"
+        },
+        {
+            "text": "数据提取么？为什么不用正则啊，你用正则不就全解决了么？"
+        },
+        {
+            "text": "During the California Gold Rush, some merchants made more money selling supplies to miners than the miners made finding gold."
+        },
+        {
+            "text": "Die wichtigsten Beiträge unserer Arbeit sind zweifach: Erstens führen wir eine neuartige dreistufige Datensynthese-Pipeline namens Draft-Refine-Critique ein, die durch iterative Verfeinerung hochwertige Trainingsdaten generiert; und zweitens schlagen wir eine umfassende Trainingsstrategie vor, die kontinuierliches Vortraining zur Längenerweiterung, überwachtes Feintuning mit spezialisierten Kontrollpunkten, direkte Präferenzoptimierung (DPO) und iteratives Self-Play-Tuning kombiniert. Um die weitere Forschung und Anwendung der strukturierten Inhaltsextraktion zu erleichtern, ist das Modell auf Hugging Face öffentlich verfügbar."
+        },
+        {
+            "image": "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"
+        }
+    ],
+    "return_documents": False
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+
+```
+
+```ts TypeScript
+import fetch from 'node-fetch';
+
+const url = 'https://aihubmix.com/v1/rerank';
+
+const options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' // Replace it by your AiHubMix Key
+  },
+  body: JSON.stringify({
+    model: 'jina-reranker-m0',
+    query: 'small language model data extraction',
+    documents: [
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png'
+      },
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png'
+      },
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png'
+      },
+      {
+        text: 'We present ReaderLM-v2, a compact 1.5 billion parameter language model designed for efficient web content extraction. Our model processes documents up to 512K tokens, transforming messy HTML into clean Markdown or JSON formats with high accuracy -- making it an ideal tool for grounding large language models. The models effectiveness results from two key innovations: (1) a three-stage data synthesis pipeline that generates high quality, diverse training data by iteratively drafting, refining, and critiquing web content extraction; and (2) a unified training framework combining continuous pre-training with multi-objective optimization. Intensive evaluation demonstrates that ReaderLM-v2 outperforms GPT-4o-2024-08-06 and other larger models by 15-20% on carefully curated benchmarks, particularly excelling at documents exceeding 100K tokens, while maintaining significantly lower computational requirements.'
+      },
+      {
+        image: 'https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp'
+      },
+      {
+        text: '数据提取么？为什么不用正则啊，你用正则不就全解决了么？'
+      },
+      {
+        text: 'During the California Gold Rush, some merchants made more money selling supplies to miners than the miners made finding gold.'
+      },
+      {
+        text: 'Die wichtigsten Beiträge unserer Arbeit sind zweifach: Erstens führen wir eine neuartige dreistufige Datensynthese-Pipeline namens Draft-Refine-Critique ein, die durch iterative Verfeinerung hochwertige Trainingsdaten generiert; und zweitens schlagen wir eine umfassende Trainingsstrategie vor, die kontinuierliches Vortraining zur Längenerweiterung, überwachtes Feintuning mit spezialisierten Kontrollpunkten, direkte Präferenzoptimierung (DPO) und iteratives Self-Play-Tuning kombiniert. Um die weitere Forschung und Anwendung der strukturierten Inhaltsextraktion zu erleichtern, ist das Modell auf Hugging Face öffentlich verfügbar.'
+      },
+      {
+        image: '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'
+      }
+    ],
+    return_documents: false
+  })
+};
+
+fetch(url, options)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+</CodeGroup>
+
+### Response Description
+```json
+{
+  "model": "jina-reranker-m0",
+  "results": [
+    {
+      "index": 1,
+      "relevance_score": 0.8814517277012487
+    },
+    {
+      "index": 3,
+      "relevance_score": 0.7756727858283531
+    },
+    {
+      "index": 7,
+      "relevance_score": 0.6128658982982312
+    }
+  ],
+  "usage": {
+    "total_tokens": 2894
+  }
+}
+```
+
+Response successful:
+- `model`: The name of the model used
+- `results`: An array of reranking results sorted by relevance score in descending order, each element contains:
+  - `index`: The index position in the original document array
+  - `relevance_score`: A relevance score between 0-1, higher scores indicate greater relevance to the query
+  - (optional)`document`: Contains the document content if `return_documents` is set to true
+- `usage`: Usage statistics
+  - `total_tokens`: Total number of tokens processed in this request
+
+### 2. Text Usage
+Text reranking supports both multilingual and regular tasks, similar to embedding usage, by passing in an array.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "Organic skincare products for sensitive skin",
+    "top_n": 3,
+    "documents": [
+        "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+        "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+        "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohltuende Wirkung unserer Bio-Hautpflege, speziell für empfindliche Haut entwickelt. Mit den beruhigenden Eigenschaften von Aloe Vera und Kamille pflegen und schützen unsere Produkte Ihre Haut auf natürliche Weise. Verabschieden Sie sich von Hautirritationen und genießen Sie einen strahlenden Teint.",
+        "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farben und innovative Techniken setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+        "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+        "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+        "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+        "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
+        "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+        "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+    ],
+    "return_documents": false
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/rerank'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # Replace it by your AiHubMix Key
+}
+data = {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "Organic skincare products for sensitive skin",
+    "top_n": 3,
+    "documents": [
+        "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+        "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+        "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohltuende Wirkung unserer Bio-Hautpflege, speziell für empfindliche Haut entwickelt. Mit den beruhigenden Eigenschaften von Aloe Vera und Kamille pflegen und schützen unsere Produkte Ihre Haut auf natürliche Weise. Verabschieden Sie sich von Hautirritationen und genießen Sie einen strahlenden Teint.",
+        "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farben und innovative Techniken setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+        "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+        "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+        "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+        "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
+        "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+        "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+    ],
+    "return_documents": False
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+```ts TypeScript
+const https = require('https');
+
+const requestData = {
+  model: "jina-reranker-v2-base-multilingual",
+  query: "Organic skincare products for sensitive skin",
+  top_n: 3,
+  documents: [
+    "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+    "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+    "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohltuende Wirkung unserer Bio-Hautpflege, speziell für empfindliche Haut entwickelt. Mit den beruhigenden Eigenschaften von Aloe Vera und Kamille pflegen und schützen unsere Produkte Ihre Haut auf natürliche Weise. Verabschieden Sie sich von Hautirritationen und genießen Sie einen strahlenden Teint.",
+    "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farben und innovative Techniken setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+    "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+    "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+    "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+    "新的化妆趋势注重鲜艳的颜色和创新的技巧：进入化妆艺术的新纪元，本季的化妆趋势以大胆的颜色和创新的技巧为主。无论是霓虹眼线还是全息高光，每一款妆容都能让您脱颖而出，展现独特魅力。",
+    "敏感肌のために特別に設計された天然有機スキンケア製品：アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+    "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています：今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+  ],
+  return_documents: false
+};
+
+const options = {
+  hostname: 'aihubmix.com',
+  port: 443,
+  path: '/v1/rerank',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' // Replace it by your AiHubMix Key
+  }
+};
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(JSON.stringify(requestData));
+req.end();
+```
+</CodeGroup>
+
+## DeepSearch
+DeepSearch combines search, reading, and reasoning capabilities to pursue the best possible answer. It's fully compatible with OpenAI's Chat API format—just replace api.openai.com with aihubmix.com to get started.  
+The stream will return the thinking process.
+
+### Request Parameters
+<ParamField body="model" type="string" required>
+  Model name, available models:
+  - `jina-deepsearch-v1`：Default model, search, read and reason until the best answer is found
+</ParamField>
+
+<ParamField body="stream" type="boolean" default="true">
+  Whether to enable streaming response. It is strongly recommended to keep this option enabled, DeepSearch requests may take a long time to complete, disabling streaming may result in a '524 Timeout' error
+</ParamField>
+
+<ParamField body="reasoning_effort" type="string" default="medium">
+  Limit the reasoning effort of the reasoning model. The current supported values are `low` (low), `medium` (medium), and `high` (high). Reducing reasoning effort can speed up the response time, reduce the number of tokens used for reasoning in the response, where:
+  - `low`：Basic reasoning and search simple queries (maximum 500K tokens/req)
+  - `medium`：Medium reasoning and search depth (maximum 1M tokens/req)
+  - `high`：Maximum reasoning and search complex queries (maximum 2M tokens/req)
+</ParamField>
+
+<ParamField body="budget_tokens" type="integer">
+  Determine the maximum number of tokens allowed for the DeepSearch processing process. A larger budget can improve response quality by conducting more comprehensive searches for complex queries. This parameter overrides the `reasoning_effort` parameter
+</ParamField>
+
+<ParamField body="max_attempts" type="integer" default="1">
+  The maximum number of retries for solving problems during the DeepSearch process. A larger value allows DeepSearch to retry solving problems by using different reasoning methods and strategies. This parameter overrides the `reasoning_effort` parameter
+</ParamField>
+
+<ParamField body="no_direct_answer" type="boolean" default="false">
+  Force the model to perform further thinking/search steps, even if the query appears simple. This is useful in scenarios where it is determined that a query always requires DeepSearch rather than a trivial problem (such as "1+1=?")
+</ParamField>
+
+<ParamField body="max_returned_urls" type="integer">
+  The maximum number of URLs included in the final answer/block. URLs are sorted by relevance and other important factors
+</ParamField>
+
+<ParamField body="structured_output" type="boolean" default="false">
+  Enable structured output to ensure that the model's final answer matches the JSON schema you provided
+</ParamField>
+
+<ParamField body="good_domains" type="array">
+  The list of domains that are given higher priority during content retrieval. Useful for specific domains with high-quality sources
+</ParamField>
+
+<ParamField body="bad_domains" type="array">
+  The list of domains that are strictly excluded during content retrieval. Typically used to filter known spam sites, low-quality or irrelevant websites
+</ParamField>
+
+<ParamField body="only_domains" type="array">
+  The list of domains that are specifically included during content retrieval. All other domains will be ignored. Useful for specific domain searches
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  The list of conversation messages between the user and the assistant. Supports multiple types (modal) messages, such as text (.txt, .pdf), images (.png, .webp, .jpeg), etc. The maximum file size is 10MB
+</ParamField>
+
+### Multimodal Message Format
+
+DeepSearch supports multiple types of message formats, which can include pure text (message), files (file), and images (image). The following are examples of different formats:
+
+#### 1. Pure Text Message
+```json
+{
+  "role": "user",
+  "content": "hi"
+}
+```
+
+#### 2. Message with File Attachment
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "what's in this file?"
+    },
+    {
+      "type": "file",
+      "data": "data:application/pdf;base64,JVBERi0xLjQKJfbk...", // PDF 文件的 base64 编码
+      "mimeType": "application/pdf"
+    }
+  ]
+}
+```
+
+#### 3. Message with Image
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "what's in the image?"
+    },
+    {
+      "type": "image",
+      "image": "data:image/webp;base64,UklGRoDOAAB...", // base64 encoding of images
+      "mimeType": "image/webp"
+    }
+  ]
+}
+```
+
+All files and images must be encoded in data URI format (data URI) in advance, with a maximum file size of 10MB.
+
+### Example of Calling
+Please note that **Jina AI's Python streaming call on the official website will not have a response**; please refer to our example.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hi!"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi, how can I help you?"
+        },
+        {
+            "role": "user",
+            "content": "what's the latest blog post from jina ai?"
+        }
+    ],
+    "stream": true,
+    "reasoning_effort": "medium",
+    "max_attempts": 1,
+    "no_direct_answer": false
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/chat/completions'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # Replace it by your AiHubMix Key
+}
+
+data = {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hi!"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi, how can I help you?"
+        },
+        {
+            "role": "user",
+            "content": "what's the latest blog post from jina ai?"
+        }
+    ],
+    "stream": True,
+    "reasoning_effort": "medium",
+    "max_attempts": 1,
+    "no_direct_answer": False
+}
+
+# Use stream=True in the request to handle streaming responses
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Iterate over the response content line by line
+    for line in response.iter_lines():
+        if line:
+            # Decode line and print (assuming SSE format: "data: {...}")
+            decoded_line = line.decode('utf-8')
+            if decoded_line.startswith('data: '):
+                # Handle potential end signal like "data: [DONE]"
+                if decoded_line[len('data: '):].strip() == '[DONE]':
+                    print("\nStream finished.")
+                    break
+                try:
+                    # Extract the JSON part
+                    json_data = json.loads(decoded_line[len('data: '):])
+                    # Process the JSON data
+                    if 'choices' in json_data and len(json_data['choices']) > 0:
+                        delta = json_data['choices'][0].get('delta', {})
+                        content_to_print = delta.get('content') or delta.get('reasoning_content') # Check both fields
+
+                        if content_to_print:
+                            print(content_to_print, end='', flush=True)
+                except json.JSONDecodeError:
+                    # Ignore lines that are not valid JSON after "data: "
+                    # print(f"\nCould not decode JSON from line: {decoded_line}")
+                    pass # Optionally log or handle non-JSON data lines if needed
+            # Handle lines that don't start with "data: " if necessary
+            # else:
+            #    print(f"Received non-data line: {decoded_line}")
+
+    print() # Add a newline at the end
+elif response.status_code == 401:
+     print(f"Error: {response.status_code} - Unauthorized. Please check your API key.")
+     try:
+         print(response.json())
+     except json.JSONDecodeError:
+         print(response.text)
+else:
+    print(f"Error: {response.status_code}")
+    try:
+        print(response.json()) # Print error details if available
+    except json.JSONDecodeError:
+        print(response.text) # Print raw text if not JSON
+```
+
+```ts TypeScript
+const https = require('https');
+
+const data = JSON.stringify({
+  model: "jina-deepsearch-v1",
+  messages: [
+    {
+      role: "user",
+      content: "Hi!"
+    },
+    {
+      role: "assistant",
+      content: "Hi, how can I help you?"
+    },
+    {
+      role: "user",
+      content: "what's the latest blog post from jina ai?"
+    }
+  ],
+  stream: true,
+  reasoning_effort: "low",
+  max_attempts: 1,
+  no_direct_answer: false
+});
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/chat/completions',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Length': data.length,
+    'Authorization': 'Bearer sk-***' // Replace it by your AiHubMix Key
+  }
+};
+
+const req = https.request(options, res => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on('data', d => {
+    process.stdout.write(d);
+  });
+});
+
+req.on('error', error => {
+  console.error(error);
+});
+
+req.write(data);
+req.end();
+```
+</CodeGroup>
+
+### Response Description
+The response of DeepSearch is streaming, including reasoning steps and final answers. The last block contains the final answer, visited URLs, and token usage.
+
+```json
+{
+  "id": "1742181758589",
+  "object": "chat.completion.chunk",
+  "created": 1742181758,
+  "model": "jina-deepsearch-v1",
+  "system_fingerprint": "fp_1742181758589",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "The latest blog post from Jina AI is titled \"Snippet Selection and URL Ranking in DeepSearch/DeepResearch,\" published on March 12, 2025 [^1]. This post discusses how to improve the quality of DeepSearch by using late-chunking embeddings for snippet selection and rerankers to prioritize URLs before crawling. You can read the full post here: https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch\n\n[^1]: Since our DeepSearch release on February 2nd 2025 we ve discovered two implementation details that greatly improved quality In both cases multilingual embeddings and rerankers are used in an in context manner operating at a much smaller scale than the traditional pre computed indices these models typically require  [jina.ai](https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch)",
+        "type": "text",
+        "annotations": [
+          {
+            "type": "url_citation",
+            "url_citation": {
+              "title": "Snippet Selection and URL Ranking in DeepSearch/DeepResearch",
+              "exactQuote": "Since our DeepSearch release on February 2nd 2025, we've discovered two implementation details that greatly improved quality. In both cases, multilingual embeddings and rerankers are used in an _\"in-context\"_ manner - operating at a much smaller scale than the traditional pre-computed indices these models typically require.",
+              "url": "https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch",
+              "dateTime": "2025-03-13 06:48:01"
+            }
+          }
+        ]
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 169670,
+    "completion_tokens": 27285,
+    "total_tokens": 196526
+  },
+  "visitedURLs": [
+    "https://github.com/jina-ai/node-DeepResearch/blob/main/src/utils/url-tools.ts",
+    "https://huggingface.co/jinaai/jina-embeddings-v3",
+    "https://github.com/jina-ai/reader",
+    "https://zilliz.com/blog/training-text-embeddings-with-jina-ai",
+    "https://threads.net/@unwind_ai/post/DGmhWCVswbe/media",
+    "https://twitter.com/JinaAI_/status/1899840196507820173",
+    "https://jina.ai/news?tag=tech-blog",
+    "https://docs.llamaindex.ai/en/stable/examples/embeddings/jinaai_embeddings",
+    "https://x.com/jinaai_",
+    "https://x.com/JinaAI_/status/1899840202358784170",
+    "https://tracxn.com/d/companies/jina-ai/__IQ81fOnU0FsDpagFjG-LrG0DMWHELqI6znTumZBQF-A/funding-and-investors",
+    "https://jina.ai/models",
+    "https://linkedin.com/posts/imohitmayank_jinaai-has-unveiled-the-ultimate-developer-activity-7300401711242711040-VD64",
+    "https://medium.com/@tossy21/trying-out-jina-ais-node-deepresearch-c5b55d630ea6",
+    "https://huggingface.co/jinaai/jina-clip-v2",
+    "https://arxiv.org/abs/2409.10173",
+    "https://milvus.io/docs/embed-with-jina.md",
+    "https://seedtable.com/best-startups-in-china",
+    "https://threads.net/@sung.kim.mw/post/DGhG-J_vREu/jina-ais-a-practical-guide-to-implementing-deepsearchdeepresearchthey-cover-desi",
+    "https://elastic.co/search-labs/blog/jina-ai-embeddings-rerank-model-open-inference-api",
+    "http://status.jina.ai/",
+    "https://apidog.com/blog/recreate-openai-deep-research",
+    "https://youtube.com/watch?v=QxHE4af5BQE",
+    "https://sdxcentral.com/articles/news/cisco-engages-businesses-on-ai-strategies-at-greater-bay-area-2025/2025/02",
+    "https://aws.amazon.com/blogs/machine-learning/build-rag-applications-using-jina-embeddings-v2-on-amazon-sagemaker-jumpstart",
+    "https://reddit.com/r/perplexity_ai/comments/1ejbdqa/fastest_open_source_ai_search_engine",
+    "https://search.jina.ai/",
+    "https://sebastian-petrus.medium.com/build-openais-deep-research-open-source-alternative-4f21aed6d9f0",
+    "https://medium.com/@elmo92/jina-reader-transforming-web-content-to-feed-llms-d238e827cc27",
+    "https://openai.com/index/introducing-deep-research",
+    "https://python.langchain.com/docs/integrations/tools/jina_search",
+    "https://varindia.com/news/meta-is-in-talks-for-usd200-billion-ai-data-center-project",
+    "https://varindia.com/news/Mira-Murati%E2%80%99s-new-AI-venture-eyes-$9-billion-valuation",
+    "https://53ai.com/news/RAG/2025031401342.html",
+    "https://arxiv.org/abs/2409.04701",
+    "https://bigdatawire.com/this-just-in/together-ai-raises-305m-series-b-to-power-ai-model-training-and-inference",
+    "https://github.blog/",
+    "https://cdn-uploads.huggingface.co/production/uploads/660c3c5c8eec126bfc7aa326/MvwT9enRT7gOESHA_tpRj.jpeg",
+    "https://cdn-uploads.huggingface.co/production/uploads/660c3c5c8eec126bfc7aa326/JNs_DrpFbr6ok_pSRUK4j.jpeg",
+    "https://app.dealroom.co/lists/33530",
+    "https://api-docs.deepseek.com/news/news250120",
+    "https://sdxcentral.com/articles/news/ninjaone-raises-500-million-valued-at-5-billion/2025/02",
+    "https://linkedin.com/sharing/share-offsite?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
+    "https://twitter.com/intent/tweet?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
+    "https://platform.openai.com/docs/api-reference/chat/create",
+    "https://mp.weixin.qq.com/s/-pPhHDi2nz8hp5R3Lm_mww",
+    "https://huggingface.us17.list-manage.com/subscribe?id=9ed45a3ef6&u=7f57e683fa28b51bfc493d048",
+    "https://automatio.ai/",
+    "https://sdk.vercel.ai/docs/introduction",
+    "https://app.eu.vanta.com/jinaai/trust/vz7f4mohp0847aho84lmva",
+    "https://apply.workable.com/huggingface/j/AF1D4E3FEB",
+    "https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
+    "https://facebook.com/sharer/sharer.php?u=http%3A%2F%2F127.0.0.1%3A3000%2Fen-US%2Fnews%2Fsnippet-selection-and-url-ranking-in-deepsearch-deepresearch%2F",
+    "https://reddit.com/submit?url=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
+    "https://apply.workable.com/huggingface",
+    "https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fjina.ai%2Fnews%2Fa-practical-guide-to-implementing-deepsearch-deepresearch%2F",
+    "https://news.ycombinator.com/submitlink?u=http%3A%2F%2F127.0.0.1%3A3000%2Fen-US%2Fnews%2Fsnippet-selection-and-url-ranking-in-deepsearch-deepresearch%2F",
+    "https://docs.github.com/site-policy/privacy-policies/github-privacy-statement",
+    "https://discord.jina.ai/",
+    "https://docs.github.com/site-policy/github-terms/github-terms-of-service",
+    "https://bigdatawire.com/this-just-in/qumulo-announces-30-million-funding",
+    "https://x.ai/blog/grok-3",
+    "https://m-ric-open-deep-research.hf.space/",
+    "https://youtu.be/sal78ACtGTc?feature=shared&t=52",
+    "https://mp.weixin.qq.com/s/apnorBj4TZs3-Mo23xUReQ",
+    "https://perplexity.ai/hub/blog/introducing-perplexity-deep-research",
+    "https://githubstatus.com/",
+    "https://github.blog/changelog/2021-09-30-footnotes-now-supported-in-markdown-fields",
+    "https://openai.com/index/introducing-operator",
+    "mailto:support@jina.ai",
+    "https://resources.github.com/learn/pathways",
+    "https://status.jina.ai/",
+    "https://reuters.com/technology/artificial-intelligence/tencents-messaging-app-weixin-launches-beta-testing-with-deepseek-2025-02-16",
+    "https://scmp.com/tech/big-tech/article/3298981/baidu-adopts-deepseek-ai-models-chasing-tencent-race-embrace-hot-start",
+    "https://microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks",
+    "javascript:UC_UI.showSecondLayer();",
+    "https://resources.github.com/",
+    "https://storm-project.stanford.edu/research/storm",
+    "https://blog.google/products/gemini/google-gemini-deep-research",
+    "https://youtu.be/vrpraFiPUyA",
+    "https://chat.baidu.com/search?extParamsJson=%7B%22enter_type%22%3A%22ai_explore_home%22%7D&isShowHello=1&pd=csaitab&setype=csaitab&usedModel=%7B%22modelName%22%3A%22DeepSeek-R1%22%7D",
+    "https://app.dover.com/jobs/jinaai",
+    "http://localhost:3000/",
+    "https://docs.cherry-ai.com/",
+    "https://en.wikipedia.org/wiki/Delayed_gratification",
+    "https://support.github.com/?tags=dotcom-footer",
+    "https://docs.jina.ai/",
+    "https://skills.github.com/",
+    "https://partner.github.com/",
+    "https://help.x.com/resources/accessibility",
+    "https://business.twitter.com/en/help/troubleshooting/how-twitter-ads-work.html",
+    "https://business.x.com/en/help/troubleshooting/how-twitter-ads-work.html",
+    "https://support.twitter.com/articles/20170514",
+    "https://support.x.com/articles/20170514",
+    "https://t.co/jnxcxPzndy",
+    "https://t.co/6EtEMa9P05",
+    "https://help.x.com/using-x/x-supported-browsers",
+    "https://legal.twitter.com/imprint.html"
+  ],
+  "readURLs": [
+    "https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch",
+    "https://github.com/jina-ai/node-DeepResearch",
+    "https://huggingface.co/blog/open-deep-research",
+    "https://jina.ai/news/snippet-selection-and-url-ranking-in-deepsearch-deepresearch",
+    "https://x.com/jinaai_?lang=en",
+    "https://jina.ai/news",
+    "https://x.com/joedevon/status/1896984525210837081",
+    "https://github.com/jina-ai/node-DeepResearch/blob/main/src/tools/jina-latechunk.ts"
+  ],
+  "numURLs": 98
+}
+```
+
+**Python Return Example:**
+```py Python
+<think>I need to check the Jina AI blog for their most recent post, which requires up-to-date information. I need to find the latest blog post from Jina AI. I will use a search engine to find the Jina AI blog and then identify the most recent post. Let me search for latest blog post from Jina AI to gather more information. Okay, I've created some queries to find the latest Jina AI blog post. First, a general search for the Jina AI blog updated in the past week. Then, some focused queries on specific Jina AI products like DeepSearch and neural search, checking for updates in the last month. Also, I included queries about embedding models and API updates, again looking at the past month. And I added a query about Elasticsearch integration from the past year. Finally, I've added a query to find any criticisms or limitations of Jina AI, to get a balanced perspective. Let me search for Jina AI Elasticsearch integration, Jina AI criticism limitations, Jina AI deepsearch updates, Jina AI neural search, Jina AI embedding models to gather more information. To accurately answer the user's question about the latest blog post from Jina AI, I need to visit the provided URLs and extract the publication dates and titles of the blog posts. This will allow me to identify the most recent one. I'll start with the most relevant URLs based on the weights assigned during the search action. Let me read https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch, https://jina.ai/news/auto-gpt-unmasked-hype-hard-truths-production-pitfalls, https://jinaai.cn/news/a-practical-guide-to-implementing-deepsearch-deepresearch, https://businesswire.com/news/home/20250220781575/en/Elasticsearch-Open-Inference-API-now-Supports-Jina-AI-Embeddings-and-Rerank-Model, https://gurufocus.com/news/2709507/elastic-nv-estc-enhances-elasticsearch-with-jina-ai-integration to gather more information. Content of https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch is too long, let me cherry-pick the relevant parts. Content of https://jinaai.cn/news/a-practical-guide-to-implementing-deepsearch-deepresearch is too long, let me cherry-pick the relevant parts. Content of https://jina.ai/news/auto-gpt-unmasked-hype-hard-truths-production-pitfalls is too long, let me cherry-pick the relevant parts. I have found several blog posts and news articles related to Jina AI. I will summarize the most recent information available to answer the user's question. But wait, let me evaluate the answer first. The answer provides a summary of recent blog posts from Jina AI, covering different aspects of their activities. This constitutes a definitive response as it directly addresses the question with specific information. The answer discusses recent blog posts and news from Jina AI. Tech news has a max age of 7 days, and since the blog posts are only a few days old, the answer is still fresh. I am sorry, but the answer is too generic. While it mentions a few blog posts, it doesn't identify the absolute latest one. A perfect answer should pinpoint the most recent blog post with its exact title and, if possible, a direct link. The current answer provides a summary of several recent posts, which isn't precise enough for what I'm looking for. I messed up by summarizing multiple blog posts instead of pinpointing the single latest one. I needed to focus on finding the most recent date and title. I should prioritize identifying the latest date associated with a blog post and then provide its title and a direct link if available. Okay, I need to find the absolute latest blog post from Jina AI. The previous answer was too generic. I need to be laser-focused on identifying the most recent post. I'll revisit the Jina AI news page and look for specific dates and titles. I'll prioritize URLs that are likely to contain blog posts or news announcements directly from Jina AI. Let me read https://jina.ai/news, https://jina.ai/deepsearch, https://zilliz.com/blog/training-text-embeddings-with-jina-ai, https://github.com/jina-ai/node-DeepResearch, https://x.com/jinaai_?lang=en to gather more information. Content of https://zilliz.com/blog/training-text-embeddings-with-jina-ai is too long, let me cherry-pick the relevant parts. Content of https://jina.ai/deepsearch is too long, let me cherry-pick the relevant parts. I have reviewed my knowledge and can confidently answer the user's question about the latest blog post from Jina AI. I will provide the title and a direct link. But wait, let me evaluate the answer first. The answer provides a clear and direct response to the question, including the title, publication date, and a link to the latest blog post from Jina AI. There are no uncertainty markers or hedging. The blog post was published on April 16, 2025, which is 8 days ago from today (April 24, 2025). Since the blog post falls under 'Tech News,' the maximum age should be 7 days. Therefore, the answer is outdated. Okay, I jumped the gun and didn't double-check the date of the blog post against the current date. My bad for not ensuring it was within the acceptable timeframe! Next time, I'll make absolutely sure to verify the publication date and confirm it's fresh enough before confidently declaring it the latest blog post. Gotta keep those dates in check! I need to find the very latest blog post from Jina AI. The previous attempt failed because it wasn't recent enough. I need to revisit the Jina AI news page to check for any even more recent posts. I'll focus on extracting the title and URL of the most recent entry. Let me read https://jina.ai/news?tag=tech-blog, https://news.ycombinator.com/item?id=38020109, https://github.com/sthagen/jina-ai-jina, https://parsers.vc/news/250222-the-new-frontier-of-ai--elasticsearch-and, https://jina.ai/embeddings to gather more information. Content of https://jina.ai/embeddings is too long, let me cherry-pick the relevant parts. Content of https://news.ycombinator.com/item?id=38020109 is too long, let me cherry-pick the relevant parts. I have gathered information from various sources about Jina AI's blog posts. I will now synthesize this information to provide the most recent blog post title and a direct link, if available. But wait, let me evaluate the answer first. The answer makes a direct statement about the latest blog post from Jina AI, providing the title, publication date, and a link to the post. There are no hedges or qualifications, so it is definitive. Let me finalize the answer. Let Let me cross-reference the information from the web to verify the answer. </think>
+
+The relentless pursuit of better search demands we confront a harsh reality: size matters, and not always in a good way. Jina AI's latest blog post, "On the Size Bias of Text Embeddings and Its Impact in Search," published on April 16, 2025, tackles this head-on. It's not just another piece of content; it's a critical examination of how the length of text inputs can skew similarity metrics, leading search systems to favor verbose, often irrelevant documents over concise, precise matches.
+
+Why should you care? Because in the age of information overload, relevance is king. We're drowning in data, and search engines are our life rafts. But if those rafts are steered by algorithms that are easily fooled by sheer volume, we're all going down with the ship.
+
+The post likely delves into the mechanics of text embeddings, those numerical representations of text that allow machines to understand and compare semantic meaning. The core issue, as Jina AI points out, is that these embeddings can be influenced by the length of the input text, a phenomenon they term "size bias." This means that a longer document, even if only marginally relevant, might appear more similar to a query than a shorter, more focused one.[^1]
+
+To truly grasp the implications, consider the following:
+
+*   **What is Size Bias?** Size bias refers to how the length of text inputs affects similarity, regardless of semantic relevance. It explains why search systems sometimes return long, barely-relevant documents instead of shorter, more precise matches to your query.[^2]
+*   **Who is impacted?** Anyone relying on semantic search, from researchers sifting through academic papers to businesses trying to surface the most pertinent information for their customers, is vulnerable to the distortions caused by size bias.
+*   **Where does this problem manifest?** This issue isn't confined to a specific search engine or platform. It's a systemic challenge inherent in the way many text embedding models are designed and implemented.
+*   **When did this become a pressing concern?** As context windows grow, and models are ingesting larger and larger documents, the problem of size bias becomes amplified.
+*   **Why does this happen?** The reasons are complex, but it boils down to the mathematical properties of high-dimensional spaces and the way similarity is calculated. Longer vectors simply have more "surface area" to overlap with a query vector, even if the semantic alignment is weak.
+*   **How can we fix it?** Jina AI's blog post likely explores potential mitigation strategies. These might include normalization techniques, architectural modifications to embedding models, or novel similarity metrics that are less susceptible to length-related distortions.
+
+Jina AI's work here isn't just academic; it's a practical intervention. By identifying and analyzing size bias, they're paving the way for more accurate and reliable search technologies. This has real-world implications, influencing everything from information retrieval to content recommendation and beyond.
+
+The latest blog post can be found here: https://jina.ai/news
+
+Ultimately, Jina AI's willingness to confront the inconvenient truths about text embeddings is a testament to their commitment to advancing the field. It's a reminder that progress isn't just about building bigger and more complex models; it's about understanding the nuances and limitations of those models and striving for solutions that prioritize accuracy and relevance above all else. And that's a size-independent truth worth embracing.
+
+
+
+[^1]: Size bias refers to how the length of text inputs affects similarity regardless of semantic relevance It explains why search systems sometimes return long barely relevant documents instead of shorter more precise matches to your query [Newsroom - Jina AI](https://jina.ai/news)
+
+[^2]: Size bias refers to how the length of text inputs affects similarity regardless of semantic relevance It explains why search systems sometimes return long barely relevant documents instead of shorter more precise matches to your query [Newsroom - Jina AI](https://jina.ai/news?tag=tech-blog)
+Stream finished.
+```
