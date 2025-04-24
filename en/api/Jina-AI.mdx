@@ -802,8 +802,10 @@ req.end();
 </CodeGroup>
 
 ### Response Description
-The response of DeepSearch is streaming, including reasoning steps and final answers. The last block contains the final answer, visited URLs, and token usage.  
-Note: This JSON object differs from the format used by Jina AI.
+The response from DeepSearch is streamed by default, including both intermediate reasoning steps and the final answer.
+The last block of the stream contains the final response, a list of visited URLs, and token usage details.
+If streaming is disabled, only the final answer will be returned—intermediate "thinking" steps will be omitted.
+**Note:** This JSON object differs from the format used by Jina AI.
 
 ```json
 {
