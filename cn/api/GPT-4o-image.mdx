@@ -21,9 +21,12 @@ icon: "palette"
 
 ## 模型和费率
 
-<table style="min-width: 50px">
-<colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p>模型</p></th><th colspan="1" rowspan="1"><p>费用 (人民币/次)</p></th></tr><tr><td colspan="1" rowspan="1"><p><code spellcheck="false">gpt-4o-image-vip</code></p></td><td colspan="1" rowspan="1"><p>折合约 ¥0.05</p></td></tr><tr><td colspan="1" rowspan="1"><p><code spellcheck="false">gpt-4o-image</code></p></td><td colspan="1" rowspan="1"><p>折合约 ¥0.02</p></td></tr><tr><td colspan="1" rowspan="1"><p>后台费率以美元为准</p></td></tr></tbody>
-</table>
+| 模型              | 费用 (人民币/次) |
+| ------------------ | ------------ |
+| `gpt-4o-image-vip` | 折合约 ¥0.05 |
+| `gpt-4o-image`     | 折合约 ¥0.02 |
+
+后台费率以美元为准
 
 ## Python 调用示例
 
@@ -68,7 +71,6 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
-
 
 ```py 图文生图
 from openai import OpenAI
@@ -119,7 +121,6 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
-
 
 ```py 多图+文生图
 from openai import OpenAI
