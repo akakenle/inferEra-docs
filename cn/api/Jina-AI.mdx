@@ -449,7 +449,6 @@ fetch(url, options)
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
 ```
-
 </CodeGroup>
 
 ### 响应说明
@@ -610,10 +609,6 @@ DeepSearch 结合了搜索、阅读和推理能力，直到找到最佳答案。
   是否启用流式响应。强烈建议保持此选项开启，DeepSearch 请求可能需要较长时间完成，禁用流式可能导致 '524 超时' 错误
 </ParamField>
 
-<ParamField body="no_direct_answer" default="false" type="boolean">
-  强制模型进行进一步思考/搜索步骤，即使查询看起来很简单。这在确定查询总是需要 DeepSearch 而不是琐碎问题（如"1\+1=?"）的场景中很有用
-</ParamField>
-
 <ParamField body="messages" type="array" required>
   用户与助手之间的对话消息列表。支持多种类型（模态）的消息，如文本 (.txt, .pdf)、图像 (.png, .webp, .jpeg) 等。文件大小最大支持 10MB
 </ParamField>
@@ -698,8 +693,7 @@ curl https://aihubmix.com/v1/chat/completions \
             "content": "what's the latest blog post from jina ai?"
         }
     ],
-    "stream": true,
-    "no_direct_answer": false
+    "stream": true
   }
 EOFEOF
 ```
@@ -731,8 +725,7 @@ data = {
             "content": "what's the latest blog post from jina ai?"
         }
     ],
-    "stream": True,
-    "no_direct_answer": False
+    "stream": True
 }
 
 # Use stream=True in the request to handle streaming responses
@@ -803,8 +796,7 @@ const data = JSON.stringify({
       content: "what's the latest blog post from jina ai?"
     }
   ],
-  stream: true,
-  no_direct_answer: false
+  stream: true
 });
 
 const options = {

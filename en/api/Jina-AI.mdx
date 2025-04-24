@@ -583,10 +583,6 @@ The stream will return the thinking process.
   Whether to enable streaming response. It is strongly recommended to keep this option enabled, DeepSearch requests may take a long time to complete, disabling streaming may result in a '524 Timeout' error
 </ParamField>
 
-<ParamField body="no_direct_answer" type="boolean" default="false">
-  Force the model to perform further thinking/search steps, even if the query appears simple. This is useful in scenarios where it is determined that a query always requires DeepSearch rather than a trivial problem (such as "1+1=?")
-</ParamField>
-
 <ParamField body="messages" type="array" required>
   The list of conversation messages between the user and the assistant. Supports multiple types (modal) messages, such as text (.txt, .pdf), images (.png, .webp, .jpeg), etc. The maximum file size is 10MB
 </ParamField>
@@ -666,8 +662,7 @@ curl https://aihubmix.com/v1/chat/completions \
             "content": "what's the latest blog post from jina ai?"
         }
     ],
-    "stream": true,
-    "no_direct_answer": false
+    "stream": true
   }
 EOFEOF
 ```
@@ -698,8 +693,7 @@ data = {
             "content": "what's the latest blog post from jina ai?"
         }
     ],
-    "stream": True,
-    "no_direct_answer": False
+    "stream": True
 }
 
 # Use stream=True in the request to handle streaming responses
@@ -769,8 +763,7 @@ const data = JSON.stringify({
       content: "what's the latest blog post from jina ai?"
     }
   ],
-  stream: true,
-  no_direct_answer: false
+  stream: true
 });
 
 const options = {
