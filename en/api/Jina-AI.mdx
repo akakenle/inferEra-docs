@@ -454,12 +454,11 @@ fetch(url, options)
 }
 ```
 
-Response successful:
+**Response successful:**
 - `model`: The name of the model used
 - `results`: An array of reranking results sorted by relevance score in descending order, each element contains:
   - `index`: The index position in the original document array
   - `relevance_score`: A relevance score between 0-1, higher scores indicate greater relevance to the query
-  - (optional)`document`: Contains the document content if `return_documents` is set to true
 - `usage`: Usage statistics
   - `total_tokens`: Total number of tokens processed in this request
 

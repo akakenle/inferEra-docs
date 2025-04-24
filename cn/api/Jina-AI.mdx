@@ -483,8 +483,6 @@ fetch(url, options)
 - `results`: 重排序结果数组，按相关性得分降序排列，每个元素包含：
   - `index`: 原始文档数组中的索引位置
   - `relevance_score`: 相关性分数，介于 0-1 之间，越高表示与查询越相关
-  - (可选)`document`: 如果 `return_documents` 设为 true，则包含文档内容
-- `usage`: 使用信息
   - `total_tokens`: 此请求处理的总 Token 数
 
 ### 2. 文本用法
@@ -517,7 +515,6 @@ curl https://aihubmix.com/v1/rerank \
   }
 EOFEOF
 ```
-
 
 ```py Python
 import requests
@@ -595,26 +592,23 @@ const req = https.request(options, res => {
 req.write(JSON.stringify(requestData));
 req.end();
 ```
-
 </CodeGroup>
 
 ## 三、深度搜索 (DeepSearch)
 
-DeepSearch 结合了搜索、阅读和推理能力，直到找到最佳答案。它完全兼容 OpenAI 的 Chat API 格式，只需将 `api.openai.com` 替换为 `aihubmix.com` 即可开始使用。\
+DeepSearch 结合了搜索、阅读和推理能力，直到找到最佳答案。它完全兼容 OpenAI 的 Chat API 格式，只需将 `api.openai.com` 替换为 `aihubmix.com` 即可开始使用。  
 流式调用 (stream) 会返回思考过程。
 
 ### 请求参数
 
 <ParamField body="model" type="string" required>
   模型名称，可用模型列表：
-
   - `jina-deepsearch-v1`：默认模型，搜索、阅读和推理直到找到最佳答案
 </ParamField>
 
 <ParamField body="stream" default="true" type="boolean">
   是否启用流式响应。强烈建议保持此选项开启，DeepSearch 请求可能需要较长时间完成，禁用流式可能导致 '524 超时' 错误
 </ParamField>
-
 
 <ParamField body="no_direct_answer" default="false" type="boolean">
   强制模型进行进一步思考/搜索步骤，即使查询看起来很简单。这在确定查询总是需要 DeepSearch 而不是琐碎问题（如"1\+1=?"）的场景中很有用
