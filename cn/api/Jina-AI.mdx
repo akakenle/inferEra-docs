@@ -10,6 +10,10 @@ icon: "j"
 - **重排序 (Rerank)**：通过优化 Embedding 候选结果，依据话题相关性进行重排序，显著提升大型语言模型的回答质量。
 - **深度搜索 (DeepSearch)**：进行深度搜索与推理，直至找到最优答案，特别适用于课题研究和产品解决方案制定等复杂任务。
 
+<Tip>
+我们在 Jina AI 接口的基础上进行了增强，以便支持未来的功能扩展，因此在使用方式上会与官方原生调用略有不同。
+</Tip>
+
 ## 快速指引
 除了更换 `API_KEY` 为 [AiHubMIX_API_KEY](https://aihubmix.com/token) 和模型端点链接，其他参数和用法和 [Jina AI 官方](https://jina.ai/)完全一致。
 
@@ -27,13 +31,8 @@ Jina AI 的 Embedding 支持普通文本和多模态图文，对于多语言任�
   - `jina-clip-v2`：多模态、多语言、1024 维、8K 上下文窗口、865M 参数
   - `jina-embeddings-v3`：文本模型、多语言、1024 维、8K 上下文窗口、570M 参数
   - `jina-colbert-v2`：多语言 ColBERT 模型，8K token 上下文，560M 参数，用于嵌入和重排序
-  - `jina-clip-v1`：多模态模型，支持图像和英文文本，768 维，8K 上下文窗口，223M 参数
   - `jina-colbert-v1-en`：英文 ColBERT 模型，8K token 上下文，137M 参数，用于嵌入和重排序
-  - `jina-embeddings-v2-base-es`：西班牙语 - 英语双语嵌入模型，768 维，8K 上下文窗口，161M 参数
   - `jina-embeddings-v2-base-code`：针对代码和文档搜索优化的模型，768 维，8K 上下文窗口，137M 参数
-  - `jina-embeddings-v2-base-de`：德语 - 英语双语嵌入模型，768 维，8K 上下文窗口，161M 参数
-  - `jina-embeddings-v2-base-zh`：中文 - 英语双语嵌入模型，768 维，8K 上下文窗口，161M 参数
-  - `jina-embeddings-v2-base-en`：英文嵌入模型，与 OpenAI 的 text-embedding-ada002 性能相当，768 维，8K 上下文窗口，137M 参数
 </ParamField>
 
 <ParamField body="input" type="array" required>
@@ -280,13 +279,7 @@ req.end();
 ### 请求参数
 <ParamField body="model" type="string" required>
   模型名称，可用模型列表如下：
-  - `jina-reranker-v2-base-multilingual`：最新的多语言重排序器，278M 参数，8K 上下文
   - `jina-reranker-m0`：多模态多语言文档重排序器，10K 上下文，2.4B 参数，用于视觉文档排序
-  - `jina-colbert-v2`：多语言 ColBERT 模型，8K 上下文，560M 参数，用于嵌入和重排序
-  - `jina-reranker-v1-tiny-en`：最快的重排序模型，适合可靠地对大量文档进行排序，8K 上下文，33M 参数
-  - `jina-reranker-v1-turbo-en`：快速推理速度和准确相关性分数的最佳组合，8K 上下文，37.8M 参数
-  - `jina-reranker-v1-base-en`：我们的第一个重排序模型，最大化搜索和 RAG 相关性，8K 上下文，137M 参数
-  - `jina-colbert-v1-en`：英文 ColBERT 模型，8K 上下文，137M 参数
 </ParamField>
 
 <ParamField body="query" type="string" required>

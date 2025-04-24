@@ -10,6 +10,10 @@ We have integrated the three core interfaces of Jina AI, helping you easily buil
 - **Reranking (Rerank)**：By optimizing the Embedding candidate results, sorting them based on topic relevance, significantly improving the quality of the answers from large language models.
 - **Deep Search (DeepSearch)**：Perform deep search and reasoning until the optimal answer is found, particularly suitable for complex tasks such as research projects and product solution development.
 
+<Tip>
+We've enhanced the Jina AI API to support future extensions, so the usage may differ slightly from the official native implementation. 
+</Tip>
+
 ## Quick Start
 Replace the `API_KEY` with [AiHubMIX_API_KEY](https://aihubmix.com/token) and the model endpoint link, and the other parameters and usage are fully consistent with [Jina AI official](https://jina.ai/).
 
@@ -27,13 +31,7 @@ Jina AI's Embedding supports both plain text and multi-modal images, and perform
   - `jina-clip-v2`：Multi-modal, multilingual, 1024-dimensional, 8K context window, 865M parameters
   - `jina-embeddings-v3`：Text model, multilingual, 1024-dimensional, 8K context window, 570M parameters
   - `jina-colbert-v2`：Multi-language ColBERT model, 8K token context, 560M parameters, used for embedding and reranking
-  - `jina-clip-v1`：Multi-modal model, supports images and English text, 768-dimensional, 8K context window, 223M parameters
-  - `jina-colbert-v1-en`：English ColBERT model, 8K token context, 137M parameters, used for embedding and reranking
-  - `jina-embeddings-v2-base-es`：Spanish-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
   - `jina-embeddings-v2-base-code`：Model optimized for code and document search, 768-dimensional, 8K context window, 137M parameters
-  - `jina-embeddings-v2-base-de`：German-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
-  - `jina-embeddings-v2-base-zh`：Chinese-English bilingual embedding model, 768-dimensional, 8K context window, 161M parameters
-  - `jina-embeddings-v2-base-en`：English embedding model, comparable to OpenAI's text-embedding-ada002, 768-dimensional, 8K context window, 137M parameters
 </ParamField>
 
 <ParamField body="input" type="array" required>
@@ -280,13 +278,7 @@ Reranker aims to improve search relevance and RAG accuracy. It deep analyzes the
 ### Request Parameters
 <ParamField body="model" type="string" required>
   Model name, available model list:
-  - `jina-reranker-v2-base-multilingual`：The latest multilingual reranker, 278M parameters, 8K context
   - `jina-reranker-m0`：Multimodal multilingual document reranker, 10K context, 2.4B parameters, for visual document sorting
-  - `jina-colbert-v2`：Multilingual ColBERT model, 8K context, 560M parameters, for embedding and reranking
-  - `jina-reranker-v1-tiny-en`：The fastest reranking model, suitable for reliably sorting a large number of documents, 8K context, 33M parameters
-  - `jina-reranker-v1-turbo-en`：The best combination of fast inference speed and accurate relevance scores, 8K context, 37.8M parameters
-  - `jina-reranker-v1-base-en`：Our first reranking model, maximizing search and RAG relevance, 8K context, 137M parameters
-  - `jina-colbert-v1-en`：English ColBERT model, 8K context, 137M parameters
 </ParamField>
 
 <ParamField body="query" type="string" required>
