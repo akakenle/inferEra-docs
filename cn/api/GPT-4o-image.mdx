@@ -214,7 +214,7 @@ for chunk in stream:
 
 ## OpenAI 正式接口兼容
 
-如果你更偏好 OpenAI 最新发布的 Image generation 调用，可以参考以下处理，注意 3 点即可：
+如果你更偏好 OpenAI 最新发布的 Image generation 调用方式，可以参考以下处理，注意 3 点即可：
 1. 不能传质量参数，模型 `gpt-4o-image-vip` 和 `gpt-4o-image` 自身捆绑了
 2. 不支持打印追踪 Token 用量的 usage 字段
 3. 输出结果是 URL 链接，不是图片，用例已经做了自动保存
