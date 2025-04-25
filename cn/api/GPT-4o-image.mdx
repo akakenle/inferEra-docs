@@ -237,7 +237,7 @@ result = client.images.generate(
     model="gpt-4o-image-vip",
     prompt=prompt,
     n=1, # 单次数量
-    size="auto", # 1024x1024 (square), 1536x1024 (landscape), 1024x1536 (portrait), auto (default)
+    size="auto", # 1024x1024 (方形), 1536x1024 (3:2 景观), 1024x1536 (2:3 肖像), auto (默认的自动)
     #quality="high" # 逆向模型不能传质量参数，模型捆绑了 📍
 )
 
