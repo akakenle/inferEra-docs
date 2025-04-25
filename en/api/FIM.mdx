@@ -20,7 +20,19 @@ In the chat/completions interface, simply set the `model id` to the model id on 
 }
 ```
 
+In the completions interface
+
+```json
+{
+    "model": "model info",
+    "prompt": "prompt",
+    "suffix": "prompt"
+}
+```
+
 ### 3. Example
+
+#### 3.1 Using FIM Completion Based on OpenAI's chat.completions Interface:
 
 <CodeGroup>
 
@@ -63,3 +75,41 @@ for chunk in response:
 ```
 
 </CodeGroup>
+
+
+#### 3.2 Completion Using FIM Based on OpenAI's Completions API:
+<CodeGroup>
+
+```py Python
+
+client = OpenAI(
+    api_key="Aihubmix APIKEY", 
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.completions.create(
+    model="deepseek-ai/DeepSeek-V2.5",
+    prompt=f"""
+def quick_sort(arr):
+   # Basic situation: if the array length is less than or equal to 1, return the array
+    if len(arr) <= 1:
+        return arr
+    else:
+""",
+    suffix=f"""
+# Test quick_sort function
+arr = [3, 6, 8, 10, 1, 2, 1]
+sorted_arr = quick_sort(arr)
+print("Sorted array:", sorted_arr)
+""",
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    print(chunk.choices[0].text, end='')
+```
+
+</CodeGroup>
+
+
