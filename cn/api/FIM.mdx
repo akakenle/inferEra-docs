@@ -20,7 +20,19 @@ icon: "message-code"
 }
 ```
 
+在 completions 接口中使用
+
+```json
+{
+    "model": "model info",
+    "prompt": "前缀内容",
+    "suffix": "后缀内容"
+}
+```
+
 ### 3. 使用示例
+
+#### 3.1 基于 OpenAI 的 chat.completions 接口使用FIM补全：
 
 <CodeGroup>
 
@@ -60,6 +72,43 @@ print("Sum of numbers:", result)
 for chunk in response:
     if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
         print(chunk.choices[0].delta.content, end='')
+```
+
+</CodeGroup>
+
+
+
+#### 3.2 基于 OpenAI 的 completions 接口使用 FIM 补全：
+<CodeGroup>
+
+```py Python
+
+client = OpenAI(
+    api_key="Aihubmix APIKEY", 
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.completions.create(
+    model="deepseek-ai/DeepSeek-V2.5",
+    prompt=f"""
+def quick_sort(arr):
+    # 基本情况，如果数组长度小于等于 1，则返回数组
+    if len(arr) <= 1:
+        return arr
+    else:
+""",
+    suffix=f"""
+# 测试 quick_sort 函数
+arr = [3, 6, 8, 10, 1, 2, 1]
+sorted_arr = quick_sort(arr)
+print("Sorted array:", sorted_arr)
+""",
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    print(chunk.choices[0].text, end='')
 ```
 
 </CodeGroup>
