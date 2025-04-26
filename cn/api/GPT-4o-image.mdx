@@ -1,19 +1,19 @@
 ---
-title: "GPT-4o 绘图尝鲜"
+title: "GPT 绘图尝鲜（逆向）"
 description: " "
-icon: "palette"
+icon: "paintbrush"
 ---
 
 ## 接口说明
 
-为满足广大用户的强烈期待，我们特别上线了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能与稳定性上更具优势。  
-请注意，逆向接口在稳定性方面无法提供完全保障，**`可能陷入 🕐 Queuing... 排队状态或生成失败`**，建议仅用于尝鲜体验与功能测试。  
-OpenAI 正式的接口 `gpt-image-1` 已经发布，基于对调用成本的考量，当前逆向接口会暂时保留，并为大家提供兼容的调用方式。
+为满足用户的强烈需求，我们特别推出了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能和稳定性方面表现更为出色。  
+请注意，这些逆向接口无法保证完全稳定，可能会出现 `🕐 Queuing... 排队状态或生成失败的情况`，因此建议仅将其用于体验新功能或进行测试。  
+鉴于 OpenAI 已正式发布 `gpt-image-1` 接口，考虑到调用成本因素，我们将暂时保留这些逆向接口，并提供完全兼容的调用方式。
 
 ## 注意事项
 
 <Warning>
-  - 特别注意：生成过程中无论任何情况导致的失败，**接口调用一经发出，都会被扣取费用**
+  - 生成过程中，无论任何情况导致的中断或失败，**接口调用一经发出，都会被扣取费用**
   - 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `input_moderation` 报错，**导致生成失败**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避
   - 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的
   - 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等
@@ -58,7 +58,7 @@ stream = client.chat.completions.create(
 Format in AV cover layout: 
 Japanese-English mixed typography, serif title with significant visual hierarchy - sense of design is the key.
 Extract words tha conveys profound meanings as title, then creative slogan, the original name can be a smaller information ONLY if necessary.
-Subtly embed watermark “jerlin” in clothing or background. Maintain emotional tone and posture, soften only when necessary. 2:3 portrait"""
+Subtly embed watermark "jerlin" in clothing or background. Maintain emotional tone and posture, soften only when necessary. 2:3 portrait"""
                 }
             ]
         }
