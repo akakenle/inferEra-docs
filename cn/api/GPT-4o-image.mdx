@@ -6,8 +6,8 @@ icon: "paintbrush"
 
 ## 接口说明
 
-为满足用户的强烈需求，我们特别推出了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能和稳定性方面表现更为出色。  
-请注意，这些逆向接口无法保证完全稳定，可能会出现 `🕐 Queuing... 排队状态或生成失败的情况`，因此建议仅将其用于体验新功能或进行测试。  
+为满足用户的强烈需求，我们特别推出了两个逆向接口：`gpt-4o-image` 与 `gpt-4o-image-vip`。其中，VIP 模型在性能和稳定性方面表现更为出色。\
+请注意，这些逆向接口无法保证完全稳定，可能会出现 `🕐 Queuing...` 排队状态或生成失败的情况，因此建议仅将其用于体验新功能或进行测试。\
 鉴于 OpenAI 已正式发布 `gpt-image-1` 接口，考虑到调用成本因素，我们将暂时保留这些逆向接口，并提供完全兼容的调用方式。
 
 ## 注意事项
@@ -21,16 +21,16 @@ icon: "paintbrush"
 
 ## 模型和费率
 
-| 模型              | 后台扣费 (美元/次) |约 (人民币/次) |
-| ------------------ | ------------ |------------ |
-| `gpt-4o-image-vip` | $0.007 |折合约 ¥0.05 |
-| `gpt-4o-image`     | $0.003 |折合约 ¥0.02 |
+| 模型                 | 后台扣费 (美元/次) | 约 (人民币/次) |
+| ------------------ | ----------- | --------- |
+| `gpt-4o-image-vip` | \$0.007     | 折合约 ¥0.05 |
+| `gpt-4o-image`     | \$0.003     | 折合约 ¥0.02 |
 
 <Info>
-1. 后台费率以美元为准。
-2. 正式的 `gpt-image-1` 输入文本 Token 部分的费率是 $5/百万 Tokens，逆向接口只按图片绘制次数计算。
+  1. 后台费率以美元为准。
+  2. 正式的 `gpt-image-1` 输入文本 Token 部分的费率是 \$5/百万 Tokens，逆向接口只按图片绘制次数计算。
 </Info>
-  
+
 ## Python 调用示例
 
 使用大家熟悉的 `v1/completions` 端点来提供支持，完美兼容，具体使用可以参考：
@@ -74,6 +74,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 
 ```py 图文生图
 from openai import OpenAI
@@ -124,6 +125,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 
 ```py 多图+文生图
 from openai import OpenAI
@@ -187,6 +189,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\n处理响应时出现错误：{str(e)}")
 ```
+
 </CodeGroup>
 
 ## 输出示例
@@ -218,6 +221,7 @@ for chunk in stream:
 ## OpenAI 正式接口兼容
 
 如果你更偏好 OpenAI 最新发布的 Image generation 调用方式，可以参考以下处理，注意 3 点即可：
+
 1. 不能传质量参数，模型 `gpt-4o-image-vip` 和 `gpt-4o-image` 自身捆绑了
 2. 不支持打印追踪 Token 用量的 usage 字段
 3. 输出结果是 URL 链接，不是图片，用例已经做了自动保存

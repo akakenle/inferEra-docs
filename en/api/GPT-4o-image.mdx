@@ -5,28 +5,33 @@ icon: "paintbrush"
 ---
 
 ## Interface Description
-To meet the strong expectations of our users, we have specially launched two reverse-engineered interfaces: `gpt-4o-image` and `gpt-4o-image-vip`. The VIP model offers superior performance and stability.  
-Please note that reverse-engineered interfaces cannot guarantee full stability and may encounter 🕐 Queuing... status or generation failures. They are recommended only for trial experiences and functional testing.  
+
+To meet the strong expectations of our users, we have specially launched two reverse-engineered interfaces: `gpt-4o-image` and `gpt-4o-image-vip`. The VIP model offers superior performance and stability.\
+Please note that reverse-engineered interfaces cannot guarantee full stability and may encounter `🕐 Queuing...` status or generation failures. They are recommended only for trial experiences and functional testing.\
 OpenAI’s official interface `gpt-image-1` has been released. Considering the cost of usage, the current reverse-engineered interfaces will be temporarily retained, with compatible calling methods provided for everyone.
 
 ## Notes
+
 <Warning>
-- **Special Note**: Regardless of the cause, once the API call is initiated, charges will apply even if the generation fails.
-- The name of living artists (such as "Ghibli" and "Makoto Shinkai") will trigger `input_moderation` error, **causing generation failure**. You can avoid this by using non-sensitive words like "Ghibli" and "Bright Modern Japanese Anime Style".
-- In general, "style" is safer than "artist", like "Pixar" is also supported.
-- A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
+  - **Special Note**: Regardless of the cause, once the API call is initiated, charges will apply even if the generation fails.
+  - The name of living artists (such as "Ghibli" and "Makoto Shinkai") will trigger `input_moderation` error, **causing generation failure**. You can avoid this by using non-sensitive words like "Ghibli" and "Bright Modern Japanese Anime Style".
+  - In general, "style" is safer than "artist", like "Pixar" is also supported.
+  - A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
 </Warning>
 
 ## Model and Pricing
-| Model               | Price ($/IMG) |
-| ------------------ | ------------ |
-| `gpt-4o-image-vip` | $0.007 |
-| `gpt-4o-image`     | $0.003 |
+
+| Model              | Price (\$/IMG) |
+| ------------------ | -------------- |
+| `gpt-4o-image-vip` | \$0.007        |
+| `gpt-4o-image`     | \$0.003        |
 
 ## Python Example
+
 Using the familiar `v1/completions` endpoint, we provide support, which is fully compatible. For specific usage, please refer to:
 
 <CodeGroup>
+
 ```py Text-to-Image
 from openai import OpenAI
 
@@ -64,6 +69,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\nError occurred while processing the response: {str(e)}")
 ```
+
 
 ```py Text-to-Image with Image
 from openai import OpenAI
@@ -114,6 +120,7 @@ for chunk in stream:
     except Exception as e:
         print(f"\nError occurred while processing the response: {str(e)}")
 ```
+
 
 ```py Multi-Image with Text
 from openai import OpenAI
@@ -176,9 +183,11 @@ for chunk in stream:
     except Exception as e:
         print(f"\nError occurred while processing the response: {str(e)}")
 ```
+
 </CodeGroup>
 
 ## Output Example
+
 ```
 {
   "prompt": "Redesign 'Girl with a Pearl Earring' as an anime-style illustrated cover. Preserve the original essence and composition: the iconic side-glance pose, serene expression, and intimate framing. Render in refined Kyoto Anime-inspired style with soft brushwork, cinematic lighting, and progressive depth. Create an AV cover layout with Japanese-English mixed typography, using a prominent serif title with strong visual hierarchy. Extract profound words for the title and include a creative slogan. The original name 'Girl with a Pearl Earring' should appear as smaller text if needed. Subtly embed the watermark 'jerlin' in clothing or background. For modesty, replace any potential nudity with flowing fabric, hair, or veils while maintaining the emotional tone and posture. Soften details only when necessary.",
@@ -204,26 +213,25 @@ for chunk in stream:
 ```
 
 ## Effect Demonstration
+
 <Card title="Girl with a Pearl Earring" img="../media/Girl-with-a-Pearl-Earring.PNG">
-1. The famous painting is reinterpreted, with text and watermark directly output.
+  1. The famous painting is reinterpreted, with text and watermark directly output.
 </Card>
 
 <Card title="Pixar" img="../media/pixar.png">
-2. The Pixar 3D Cartoon style, stable as ever.
+  1. The Pixar 3D Cartoon style, stable as ever.
 </Card>
 
 <Card title="Ghibli" img="../media/ghibli.png">
-3. The most popular Ghibli
+  1. The most popular Ghibli
 </Card>
 
 ## Practical Tips
+
 <Tip>
-- Support any language, Chinese drawing is also stable, but we don't recommend drawing a large amount of text.
-- Specify the aspect ratio in the prompt, otherwise 4o will automatically determine it. Supports 2:3, 3:2, 1:1.
-- Give reference images if you don't have inspiration, support single image and multi-image.
-- Upload images can be compressed for pre-processing, improve speed.
-- Support transparent background, no need to remove the background.——just add the requirement in the prompt.
+  - Support any language, Chinese drawing is also stable, but we don't recommend drawing a large amount of text.
+  - Specify the aspect ratio in the prompt, otherwise 4o will automatically determine it. Supports 2:3, 3:2, 1:1.
+  - Give reference images if you don't have inspiration, support single image and multi-image.
+  - Upload images can be compressed for pre-processing, improve speed.
+  - Support transparent background, no need to remove the background.——just add the requirement in the prompt.
 </Tip>
-
-
-

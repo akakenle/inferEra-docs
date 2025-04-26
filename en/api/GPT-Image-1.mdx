@@ -6,45 +6,48 @@ icon: "palette"
 
 ## API Overview
 
-Azure OpenAI's `gpt-image-1` image generation API offers both text-to-image generation and image-to-image editing with text guidance capabilities.  
+Azure OpenAI's `gpt-image-1` image generation API offers both text-to-image generation and image-to-image editing with text guidance capabilities.\
 Before using this API, please ensure you have the latest OpenAI package installed by running `pip install -U openai`.
 
 ## Important Notes
 
 <Warning>
-- Once an API call is sent, **you will be charged regardless of any interruptions or failures** during the generation process
-- Names of living artists (such as "Hayao Miyazaki", "Makoto Shinkai", etc.) will trigger a `moderation_blocked` error, **causing generation to fail**. You can work around this by using non-sensitive terms like "Ghibli" or "bright modern Japanese anime style" instead. The same applies to images with revealing clothing or suggestive content.
-- Generally, referencing "styles" is safer than naming "artists" - for example, "Pixar" is supported.
-- A more reliable approach is to use deceased artists or their corresponding styles, such as "Van Gogh" or "Mona Lisa"
+  - Once an API call is sent, **you will be charged regardless of any interruptions or failures** during the generation process
+  - Names of living artists (such as "Hayao Miyazaki", "Makoto Shinkai", etc.) will trigger a `moderation_blocked` error, **causing generation to fail**. You can work around this by using non-sensitive terms like "Ghibli" or "bright modern Japanese anime style" instead. The same applies to images with revealing clothing or suggestive content.
+  - Generally, referencing "styles" is safer than naming "artists" - for example, "Pixar" is supported.
+  - A more reliable approach is to use deceased artists or their corresponding styles, such as "Van Gogh" or "Mona Lisa"
 </Warning>
 
 ## Model and Pricing
 
-| Model | Quality | 1024x1024 | 1024x1536 | 1536x1024 |
-| ------------------ | ------------ | ------------ | ------------ | ------------ |
-| gpt-image-1 | low | $0.011 | $0.016 | $0.016 |
-| gpt-image-1 | medium | $0.042 | $0.063 | $0.063 |
-| gpt-image-1 | high | $0.167 | $0.25 | $0.25 |
+| Model       | Quality | 1024x1024 | 1024x1536 | 1536x1024 |
+| ----------- | ------- | --------- | --------- | --------- |
+| gpt-image-1 | low     | \$0.011   | \$0.016   | \$0.016   |
+| gpt-image-1 | medium  | \$0.042   | \$0.063   | \$0.063   |
+| gpt-image-1 | high    | \$0.167   | \$0.25    | \$0.25    |
 
 <Info>
-Note: The input text tokens are billed separately at $5 per million tokens.
+  Note: The input text tokens are billed separately at \$5 per million tokens.
 </Info>
-  
+
 ## API Usage
 
 **Endpoints**
+
 1. Image generation: `https://aihubmix.com/v1/images/generations`
 2. Image editing: `https://aihubmix.com/v1/images/edits`
 
-**Python Examples:**  
+**Python Examples:**
+
 <CodeGroup>
+
 ```py Generation (Text-to-Image)
 from openai import OpenAI
 import base64
 import os
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # Replace with your API Key "sk-***" from your dashboard
+    api_key="AIHUBMIX_API_KEY", # Replace with your AIHUBMIX Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -95,8 +98,8 @@ for i, image_data in enumerate(result.data):
         print(f"Image saved to: {file_path}")
     else:
         print(f"Image data for index {i} is empty, skipping save.")
-
 ```
+
 
 ```py Editing (Image+Text to Image)
 from openai import OpenAI
@@ -104,7 +107,7 @@ import base64
 import os
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # Replace with your API Key "sk-***" from your dashboard
+    api_key="AIHUBMIX_API_KEY", # Replace with your AIHUBMIX Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
@@ -160,26 +163,33 @@ for i, image_item in enumerate(result.data):
     except Exception as e:
         print(f"Error saving image {i+1} ({file_path}): {e}")
 ```
+
 </CodeGroup>
+
 For more parameter details, please refer to the [OpenAI official documentation](https://platform.openai.com/docs/api-reference/images/create)
 
 ## Output Examples
+
 <CodeGroup>
+
 ```json Generation
 Usage(input_tokens=150, input_tokens_details=UsageInputTokensDetails(image_tokens=0, text_tokens=150), output_tokens=6240, total_tokens=6390)
 Image saved to: ./image_gen_14.png
 ```
+
 
 ```json Editing
 Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_tokens=646, text_tokens=346), output_tokens=12480, total_tokens=13472)
 Edited image 1 saved to: ./image_edit_1.png
 Edited image 2 saved to: ./image_edit_2.png
 ```
+
 </CodeGroup>
 
 ## Rejection Scenarios
 
 Error message when a request is rejected:
+
 ```json
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
@@ -187,12 +197,12 @@ Error code: 400 - {'error': {'message': 'Your request was rejected as a result o
 ## Practical Tips
 
 <Tip>
-- Supports all languages. Chinese text works reliably, though we don't recommend generating large amounts of text in any language
-- The size parameter doesn't support explicitly passing size="auto" - auto is the default
-- Aspect ratios can be specified in the prompt (supports 2:3, 3:2, 1:1) or set via the size parameter
-- The `moderation` parameter controls sensitivity, but even with it set to "low," requests might still be rejected (e.g., if Venus is too revealing)
-- The edits endpoint doesn't support the `moderation` parameter
-- Combining text descriptions with reference images produces more accurate results
-- Compressing uploaded images as pre-processing can improve speed
-- Transparent backgrounds are supported (no need for manual cutouts) — just add this requirement to your prompt
+  - Supports all languages. Chinese text works reliably, though we don't recommend generating large amounts of text in any language
+  - The size parameter doesn't support explicitly passing size="auto" - auto is the default
+  - Aspect ratios can be specified in the prompt (supports 2:3, 3:2, 1:1) or set via the size parameter
+  - The `moderation` parameter controls sensitivity, but even with it set to "low," requests might still be rejected (e.g., if Venus is too revealing)
+  - The edits endpoint doesn't support the `moderation` parameter
+  - Combining text descriptions with reference images produces more accurate results
+  - Compressing uploaded images as pre-processing can improve speed
+  - Transparent backgrounds are supported (no need for manual cutouts) — just add this requirement to your prompt
 </Tip>
