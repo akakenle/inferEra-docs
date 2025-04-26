@@ -5,9 +5,9 @@ icon: "palette"
 ---
 
 ## Interface Description
-As OpenAI has yet to officially release a GPT-4 image generation API, we've temporarily made two reverse-engineered endpoints—`gpt-4o-image` and `gpt-4o-image-vip`—available, enabling users to preview GPT-4o's powerful image creation capabilities.  
-Please note, these reverse-engineered endpoints do not guarantee consistent stability and are intended solely for early access and exploratory use.
-Once OpenAI officially launches the GPT-4 image API, we will immediately discontinue these unofficial endpoints and seamlessly transition to the official stable release.
+To meet the strong expectations of our users, we have specially launched two reverse-engineered interfaces: `gpt-4o-image` and `gpt-4o-image-vip`. The VIP model offers superior performance and stability.  
+Please note that reverse-engineered interfaces cannot guarantee full stability and **may encounter 🕐 Queuing... status or generation failures**. They are recommended only for trial experiences and functional testing.  
+OpenAI’s official interface `gpt-image-1` has been released. Considering the cost of usage, the current reverse-engineered interfaces will be temporarily retained, with compatible calling methods provided for everyone.
 
 ## Notes
 <Warning>
@@ -25,6 +25,7 @@ Once OpenAI officially launches the GPT-4 image API, we will immediately discont
 
 ## Python Example
 Using the familiar `v1/completions` endpoint, we provide support, which is fully compatible. For specific usage, please refer to:
+
 <CodeGroup>
 ```py Text-to-Image
 from openai import OpenAI
