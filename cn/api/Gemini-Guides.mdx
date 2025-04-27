@@ -199,7 +199,7 @@ client = OpenAI(
 
 completion = client.chat.completions.create(
     model="gemini-2.5-flash-preview-04-17",
-    reasoning_effort="low", #"low", "medium", and "high", which behind the scenes we map to 1K, 8K, and 24K thinking token budgets
+    reasoning_effort="low", # 可选 "low", "medium" 和 "high", 分别对应 1K, 8K 和 24K thinking token budgets
     messages=[
         {
             "role": "user",
