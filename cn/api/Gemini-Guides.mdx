@@ -9,12 +9,21 @@ icon: 'google'
 对于 Gemini 系列，我们提供原生调用和 Openai 兼容这 2 种调用方式。  
 使用前运行 `pip install google-genai` 或 `pip install -U google-genai`，安装（更新）原生依赖。
 
-对于原生的转发支持，主要是在内部传入 AiHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例： 
+1️⃣ 对于原生调用，主要是在内部传入 AiHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例： 
 
-```
+```py
 client = genai.Client(
     api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
-    http_options={"base_url": "https://aihubmix.com"},
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+```
+
+2️⃣ 对于 Openai 兼容格式，则维持通用的 `v1` 端点：
+
+```py
+client = OpenAI(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com/v1",
 )
 ```
 
@@ -32,7 +41,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.0-flash"
@@ -61,7 +70,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.0-flash"
@@ -96,7 +105,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.5-flash-preview-04-17" #gemini-2.5-pro-preview-03-25、gemini-2.5-flash-preview-04-17
@@ -134,7 +143,7 @@ import os
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.5-pro-preview-03-25"

@@ -9,13 +9,22 @@ icon: 'google'
 For the Gemini series, we provide **two** invocation methods: native API calls and OpenAI-compatible calls.  
 Before you start, make sure to install or update the native dependency by running either `pip install google-genai` or `pip install -U google-genai`.
 
-For native forwarding, you mainly need to inject your **AiHubMix API key** and **request URL** into the internal client setup.  
+1️⃣ For native forwarding, you mainly need to inject your **AiHubMix API key** and **request URL** into the internal client setup.  
 ⚡️ Note: the URL format differs from the conventional `base_url` usage. Please refer to the example below:
 
 ```python
 client = genai.Client(
-    api_key="sk-***",  # 🔑 Replace with the key you generated from AiHubMix
+    api_key="sk-***",  # Replace with the key you generated from AiHubMix
     http_options={"base_url": "https://aihubmix.com"},
+)
+```
+
+2️⃣ For OpenAI-compatible formats, retain the universal `v1` endpoint.
+
+```py
+client = OpenAI(
+    api_key="sk-***", # Replace with the key you generated from AiHubMix
+    base_url="https://aihubmix.com/v1",
 )
 ```
 
@@ -33,7 +42,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.0-flash"
@@ -62,7 +71,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.0-flash"
@@ -97,7 +106,7 @@ from google.genai import types
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.5-flash-preview-04-17" #gemini-2.5-pro-preview-03-25、gemini-2.5-flash-preview-04-17
@@ -135,7 +144,7 @@ import os
 def generate():
     client = genai.Client(
         api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
-        http_options={"base_url": "https://aihubmix.com"},
+        http_options={"base_url": "https://aihubmix.com/gemini"},
     )
 
     model = "gemini-2.5-pro-preview-03-25"
