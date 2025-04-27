@@ -36,7 +36,6 @@ def generate():
         http_options={"base_url": "https://aihubmix.com"},
     )
 
-
     model = "gemini-2.0-flash"
     contents = [
         types.Content(
@@ -100,7 +99,6 @@ def generate():
         api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
         http_options={"base_url": "https://aihubmix.com"},
     )
-
 
     model = "gemini-2.5-flash-preview-04-17" #gemini-2.5-pro-preview-03-25、gemini-2.5-flash-preview-04-17
     contents = [
@@ -168,11 +166,10 @@ if __name__ == "__main__":
 
 ## Gemini 2.5 Flash: Quick Task Support
 
-For rapid task execution, you can use the following setup to **disable thinking** in the Flash model.  
 Example for OpenAI-compatible invocation:
 
 <CodeGroup>
-```py Python
+```py Python Disable thinking for rapid task
 from openai import OpenAI
 
 client = OpenAI(
@@ -182,6 +179,28 @@ client = OpenAI(
 
 completion = client.chat.completions.create(
     model="gemini-2.5-flash-preview-04-17-nothink",
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+```
+
+```py Python Reasoning Effort
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # Replace with the key you generated in AiHubMix
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", #"low", "medium", and "high", which behind the scenes we map to 1K, 8K, and 24K thinking token budgets
     messages=[
         {
             "role": "user",
