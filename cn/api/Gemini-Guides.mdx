@@ -1,15 +1,15 @@
 ---
 title: "Gemini 指南"
 description: "双子星漫游指南：关于本站的 Gemini 调用细节，在此汇总。"
-icon: 'google'
+icon: "google"
 ---
 
 ## Gemini 原生转发方式
 
-对于 Gemini 系列，我们提供原生调用和 Openai 兼容这 2 种调用方式。  
+对于 Gemini 系列，我们提供原生调用和 Openai 兼容这 2 种调用方式。\
 使用前运行 `pip install google-genai` 或 `pip install -U google-genai`，安装（更新）原生依赖。
 
-1️⃣ 对于原生调用，主要是在内部传入 AiHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例： 
+1️⃣ 对于原生调用，主要是在内部传入 AiHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例：
 
 ```py
 client = genai.Client(
@@ -28,12 +28,15 @@ client = OpenAI(
 ```
 
 ### Gemini 2.5 系列的「推理」说明
+
 1. 2.5 系列都是推理模型。
 2. 2.5 flash 是混合模型，类似 claude sonnet 3.7，可以通过用 `thinking_budget` 控制推理预算来达到最佳效果。
 3. 2.5 pro 是纯粹的推理模型，因此不能关闭 thinking、也不显式传递推理预算。
 
 **Python 调用参考如下：**
+
 <CodeGroup>
+
 ```py 普通非流式
 from google import genai
 from google.genai import types
@@ -62,6 +65,7 @@ def generate():
 if __name__ == "__main__":
     generate()
 ```
+
 
 ```py 2.0 系列-流式
 from google import genai
@@ -95,8 +99,8 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-
 ```
+
 
 ```py 2.5 Flash-流式
 from google import genai
@@ -135,6 +139,7 @@ if __name__ == "__main__":
     generate()
 ```
 
+
 ```py 2.5 Pro-流式
 from google import genai
 from google.genai import types
@@ -168,8 +173,8 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-
 ```
+
 </CodeGroup>
 
 ## Gemini 2.5 Flash 支持
@@ -177,6 +182,7 @@ if __name__ == "__main__":
 Openai 兼容方式调用参考如下：
 
 <CodeGroup>
+
 ```py Python 用于快速任务时，关闭思考
 from openai import OpenAI
 
@@ -197,6 +203,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 
 ```py Python 控制预算
 from openai import OpenAI
@@ -220,6 +227,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+
 ```shell Curl
 curl -X POST https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -234,19 +242,209 @@ curl -X POST https://aihubmix.com/v1/chat/completions \
     ]
   }'
 ```
+
 </CodeGroup>
 
 用于复杂任务时，只需要将模型 id 设置为默认开启思考的 `gemini-2.5-flash-preview-04-17` 即可。
 
 <Info>
-Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
+  Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
 </Info>
 
-## Gemini Function calling
+## 多媒体文件
+
+Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、视频），用 `inline_data` 上传。  
+大于 20M 的多媒体需要用 File API（尚未支持），待完善状态跟踪，返回 `upload_url`。
+
+<CodeGroup>
+  
+```py 图片
+from google import genai
+from google.genai import types
+
+# 读取文件为二进制数据
+file_path = "yourpath/file.jpeg"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="image/jpeg"
+                )
+            ),
+            types.Part(
+                text="Describe the image."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+  
+```py 音频
+from google import genai
+from google.genai import types
+
+# 读取文件为二进制数据
+file_path = "yourpath/file.m4a"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="audio/m4a"
+                )
+            ),
+            types.Part(
+                text="Transcribe the audio to text."
+            )
+        ]
+    )
+)
+
+print(response.text)
+
+```
+
+```py 视频
+from google import genai
+from google.genai import types
+
+# 读取文件为二进制数据
+file_path = "yourpath/file.mp4"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="video/mp4"
+                )
+            ),
+            types.Part(
+                text="Summarize this video. Then create a quiz with an answer key based on the information in this video."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+```py Youtube 链接
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                file_data=types.FileData(
+                    file_uri="https://www.youtube.com/watch?v=OoU7PwNyYUw"
+                )
+            ),
+            types.Part(
+                text="Please summarize the video in 3 sentences."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+</CodeGroup>
+
+## Code Execution
+
+自动代码解析器用例参考：
+
+```py Python
+from google import genai
+from google.genai import types
+
+# 读取文件为二进制数据
+file_path = "yourpath/file.csv"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="text/csv"
+                )
+            ),
+            types.Part(
+                text="Please analyze this CSV and summarize the key statistics. Use code execution if needed."
+            )
+        ]
+    ),
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(
+            code_execution=types.ToolCodeExecution
+        )]
+    )
+)
+
+for part in response.candidates[0].content.parts:
+    if part.text is not None:
+        print(part.text)
+    if getattr(part, "executable_code", None) is not None:
+        print("Generated code:\n", part.executable_code.code)
+    if getattr(part, "code_execution_result", None) is not None:
+        print("Execution result:\n", part.code_execution_result.output)
+```
+
+## Function calling
 
 使用 openai 兼容方式调用 Gemini 的 function calling 功能时，需要在请求体内部传入`tool_choice="auto"`，否则会报错。
 
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -308,9 +506,11 @@ else:
     print("No function call found in the response.")
     print(response.choices[0].message.content)
 ```
+
 </CodeGroup>
 
 **输出结果示例：**
+
 ```bash
 Function to call: schedule_meeting
 Arguments: {"attendees":["Bob","Alice"],"date":"2025-03-14","time":"10:00","topic":"Q3 planning"}
