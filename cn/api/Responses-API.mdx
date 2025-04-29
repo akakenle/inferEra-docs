@@ -11,7 +11,7 @@ icon: "o"
 - ✅ Functions：函数调用
 - ✅ Web search：搜索
 - ✅ Computer Use：自动操作
-- 🚧 Reasoning：推理深度，建设中，`o3-mini` 的请求会暂无响应
+- ✅ Reasoning：推理深度，支持 3 档
 
 ## 使用 (Python 调用)：
 
@@ -44,7 +44,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py 图文
 from openai import OpenAI
 
@@ -72,7 +71,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py 流式
 from openai import OpenAI
 
@@ -92,7 +90,6 @@ for event in response:
   print(event)
 ```
 
-
 ```py 搜索
 from openai import OpenAI
 
@@ -109,7 +106,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 函数调用
 from openai import OpenAI
@@ -148,8 +144,7 @@ response = client.responses.create(
 print(response)
 ```
 
-
-```py ⏳ 推理
+```py 推理
 from openai import OpenAI
 
 client = OpenAI(
