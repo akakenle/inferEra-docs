@@ -1,17 +1,19 @@
 ---
 title: "Qwen Series"
-description: ""
-icon: 'a'
+icon: "a"
 ---
 
 ## Qwen 3 Series
 
-> Qwen3 redefines open LLMs with dynamic thinking modes, excelling in code, math, and multilingual reasoning. Powered by sparse 22B active parameters, it balances blazing speed with deep intelligence — fully open-source, from lightweight to 235B giants.
+Qwen3 redefines open LLMs with dynamic thinking modes, excelling in code, math, and multilingual reasoning. Powered by sparse 22B active parameters, it balances blazing speed with deep intelligence — fully open-source, from lightweight to 235B giants.
 
-1. Basic usage: Forward with OpenAI compatible format
-2. Tool call: Does not support OpenAI compatible format, you need to run the command to install the dependency `pip install -U qwen-agent mcp`. For more details, please refer to [Ali official documentation](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+**1. Basic usage:** Forward with OpenAI compatible format
+**2. Tool call:** Does not support OpenAI compatible format, you need to run the command to install the dependency:
+`pip install -U qwen-agent mcp`.
+For more details, please refer to [Ali official documentation](https://huggingface.co/Qwen/Qwen3-235B-A22B)
 
 <CodeGroup>
+
 ```py Basic usage
 from openai import OpenAI
 
@@ -35,6 +37,7 @@ for chunk in completion:
     if chunk.choices[0].delta.content is not None:
         print(chunk.choices[0].delta.content, end="")
 ```
+
 
 ```py Tools + mcp
 from qwen_agent.agents import Assistant
@@ -84,16 +87,19 @@ messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Introduc
 for responses in bot.run(messages=messages):
     pass
 print(responses)
-
 ```
+
 </CodeGroup>
 
 ## Qwen 2.5 and QwQ Series
+
 Use the OpenAI compatible format to forward, the difference is that the streaming call needs to extract `chunk.choices[0].delta.content`, refer to the following.
-1. Qwen 2.5 vl: Image recognition
-2. QwQ: Text task
+
+**1. Qwen 2.5 vl:** Image recognition
+**2. QwQ:** Text task
 
 <CodeGroup>
+
 ```py Qwen 2.5 vl
 from openai import OpenAI
 import base64
@@ -141,6 +147,7 @@ for chunk in completion:
             print(chunk.choices[0].delta.content, end="")
 ```
 
+
 ```py QwQ
 from openai import OpenAI
 
@@ -167,4 +174,5 @@ for chunk in completion:
         if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
             print(chunk.choices[0].delta.content, end="")
 ```
+
 </CodeGroup>

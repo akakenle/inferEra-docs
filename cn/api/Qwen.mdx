@@ -1,17 +1,21 @@
 ---
 title: "阿里通义系列"
-description: ""
-icon: 'a'
+icon: "a"
 ---
 
 ## Qwen 3 系列
 
-> Qwen3 系列是阿里推出的新一代开源大模型，能力大幅跃升：在代码理解、数学推理、多语言表达、复杂推断任务上，比肩甚至超越了目前市面上的顶级模型（如 o1、DeepSeek-R1）。**它的核心突破在于引入了「思考模式」与「非思考模式」切换机制，让模型在面对不同难度任务时，自主调节推理深度，实现了速度与精度的双优平衡。**旗舰版 Qwen3-235B 采用稀疏激活，仅用 22B 参数推理，兼顾成本和卓越能力。全系模型全面开源，涵盖从轻量到超大规模需求。
+Qwen3 系列是阿里推出的新一代开源大模型，能力大幅跃升：在代码理解、数学推理、多语言表达、复杂推断任务上，比肩甚至超越了目前市面上的顶级模型（如 o1、DeepSeek-R1）。**它的核心突破在于引入了「思考模式」与「非思考模式」切换机制，让模型在面对不同难度任务时，自主调节推理深度，实现了速度与精度的双优平衡。** 旗舰版 Qwen3-235B 采用稀疏激活，仅用 22B 参数推理，兼顾成本和卓越能力。全系模型全面开源，涵盖从轻量到超大规模需求。
 
-1. 基础用法：用 OpenAI 兼容格式转发
-2. 工具调用：不支持OpenAI 兼容格式，需要先运行指令安装依赖 `pip install -U qwen-agent mcp`。更多细节可以参考[阿里官方文档](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+**1. 基础用法：** 用 OpenAI 兼容格式转发
+**2. 工具调用：** 不支持OpenAI 兼容格式，需要先运行指令安装依赖：
+
+`pip install -U qwen-agent mcp`。
+
+更多细节可以参考[阿里官方文档](https://huggingface.co/Qwen/Qwen3-235B-A22B)
 
 <CodeGroup>
+
 ```py 基础用法
 from openai import OpenAI
 
@@ -35,6 +39,7 @@ for chunk in completion:
     if chunk.choices[0].delta.content is not None:
         print(chunk.choices[0].delta.content, end="")
 ```
+
 
 ```py Tools + mcp
 from qwen_agent.agents import Assistant
@@ -84,16 +89,19 @@ messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Introduc
 for responses in bot.run(messages=messages):
     pass
 print(responses)
-
 ```
+
 </CodeGroup>
 
 ## Qwen 2.5 和 QwQ 系列
+
 用 OpenAI 的兼容格式转发即可，区别在于流式调用，需要提取 `chunk.choices[0].delta.content`，参考如下。
-1. Qwen 2.5 vl：图片识别
-2. QwQ：文本任务
+
+**1. Qwen 2.5 vl：** 图片识别
+**2. QwQ：** 文本任务
 
 <CodeGroup>
+
 ```py Qwen 2.5 vl
 from openai import OpenAI
 import base64
@@ -145,6 +153,7 @@ for chunk in completion:
             print(chunk.choices[0].delta.content, end="")
 ```
 
+
 ```py QwQ
 from openai import OpenAI
 
@@ -172,4 +181,5 @@ for chunk in completion:
         if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
             print(chunk.choices[0].delta.content, end="")
 ```
+
 </CodeGroup>
