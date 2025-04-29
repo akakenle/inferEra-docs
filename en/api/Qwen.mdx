@@ -7,7 +7,7 @@ icon: "a"
 
 Qwen3 redefines open LLMs with dynamic thinking modes, excelling in code, math, and multilingual reasoning. Powered by sparse 22B active parameters, it balances blazing speed with deep intelligence — fully open-source, from lightweight to 235B giants.
 
-**1. Basic usage:** Forward with OpenAI compatible format
+**1. Basic usage:** Forward with OpenAI compatible format.  
 **2. Tool call:** Does not support OpenAI compatible format, you need to run the command to install the dependency:
 `pip install -U qwen-agent mcp`.
 For more details, please refer to [Ali official documentation](https://huggingface.co/Qwen/Qwen3-235B-A22B)
@@ -46,10 +46,6 @@ import os
 # Define LLM
 llm_cfg = {
     'model': 'Qwen/Qwen3-30B-A3B',
-
-    # Use the endpoint provided by Alibaba Model Studio:
-    # 'model_type': 'qwen_dashscope',
-    # 'api_key': os.getenv('DASHSCOPE_API_KEY'),
 
     # Use a custom endpoint compatible with OpenAI API:
     'model_server': 'https://aihubmix.com/v1',
@@ -95,8 +91,8 @@ print(responses)
 
 Use the OpenAI compatible format to forward, the difference is that the streaming call needs to extract `chunk.choices[0].delta.content`, refer to the following.
 
-**1. Qwen 2.5 vl:** Image recognition
-**2. QwQ:** Text task
+**1. Qwen 2.5 vl:** Image recognition.  
+**2. QwQ:** Text task.  
 
 <CodeGroup>
 

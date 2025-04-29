@@ -3,7 +3,7 @@ title: "Ideogram AI 绘图支持"
 icon: "paintbrush"
 ---
 
-**🎨 接口说明：**
+## 🎨 接口说明
 支持 Ideogram AI 绘图接口，文字绘制能力强劲，支持生图（generate）、混合（remix）、局部编辑（edit）、放大（upscale）和描述（describe）等。
 
 - **混合：** 在参考图的基础上，根据提示词进行重绘，生成新的图片。
@@ -31,7 +31,7 @@ icon: "paintbrush"
 
 ## Generate
 
-`POST` [https://aihubmix.com/ideogram/generate\\](https://api.aihubmix.com/ideogram/generate\) 根据给定提示词和可选参数同步生成图像。图像链接的有效期有限；如果你想保留图像，必须下载保存。
+`POST` [https://aihubmix.com/ideogram/generate\\](https://api.aihubmix.com/ideogram/generate\\) 根据给定提示词和可选参数同步生成图像。图像链接的有效期有限；如果你想保留图像，必须下载保存。
 
 ### Request Parameters
 
@@ -170,6 +170,7 @@ curl -X POST https://aihubmix.com/ideogram/generate \
   }
 }'
 ```
+
 </CodeGroup>
 
 ### Response
@@ -293,6 +294,7 @@ files["image_file"].close()
 files["mask"].close()
 ```
 
+
 ```js Javascript
 const url = 'https://aihubmix.com/ideogram/edit';
 const form = new FormData();
@@ -318,6 +320,7 @@ try {
 }
 ```
 
+
 ```shell Curl
 curl -X POST https://aihubmix.com/ideogram/edit \
      -H "Api-Key: <apiKey>" \
@@ -327,6 +330,7 @@ curl -X POST https://aihubmix.com/ideogram/edit \
      -F prompt="prompt" \
      -F model="V_1"
 ```
+
 </CodeGroup>
 
 ### Response
@@ -739,26 +743,26 @@ Description(s) created successfully.
 
 ### **图像生成**
 
-| 型号        | 功能                          | 每张图片费用    |
-| --------- | --------------------------- | --------- |
-| 2a        | 文字生图，或文字 \+ 参考图生图           | US $0.04  |
-| 2a Turbo  | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US $0.025 |
-| 2.0       | 文字生图，或文字 \+ 参考图生图           | US $0.08  |
-| 2.0 Turbo | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US $0.05  |
-| 1.0       | 文字生图，或文字 \+ 参考图生图           | US $0.06  |
-| 1.0 Turbo | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US $0.02  |
+| 型号        | 功能                          | 每张图片费用     |
+| --------- | --------------------------- | ---------- |
+| 2a        | 文字生图，或文字 \+ 参考图生图           | US \$0.04  |
+| 2a Turbo  | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US \$0.025 |
+| 2.0       | 文字生图，或文字 \+ 参考图生图           | US \$0.08  |
+| 2.0 Turbo | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US \$0.05  |
+| 1.0       | 文字生图，或文字 \+ 参考图生图           | US \$0.06  |
+| 1.0 Turbo | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US \$0.02  |
 
 ### **图像编辑**
 
-| 型号             | 功能                                | 每张图片费用   |
-| -------------- | --------------------------------- | -------- |
-| 2.0 Edit       | 通过文字提示、参考图片和二进制蒙版重新生成图像           | US $0.08 |
-| 2.0 Turbo Edit | 通过文字提示、参考图片和二进制蒙版重新生成图像（更快速但质量略低） | US $0.05 |
+| 型号             | 功能                                | 每张图片费用    |
+| -------------- | --------------------------------- | --------- |
+| 2.0 Edit       | 通过文字提示、参考图片和二进制蒙版重新生成图像           | US \$0.08 |
+| 2.0 Turbo Edit | 通过文字提示、参考图片和二进制蒙版重新生成图像（更快速但质量略低） | US \$0.05 |
 
 ### **图像增强**
 
-| 型号      | 功能                        | 每张图片费用   |
-| ------- | ------------------------- | -------- |
-| Upscale | 将参考图片分辨率提升至 2 倍，并可能增强图片效果 | US $0.06 |
+| 型号      | 功能                        | 每张图片费用    |
+| ------- | ------------------------- | --------- |
+| Upscale | 将参考图片分辨率提升至 2 倍，并可能增强图片效果 | US \$0.06 |
 
 更多详情可见[官方文档](https://developer.ideogram.ai/api-reference/api-reference/generate)

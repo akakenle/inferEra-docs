@@ -7,7 +7,7 @@ icon: "a"
 
 Qwen3 系列是阿里推出的新一代开源大模型，能力大幅跃升：在代码理解、数学推理、多语言表达、复杂推断任务上，比肩甚至超越了目前市面上的顶级模型（如 o1、DeepSeek-R1）。**它的核心突破在于引入了「思考模式」与「非思考模式」切换机制，让模型在面对不同难度任务时，自主调节推理深度，实现了速度与精度的双优平衡。** 旗舰版 Qwen3-235B 采用稀疏激活，仅用 22B 参数推理，兼顾成本和卓越能力。全系模型全面开源，涵盖从轻量到超大规模需求。
 
-**1. 基础用法：** 用 OpenAI 兼容格式转发
+**1. 基础用法：** 用 OpenAI 兼容格式转发。  
 **2. 工具调用：** 不支持OpenAI 兼容格式，需要先运行指令安装依赖：
 
 `pip install -U qwen-agent mcp`。
@@ -48,10 +48,6 @@ import os
 # Define LLM
 llm_cfg = {
     'model': 'Qwen/Qwen3-30B-A3B',
-
-    # Use the endpoint provided by Alibaba Model Studio:
-    # 'model_type': 'qwen_dashscope',
-    # 'api_key': os.getenv('DASHSCOPE_API_KEY'),
 
     # Use a custom endpoint compatible with OpenAI API:
     'model_server': 'https://aihubmix.com/v1',
@@ -97,7 +93,7 @@ print(responses)
 
 用 OpenAI 的兼容格式转发即可，区别在于流式调用，需要提取 `chunk.choices[0].delta.content`，参考如下。
 
-**1. Qwen 2.5 vl：** 图片识别
+**1. Qwen 2.5 vl：** 图片识别  
 **2. QwQ：** 文本任务
 
 <CodeGroup>
