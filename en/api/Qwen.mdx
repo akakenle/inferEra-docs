@@ -1,0 +1,170 @@
+---
+title: "Qwen Series"
+description: ""
+icon: 'a'
+---
+
+## Qwen 3 Series
+
+> Qwen3 redefines open LLMs with dynamic thinking modes, excelling in code, math, and multilingual reasoning. Powered by sparse 22B active parameters, it balances blazing speed with deep intelligence — fully open-source, from lightweight to 235B giants.
+
+1. Basic usage: Forward with OpenAI compatible format
+2. Tool call: Does not support OpenAI compatible format, you need to run the command to install the dependency `pip install -U qwen-agent mcp`. For more details, please refer to [Ali official documentation](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+
+<CodeGroup>
+```py Basic usage
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end="")
+```
+
+```py Tools + mcp
+from qwen_agent.agents import Assistant
+import os
+
+# Define LLM
+llm_cfg = {
+    'model': 'Qwen/Qwen3-30B-A3B',
+
+    # Use the endpoint provided by Alibaba Model Studio:
+    # 'model_type': 'qwen_dashscope',
+    # 'api_key': os.getenv('DASHSCOPE_API_KEY'),
+
+    # Use a custom endpoint compatible with OpenAI API:
+    'model_server': 'https://aihubmix.com/v1',
+    'api_key': os.getenv('AIHUBMIX_API_KEY'),
+
+    # Other parameters:
+    # 'generate_cfg': {
+    #         # Add: When the response content is `<think>this is the thought</think>this is the answer;
+    #         # Do not add: When the response has been separated by reasoning_content and content.
+    #         'thought_in_content': True,
+    #     },
+}
+
+# Define Tools
+tools = [
+    {'mcpServers': {  # You can specify the MCP configuration file
+            'time': {
+                'command': 'uvx',
+                'args': ['mcp-server-time', '--local-timezone=Asia/Shanghai']
+            },
+            "fetch": {
+                "command": "uvx",
+                "args": ["mcp-server-fetch"]
+            }
+        }
+    },
+  'code_interpreter',  # Built-in tools
+]
+
+# Define Agent
+bot = Assistant(llm=llm_cfg, function_list=tools)
+
+# Streaming generation
+messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Introduce the latest developments of Qwen'}]
+for responses in bot.run(messages=messages):
+    pass
+print(responses)
+
+```
+</CodeGroup>
+
+## Qwen 2.5 and QwQ Series
+Use the OpenAI compatible format to forward, the difference is that the streaming call needs to extract `chunk.choices[0].delta.content`, refer to the following.
+1. Qwen 2.5 vl: Image recognition
+2. QwQ: Text task
+
+<CodeGroup>
+```py Qwen 2.5 vl
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
+    base_url="https://aihubmix.com/v1",
+)
+
+image_path = "yourpath/file.png"
+
+def encode_image(image_path):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image file does not exist: {image_path}")
+    
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the base64 encoding of the image
+base64_image = encode_image(image_path)
+
+completion = client.chat.completions.create(
+    model="qwen2.5-vl-72b-instruct",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Please describe this image in detail"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+```py QwQ
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/QVQ-72B-Preview",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "What is the meta rule that dominates the universe?"}
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+</CodeGroup>
