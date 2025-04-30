@@ -176,7 +176,7 @@ print(responses)
 
 ## Qwen 2.5 和 QwQ 系列
 
-用 OpenAI 的兼容格式转发即可，区别在于流式调用，需要提取 `chunk.choices[0].delta.content`，参考如下。
+用 OpenAI 的兼容格式转发即可，区别在于流式调用的提取，需要剔除为空的 `chunk.choices[0].delta.content`，参考如下。
 
 **1. Qwen 2.5 vl：** 图片识别  
 **2. QwQ：** 文本任务
