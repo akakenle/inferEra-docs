@@ -174,16 +174,20 @@ print(responses)
 
 </CodeGroup>
 
-## Qwen 2.5 和 QwQ/QvQ 系列
+## QvQ、Qwen 2.5 和 QwQ 系列
 
 用 OpenAI 的兼容格式转发即可，区别在于流式调用的提取，需要剔除为空的 `chunk.choices[0].delta.content`，参考如下。
 
-**1. Qwen 2.5 vl：** 图片识别  
-**2. QwQ：** 文本任务
+**1. QvQ、Qwen 2.5 VL：** 图片识别  
+**2. QwQ：** 文本任务  
+
+<Info>
+  `Qwen/QVQ-72B-Preview` 是基于 `Qwen2-VL-72B` 构建的开源多模态推理模型，专注于视觉推理和跨模态任务。
+</Info>
 
 <CodeGroup>
 
-```py Qwen 2.5 vl
+```py Qwen 2.5 VL
 from openai import OpenAI
 import base64
 import os
@@ -193,7 +197,6 @@ client = OpenAI(
     base_url="https://aihubmix.com/v1",
 )
 
-# 图片路径
 image_path = "yourpath/file.png"
 
 # 读取并编码图片
@@ -209,7 +212,7 @@ base64_image = encode_image(image_path)
 
 # 创建包含文本和图像的消息
 completion = client.chat.completions.create(
-    model="qwen2.5-vl-72b-instruct",
+    model="qwen2.5-vl-72b-instruct", #qwen2.5-vl-72b-instruct 或 Qwen/QVQ-72B-Preview
     messages=[
         {
             "role": "user",
@@ -235,7 +238,7 @@ for chunk in completion:
 ```
 
 
-```py QwQ | QvQ
+```py QwQ
 from openai import OpenAI
 
 client = OpenAI(
@@ -244,7 +247,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-    model="Qwen/QwQ-32B", #或 Qwen/QVQ-72B-Preview
+    model="Qwen/QwQ-32B",
     messages=[
         {
             "role": "user",

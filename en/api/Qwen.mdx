@@ -177,12 +177,12 @@ print(responses)
 
 Use the OpenAI compatible format to forward, the difference is that the streaming call needs to extract `chunk.choices[0].delta.content`, refer to the following.
 
-**1. Qwen 2.5 vl:** Image recognition.  
+**1. QvQ，Qwen 2.5 VL:** Image recognition.  
 **2. QwQ:** Text task.  
 
 <CodeGroup>
 
-```py Qwen 2.5 vl
+```py Qwen 2.5 VL
 from openai import OpenAI
 import base64
 import os
@@ -205,7 +205,7 @@ def encode_image(image_path):
 base64_image = encode_image(image_path)
 
 completion = client.chat.completions.create(
-    model="qwen2.5-vl-72b-instruct",
+    model="qwen2.5-vl-72b-instruct", #qwen2.5-vl-72b-instruct OR Qwen/QVQ-72B-Preview
     messages=[
         {
             "role": "user",
@@ -230,7 +230,7 @@ for chunk in completion:
 ```
 
 
-```py QwQ & QvW
+```py QwQ
 from openai import OpenAI
 
 client = OpenAI(
@@ -239,7 +239,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-    model="Qwen/QwQ-32B", #OR Qwen/QVQ-72B-Preview
+    model="Qwen/QwQ-32B",
     messages=[
         {
             "role": "user",
