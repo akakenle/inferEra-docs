@@ -35,9 +35,11 @@ completion = client.chat.completions.create(
     stream=True
 )
 
+# 某些 chunk 对象可能没有 choices 属性或 choices 是一个空列表，处理方法：
 for chunk in completion:
-    if chunk.choices[0].delta.content is not None:
-        print(chunk.choices[0].delta.content, end="")
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
 ```
 
 
@@ -172,7 +174,6 @@ completion = client.chat.completions.create(
 )
 
 for chunk in completion:
-    # 安全地检查是否有内容
     if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
         if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
             print(chunk.choices[0].delta.content, end="")
