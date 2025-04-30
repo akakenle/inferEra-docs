@@ -8,7 +8,7 @@ icon: "a"
 Qwen3 redefines open LLMs with dynamic thinking modes, excelling in code, math, and multilingual reasoning. Powered by sparse 22B active parameters, it balances blazing speed with deep intelligence — fully open-source, from lightweight to 235B giants.
 
 **1. Basic usage:** Forward with OpenAI compatible format.  
-**2. Tool call:** Does not support OpenAI compatible format, you need to run the command to install the dependency:
+**2. Tool call:** Regular tools support the OpenAI-compatible format, while MCP Tools rely on qwen-agent and require installing dependencies first using the command:
 `pip install -U qwen-agent mcp`.
 For more details, please refer to [Ali official documentation](https://huggingface.co/Qwen/Qwen3-235B-A22B)
 
@@ -39,8 +39,93 @@ for chunk in completion:
             print(chunk.choices[0].delta.content, end="")
 ```
 
+```py Tools
+from openai import OpenAI
 
-```py Tools + mcp
+client = OpenAI(
+    api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
+    base_url="https://aihubmix.com/v1",
+)
+
+# Define Tools
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather of a specified location",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "City name, e.g., Beijing, Shanghai, etc."
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "Temperature unit"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+# Create chat completion request with tool definitions
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",  # Supported by both 2.5 and 3, not supported by QwQ
+    messages=[
+        {
+            "role": "user",
+            "content": "What's the weather like in Beijing today?"
+        }
+    ],
+    tools=tools,
+    tool_choice="auto",  # Let the model decide whether to use a tool
+    stream=True
+)
+
+# Dictionary for collecting tool call info
+tool_calls = {}
+
+# Handle streaming responses
+for chunk in completion:
+    if not hasattr(chunk.choices, '__len__') or len(chunk.choices) == 0:
+        continue
+        
+    delta = chunk.choices[0].delta
+    
+    # Handle textual content
+    if hasattr(delta, 'content') and delta.content:
+        print(delta.content, end="")
+    
+    # Handle tool calls
+    if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        for tool_call in delta.tool_calls:
+            if not hasattr(tool_call, 'index'):
+                continue
+                
+            idx = tool_call.index
+            if idx not in tool_calls:
+                tool_calls[idx] = {"name": "", "arguments": ""}
+                
+            if hasattr(tool_call, 'function'):
+                if hasattr(tool_call.function, 'name') and tool_call.function.name:
+                    tool_calls[idx]["name"] = tool_call.function.name
+                if hasattr(tool_call.function, 'arguments') and tool_call.function.arguments:
+                    tool_calls[idx]["arguments"] += tool_call.function.arguments
+
+# After completion, print collected tool call info
+for idx, info in tool_calls.items():
+    if info["name"]:
+        print(f"\nTool call: {info['name']}")
+    if info["arguments"]:
+        print(f"Arguments: {info['arguments']}")
+```
+
+```py MCP Tools
 from qwen_agent.agents import Assistant
 import os
 

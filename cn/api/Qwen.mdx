@@ -8,10 +8,7 @@ icon: "a"
 Qwen3 系列是阿里推出的新一代开源大模型，能力大幅跃升：在代码理解、数学推理、多语言表达、复杂推断任务上，比肩甚至超越了目前市面上的顶级模型（如 o1、DeepSeek-R1）。**它的核心突破在于引入了「思考模式」与「非思考模式」切换机制，让模型在面对不同难度任务时，自主调节推理深度，实现了速度与精度的双优平衡。** 旗舰版 Qwen3-235B 采用稀疏激活，仅用 22B 参数推理，兼顾成本和卓越能力。全系模型全面开源，涵盖从轻量到超大规模需求。
 
 **1. 基础用法：** 用 OpenAI 兼容格式转发。  
-**2. 工具调用：** 不支持OpenAI 兼容格式，需要先运行指令安装依赖：
-
-`pip install -U qwen-agent mcp`。
-
+**2. 工具调用：** 常规 Tools 调用支持 OpenAI 兼容格式（适用于 V2.5、V3），而 MCP Tools 依赖 `qwen-agent`，需要先运行指令安装依赖：`pip install -U qwen-agent mcp`。
 更多细节可以参考[阿里官方文档](https://huggingface.co/Qwen/Qwen3-235B-A22B)
 
 <CodeGroup>
@@ -42,8 +39,94 @@ for chunk in completion:
             print(chunk.choices[0].delta.content, end="")
 ```
 
+```py Tools
+from openai import OpenAI
 
-```py Tools + mcp
+client = OpenAI(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com/v1",
+)
+
+# 定义工具
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "获取指定位置的当前天气",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "城市名称，如北京、上海等"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "温度单位"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+# 创建聊天完成请求，包含工具定义
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B", #2.5 和 3 都支持，QwQ 不支持
+    messages=[
+        {
+            "role": "user",
+            "content": "北京今天的天气怎么样？"
+        }
+    ],
+    tools=tools,
+    tool_choice="auto",  # 让模型自行决定是否使用工具
+    stream=True
+)
+
+# 用于收集工具调用信息的字典
+tool_calls = {}
+
+# 处理流式响应
+for chunk in completion:
+    if not hasattr(chunk.choices, '__len__') or len(chunk.choices) == 0:
+        continue
+        
+    delta = chunk.choices[0].delta
+    
+    # 处理文本内容
+    if hasattr(delta, 'content') and delta.content:
+        print(delta.content, end="")
+    
+    # 处理工具调用
+    if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        for tool_call in delta.tool_calls:
+            if not hasattr(tool_call, 'index'):
+                continue
+                
+            idx = tool_call.index
+            if idx not in tool_calls:
+                tool_calls[idx] = {"name": "", "arguments": ""}
+                
+            if hasattr(tool_call, 'function'):
+                if hasattr(tool_call.function, 'name') and tool_call.function.name:
+                    tool_calls[idx]["name"] = tool_call.function.name
+                if hasattr(tool_call.function, 'arguments') and tool_call.function.arguments:
+                    tool_calls[idx]["arguments"] += tool_call.function.arguments
+
+# 完成后，打印收集到的工具调用信息
+for idx, info in tool_calls.items():
+    if info["name"]:
+        print(f"\n工具调用：{info['name']}")
+    if info["arguments"]:
+        print(f"参数：{info['arguments']}")
+
+```
+
+```py MCP Tools
 from qwen_agent.agents import Assistant
 import os
 
