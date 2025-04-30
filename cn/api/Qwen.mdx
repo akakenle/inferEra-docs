@@ -174,7 +174,7 @@ print(responses)
 
 </CodeGroup>
 
-## Qwen 2.5 和 QwQ 系列
+## Qwen 2.5 和 QwQ/QvQ 系列
 
 用 OpenAI 的兼容格式转发即可，区别在于流式调用的提取，需要剔除为空的 `chunk.choices[0].delta.content`，参考如下。
 
@@ -235,7 +235,7 @@ for chunk in completion:
 ```
 
 
-```py QwQ
+```py QwQ | QvQ
 from openai import OpenAI
 
 client = OpenAI(
@@ -244,7 +244,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-    model="Qwen/QVQ-72B-Preview",
+    model="Qwen/QwQ-32B", #或 Qwen/QVQ-72B-Preview
     messages=[
         {
             "role": "user",

@@ -173,7 +173,7 @@ print(responses)
 
 </CodeGroup>
 
-## Qwen 2.5 and QwQ Series
+## Qwen 2.5 and QwQ/QvQ Series
 
 Use the OpenAI compatible format to forward, the difference is that the streaming call needs to extract `chunk.choices[0].delta.content`, refer to the following.
 
@@ -230,7 +230,7 @@ for chunk in completion:
 ```
 
 
-```py QwQ
+```py QwQ & QvW
 from openai import OpenAI
 
 client = OpenAI(
@@ -239,7 +239,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-    model="Qwen/QVQ-72B-Preview",
+    model="Qwen/QwQ-32B", #OR Qwen/QVQ-72B-Preview
     messages=[
         {
             "role": "user",
