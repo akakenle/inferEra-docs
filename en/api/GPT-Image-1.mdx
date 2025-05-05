@@ -194,7 +194,7 @@ Error message when a request is rejected:
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
 
-When requesting 2-10 images in a single generation, if the system detects that the request violates platform policies, the flagged content will not be generated. This may result in fewer images generated than the number originally requested.  
+When requesting 2-10 images in a single generation, if the system detects that the request violates platform policies, the flagged content will not be generated. This may result in fewer images generated than the number originally requested. however, no `moderation_blocked` error will be thrown in multi-image generation. 
 Therefore, it’s recommended to proactively avoid potential intellectual property (IP) or copyright issues to minimize the risk of system rejection and ensure smooth generation.
 
 **✍️ Key recommendations:**  
