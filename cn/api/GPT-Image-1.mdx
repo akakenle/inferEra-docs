@@ -184,6 +184,14 @@ Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_token
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
 
+对于单次请求生成 2-10 张图片的情况，如果系统检测到请求涉嫌违反平台政策，该请求中的违规部分将不会被生成。这可能导致实际生成图片数量少于用户请求数量。  
+因此，请在创作中主动规避潜在的知识产权（IP）或版权问题，以减少生成被系统拦截的风险，确保创作顺利完成。
+
+**✍️ 关键提示：**。
+- 避免直接使用已知的受版权保护角色、品牌标志、名人肖像等
+- 可以采用「风格借鉴」「创意改编」「泛指描述」等方式表达
+- 若需引用特定元素，请提前确认该元素是否处于公有领域
+
 ## 实用提示
 
 <Tip>

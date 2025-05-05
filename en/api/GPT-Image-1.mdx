@@ -194,6 +194,14 @@ Error message when a request is rejected:
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
 
+When requesting 2-10 images in a single generation, if the system detects that the request violates platform policies, the flagged content will not be generated. This may result in fewer images generated than the number originally requested.  
+Therefore, it’s recommended to proactively avoid potential intellectual property (IP) or copyright issues to minimize the risk of system rejection and ensure smooth generation.
+
+**✍️ Key recommendations:**  
+- Avoid direct use of copyrighted characters, logos, celebrity likenesses, etc.
+- Consider using "style inspiration", "creative reinterpretation", or "generalized descriptions" instead
+- If referencing specific elements, check whether they fall within the public domain
+
 ## Practical Tips
 
 <Tip>
