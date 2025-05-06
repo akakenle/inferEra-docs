@@ -27,7 +27,6 @@
               {
                 "group": "API",
                 "pages": [
-                  "cn/api/Cli",
                   "cn/api/Model-Information",
                   "cn/api/Model-List",
                   "cn/api/OpenAI-library", 
@@ -46,7 +45,8 @@
                   "cn/api/Multimodal-Interaction-with-Gemini",
                   "cn/api/Qwen",
                   "cn/api/IdeogramAI",
-                  "cn/api/Jina-AI"
+                  "cn/api/Jina-AI",
+                  "cn/api/Cli"
                 ]
               },
               {
@@ -128,7 +128,6 @@
               {
                 "group": "API",
                 "pages": [
-                  "en/api/Cli",
                   "en/api/Model-Information",
                   "en/api/Model-List",
                   "en/api/OpenAI-library",  
@@ -147,7 +146,8 @@
                   "en/api/Multimodal-Interaction-with-Gemini",
                   "en/api/Qwen",
                   "en/api/IdeogramAI",
-                  "en/api/Jina-AI"
+                  "en/api/Jina-AI",
+                  "en/api/Cli"
                 ]
               },
               {
