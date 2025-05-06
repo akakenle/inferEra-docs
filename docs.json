@@ -27,6 +27,7 @@
               {
                 "group": "API",
                 "pages": [
+                  "cn/api/Cli",
                   "cn/api/Model-Information",
                   "cn/api/Model-List",
                   "cn/api/OpenAI-library", 
@@ -127,6 +128,7 @@
               {
                 "group": "API",
                 "pages": [
+                  "en/api/Cli",
                   "en/api/Model-Information",
                   "en/api/Model-List",
                   "en/api/OpenAI-library",  
