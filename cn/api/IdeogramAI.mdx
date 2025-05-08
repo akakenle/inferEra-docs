@@ -21,7 +21,8 @@ icon: "paintbrush"
 - ANIME：动漫
 
 <Tip>
-  注意风格参数 `style_type` 仅适用于 V_2 及更高版本的模型。
+  - 注意风格参数 `style_type` 仅适用于 V_2 及更高版本的模型。
+  - V3 支持即将上线
 </Tip>
 
 <Warning>
@@ -123,9 +124,9 @@ payload = { "image_request": {
         "aspect_ratio": "ASPECT_3_2",  # 可选 include ASPECT_1_1(Default), ASPECT_3_2, ASPECT_2_3, ASPECT_4_3, ASPECT_3_4, ASPECT_16_9, ASPECT_9_16, SPECT_16_10, ASPECT_10_16
         "model": "V_2",
         "num_images": 2, #integer 可选 >=1 <=8 Defaults to 1
-        "magic_prompt_option": "AUTO", #string 可选 AUTO, ON, OFF
+        "magic_prompt_option": "AUTO", # string 可选 AUTO, ON, OFF
         #"seed": "2" #integer 可选 >=0 <=2147483647
-        "style_type": "RENDER_3D" #string 可选 AUTO/GENERAL/REALISTIC/DESIGN/RENDER_3D/ANIME, 仅适用于 V_2 及以上版本
+        "style_type": "RENDER_3D" # string 可选 AUTO/GENERAL/REALISTIC/DESIGN/RENDER_3D/ANIME, 仅适用于 V_2 及以上版本
     } }
 headers = {
     "Api-Key": os.getenv("AIHUBMIX_API_KEY"),
@@ -271,16 +272,16 @@ import os
 url = "https://aihubmix.com/ideogram/eidt"
 
 files = {
-    "image_file": open('<file1>', 'rb'), #必须
-    "mask": "open('<file1>', 'rb')" #必须
+    "image_file": open('<file1>', 'rb'), # 必须
+    "mask": "open('<file1>', 'rb')" # 必须
 }
 
 payload = {
-    "prompt": "\"prompt\"", #必须
-    "model": "V_2",  #必须，only supported for V_2 and V_2_TURBO.
+    "prompt": "\"prompt\"", # 必须
+    "model": "V_2",  # 必须，only supported for V_2 and V_2_TURBO.
     "magic_prompt_option": ,
-    "num_images":1, #integer 可选 >=1 <=8 Defaults to 1
-    "seed": , #integer 可选 >=0 <=2147483647
+    "num_images":1, # integer 可选 >=1 <=8 Defaults to 1
+    "seed": , # integer 可选 >=0 <=2147483647
     "style_type":
 16}
 headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
