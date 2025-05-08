@@ -3,8 +3,529 @@ title: "Ideogram AI 绘图支持"
 icon: "paintbrush"
 ---
 
-## 🎨 接口说明
-支持 Ideogram AI 绘图接口，文字绘制能力强劲，支持生图（generate）、混合（remix）、局部编辑（edit）、放大（upscale）和描述（describe）等。
+## Ideogram V3 接口
+
+> Ideogram V3 模型提供了高级的图像生成和处理能力。V3 接口与之前版本在参数和使用方式上有所不同，本节将详细介绍 V3 的各个接口及使用示例。
+
+### V3 Generate
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/generate](https://aihubmix.com/ideogram/v1/ideogram-v3/generate)
+
+根据给定提示词生成图像。V3 模型提供了更高质量的图像生成能力，支持更丰富的风格和参数控制。
+
+<ParamField body="prompt" type="string" required>
+  用于生成图像的提示词
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  渲染速度选项，可选 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  单次出图数量，范围 1-8  
+  增加图片几乎不会增加生图耗时
+</ParamField>
+
+<ParamField body="aspect_ratio" default="1x1" type="string">
+  用于图像生成的宽高比，支持超多规格  
+  可选 ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']  
+  和 V3 以下不同的模型使用的 `ASPECT_10_16` 类型的规范不同。
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  提示词增强选项。可用参数：`AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成图像的风格类型，可选 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`  
+  注意相对 V2 版本，类型更聚焦
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  描述不想在图像中出现的内容
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  随机种子，范围：0-2147483647  
+  单次生成多张图时不要使用 seed，否则会生成相同图像
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  风格参考图片，可用于风格引导
+</ParamField>
+
+### 调用示例
+
+<CodeGroup>
+
+```shell Curl 文生图
+curl -X POST https://aihubmix.com/ideogram/v1/ideogram-v3/generate \
+  -H "Api-Key: sk-***" \
+  -H "Content-Type: multipart/form-data" \
+  -F prompt="Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render" \
+  -F rendering_speed="QUALITY" \
+  -F num_images="2" \
+  -F aspect_ratio="2x1"
+```
+
+```py Python 文生图
+import requests
+import os
+
+# 准备请求数据 - 使用字典而不是JSON
+data = {
+  "prompt": "Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render",
+  "rendering_speed": "QUALITY",
+  "num_images": "2",
+  "aspect_ratio": "2x1",
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark"
+}
+
+# Content-Type 为 multipart/form-data
+files = {}
+for key, value in data.items():
+    files[key] = (None, str(value))  # 将每个数据字段作为表单字段发送
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # 换成你在 AiHubMix 生成的密钥
+  },
+  files=files
+)
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正确获取图片 URL
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("图片已保存到 output.png")
+    else:
+        print(f"获取图片失败：{image_response.status_code}")
+else:
+    print("API 请求失败或返回数据中没有图片")
+```
+
+```py Python 参考图+文生图
+import requests
+import os
+
+data = {
+  "prompt": "Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render",
+  "rendering_speed": "QUALITY",
+  "num_images": 2,
+  # "seed": "998", # 多张图时不要使用 seed
+  "aspect_ratio": "2x1", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark",
+}
+
+# initialize files parameter
+files = None
+
+# 样式参考图路径
+style_reference_path = "yourpath/reference-image.jpeg"
+use_reference_image = True
+
+if use_reference_image and os.path.exists(style_reference_path):
+    # 如果使用参考图片且文件存在，则设置 files 参数
+    files = [
+        ("style_reference_images", open(style_reference_path, "rb")),
+        # 如果需要添加多个样式参考图片，可以按如下方式添加：
+        # ("style_reference_images", open("第二张参考图片路径", "rb")),
+    ]
+elif use_reference_image:
+    print(f"警告：样式参考图片未找到：{style_reference_path}")
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # 换成你在 AiHubMix 生成的密钥
+  },
+  data=data,
+  files=files
+)
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正确获取图片 URL
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("图片已保存到 output.png")
+    else:
+        print(f"获取图片失败：{image_response.status_code}")
+else:
+    print("API 请求失败或返回数据中没有图片")
+```
+
+</CodeGroup>
+
+### V3 Remix
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/remix](https://aihubmix.com/ideogram/v1/ideogram-v3/remix)
+
+在参考图的基础上，根据提示词重新生成图像。V3 的 Remix 功能对原始图像的风格和内容有更好的保留能力。
+
+<ParamField body="prompt" type="string" required>
+  用于重绘图像的提示词
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  原始图像文件
+</ParamField>
+
+<ParamField body="image_weight" default="50" type="integer">
+  原图的影响权重，范围 1-100，数值越大，结果越像原图。
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  渲染速度选项，可选 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  单次出图数量，范围 1-8
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  输出图像的宽高比，可选 ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  风格参考图片，可用于风格引导
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  随机种子，范围：0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  提示词增强选项，可用参数：`AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成图像的风格类型，可选 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  描述不想在图像中出现的内容
+</ParamField>
+
+### 调用示例
+
+<CodeGroup>
+
+```py Python 融图
+import requests
+import os
+
+data = {
+  "prompt": "bird playing with a cat in the snow, pixel art style",
+  "image_weight": "60",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  "aspect_ratio": "16x9", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, bad anatomy, watermark",
+}
+
+# 原图 - 必填
+source_image_path = "yourpath/image.jpeg"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"源图片未找到：{source_image_path}")
+
+# initialize files parameter
+files = None
+
+# 样式参考图路径
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# 准备文件上传
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 如果使用参考图片且文件存在，则设置 files 参数
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"警告：样式参考图片未找到：{style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/remix",
+      headers={
+        "Api-Key": "sk-***" # 换成你在 AiHubMix 生成的密钥
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正确获取图片 URL
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("图片已保存到 output.png")
+    else:
+        print(f"获取图片失败：{image_response.status_code}")
+else:
+    print("API 请求失败或返回数据中没有图片")
+    print(f"错误详情：{response_json}")
+```
+
+</CodeGroup>
+
+### V3 Edit
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/edit](https://aihubmix.com/ideogram/v1/ideogram-v3/edit)
+
+V3 的局部编辑功能允许用户通过提供原始图像和蒙版，精确地编辑图像的特定区域，同时保持其他区域不变。
+
+<ParamField body="prompt" type="string" required>
+  用于编辑图像的提示词
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  原始图像文件
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  遮罩图片，黑色区域表示需要编辑的部分，白色区域表示保持不变
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  渲染速度选项，可选 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  单次出图数量，范围 1-8
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  输出图像的宽高比
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  随机种子，范围：0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  提示词增强选项，可用参数：`AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成图像的风格类型，可选 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  描述不想在图像中出现的内容
+</ParamField>
+
+### 调用示例
+
+<CodeGroup>
+
+```py Python 局部编辑
+import requests
+import os
+
+# 原图 - 必填
+source_image_path = "yourpath/image.jpeg"
+# mask - 必填
+mask_image_path = "yourpath/mask.jpg"
+
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"源图片未找到：{source_image_path}")
+
+with open(source_image_path, "rb") as image_file, open(mask_image_path, "rb") as mask_file:
+    response = requests.post(
+        "https://aihubmix.com/ideogram/v1/ideogram-v3/edit",
+        headers={
+            "Api-Key": "sk-***" # 换成你在 AiHubMix 生成的密钥
+        },
+        data={
+            "prompt": "remove text",
+            "rendering_speed": "DEFAULT",
+            "num_images": 1,
+            "seed": 1,
+            "aspect_ratio": "16x9",
+            "magic_prompt": "AUTO",
+            "style_type": "AUTO",
+            "negative_prompt": "blurry, bad anatomy, watermark",
+        },
+        files={
+            "image": image_file,
+            "mask": mask_file,
+        }
+    )
+
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正确获取图片 URL
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("图片已保存到 output.png")
+    else:
+        print(f"获取图片失败：{image_response.status_code}")
+else:
+    print("API 请求失败或返回数据中没有图片")
+    print(f"错误详情：{response_json}")
+```
+
+</CodeGroup>
+
+### V3 Replace Background
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background](https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background)
+
+V3 的背景替换功能可以智能地识别图像的前景和背景，并根据提示词替换背景，同时保持前景对象不变。
+
+<ParamField body="prompt" type="string" required>
+  用于替换背景的提示词
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  原始图像文件
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  渲染速度选项，可选 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  单次出图数量，范围 1-8
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  风格参考图片，可用于风格引导
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  随机种子，范围：0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  提示词增强选项，可用参数：`AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成图像的风格类型，可选 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+### 调用示例
+
+<CodeGroup>
+
+```py Python 背景替换
+import requests
+import os
+
+data = {
+  "prompt": "bird playing with a cat in the snow, pixel art style",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  # no "aspect_ratio"
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  # no "negative_prompt"
+}
+
+# 原图 - 必填
+source_image_path = "yourpath/image.png"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"源图片未找到：{source_image_path}")
+
+# initialize files parameter
+files = None
+
+# 样式参考图路径
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# 准备文件上传
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 如果使用参考图片且文件存在，则设置 files 参数
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"警告：样式参考图片未找到：{style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background",
+      headers={
+        "Api-Key": "sk-***" # 换成你在 AiHubMix 生成的密钥
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正确获取图片 URL
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("图片已保存到 output.png")
+    else:
+        print(f"获取图片失败：{image_response.status_code}")
+else:
+    print("API 请求失败或返回数据中没有图片")
+    print(f"错误详情：{response_json}")
+```
+
+</CodeGroup>
+
+更多可选参数可参考 [Ideogram AI 官方指南](https://developer.ideogram.ai/api-reference/api-reference/generate-v3)
+
+### 💰 V3 计价
+
+| Ideogram 模型 | Generate | Remix | Edit | Reframe | Replace BG |
+|-------------|---------|-------|------|---------|-----------|
+| 3.0 Turbo | US $0.03 | US $0.03 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 Default | US $0.06 | US $0.06 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 Quality | US $0.09 | US $0.09 | US $0.09 | US $0.09 | US $0.09 |
+
+---
+
+## V2-V1 接口说明
+Ideogram AI V2-V1 绘图接口，文字绘制能力强劲，支持生图（generate）、混合（remix）、局部编辑（edit）、放大（upscale）和描述（describe）等。
 
 - **混合：** 在参考图的基础上，根据提示词进行重绘，生成新的图片。
 - **编辑：** 在参考图的基础上，根据提示词和蒙版进行局部编辑，生成新的图片。
@@ -30,11 +551,11 @@ icon: "paintbrush"
   2. Cherry Studio 暂时只开放了 Ideogram 绘图（generate）接口。
 </Warning>
 
-## Generate
+### Generate
 
 `POST` [https://aihubmix.com/ideogram/generate\\](https://api.aihubmix.com/ideogram/generate\\) 根据给定提示词和可选参数同步生成图像。图像链接的有效期有限；如果你想保留图像，必须下载保存。
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   生成图像的请求对象
@@ -201,13 +722,13 @@ Image(s) generated successfully.
 - `422` : Post Generate Image Request Unprocessable Entity Error
 - `429` : Post Generate Image Request Too Many Requests Error
 
-## Edit
+### Edit
 
 `POST` [https://aihubmix.com/ideogram/edit](https://api.aihubmix.com/ideogram/edit)
 
 使用提供的蒙版同步编辑指定图像。蒙版标示出应被编辑的图像部分，而提示词和所选风格类型可进一步引导编辑方向。支持的图像格式包括 JPEG、PNG 和 WebP。图像链接的有效期有限；如果你想保留图像，必须下载保存。
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_file" type="file" required>
   原始图像文件，支持 JPEG、PNG 和 WebP 格式
@@ -361,13 +882,13 @@ Image edits generated successfully.
 - `422` : Post Edit Image Request Unprocessable Entity Error
 - `429` : Post Edit Image Request Too Many Requests Error
 
-## Remix
+### Remix
 
 `POST` [https://aihubmix.com/ideogram/remix](https://api.aihubmix.com/ideogram/remix)
 
 根据给定提示词和可选参数来融合提供的图像。输入图像会在重混前裁剪至所选宽高比。支持的图像格式包括 JPEG、PNG 和 WebP。图像链接的有效期有限；如果你想保留图像，必须下载保存。
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   使用提供的图像和提示词生成新图像的请求，提供的图像会被裁剪以匹配所选的输出宽高比。
@@ -536,13 +1057,13 @@ Image(s) generated successfully.
 - `422` : Post Remix Image Request Unprocessable Entity Error
 - `429` : Post Remix Image Request Too Many Requests Error
 
-## Upscale
+### Upscale
 
 `POST` [https://aihubmix.com/ideogram/upscale](https://api.aihubmix.com/ideogram/upscale)
 
 使用可选提示词同步放大提供的图像（超分）。支持的图像格式包括 JPEG、PNG 和 WebP。图像链接的有效期有限；如果你想保留图像，必须下载保存。
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   请求对象，用于使用可选提示词放大提供的图像
@@ -653,13 +1174,13 @@ Image(s) generated successfully.
 - `422` : Post Upscale Image Request Unprocessable Entity Error
 - `429` : Post Upscale Image Request Too Many Requests Error
 
-## Describe
+### Describe
 
 `POST` [https://aihubmix.com/ideogram/describe](https://api.aihubmix.com/ideogram/describe)
 
 对上传的图像进行描述分析。支持的图像格式包括 JPEG、PNG 和 WebP。
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_file" type="file" required>
   需要描述的图像文件，支持 JPEG、PNG 和 WebP 格式
@@ -740,9 +1261,9 @@ Description(s) created successfully.
 
 ---
 
-## 💰 计价
+### 💰 V2 & V1 计价
 
-### **图像生成**
+#### 图像生成
 
 | 型号        | 功能                          | 每张图片费用     |
 | --------- | --------------------------- | ---------- |
@@ -753,14 +1274,14 @@ Description(s) created successfully.
 | 1.0       | 文字生图，或文字 \+ 参考图生图           | US \$0.06  |
 | 1.0 Turbo | 文字生图，或文字 \+ 参考图生图（更快速但质量略低） | US \$0.02  |
 
-### **图像编辑**
+#### 图像编辑
 
 | 型号             | 功能                                | 每张图片费用    |
 | -------------- | --------------------------------- | --------- |
 | 2.0 Edit       | 通过文字提示、参考图片和二进制蒙版重新生成图像           | US \$0.08 |
 | 2.0 Turbo Edit | 通过文字提示、参考图片和二进制蒙版重新生成图像（更快速但质量略低） | US \$0.05 |
 
-### **图像增强**
+#### 图像增强
 
 | 型号      | 功能                        | 每张图片费用    |
 | ------- | ------------------------- | --------- |

@@ -3,8 +3,532 @@ title: "Ideogram AI Drawing Support"
 icon: "paintbrush"
 ---
 
-## 🎨 Interface Description
-Supports Ideogram AI drawing interface with strong text-to-image capabilities, including generate, remix, edit, upscale, and describe functionalities.
+## Ideogram V3 Interface
+
+> Ideogram V3 model provides advanced image generation and processing capabilities. The V3 interface differs from previous versions in parameters and usage, and this section will detail the V3 interfaces and usage examples.
+
+### V3 Generate
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/generate](https://aihubmix.com/ideogram/v1/ideogram-v3/generate)
+
+Generate images based on given prompts. The V3 model provides higher quality image generation capabilities, supporting more diverse styles and parameter controls.
+
+<ParamField body="prompt" type="string" required>
+  Prompt for image generation
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  Rendering speed options, available `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  Number of images to generate, range 1-8  
+  Generating more images will not significantly increase the generation time
+</ParamField>
+
+<ParamField body="aspect_ratio" default="1x1" type="string">
+  Aspect ratio for image generation, supports a wide range of specifications  
+  Available ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']  
+  The aspect ratios used in different models are different.
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  Prompt enhancement. Available parameters: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  Style type for image generation, available `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`  
+  Note: Compared to V2 version, the type is more focused
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  Description of content you do not want to appear in the image
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  Random seed, range: 0-2147483647  
+  Do not use seed when generating multiple images, otherwise the same image will be generated
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  Style reference image, can be used for style guidance
+</ParamField>
+
+### Usage Examples
+
+<CodeGroup>
+
+```shell Curl Text-to-Image
+curl -X POST https://aihubmix.com/ideogram/v1/ideogram-v3/generate \
+  -H "Api-Key: sk-***" \
+  -H "Content-Type: multipart/form-data" \
+  -F prompt="Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render" \
+  -F rendering_speed="QUALITY" \
+  -F num_images="2" \
+  -F aspect_ratio="2x1"
+```
+
+```py Python Text-to-Image
+import requests
+import os
+
+# Prepare request data - use dictionary instead of JSON
+data = {
+  "prompt": "Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render",
+  "rendering_speed": "QUALITY",
+  "num_images": "2",
+  "aspect_ratio": "2x1",
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark"
+}
+
+# Content-Type is multipart/form-data
+files = {}
+for key, value in data.items():
+    files[key] = (None, str(value))  # Send each data field as a form field
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # Replace with your AiHubMix API key
+  },
+  files=files
+)
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("Image saved to output.png")
+    else:
+        print(f"Failed to get image: {image_response.status_code}")
+else:
+    print("API request failed or no image returned")
+```
+
+```py Python Reference Image + Text-to-Image
+import requests
+import os
+
+data = {
+  "prompt": "Delicate 3D cover design with various combat machines flying from an portal. The machines have different shapes, sizes, and colors. The portal is emitting swirling energy. The background contains a futuristic city with tall buildings. The text \"One Gateway, Infinite Models\" is placed in the center with neon lights, expansive view, cinematic lighting, vivid color, bright tone. clean text, cyber punk, smooth render",
+  "rendering_speed": "QUALITY",
+  "num_images": 2,
+  # "seed": "998", # DO NOT use seed when generating multiple images
+  "aspect_ratio": "2x1", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark",
+}
+
+# initialize files parameter
+files = None
+
+# Style reference image path
+style_reference_path = "yourpath/reference-image.jpeg"
+use_reference_image = True
+
+if use_reference_image and os.path.exists(style_reference_path):
+    # If using a reference image and the file exists, set the files parameter
+    files = [
+        ("style_reference_images", open(style_reference_path, "rb")),
+        # If you need to add multiple style reference images, you can add them as follows:
+        # ("style_reference_images", open("Second reference image path", "rb")),
+    ]
+elif use_reference_image:
+    print(f"Warning: Style reference image not found: {style_reference_path}")
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # Replace with your AiHubMix API key
+  },
+  data=data,
+  files=files
+)
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("Image saved to output.png")
+    else:
+        print(f"Failed to get image: {image_response.status_code}")
+else:
+    print("API request failed or no image returned")
+```
+
+</CodeGroup>
+
+### V3 Remix
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/remix](https://aihubmix.com/ideogram/v1/ideogram-v3/remix)
+
+Remix images based on a reference image and prompt. The Remix function of V3 has better retention of the style and content of the original image.
+
+<ParamField body="prompt" type="string" required>
+  Prompt for image remixing
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  Original image file
+</ParamField>
+
+<ParamField body="image_weight" default="50" type="integer">
+  The weight of the original image, range 1-100, the larger the value, the more similar the result to the original image.
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  Rendering speed options, available `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  Number of images to generate, range 1-8
+  Generating more images will not significantly increase the generation time
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  Aspect ratio of the output image, available ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  Style reference image, can be used for style guidance
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  Random seed, range: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  Prompt enhancement. Available parameters: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  Style type for image generation, available `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  Description of content you do not want to appear in the image
+</ParamField>
+
+### Usage Examples
+
+<CodeGroup>
+
+```py Python Remix
+import requests
+import os
+
+data = {
+  "prompt": "bird playing with a cat in the snow, pixel art style",
+  "image_weight": "60",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  "aspect_ratio": "16x9", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, bad anatomy, watermark",
+}
+
+# Original image - required
+source_image_path = "yourpath/image.jpeg"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"Original image not found: {source_image_path}")
+
+# initialize files parameter
+files = None
+
+# Style reference image path
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# Prepare the files for upload
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # If using a reference image and the file exists, set the files parameter
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"Warning: Style reference image not found: {style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/remix",
+      headers={
+        "Api-Key": "sk-***" # Replace with your AiHubMix API key
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("Image saved to output.png")
+    else:
+        print(f"Failed to get image: {image_response.status_code}")
+else:
+    print("API request failed or no image returned")
+    print(f"Error details: {response_json}")
+```
+
+</CodeGroup>
+
+### V3 Edit
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/edit](https://aihubmix.com/ideogram/v1/ideogram-v3/edit)
+
+The local editing function of V3 allows users to precisely edit specific areas of an image by providing the original image and mask, while keeping other areas unchanged.
+
+<ParamField body="prompt" type="string" required>
+  Prompt for image editing
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  Original image file
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  Mask image, black area represents the part to be edited, white area represents the part to be kept unchanged
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  Rendering speed options, available `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  Number of images to generate, range 1-8
+  Generating more images will not significantly increase the generation time
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  Aspect ratio of the output image, available ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  Random seed, range: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  Prompt enhancement. Available parameters: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  Style type for image generation, available `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  Description of content you do not want to appear in the image
+</ParamField>
+
+### Usage Examples
+
+<CodeGroup>
+
+```py Python Edit
+import requests
+import os
+
+# Original image - required
+source_image_path = "yourpath/image.jpeg"
+# mask - required
+mask_image_path = "yourpath/mask.jpg"
+
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"Original image not found: {source_image_path}")
+
+with open(source_image_path, "rb") as image_file, open(mask_image_path, "rb") as mask_file:
+    response = requests.post(
+        "https://aihubmix.com/ideogram/v1/ideogram-v3/edit",
+        headers={
+            "Api-Key": "sk-***" # Replace with your AiHubMix API key
+        },
+        data={
+            "prompt": "remove text",
+            "rendering_speed": "DEFAULT",
+            "num_images": 1,
+            "seed": 1,
+            "aspect_ratio": "16x9",
+            "magic_prompt": "AUTO",
+            "style_type": "AUTO",
+            "negative_prompt": "blurry, bad anatomy, watermark",
+        },
+        files={
+            "image": image_file,
+            "mask": mask_file,
+        }
+    )
+
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("Image saved to output.png")
+    else:
+        print(f"Failed to get image: {image_response.status_code}")
+else:
+    print("API request failed or no image returned")
+    print(f"Error details: {response_json}")
+```
+
+</CodeGroup>
+
+### V3 Replace Background
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background](https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background)
+
+V3 的背景替换功能可以智能地识别图像的前景和背景，并根据提示词替换背景，同时保持前景对象不变。
+
+<ParamField body="prompt" type="string" required>
+  Prompt for background replacement
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  Original image file
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  Rendering speed options, available `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  Number of images to generate, range 1-8
+  Generating more images will not significantly increase the generation time
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  Style reference image, can be used for style guidance
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  Random seed, range: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  Prompt enhancement. Available parameters: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  Style type for image generation, available `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+### Usage Examples
+
+<CodeGroup>
+
+```py Python Replace Background
+import requests
+import os
+
+data = {
+  "prompt": "bird playing with a cat in the snow, pixel art style",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  # no "aspect_ratio"
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  # no "negative_prompt"
+}
+
+# Original image - required
+source_image_path = "yourpath/image.png"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"Original image not found: {source_image_path}")
+
+# initialize files parameter
+files = None
+
+# Style reference image path
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# Prepare files
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # If using a reference image and the file exists, set the files parameter
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"Warning: Style reference image not found: {style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background",
+      headers={
+        "Api-Key": "sk-***" # Replace with your AiHubMix API key
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# save output image to file
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("Image saved to output.png")
+    else:
+        print(f"Failed to get image: {image_response.status_code}")
+else:
+    print("API request failed or no image returned")
+    print(f"Error details: {response_json}")
+```
+
+</CodeGroup>
+
+For more optional parameters, please refer to [Ideogram AI](https://developer.ideogram.ai/api-reference/api-reference/generate-v3)
+
+### 💰 V3 Pricing
+
+| Ideogram v3 | Generate | Remix | Edit | Reframe | Replace BG |
+|-------------|---------|-------|------|---------|-----------|
+| 3.0 Turbo | US $0.03 | US $0.03 | US $0.03 | US $0.03 | US $0.03 |
+| 3.0 Default | US $0.06 | US $0.06 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 Quality | US $0.09 | US $0.09 | US $0.09 | US $0.09 | US $0.09 |
+
+---
+
+## V2 & V1 Interface Description
+Ideogram AI V2 & V1 drawing interface with strong text-to-image capabilities, including generate, remix, edit, upscale, and describe functionalities.
 
 - **Remix:** Create new images based on a reference image and prompt.
 - **Edit:** Make local edits to specific areas of a reference image using prompts and masks.
@@ -25,12 +549,12 @@ Supports Ideogram AI drawing interface with strong text-to-image capabilities, i
   2. Cherry Studio currently only offers the Ideogram drawing (generate) interface.
 </Warning>
 
-## Generate
+### Generate
 
 `POST` [https://aihubmix.com/ideogram/generate](https://api.aihubmix.com/ideogram/generate)\
 Synchronously generates images based on given prompts and optional parameters. Image links have a limited validity period; if you want to keep the images, you must download and save them.
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   Request object for image generation
@@ -195,13 +719,13 @@ Image(s) generated successfully.
 - `422` : Post Generate Image Request Unprocessable Entity Error
 - `429` : Post Generate Image Request Too Many Requests Error
 
-## Edit
+### Edit
 
 `POST` [https://aihubmix.com/ideogram/edit](https://api.aihubmix.com/ideogram/edit)
 
 Synchronously edits a specified image using the provided mask. The mask indicates which parts of the image should be edited, while the prompt and selected style type can further guide the editing direction. Supported image formats include JPEG, PNG, and WebP. Image links have a limited validity period; if you want to keep the images, you must download and save them.
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_file" type="file" required>
   Original image file, supports JPEG, PNG, and WebP formats
@@ -353,13 +877,13 @@ Image edits generated successfully.
 - `422` : Post Edit Image Request Unprocessable Entity Error
 - `429` : Post Edit Image Request Too Many Requests Error
 
-## Remix
+### Remix
 
 `POST` [https://aihubmix.com/ideogram/remix](https://api.aihubmix.com/ideogram/remix)
 
 Fuses the provided image with given prompts and optional parameters. Input images are cropped to the selected aspect ratio before remixing. Supported image formats include JPEG, PNG, and WebP. Image links have a limited validity period; if you want to keep the images, you must download and save them.
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   Request to generate new images using the provided image and prompt. The provided image will be cropped to match the selected output aspect ratio.
@@ -526,13 +1050,13 @@ Image(s) generated successfully.
 - `422` : Post Remix Image Request Unprocessable Entity Error
 - `429` : Post Remix Image Request Too Many Requests Error
 
-## Upscale
+### Upscale
 
 `POST` [https://aihubmix.com/ideogram/upscale](https://api.aihubmix.com/ideogram/upscale)
 
 Synchronously upscales the provided image with optional prompts. Supported image formats include JPEG, PNG, and WebP. Image links have a limited validity period; if you want to keep the images, you must download and save them.
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_request" type="object" required>
   Request object for upscaling the provided image with optional prompts
@@ -641,13 +1165,13 @@ Image(s) generated successfully.
 - `422` : Post Upscale Image Request Unprocessable Entity Error
 - `429` : Post Upscale Image Request Too Many Requests Error
 
-## Describe
+### Describe
 
 `POST` [https://aihubmix.com/ideogram/describe](https://api.aihubmix.com/ideogram/describe)
 
 Analyzes and describes the uploaded image. Supported image formats include JPEG, PNG, and WebP.
 
-### Request Parameters
+**Request Parameters**
 
 <ParamField body="image_file" type="file" required>
   Image file to describe, supports JPEG, PNG, and WebP formats
@@ -726,9 +1250,9 @@ Description(s) created successfully.
 
 ---
 
-## 💰 Pricing
+### 💰 V2 & V1 Pricing
 
-### **Image Generation**
+#### Image Generation
 
 | Model     | Feature                                                                                | Cost per Image |
 | --------- | -------------------------------------------------------------------------------------- | -------------- |
@@ -739,14 +1263,14 @@ Description(s) created successfully.
 | 1.0       | Text to image, or text \+ reference image to image                                     | US $0.06       |
 | 1.0 Turbo | Text to image, or text \+ reference image to image (faster but slightly lower quality) | US $0.02       |
 
-### **Image Editing**
+#### Image Editing
 
 | Model          | Feature                                                                                                      | Cost per Image |
 | -------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
 | 2.0 Edit       | Regenerate images using text prompts, reference images, and binary masks                                     | US $0.08       |
 | 2.0 Turbo Edit | Regenerate images using text prompts, reference images, and binary masks (faster but slightly lower quality) | US $0.05       |
 
-### **Image Enhancement**
+#### Image Enhancement
 
 | Model   | Feature                                                                     | Cost per Image |
 | ------- | --------------------------------------------------------------------------- | -------------- |
