@@ -253,11 +253,11 @@ curl -X POST https://aihubmix.com/v1/chat/completions \
 
 ## 多媒体文件
 
-Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、视频），用 `inline_data` 上传。  
+Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、视频），用 `inline_data` 上传。\
 大于 20M 的多媒体需要用 File API（尚未支持），待完善状态跟踪，返回 `upload_url`。
 
 <CodeGroup>
-  
+
 ```py 图片
 from google import genai
 from google.genai import types
@@ -291,7 +291,8 @@ response = client.models.generate_content(
 
 print(response.text)
 ```
-  
+
+
 ```py 音频
 from google import genai
 from google.genai import types
@@ -324,8 +325,8 @@ response = client.models.generate_content(
 )
 
 print(response.text)
-
 ```
+
 
 ```py 视频
 from google import genai
@@ -361,6 +362,7 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
+
 ```py Youtube 链接
 from google import genai
 from google.genai import types
@@ -388,6 +390,7 @@ response = client.models.generate_content(
 
 print(response.text)
 ```
+
 </CodeGroup>
 
 ## Code Execution
@@ -516,3 +519,95 @@ Function to call: schedule_meeting
 Arguments: {"attendees":["Bob","Alice"],"date":"2025-03-14","time":"10:00","topic":"Q3 planning"}
 CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, completion_tokens_details=None, prompt_tokens_details=None)
 ```
+
+## Tokens 用量追踪
+
+1. Gemini 原生采用 `usage_metadata` 来[追踪使用的 token](https://ai.google.dev/gemini-api/docs/tokens?lang=python)，其中的字段对应如下：
+  - prompt_token_count: 输入 token 数
+  - candidates_token_count: 输出 token 数
+  - thoughts_token_count: 推理使用的 token 数，性质上也是输出 token
+  - total_token_count: 总 token 使用量（输入+输出）
+2. 对于 OpenAI 兼容格式，则采用 `.usage` 来追踪，字段对应如下：
+  - usage.completion_tokens: 输入 token 数
+  - usage.prompt_tokens: 输出 token 数（包含推理使用的 token 数）
+  - usage.total_tokens:总 token 使用量
+
+**使用方法如下:**
+<CodeGroup>
+  
+```py Gemini 原生
+from google import genai
+from google.genai import types
+import time
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""金融领域的「72 法则」是如何推导的？"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    # 在所有 chunk 处理完后，打印完整的 token 使用情况
+    if final_usage_metadata:
+        print(f"\nUsage: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+
+```
+
+```py OpenAI 兼容
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", #"low", "medium", and "high", which behind the scenes we map to 1K, 8K, and 24K thinking token budgets. If you want to disable thinking, you can set the reasoning effort to "none".
+    messages=[
+        {
+            "role": "user",
+            "content": "金融领域的「72 法则」是如何推导的？"
+        }
+    ],
+    stream=True
+)
+
+#print(completion.choices[0].message.content)
+
+for chunk in completion:
+    print(chunk.choices[0].delta)
+    # 只在最后一个 chunk（包含完整 usage 数据）时打印 usage 信息
+    if chunk.usage and chunk.usage.completion_tokens > 0:
+        print(f"输出 tokens: {chunk.usage.completion_tokens}")
+        print(f"输入 tokens: {chunk.usage.prompt_tokens}")
+        print(f"总 tokens: {chunk.usage.total_tokens}")
+```
+
+</CodeGroup>
