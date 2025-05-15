@@ -1,15 +1,15 @@
 ---
 title: "Gemini Guides"
 description: "A comprehensive guide to Gemini API calls on our platform."
-icon: 'google'
+icon: "google"
 ---
 
 ## Native Forwarding for Gemini Models
 
-For the Gemini series, we provide **two** invocation methods: native API calls and OpenAI-compatible calls.  
+For the Gemini series, we provide **two** invocation methods: native API calls and OpenAI-compatible calls.\
 Before you start, make sure to install or update the native dependency by running either `pip install google-genai` or `pip install -U google-genai`.
 
-1️⃣ For native forwarding, you mainly need to inject your **AiHubMix API key** and **request URL** into the internal client setup.  
+1️⃣ For native forwarding, you mainly need to inject your **AiHubMix API key** and **request URL** into the internal client setup.\
 ⚡️ Note: the URL format differs from the conventional `base_url` usage. Please refer to the example below:
 
 ```python
@@ -29,12 +29,15 @@ client = OpenAI(
 ```
 
 ### About Gemini 2.5 Inference Models
+
 1. The entire 2.5 series consists of **inference models**.
 2. **2.5 Flash** is a hybrid model, similar to Claude Sonnet 3.7. You can fine-tune its reasoning behavior by adjusting the `thinking_budget` parameter for optimal control.
 3. **2.5 Pro** is a pure inference model. Thinking cannot be disabled, and `thinking_budget` should not be explicitly set.
 
-**Python usage examples:**  
+**Python usage examples:**
+
 <CodeGroup>
+
 ```py StreamFalse
 from google import genai
 from google.genai import types
@@ -63,6 +66,7 @@ def generate():
 if __name__ == "__main__":
     generate()
 ```
+
 
 ```py 2.0 Series-Stream
 from google import genai
@@ -96,8 +100,8 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-
 ```
+
 
 ```py 2.5 Flash-Stream
 from google import genai
@@ -136,6 +140,7 @@ if __name__ == "__main__":
     generate()
 ```
 
+
 ```py 2.5 Pro-Stream
 from google import genai
 from google.genai import types
@@ -169,8 +174,8 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-
 ```
+
 </CodeGroup>
 
 ## Gemini 2.5 Flash: Quick Task Support
@@ -178,6 +183,7 @@ if __name__ == "__main__":
 Example for OpenAI-compatible invocation:
 
 <CodeGroup>
+
 ```py Python Disable thinking for rapid task
 from openai import OpenAI
 
@@ -198,6 +204,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 
 ```py Python Reasoning Effort
 from openai import OpenAI
@@ -221,6 +228,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+
 ```shell Curl
 curl -X POST https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -235,12 +243,13 @@ curl -X POST https://aihubmix.com/v1/chat/completions \
     ]
   }'
 ```
+
 </CodeGroup>
 
 For complex tasks, simply set the model id to the default `gemini-2.5-flash-preview-04-17` to enable thinking.
 
 <Info>
-Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 24K. The default budget is 1024, and the optimal marginal effect is 16K.
+  Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 24K. The default budget is 1024, and the optimal marginal effect is 16K.
 </Info>
 
 ## Media Understanding
@@ -249,7 +258,7 @@ Aihubmix currently supports uploading multimedia files (images, audio, and video
 For files exceeding 20MB, a File API will be required. This functionality is not yet available; progress tracking and upload_url retrieval are under development.
 
 <CodeGroup>
-  
+
 ```py Image
 from google import genai
 from google.genai import types
@@ -282,7 +291,8 @@ response = client.models.generate_content(
 
 print(response.text)
 ```
-  
+
+
 ```py Audio
 from google import genai
 from google.genai import types
@@ -314,8 +324,8 @@ response = client.models.generate_content(
 )
 
 print(response.text)
-
 ```
+
 
 ```py Video
 from google import genai
@@ -350,6 +360,7 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
+
 ```py Youtube URL
 from google import genai
 from google.genai import types
@@ -377,6 +388,7 @@ response = client.models.generate_content(
 
 print(response.text)
 ```
+
 </CodeGroup>
 
 ## Code Execution
@@ -432,6 +444,7 @@ for part in response.candidates[0].content.parts:
 By using the openai compatible way to call Gemini's function calling, you need to pass in `tool_choice="auto"` in the request body, otherwise it will report an error.
 
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -493,11 +506,110 @@ else:
     print("No function call found in the response.")
     print(response.choices[0].message.content)
 ```
+
 </CodeGroup>
 
 **Output Example:**
+
 ```bash
 Function to call: schedule_meeting
 Arguments: {"attendees":["Bob","Alice"],"date":"2025-03-14","time":"10:00","topic":"Q3 planning"}
 CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, completion_tokens_details=None, prompt_tokens_details=None)
 ```
+
+## Token Usage Tracking Made Simple
+
+1. **Gemini** tracks token usage using `usage_metadata`. Here’s what each field means:
+   - `prompt_token_count`: number of input tokens
+   - `candidates_token_count`: number of output tokens
+   - `thoughts_token_count`: tokens used during reasoning (also counted as output)
+   - `total_token_count`: total tokens used (input \+ output)
+
+   For more details, check out their [official docs](https://ai.google.dev/gemini-api/docs/tokens?lang=python).
+2. For APIs using the **OpenAI-compatible format**, token usage is tracked under `.usage` with the following fields:
+   - `usage.completion_tokens`: number of input tokens
+   - `usage.prompt_tokens`: number of output tokens (including reasoning)
+   - `usage.total_tokens`: total token usage
+
+---
+
+**Here’s how to use it in code:**
+
+<CodeGroup>
+
+```py Gemini native
+from google import genai
+from google.genai import types
+import time
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # Replace this with your key from AiHubMix
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""How is the "Rule of 72" derived in the financial world?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    # Once all chunks are processed, print the full token usage
+    if final_usage_metadata:
+        print(f"\nUsage: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py OpenAI compatible
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # Replace this with your key from AiHubMix
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", #"low", "medium", and "high", which behind the scenes we map to 1K, 8K, and 24K thinking token budgets. If you want to disable thinking, you can set the reasoning effort to "none".
+    messages=[
+        {
+            "role": "user",
+            "content": "How is the "Rule of 72" derived in the financial world?"
+        }
+    ],
+    stream=True
+)
+
+#print(completion.choices[0].message.content)
+
+for chunk in completion:
+    print(chunk.choices[0].delta)
+    # Only print token usage info on the last chunk (which includes full usage data)
+    if chunk.usage and chunk.usage.completion_tokens > 0:
+        print(f"Output tokens: {chunk.usage.completion_tokens}")
+        print(f"Input tokens: {chunk.usage.prompt_tokens}")
+        print(f"Total tokens: {chunk.usage.total_tokens}")
+```
+
+</CodeGroup>
