@@ -82,7 +82,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-  model="gpt-4o-mini",
+  model="gpt-4o-mini", # codex-mini-latest 可用
   instructions="You are a helpful assistant.",
   input="Hello!",
   stream=True
@@ -139,7 +139,7 @@ tools = [
 ]
 
 response = client.responses.create(
-  model="gpt-4o-mini",
+  model="gpt-4o-mini", # codex-mini-latest 可用
   tools=tools,
   input="What is the weather like in Boston today?",
   tool_choice="auto"
@@ -158,7 +158,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="o4-mini", #支持 o4-mini, o3-mini, o3, o1
+    model="o4-mini", # 支持 codex-mini-latest, o4-mini, o3-mini, o3, o1
     input="How much wood would a woodchuck chuck?",
     reasoning={
         "effort": "medium" #支持 low, medium, high
@@ -173,9 +173,10 @@ print(response)
 **注意：**
 
 1. 最新的 \`codex-mini-latest\` 不支持搜索
-2.  Computer use 需要配合 Praywright 使用，建议参考[官方仓库](https://github.com/openai/openai-cua-sample-app)
+2. Computer use 需要配合 Praywright 使用，建议参考[官方仓库](https://github.com/openai/openai-cua-sample-app)
 
-  已知细节问题：  
-  - 调用用例复杂
-  - 截图大量，耗时久，任务成功率低
-  - 或触发 CAPTCHA 验证或 Cloudflare 真人验证，可能遇到无限循环
+已知细节问题：
+
+- 调用用例复杂
+- 截图大量，耗时久，任务成功率低
+- 或触发 CAPTCHA 验证或 Cloudflare 真人验证，可能遇到无限循环
