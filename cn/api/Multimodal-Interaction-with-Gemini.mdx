@@ -1,16 +1,103 @@
 ---
 title: "Gemini 新「智绘」"
-description: "加入 gemini-2.0-flash-exp 模型支持"
-icon: 'eyes'
+description: "Gemini 绘图和视频生成指引"
+icon: "eyes"
 ---
 
-**Gemini 2.0 Flash 图像生成能力升级**。
-`gemini-2.0-flash-exp` 即将升级为 `gemini-2.0-flash-preview-image-generation`，让你的创作流程更流畅、更精彩。
+## Imagen 3.0 绘图
+
+Imagen 3.0 是 Google 推出的先进图像生成 AI 模型，能够根据文本提示创建高质量、逼真的图像。本指南将帮助您了解如何使用 Imagen 3.0 API 生成图像，包括参数设置、模型选择和代码示例。
+
+<Tip>
+  1. 目前 Imagen 3.0 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
+  2. 绘制大量文本的表现不稳定，建议只绘制重点关键词
+</Tip>
+
+### 模型参数
+
+Imagen 目前仅支持英文提示词，并提供以下参数：
+
+- **numberOfImages**: 要生成的图像数量，范围从 1 到 4（含）。默认值为 4。
+- **aspectRatio**: 更改生成图像的宽高比。支持的值有 "1:1"、"3:4"、"4:3"、"9:16" 和 "16:9"。默认值为 "1:1"。
+- **personGeneration**: 允许模型生成人物图像。支持以下值：
+  - "DONT_ALLOW": 阻止生成人物图像。
+  - "ALLOW_ADULT": 生成成人图像，但不生成儿童图像。这是默认值。
+
+### 费率
+
+使用 Imagen 3.0 API 生成图像的费用为 **\$0.03/张**。请注意，每次调用可以生成 1-4 张图像，费用将按实际生成的图像数量计算。
+
+### 调用示例
+
+以下是使用 Imagen 3.0 生成图像的 Python 调用示例：
+
+<CodeGroup>
+
+```py Imagen 3.0
+import os
+import time
+from google import genai
+from google.genai import types
+from PIL import Image
+from io import BytesIO
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+# 目前只支持英文 prompt，绘制大量文本的表现较差
+response = client.models.generate_images(
+    model='imagen-3.0-generate-002',
+    prompt='A minimalist logo for a LLM router market company on a solid white background. trident in a circle as the main symbol, with ONLY text \'InferEra\' below.',
+    config=types.GenerateImagesConfig(
+        number_of_images=1,
+        aspect_ratio="1:1", # supports "1:1", "9:16", "16:9", "3:4", or "4:3".
+    )
+)
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+output_dir = os.path.join(script_dir, "output")
+
+os.makedirs(output_dir, exist_ok=True)
+
+# 生成时间戳作为文件名前缀，避免文件名冲突
+timestamp = int(time.time())
+
+# 保存并显示生成的图片
+for i, generated_image in enumerate(response.generated_images):
+  image = Image.open(BytesIO(generated_image.image.image_bytes))
+  image.show()
+  
+  file_name = f"imagen3_{timestamp}_{i+1}.png"
+  file_path = os.path.join(output_dir, file_name)
+  image.save(file_path)
+  
+  print(f"图片已保存至：{file_path}")
+```
+
+</CodeGroup>
+
+### 提示词技巧
+
+创建有效的提示词对于获得理想的图像至关重要：
+
+- 使用详细的描述，包括主题、风格、光照、角度等。
+- 指定艺术风格（如电影感、写实主义、动漫风格等）。
+- 包含技术细节（如 DSLR、高清、细节丰富等）。
+- 避免负面或违禁内容。
+- **避免在提示词中包含大量文本**，仅使用重点关键词以获得更稳定的结果。
+
+## Gemini 2.0 Flash 图像生成能力升级
+
+Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.0 相比，Gemini 的图像生成更适合于需要上下文理解和推理的场景，而非追求极致的艺术表现和视觉质量。
+
 - 更高的视觉质量 → 相比 exp 版，图像更锐利、更丰富、更清晰。
 - 更准确的文本呈现 → 生成的视觉中，文本更加精准、干净、易读。
 - 显著减少过滤拦截 → 得益于更智能、宽松的过滤机制，创作时几乎不再被打断。
 
 **说明：**
+
 - 需要新增参数来体验新特性 `"modalities":["text","image"]`
 - 图片以 Base64 编码形式传递与输出
 - 作为实验模型，建议明确指出 "输出图片"，否则可能只有文本
@@ -18,7 +105,12 @@ icon: 'eyes'
 - python 调用需要最新的 openai sdk 支持，请先运行 `pip install -U openai`
 - 了解更多请访问 [Gemini 官方文档](https://ai.google.dev/gemini-api/docs/image-generation)
 
-## 输入参考结构：
+<Tip>
+  `gemini-2.0-flash-exp` 即将升级为 `gemini-2.0-flash-preview-image-generation`，让你的创作流程更流畅、更精彩。
+</Tip>
+  
+**输入参考结构：**
+
 ```json
 "modalities": ["text","image"]
 {
@@ -34,7 +126,8 @@ icon: 'eyes'
   }'
 ```
 
-## 输出参考结构：
+**输出参考结构：**
+
 ```json
 "choices":
     [
@@ -71,11 +164,56 @@ icon: 'eyes'
     ],
 ```
 
-## 图文生成
-Iuput：text
-Output：text + image
+### 图文生成
 
-```python 
+Iuput：text
+Output：text \+ image
+
+<CodeGroup>
+
+```shell Curl
+IMG_PATH="/your_path/image.jpg"
+
+if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
+  B64FLAGS="--input"
+else
+  B64FLAGS="-w0"
+fi
+
+IMG_BASE64=$(base64 "$B64FLAGS" "$IMG_PATH" 2>&1)
+
+curl https://api.aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "gemini-2.0-flash-exp",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type":"text",
+            "text":"describe the image with a concise and engaging paragraph, then fill color as children's crayon style"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "data:image/jpeg;base64,'$IMG_BASE64'"
+            }
+          }
+        ]
+      }
+    ],
+    "modalities": ["text","image"],
+    "temperature": 0.7
+}' \
+  | grep -o '"data":"[^"]*"' \
+  | cut -d'"' -f4 \
+  | base64 --decode > /your_path/imageGen.jpg
+```
+
+
+```py Python
 import os
 from openai import OpenAI
 from PIL import Image
@@ -142,14 +280,19 @@ except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
 
-**输出实例：**  
+</CodeGroup>
+
+**输出实例：**\
 ![图片](./../media/gemini-s-flash-exp-usage-shot.png)
 
-## Edit image 
-Iuput：text + image  
-Output：text + image  
+### 图片编辑
 
-```Python 
+Iuput：text \+ image\
+Output：text \+ image
+
+<CodeGroup>
+
+```py Python
 import os
 from openai import OpenAI
 from PIL import Image
@@ -231,55 +374,30 @@ except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
 
-**输出实例：**  
+</CodeGroup>
+
+**输出实例：**\
 ![图片](./../media/gemini-s-flash-exp-usage-shot-2.png)
 
----
+## 选择正确的绘图模型
 
-## More examples
-1. Typescript  
-```typescript
-# 敬请期待
-```
+### 选择 Gemini 的情况：
 
-2. Curl  
-```bash
-IMG_PATH="/your_path/image.jpg"
+- 需要利用世界知识和推理能力生成上下文相关的图像。
+- 需要无缝混合文本和图像。
+- 希望在长文本序列中嵌入准确的视觉内容。
+- 希望在保持上下文的同时以对话方式编辑图像。
 
-if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
-  B64FLAGS="--input"
-else
-  B64FLAGS="-w0"
-fi
+### 选择 Imagen 3 的情况：
 
-IMG_BASE64=$(base64 "$B64FLAGS" "$IMG_PATH" 2>&1)
+- 图像质量、照片真实感、艺术细节或特定风格（如印象派、动漫）是首要考虑因素。
+- 执行专业编辑任务，如产品背景更新或图像放大。
+- 注入品牌、风格或生成标志和产品设计。
 
-curl https://api.aihubmix.com/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
-  -d '{
-    "model": "gemini-2.0-flash-exp",
-    "messages": [
-      {
-        "role": "user",
-        "content": [
-          {
-            "type":"text",
-            "text":"describe the image with a concise and engaging paragraph, then fill color as children's crayon style"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "data:image/jpeg;base64,'$IMG_BASE64'"
-            }
-          }
-        ]
-      }
-    ],
-    "modalities": ["text","image"],
-    "temperature": 0.7
-}' \
-  | grep -o '"data":"[^"]*"' \
-  | cut -d'"' -f4 \
-  | base64 --decode > /your_path/imageGen.jpg
-```
+### 最佳实践
+
+1. **优化提示词**：精心设计提示词，这是获得高质量输出的关键。
+2. **实验参数**：尝试不同的宽高比和设置，找到最适合您需求的配置。
+3. **批量生成**：生成多张图像以增加获得理想结果的机会。
+4. **保存元数据**：将提示词和时间戳与图像一起保存，以便追踪和复制成功的结果。
+5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。

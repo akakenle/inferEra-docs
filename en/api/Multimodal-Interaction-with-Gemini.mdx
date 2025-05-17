@@ -1,8 +1,96 @@
 ---
 title: "Gemini Imagine"
-description: "Adding gemini-2.0-flash-exp Model Support"
+description: "Gemini image/video generation"
 icon: 'eyes'
 ---
+
+## Imagen 3.0 Guide
+
+Imagen 3.0 is an advanced image generation AI model launched by Google, capable of creating high-quality, realistic images based on text prompts. This guide will help you understand how to use the Imagen 3.0 API to generate images, including parameter settings, model selection, and code examples.
+
+<Tip>
+1. Currently, Imagen 3.0 only supports English prompts. When integrating, it's recommended to add automatic translation to allow users to use it without language barriers.
+2. Performance is unstable when rendering large amounts of text. It's recommended to only include key keywords.
+</Tip>
+
+### Model Parameters
+
+Imagen currently only supports English prompts and provides the following parameters:
+
+- **numberOfImages**: The number of images to generate, ranging from 1 to 4 (inclusive). The default value is 4.
+- **aspectRatio**: Changes the aspect ratio of the generated images. Supported values are "1:1", "3:4", "4:3", "9:16", and "16:9". The default value is "1:1".
+- **personGeneration**: Allows the model to generate images of people. Supports the following values:
+  - "DONT_ALLOW": Prevents the generation of images containing people.
+  - "ALLOW_ADULT": Generates images of adults but not children. This is the default value.
+
+### Usage Pricing
+
+The cost of using the Imagen 3.0 API to generate images is **$0.03 per image**. Please note that each API call can generate 1-4 images, and you will be charged based on the actual number of images generated.
+
+### API Call Example
+
+Here's a Python example of generating images using Imagen 3.0:
+
+<CodeGroup>
+
+```py Imagen 3.0
+import os
+import time
+from google import genai
+from google.genai import types
+from PIL import Image
+from io import BytesIO
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 Replace with your key generated on AiHubMix
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+# Currently only supports English prompts, performance is poor with large amounts of text
+response = client.models.generate_images(
+    model='imagen-3.0-generate-002',
+    prompt='A minimalist logo for a LLM router market company on a solid white background. trident in a circle as the main symbol, with ONLY text \'InferEra\' below.',
+    config=types.GenerateImagesConfig(
+        number_of_images=1,
+        aspect_ratio="1:1", # supports "1:1", "9:16", "16:9", "3:4", or "4:3".
+    )
+)
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+output_dir = os.path.join(script_dir, "output")
+
+os.makedirs(output_dir, exist_ok=True)
+
+# Generate timestamp as filename prefix to avoid filename conflicts
+timestamp = int(time.time())
+
+# Save and display the generated images
+for i, generated_image in enumerate(response.generated_images):
+  image = Image.open(BytesIO(generated_image.image.image_bytes))
+  image.show()
+  
+  file_name = f"imagen3_{timestamp}_{i+1}.png"
+  file_path = os.path.join(output_dir, file_name)
+  image.save(file_path)
+  
+  print(f"Image saved to: {file_path}")
+```
+
+</CodeGroup>
+
+### Prompt Tips
+
+Creating effective prompts is crucial for obtaining desired images:
+
+- Use detailed descriptions, including subject, style, lighting, angle, etc.
+- Specify artistic styles (such as cinematic, photorealistic, anime style, etc.).
+- Include technical details (such as DSLR, high-definition, rich in detail, etc.).
+- Avoid negative or prohibited content.
+- **Avoid including large amounts of text in prompts**, only use key keywords for more stable results.
+
+## Gemini Image Generation
+
+Gemini also offers image generation capabilities as an alternative. Compared to Imagen 3.0, Gemini's image generation is better suited for scenarios that require contextual understanding and reasoning, rather than pursuing ultimate artistic expression and visual quality.
 
 **Instructions:**
 - Need to add parameters to experience new features: `"modalities":["text","image"]`
@@ -12,7 +100,7 @@ icon: 'eyes'
 - Python calls require the latest OpenAI SDK, run `pip install -U openai` first
 - For more information, visit the [Gemini official documentation](https://ai.google.dev/gemini-api/docs/image-generation)
 
-## Input Reference Structure:
+**Input Reference Structure:**
 ```json
 "modalities": ["text","image"]
 {
@@ -28,7 +116,7 @@ icon: 'eyes'
   }'
 ```
 
-## Output Reference Structure:
+**Output Reference Structure:**
 ```json
 "choices":
     [
@@ -65,11 +153,54 @@ icon: 'eyes'
     ],
 ```
 
-## Text-to-Image Generation
+### Text-to-Image Generation
 Input: text
 Output: text + image
 
-```python 
+<CodeGroup>
+
+```shell Curl
+IMG_PATH="/your_path/image.jpg"
+
+if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
+  B64FLAGS="--input"
+else
+  B64FLAGS="-w0"
+fi
+
+IMG_BASE64=$(base64 "$B64FLAGS" "$IMG_PATH" 2>&1)
+
+curl https://api.aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "gemini-2.0-flash-exp",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type":"text",
+            "text":"describe the image with a concise and engaging paragraph, then fill color as children's crayon style"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "data:image/jpeg;base64,'$IMG_BASE64'"
+            }
+          }
+        ]
+      }
+    ],
+    "modalities": ["text","image"],
+    "temperature": 0.7
+}' \
+  | grep -o '"data":"[^"]*"' \
+  | cut -d'"' -f4 \
+  | base64 --decode > /your_path/imageGen.jpg
+```
+
+```py Python
 import os
 from openai import OpenAI
 from PIL import Image
@@ -136,14 +267,18 @@ except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
 
+</CodeGroup>
+
 **Output Example:**  
 ![Image](./../media/gemini-s-flash-exp-usage-shot.png)
 
-## Edit Image
+### Edit Image
 Input: text + image  
 Output: text + image  
 
-```Python 
+<CodeGroup>
+
+```py Python 
 import os
 from openai import OpenAI
 from PIL import Image
@@ -225,18 +360,30 @@ except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
 
+</CodeGroup>
+
 **Output Example:**  
 ![Image](./../media/gemini-s-flash-exp-usage-shot-2.png)
 
----
+## Choosing the Right Model
 
-## More Examples
-1. TypeScript  
-```TypeScript
-# Coming soon
-```
+### When to Choose Gemini:
 
-2. curl  
-```bash
-# Coming soon
-```
+- When you need to leverage world knowledge and reasoning abilities to generate contextually relevant images.
+- When you need seamless integration of text and images.
+- When you want to embed accurate visual content in long text sequences.
+- When you want to edit images conversationally while maintaining context.
+
+### When to Choose Imagen 3:
+
+- When image quality, photorealism, artistic detail, or specific styles (such as impressionism, anime) are the primary considerations.
+- When performing professional editing tasks, such as product background updates or image enlargement.
+- When injecting branding, style, or generating logos and product designs.
+
+### Best Practices
+
+1. **Optimize prompts**: Carefully crafting prompts is key to obtaining high-quality output.
+2. **Experiment with parameters**: Try different aspect ratios and settings to find the configuration that best suits your needs.
+3. **Batch generation**: Generate multiple images to increase the chance of getting ideal results.
+4. **Save metadata**: Save prompts and timestamps along with images to track and replicate successful results.
+5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of service.
