@@ -389,3 +389,88 @@ except Exception as e:
 3. **Batch generation**: Generate multiple images to increase the chance of getting ideal results.
 4. **Save metadata**: Save prompts and timestamps along with images to track and replicate successful results.
 5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of service.
+
+---
+
+## Veo 2.0 Video Generation
+
+VEO 2.0 is an advanced video generation AI model launched by Google, capable of creating high-quality, realistic short videos based on text prompts. This part will help you understand how to use the VEO 2.0 API to generate videos, including parameter settings, model selection, and code examples.
+
+<Tip>
+1. Currently, VEO 2.0 only supports English prompts
+2. Video generation takes approximately 2-3 minutes, please be patient
+</Tip>
+
+### Model Parameters
+
+VEO 2.0 provides the following parameters:
+
+- **numberOfVideos**: The number of videos to generate, options are 1 or 2. Default is 2.
+- **aspectRatio**: The aspect ratio of the generated videos. Supported values are "16:9" and "9:16".
+- **durationSeconds**: Video duration, options are 5 seconds or 8 seconds. Default is 8 seconds.
+- **personGeneration**: Controls whether to allow videos containing people. Supports the following values:
+  - "dont_allow": Prevents generation of videos containing people.
+  - "allow_adult": Allows generation of videos containing adults, but not children.
+
+### Pricing
+
+The cost of the VEO 2.0 API is $0.35/s
+
+### Usage Example
+
+Here's a Python example of using VEO 2.0 to generate videos:
+
+<CodeGroup>
+
+```py VEO 2.0
+import os
+import time
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key=os.getenv("AIHUBMIX_API_KEY"), # 🔑 Replace with your AiHubMix API key
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+operation = client.models.generate_videos(
+    model="veo-2.0-generate-001",
+    prompt="Panning wide shot of a calico kitten sleeping in the sunshine",
+    config=types.GenerateVideosConfig(
+        person_generation="dont_allow",  # "dont_allow" or "allow_adult"
+        aspect_ratio="16:9",  # "16:9" or "9:16"
+        number_of_videos=1, # Integer, options are 1 or 2, default is 2
+        durationSeconds=5, # Integer, options are 5 or 8, default is 8
+    ),
+)
+
+# Takes 2-3 minutes, video duration is 5-8s
+while not operation.done:
+    time.sleep(20)
+    operation = client.operations.get(operation)
+
+for n, generated_video in enumerate(operation.response.generated_videos):
+    client.files.download(file=generated_video.video)
+    generated_video.video.save(f"video{n}.mp4")  # Save the video
+```
+
+</CodeGroup>
+
+### Prompt Tips
+
+Creating effective prompts is crucial for obtaining desired videos:
+
+- Describe clear scenes, actions, and atmosphere
+- Specify filming styles (such as panoramic, close-up, tracking shots, etc.)
+- Describe lighting conditions (such as sunny, dusk, indoor lighting, etc.)
+- Specify the main subject and its actions (e.g., "a kitten sleeping in the sunshine")
+- Avoid overly complex narratives or rapidly changing scenes
+- Avoid negative or prohibited content
+
+### Best Practices
+
+1. **Clear and concise prompts**: Use clear, specific descriptions to guide video generation.
+2. **Patience is key**: Video generation takes 2-3 minutes, please wait for completion.
+3. **Test different parameters**: Try different aspect ratios and durations to find the settings that best suit your needs.
+4. **Save generation records**: Record prompts along with generated videos to track successful results.
+5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of use. 

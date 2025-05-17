@@ -402,3 +402,88 @@ except Exception as e:
 3. **批量生成**：生成多张图像以增加获得理想结果的机会。
 4. **保存元数据**：将提示词和时间戳与图像一起保存，以便追踪和复制成功的结果。
 5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。
+
+---
+
+## Veo 2.0 视频生成
+
+VEO 2.0 是 Google 推出的先进视频生成 AI 模型，能够根据文本提示创建高质量、逼真的短视频。下面的指南将帮助您了解如何使用 VEO 2.0 API 生成视频，包括参数设置、模型选择和代码示例。
+
+<Tip>
+1. 目前 VEO 2.0 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
+2. 生成视频需要耗时 2-3 分钟，请耐心等待
+</Tip>
+
+### 模型参数
+
+VEO 2.0 提供以下参数：
+
+- **numberOfVideos**: 要生成的视频数量，可选 1 或 2。默认值为 2。
+- **aspectRatio**: 生成视频的宽高比。支持的值有 "16:9" 和 "9:16"。
+- **durationSeconds**: 视频时长，可选 5 秒或 8 秒。默认值为 8 秒。
+- **personGeneration**: 控制是否允许生成含人物的视频。支持以下值：
+  - "dont_allow": 阻止生成含人物的视频。
+  - "allow_adult": 允许生成含成人的视频，但不生成儿童视频。
+
+### 费率
+
+使用 VEO 2.0 API 的费用是 $0.35/秒
+
+### 调用示例
+
+以下是使用 VEO 2.0 生成视频的 Python 调用示例：
+
+<CodeGroup>
+
+```py VEO 2.0
+import os
+import time
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key=os.getenv("AIHUBMIX_API_KEY"), # 🔑 换成你在 AiHubMix 生成的密钥
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+operation = client.models.generate_videos(
+    model="veo-2.0-generate-001",
+    prompt="Panning wide shot of a calico kitten sleeping in the sunshine",
+    config=types.GenerateVideosConfig(
+        person_generation="dont_allow",  # "dont_allow" 或 "allow_adult"
+        aspect_ratio="16:9",  # "16:9" 或 "9:16"
+        number_of_videos=1, # 整数，可选 1、2，默认 2
+        durationSeconds=5, # 整数，可选 5、8，默认 8
+    ),
+)
+
+# 耗时 2-3 分钟，视频时长 5-8s
+while not operation.done:
+    time.sleep(20)
+    operation = client.operations.get(operation)
+
+for n, generated_video in enumerate(operation.response.generated_videos):
+    client.files.download(file=generated_video.video)
+    generated_video.video.save(f"video{n}.mp4")  # 保存视频
+```
+
+</CodeGroup>
+
+### 提示词技巧
+
+创建有效的提示词对于获得理想的视频至关重要：
+
+- 描述清晰的场景、动作和氛围
+- 指定拍摄风格（如全景、特写、跟踪镜头等）
+- 描述光照条件（如阳光明媚、黄昏、室内灯光等）
+- 指明主体对象及其动作（如"猫咪在阳光下睡觉"）
+- 避免过于复杂的叙事或快速变化的场景
+- 避免负面或违禁内容
+
+### 最佳实践
+
+1. **简洁明了的提示词**：使用清晰、具体的描述来指导视频生成。
+2. **耐心等待**：视频生成需要 2-3 分钟，请耐心等待完成。
+3. **测试不同参数**：尝试不同的宽高比和时长，找到最适合您需求的设置。
+4. **保存生成记录**：将提示词与生成的视频一起记录，以便追踪成功的结果。
+5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。 
