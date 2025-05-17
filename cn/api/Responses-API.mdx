@@ -102,7 +102,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-  model="gpt-4o-mini",
+  model="gpt-4o-mini", # codex-mini-latest 不支持搜索📍
   tools=[{ "type": "web_search_preview" }],
   input="What was a positive news story from today?",
 )
@@ -171,10 +171,11 @@ print(response)
 </CodeGroup>
 
 **注意：**
-Computer use 需要配合 Praywright 使用，建议参考[官方仓库](https://github.com/openai/openai-cua-sample-app)
 
-已知细节问题：
+1. 最新的 \`codex-mini-latest\` 不支持搜索
+2.  Computer use 需要配合 Praywright 使用，建议参考[官方仓库](https://github.com/openai/openai-cua-sample-app)
 
-- 调用用例复杂
-- 截图大量，耗时久，任务成功率低
-- 或触发 CAPTCHA 验证或 Cloudflare 真人验证，可能遇到无限循环
+  已知细节问题：  
+  - 调用用例复杂
+  - 截图大量，耗时久，任务成功率低
+  - 或触发 CAPTCHA 验证或 Cloudflare 真人验证，可能遇到无限循环
