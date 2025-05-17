@@ -97,7 +97,8 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 - 显著减少过滤拦截 → 得益于更智能、宽松的过滤机制，创作时几乎不再被打断。
 
 **说明：**
-
+- 模型 id：`gemini-2.0-flash-preview-image-generation`
+- 费率（输入→输出）：$0.1→$0.4/M tokens
 - 需要新增参数来体验新特性 `"modalities":["text","image"]`
 - 图片以 Base64 编码形式传递与输出
 - 作为实验模型，建议明确指出 "输出图片"，否则可能只有文本
@@ -234,7 +235,7 @@ response = client.chat.completions.create(
             "content": [
                 {
                     "type": "text",
-                    "text": "generate an adorable mermaid in the sea, bold outline, chibi cartoon, in the style of Children coloring book, B&W",
+                    "text": "generate an adorable mermaid in the sea, bold outline, chibi cartoon, in the style of Children coloring book, B&W, HD",
                 }
             ],
         },
