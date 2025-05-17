@@ -88,7 +88,7 @@ for i, generated_image in enumerate(response.generated_images):
 - 避免负面或违禁内容。
 - **避免在提示词中包含大量文本**，仅使用重点关键词以获得更稳定的结果。
 
-## Gemini 2.0 Flash 图像生成能力升级
+## Gemini 2.0 Flash 图像生成
 
 Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.0 相比，Gemini 的图像生成更适合于需要上下文理解和推理的场景，而非追求极致的艺术表现和视觉质量。
 
@@ -106,7 +106,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 - 了解更多请访问 [Gemini 官方文档](https://ai.google.dev/gemini-api/docs/image-generation)
 
 <Tip>
-  `gemini-2.0-flash-exp` 即将升级为 `gemini-2.0-flash-preview-image-generation`，让你的创作流程更流畅、更精彩。
+  `gemini-2.0-flash-exp` 已经正式升级为 `gemini-2.0-flash-preview-image-generation`，让你的创作流程更流畅、更精彩。
 </Tip>
   
 **输入参考结构：**
@@ -114,7 +114,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 ```json
 "modalities": ["text","image"]
 {
-    "model": "gemini-2.0-flash-exp",
+    "model": "gemini-2.0-flash-preview-image-generation",
     "messages": [
       {
         "role": "user",
@@ -182,11 +182,11 @@ fi
 
 IMG_BASE64=$(base64 "$B64FLAGS" "$IMG_PATH" 2>&1)
 
-curl https://api.aihubmix.com/v1/chat/completions \
+curl https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
-    "model": "gemini-2.0-flash-exp",
+    "model": "gemini-2.0-flash-preview-image-generation",
     "messages": [
       {
         "role": "user",
@@ -222,12 +222,12 @@ import base64
 
 client = OpenAI(
     api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
-    base_url="https://api.aihubmix.com/v1",
+    base_url="https://aihubmix.com/v1",
 )
 
 # Using text-only input
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.0-flash-preview-image-generation",
     messages=[
         {
             "role": "user",
@@ -301,7 +301,7 @@ import base64
 
 client = OpenAI(
     api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
-    base_url="https://api.aihubmix.com/v1",
+    base_url="https://aihubmix.com/v1",
 )
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -317,7 +317,7 @@ def encode_image(image_path):
 base64_image = encode_image(image_path)
 
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.0-flash-preview-image-generation",
     messages=[
         {
             "role": "user",

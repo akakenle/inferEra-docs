@@ -93,6 +93,7 @@ Creating effective prompts is crucial for obtaining desired images:
 Gemini also offers image generation capabilities as an alternative. Compared to Imagen 3.0, Gemini's image generation is better suited for scenarios that require contextual understanding and reasoning, rather than pursuing ultimate artistic expression and visual quality.
 
 **Instructions:**
+- Model id: `gemini-2.0-flash-preview-image-generation`
 - Need to add parameters to experience new features: `"modalities":["text","image"]`
 - Images are passed and output in Base64 encoding
 - As an experimental model, it's recommended to explicitly specify "output image", otherwise it might only output text
@@ -104,7 +105,7 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 ```json
 "modalities": ["text","image"]
 {
-    "model": "gemini-2.0-flash-exp",
+    "model": "gemini-2.0-flash-preview-image-generation",
     "messages": [
       {
         "role": "user",
@@ -170,11 +171,11 @@ fi
 
 IMG_BASE64=$(base64 "$B64FLAGS" "$IMG_PATH" 2>&1)
 
-curl https://api.aihubmix.com/v1/chat/completions \
+curl https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
-    "model": "gemini-2.0-flash-exp",
+    "model": "gemini-2.0-flash-preview-image-generation",
     "messages": [
       {
         "role": "user",
@@ -209,12 +210,12 @@ import base64
 
 client = OpenAI(
     api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
-    base_url="https://api.aihubmix.com/v1",
+    base_url="https://aihubmix.com/v1",
 )
 
 # Using text-only input
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.0-flash-preview-image-generation",
     messages=[
         {
             "role": "user",
@@ -287,7 +288,7 @@ import base64
 
 client = OpenAI(
     api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
-    base_url="https://api.aihubmix.com/v1",
+    base_url="https://aihubmix.com/v1",
 )
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -303,7 +304,7 @@ def encode_image(image_path):
 base64_image = encode_image(image_path)
 
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.0-flash-preview-image-generation",
     messages=[
         {
             "role": "user",
