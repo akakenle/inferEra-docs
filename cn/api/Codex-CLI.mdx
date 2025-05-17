@@ -8,6 +8,11 @@ icon: 'terminal'
 
 AiHubMix 提供了与 OpenAI [Codex CLI](https://github.com/openai/codex) 的无缝集成，让你可以在命令行环境中利用先进的 AI 编程助手。通过简单的配置步骤，即可在终端中直接使用自然语言执行各种编程和系统操作任务。
 
+使用之前，请先运行以下命令安装或更新：  
+```bash
+npm install -g @openai/codex
+```
+
 ## 配置步骤
 
 ### 1. 环境变量设置
@@ -56,7 +61,7 @@ codex
 ## 高级配置
 
 <Tip>
-- 默认模型为极具性价比的 `o4-mini`，可以在 `~/.codex/config.json`修改
+- 默认模型为 `codex-mini-latest`，一个专为编码任务微调过的 `o4-mini`，可以在 `~/.codex/config.json`修改
 - 目前仅支持 OpenAI 家的模型，模型列表可在 [Responses API 文档](https://platform.openai.com/docs/api-reference/responses) 中查看
 - 你可以通过编辑 `~/.codex/instructions.md` 文件来自定义系统提示词，定制 AI 助手的行为
 </Tip>
@@ -75,7 +80,7 @@ Usage
 
 Options
   -h, --help                 显示帮助信息并退出
-  -m, --model <model>        指定使用的模型 (默认: o4-mini)
+  -m, --model <model>        指定使用的模型 (默认: codex-mini-latest)
   -i, --image <path>         包含图像输入的文件路径
   -v, --view <rollout>       查看之前保存的会话记录
   -q, --quiet                非交互模式，仅打印助手的最终输出

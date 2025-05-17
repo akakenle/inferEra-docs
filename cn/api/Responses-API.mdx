@@ -37,12 +37,13 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-  model="gpt-4o-mini",
+  model="gpt-4o-mini", # codex-mini-latest 可用
   input="Tell me a three sentence bedtime story about a unicorn."
 )
 
 print(response)
 ```
+
 
 ```py 图文
 from openai import OpenAI
@@ -53,7 +54,7 @@ client = OpenAI(
 )
 
 response = client.responses.create(
-    model="gpt-4o-mini",
+    model="gpt-4o-mini", # codex-mini-latest 可用
     input=[
         {
             "role": "user",
@@ -70,6 +71,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py 流式
 from openai import OpenAI
@@ -90,6 +92,7 @@ for event in response:
   print(event)
 ```
 
+
 ```py 搜索
 from openai import OpenAI
 
@@ -106,6 +109,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py 函数调用
 from openai import OpenAI
@@ -143,6 +147,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py 推理
 from openai import OpenAI
