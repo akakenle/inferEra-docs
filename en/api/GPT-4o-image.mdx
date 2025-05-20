@@ -212,6 +212,86 @@ for chunk in stream:
 [Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
 ```
 
+## Compatibility with Official OpenAI API
+
+If you prefer using the latest image generation method released by OpenAI, you can refer to the following implementation. Just keep these 3 points in mind:
+
+1. Do not include the `quality` parameter — models like `gpt-4o-image-vip` and `gpt-4o-image` have it bundled internally.
+2. The `usage` field (token tracking) is not supported.
+3. The latest output returns Base64-encoded image data, and the current script already handles automatic saving.
+
+```py Python
+from openai import OpenAI
+import os
+import requests
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Replace with your AiHubMix API key
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+redesign poster of the movie [Black Swam], 3D cartoon, smooth render, bright tone, 2:3
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # Number of images to generate
+    size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    #quality="high" # Do not pass quality for reverse model, it's internally bound 📍
+)
+
+print(result) # Print full API response; usage not supported for reverse API 📍
+
+# Define output filename prefix and directory
+output_dir = "." # You can specify another directory
+file_prefix = "image_gen-reverse"
+
+# Ensure output directory exists
+os.makedirs(output_dir, exist_ok=True)
+
+# Iterate through all returned image data
+for i, image_data in enumerate(result.data):
+    # Handle base64 string first
+    if hasattr(image_data, "b64_json") and image_data.b64_json:
+        image_bytes = base64.b64decode(image_data.b64_json)
+        current_index = i
+        while True:
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name)
+            if not os.path.exists(file_path):
+                break
+            current_index += 1
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"Image saved to: {file_path} (base64)")
+    # Then handle url field (robust fallback in case of interface change)
+    elif hasattr(image_data, "url") and image_data.url:
+        try:
+            response = requests.get(image_data.url, stream=True)
+            response.raise_for_status()
+            image_bytes = response.content
+            current_index = i
+            while True:
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name)
+                if not os.path.exists(file_path):
+                    break
+                current_index += 1
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"Image saved to: {file_path} (url)")
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to download image #{i}: {e}")
+        except Exception as e:
+            print(f"Error occurred while processing image #{i}: {e}")
+    else:
+        print(f"No b64_json or url found in image #{i}, skipping save.")
+
+```
+
 ## Effect Demonstration
 
 <Card title="Girl with a Pearl Earring" img="../media/Girl-with-a-Pearl-Earring.PNG">
