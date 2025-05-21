@@ -4,12 +4,17 @@ description: "Gemini image/video generation"
 icon: 'eyes'
 ---
 
-## Imagen 3.0 Guide
+## Imagen Guide
 
-Imagen 3.0 is an advanced image generation AI model launched by Google, capable of creating high-quality, realistic images based on text prompts. This guide will help you understand how to use the Imagen 3.0 API to generate images, including parameter settings, model selection, and code examples.
+Imagen is an advanced series of image generation AI models developed by Google, capable of creating high-quality, realistic images based on text prompts. This guide will help you understand how to use the Imagen API to generate images, including parameter settings, model selection, and code examples.
+
+Available Models：
+- gemini-2.0-flash-preview-image-generation
+- imagen-4.0-ultra-generate-exp-05-20
+- imagen-3.0-generate-002
 
 <Tip>
-1. Currently, Imagen 3.0 only supports English prompts. When integrating, it's recommended to add automatic translation to allow users to use it without language barriers.
+1. Currently, Imagen only supports English prompts. When integrating, it's recommended to add automatic translation to allow users to use it without language barriers.
 2. Performance is unstable when rendering large amounts of text. It's recommended to only include key keywords.
 </Tip>
 
@@ -25,7 +30,7 @@ Imagen currently only supports English prompts and provides the following parame
 
 ### Usage Pricing
 
-The cost of using the Imagen 3.0 API to generate images is **$0.03 per image**. Please note that each API call can generate 1-4 images, and you will be charged based on the actual number of images generated.
+The cost of using the Imagen API to generate images is **$0.03 per image**. Please note that each API call can generate 1-4 images, and you will be charged based on the actual number of images generated.
 
 ### API Call Example
 
@@ -33,7 +38,7 @@ Here's a Python example of generating images using Imagen 3.0:
 
 <CodeGroup>
 
-```py Imagen 3.0
+```py Imagen
 import os
 import time
 from google import genai
@@ -90,7 +95,7 @@ Creating effective prompts is crucial for obtaining desired images:
 
 ## Gemini Image Generation
 
-Gemini also offers image generation capabilities as an alternative. Compared to Imagen 3.0, Gemini's image generation is better suited for scenarios that require contextual understanding and reasoning, rather than pursuing ultimate artistic expression and visual quality.
+Gemini also offers image generation capabilities as an alternative. Compared to Imagen, Gemini's image generation is better suited for scenarios that require contextual understanding and reasoning, rather than pursuing ultimate artistic expression and visual quality.
 
 **Instructions:**
 - Model id: `gemini-2.0-flash-preview-image-generation`
@@ -376,7 +381,7 @@ except Exception as e:
 - When you want to embed accurate visual content in long text sequences.
 - When you want to edit images conversationally while maintaining context.
 
-### When to Choose Imagen 3:
+### When to Choose Imagen:
 
 - When image quality, photorealism, artistic detail, or specific styles (such as impressionism, anime) are the primary considerations.
 - When performing professional editing tasks, such as product background updates or image enlargement.

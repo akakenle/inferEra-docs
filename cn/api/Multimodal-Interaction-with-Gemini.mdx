@@ -4,12 +4,17 @@ description: "Gemini 绘图和视频生成指引"
 icon: "eyes"
 ---
 
-## Imagen 3.0 绘图
+## Imagen 绘图
 
-Imagen 3.0 是 Google 推出的先进图像生成 AI 模型，能够根据文本提示创建高质量、逼真的图像。本指南将帮助您了解如何使用 Imagen 3.0 API 生成图像，包括参数设置、模型选择和代码示例。
+Imagen 是 Google 推出的先进图像生成 AI 模型系列，能够根据文本提示创建高质量、逼真的图像。本指南将帮助您了解如何使用 Imagen 系列 API 生成图像，包括参数设置、模型选择和代码示例。
+
+可用模型列表：
+- gemini-2.0-flash-preview-image-generation
+- imagen-4.0-ultra-generate-exp-05-20
+- imagen-3.0-generate-002
 
 <Tip>
-  1. 目前 Imagen 3.0 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
+  1. 目前 Imagen 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
   2. 绘制大量文本的表现不稳定，建议只绘制重点关键词
 </Tip>
 
@@ -25,15 +30,15 @@ Imagen 目前仅支持英文提示词，并提供以下参数：
 
 ### 费率
 
-使用 Imagen 3.0 API 生成图像的费用为 **\$0.03/张**。请注意，每次调用可以生成 1-4 张图像，费用将按实际生成的图像数量计算。
+使用 Imagen API 生成图像的费用为 **\$0.03/张**。请注意，每次调用可以生成 1-4 张图像，费用将按实际生成的图像数量计算。
 
 ### 调用示例
 
-以下是使用 Imagen 3.0 生成图像的 Python 调用示例：
+以下是使用 Imagen 生成图像的 Python 调用示例：
 
 <CodeGroup>
 
-```py Imagen 3.0
+```py Imagen
 import os
 import time
 from google import genai
@@ -389,7 +394,7 @@ except Exception as e:
 - 希望在长文本序列中嵌入准确的视觉内容。
 - 希望在保持上下文的同时以对话方式编辑图像。
 
-### 选择 Imagen 3 的情况：
+### 选择 Imagen 的情况：
 
 - 图像质量、照片真实感、艺术细节或特定风格（如印象派、动漫）是首要考虑因素。
 - 执行专业编辑任务，如产品背景更新或图像放大。
