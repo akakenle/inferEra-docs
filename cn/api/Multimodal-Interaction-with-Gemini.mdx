@@ -93,6 +93,7 @@ for i, generated_image in enumerate(response.generated_images):
 - 包含技术细节（如 DSLR、高清、细节丰富等）。
 - 避免负面或违禁内容。
 - **避免在提示词中包含大量文本**，仅使用重点关键词以获得更稳定的结果。
+- 关键词包含 `girl` 时容易触发 TypeError: 'NoneType' object is not iterable 报错，不推荐用于人物绘制
 
 ## Gemini 2.0 Flash 图像生成
 
