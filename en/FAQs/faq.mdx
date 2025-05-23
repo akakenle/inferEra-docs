@@ -4,6 +4,82 @@ description: "The most common questions about our service"
 icon: 'square-question'
 ---
 
+## Why Does My LLM Return Incorrect Information About Its Underlying Model?
+
+### Model Hallucination: When the LLM Sounds Confident But Is Wrong
+
+When working with large language models like GPT-4 or Claude, developers may encounter cases where the model gives incorrect information about its architecture, origin, or performance. This behavior is a form of hallucination—a confident yet unfounded response. It is especially common when using model aggregation platforms or proxy services, and should not be mistaken for deliberate tampering by the platform.
+
+You can cross-check the actual model being used through system-level observable indicators such as:
+
+- **Context window size**: For example, GPT-4 Turbo supports up to 128k tokens—watch for truncation behavior.
+- **First-token latency**: Different models have noticeably different response times.
+- **Generation throughput (tokens/sec)**: GPT-3.5 and Claude-Haiku are typically much faster than GPT-4 or Claude-Opus.
+- **API metadata or response headers**: Look for fields like `model_id` or `provider` to verify source.
+- **Stylistic fingerprints**: Claude models tend to be more restrained and implicit, while GPT models are more logic-driven and assertive.
+
+Monitoring these signals together can help validate the true backend model and prevent mistaking hallucinated responses for factual system information.
+
+### Common Hallucination Scenarios
+
+| Type of Question     | Example Question               | Typical Hallucinated Answer                            |
+|----------------------|--------------------------------|---------------------------------------------------------|
+| Model Identity       | "Are you GPT-4?"               | "I'm GPT-4 Turbo, released in June 2024."              |
+| Source Attribution   | "Are you Claude?"              | "I'm Claude 3.5 Sonnet, provided by Anthropic."        |
+| Performance Claims   | "Who's faster, you or Gemini?" | "I'm faster and have more parameters." (fabricated)    |
+
+### Why Does This Happen?
+
+1. **Language models are not aware of their environment**  
+   LLMs have no actual awareness of where they are running. They respond based purely on patterns in text, not on introspective system data.
+
+2. **Injected prompts can be inaccurate or misleading**  
+   Some platforms inject system prompts that assert identity, like “You are Claude Sonnet,” which influences the model’s response regardless of actual backend.
+
+3. **Aggregation layers obscure real runtime details**  
+   When proxying across multiple providers, the model itself cannot detect the infrastructure behind it—it only sees the prompt.
+
+### Mitigation Strategies
+
+#### 1. Do not trust identity claims made by the model itself
+
+Any self-description like “I am GPT-4” or “I run on Claude” should be treated as **textual output**, not system truth.
+
+#### 2. Propagate trusted metadata from the backend
+
+Use system-level APIs to provide metadata about the model rather than relying on model responses. For example:
+
+```json
+{
+  "model_id": "claude-sonnet-202405",
+  "provider": "Anthropic",
+  "source": "official_api",
+  "note": "Do not infer identity from model's own response"
+}
+````
+
+This metadata should be passed through the call chain and surfaced where needed.
+
+#### 3. Inject identity explicitly through the system prompt
+
+If you need the model to refer to its own identity, do so via a fixed `system prompt`, and lock it down to prevent hallucination:
+
+```
+You are running on Platform X, using the Anthropic Claude Sonnet model via backend API. Do not modify or speculate on your identity.
+```
+
+#### 4. Surface model info in the frontend from system, not model output
+
+Avoid presenting the model’s own claims as “official model information.” Clearly label such content as “system verified” versus “model generated.”
+
+#### 5. Use hallucination detection and confidence scoring
+
+Implement detection logic to flag statements like “I am GPT-4,” assigning low confidence scores or adding warnings. This can involve keyword heuristics, secondary model evaluation, or fine-tuned classifiers.
+
+### Conclusion
+
+Language models are not reliable sources for identifying their own backend, provider, or performance tier. To build trustworthy AI systems, **model identity must come from the system—not from the model's own mouth**.
+
 ## Why does GPT-4 consume tokens so quickly?
 - GPT-4 consumes tokens 20 to 40 times faster than GPT-3.5-turbo. Assuming you purchase 90,000 tokens, using an average multiplier of 30, you get about 3,000 words. Including historical messages further reduces the number of messages you can send. In extreme cases, a single message can consume all 90,000 tokens, so please use them cautiously.
 
@@ -18,8 +94,7 @@ icon: 'square-question'
 ## Why doesn't GPT-4 know who it is?
 Asking GPT-4 questions like "Who are you?" or "What model are you?" will generally result in it saying it's GPT-3, likely due to preset reasons. Both GPT-4 and 3.5 use data from before 2021, when GPT-4 didn't exist. Some platforms don't answer as GPT-3 because they preset prompts to make GPT think it's another model, which can be seen by the total token consumption of the Q&A. Preset prompts consume tokens. If you notice differences between the website and API responses, it's normal. First, GPT-4's responses to the same question vary each time; second, the website has optimized GPT-4's parameters.
 
-### See the popular science on Zhihu:
-https://zhuanlan.zhihu.com/p/646500946
+See the popular science on [Zhihu](https://zhuanlan.zhihu.com/p/646500946)
 
 ## Why does GPT-4 give such silly answers? I still think you're a fake GPT-4.
 GPT-4 isn't omnipotent; its training parameters aren't much larger than GPT-3's. Don't mythologize GPT-4 due to marketing hype. Also, since Chinese corpus accounts for a small portion of training, it may not perform well on some Chinese questions. The same question asked in English might yield completely different results. You can try asking in English. GPT-4 excels in reasoning ability. From user experiences, it's better at coding than GPT-3.5 but still gives fabricated answers.
