@@ -12,13 +12,13 @@ icon: 'square-question'
 
 你可以通过相关可追踪的系统指标进行交叉验证，例如：
 
-- **上下文窗口大小**：如 GPT-4 Turbo 支持最大 128k token，上下文截断点可间接判断；
+- **上下文窗口大小**：如 GPT-4 Turbo 支持最大 128k token，传入 `max_tokens` 参数可以验证、上下文截断点也可用作间接判断；
 - **首 Token 延迟（first-token latency）**：不同模型响应速度差异显著；
 - **生成吞吐率（tokens/sec）**：GPT-3.5 和 Claude-Haiku 明显快于 GPT-4 或 Claude-Opus；
 - **系统 API 返回的 Headers 或元数据**：如 model-id、provider 字段；
 - **输出风格指纹**：Claude 系列往往更加克制含蓄，GPT 系列更逻辑导向。
 
-通过上述信号协同观察，可辅助验证模型实际运行基座，避免将幻觉误当作系统真相。
+通过上述信号协同观察，可辅助验证模型实际运行基座，避免将幻觉误当作系统真相。  
 如果你需要追踪首 Token 延迟或吞吐率的测试脚本，可以到此[下载](https://github.com/jerlinn/inferHub/tree/main/scripts)。
 
 ### 常见幻觉场景举例
