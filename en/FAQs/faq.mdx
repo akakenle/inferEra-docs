@@ -10,15 +10,18 @@ icon: 'square-question'
 
 When working with large language models like GPT-4 or Claude, developers may encounter cases where the model gives incorrect information about its architecture, origin, or performance. This behavior is a form of hallucination—a confident yet unfounded response. It is especially common when using model aggregation platforms or proxy services, and should not be mistaken for deliberate tampering by the platform.
 
-You can cross-check the actual model being used through system-level observable indicators such as:
+You can cross-check the actual backend model using traceable system-level signals such as:
 
-- **Context window size**: For example, GPT-4 Turbo supports up to 128k tokens—watch for truncation behavior.
-- **First-token latency**: Different models have noticeably different response times.
-- **Generation throughput (tokens/sec)**: GPT-3.5 and Claude-Haiku are typically much faster than GPT-4 or Claude-Opus.
-- **API metadata or response headers**: Look for fields like `model_id` or `provider` to verify source.
-- **Stylistic fingerprints**: Claude models tend to be more restrained and implicit, while GPT models are more logic-driven and assertive.
+- **Context window size**: For example, GPT-4 Turbo supports up to 128k tokens. You can validate this by passing the `max_tokens` parameter or inferring from where context truncation occurs.
+- **First-token latency**: Different models exhibit distinct response delays before the first token is returned.
+- **Generation throughput (tokens/sec)**: GPT-3.5 and Claude-Haiku are noticeably faster than GPT-4 or Claude-Opus.
+- **System API response headers or metadata**: Fields like `model-id` and `provider` can reveal backend identity.
+- **Native call constraints**: For instance, OpenAI or Gemini models cannot be queried via Claude-native interfaces—this applies to similar mismatches as well.
+- **Stylistic fingerprinting**: Claude models tend to be more restrained and implicit, while GPT models are generally more logic-driven and declarative.
 
-Monitoring these signals together can help validate the true backend model and prevent mistaking hallucinated responses for factual system information.
+Observing these signals in combination can help verify the actual model running under the hood and avoid mistaking hallucinated claims as ground truth.
+
+If you need test scripts for measuring first-token latency or throughput, you can [download them here](https://github.com/jerlinn/inferHub/tree/main/scripts).
 
 ### Common Hallucination Scenarios
 
@@ -91,31 +94,10 @@ Language models are not reliable sources for identifying their own backend, prov
 - Click the settings button in the lower-left corner to turn off automatic title generation, which can reduce token consumption.
 - During a conversation, click the robot icon above the chat box to quickly switch models. Prefer using 3.5 for Q&A, and if unsatisfied, switch to 4.0 to ask again.
 
-## Why doesn't GPT-4 know who it is?
-Asking GPT-4 questions like "Who are you?" or "What model are you?" will generally result in it saying it's GPT-3, likely due to preset reasons. Both GPT-4 and 3.5 use data from before 2021, when GPT-4 didn't exist. Some platforms don't answer as GPT-3 because they preset prompts to make GPT think it's another model, which can be seen by the total token consumption of the Q&A. Preset prompts consume tokens. If you notice differences between the website and API responses, it's normal. First, GPT-4's responses to the same question vary each time; second, the website has optimized GPT-4's parameters.
-
-See the popular science on [Zhihu](https://zhuanlan.zhihu.com/p/646500946)
-
-## Why does GPT-4 give such silly answers? I still think you're a fake GPT-4.
-GPT-4 isn't omnipotent; its training parameters aren't much larger than GPT-3's. Don't mythologize GPT-4 due to marketing hype. Also, since Chinese corpus accounts for a small portion of training, it may not perform well on some Chinese questions. The same question asked in English might yield completely different results. You can try asking in English. GPT-4 excels in reasoning ability. From user experiences, it's better at coding than GPT-3.5 but still gives fabricated answers.
-
-## How to verify if it's GPT-3.5 or GPT-4?
-We provide a simple method to verify whether you're using GPT-3.5 or GPT-4. Here are some test questions and their expected answers for different models:
-Test questions:
-- What is the day after yesterday's today? GPT-3.5 should answer "yesterday," while GPT-4 should answer "today."
-- There are 9 birds on a tree, a hunter shoots one, how many are left? GPT-3.5 might say "8," while GPT-4 will tell you "0, the others flew away."
-- Why did Zhou Shuren hit Lu Xun? GPT-3.5 might give a fabricated answer, while GPT-4 will point out that "Lu Xun" and "Zhou Shuren" are the same person.
-
-## I don't believe you; you're just a shell of 3.5, pretending to be GPT-4.
-The platform pays a significant cost to suppliers for the GPT interface every month. If you can't distinguish whether it's GPT-4 and insist on your judgment, you're not the target customer group of the platform. You can use services from other platforms that you "think" are the "real" GPT-4.
-
-## What are the differences between GPT-4 and GPT-3.5?
-From a model perspective, GPT-3.5 supports a maximum of 4k tokens, about 2,000 Chinese characters. Exceeding this token count results in errors and inability to process. Our GPT-4 model supports up to 8k (about 4,000 Chinese characters), and the GPT-4-32k model supports up to 32k (about 16,000 Chinese characters). This is the biggest difference at the interface level, allowing GPT-4 to learn and process ultra-long contexts, which GPT-3.5 cannot do. In terms of actual performance, GPT-4 shows significant advantages in complex logical reasoning problems. When OpenAI launched GPT-4, they provided an example of listing several people's available times for a meeting, and GPT-3 gave incorrect nonsense answers, while GPT-4 provided the correct answer. However, in actual tests, this accuracy is only evident when asking in English. The same question translated into Chinese results in incorrect answers, showing that GPT-4 is not a silver bullet, just an evolved version of GPT-3.5 with many unsatisfactory aspects. Many review bloggers have tested this, and you can learn how they test.
-
 ## Why doesn't the backend show the used quota when creating a key?
 When set to unlimited quota, the used quota won't update. Change the unlimited quota to a limited quota to see the usage.
 
-User Agreement
+## User Agreement
 Payment is considered agreement to this agreement! Otherwise, please do not pay!
 1. This service will not persistently store any user's chat information in any form;
 2. This service does not know and cannot know any text content transmitted by users in this service. Any illegal or criminal consequences caused by users using this service are borne by the user, and this service will fully cooperate with any related investigations that may arise.
