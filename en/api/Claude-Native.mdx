@@ -27,7 +27,7 @@ pip install -U anthropic
 
 <Tip>
   1. For models version 3.5 and above, if you need output longer than 4096 tokens, be sure to explicitly specify the `"max_tokens"` parameter, referring to the `Max Output` column in the table above.
-  2. For Sonnet 3.7, you can increase the max output from 64K to 128K by passing `default_headers={"anthropic-beta": "output-128k-2025-02-19"}`. See the "Streaming 128K" example below.
+  2. For Sonnet 3.7, you can increase the max output from 64K to 128K by passing `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}`. See the "Streaming 128K" example below.
 </Tip>
 
 **Endpoint:** `POST` /v1/messages
@@ -79,10 +79,7 @@ import anthropic
 
 client = anthropic.Anthropic(
     api_key="sk-***", # Replace it by your AiHubMix Key
-    base_url="https://aihubmix.com",
-    default_headers={
-        "anthropic-beta": "output-128k-2025-02-19"
-    }
+    base_url="https://aihubmix.com"
 )
 
 with client.messages.stream(
@@ -91,6 +88,9 @@ with client.messages.stream(
     messages=[
         {"role": "user", "content": "Please generate the beginning of a novel that will span 100,000 tokens."}
     ],
+    extra_headers={
+        "anthropic-beta": "output-128k-2025-02-19"
+    }
 ) as stream:
     for text in stream.text_stream:
         print(text, end="", flush=True)
