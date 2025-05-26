@@ -26,7 +26,8 @@ pip install -U anthropic
 | Training Cut-off  | Mar 2025      | Mar 2025        | Nov 2024          | Apr 2024          | July 2024        | Aug 2023      | Aug 2023       |
 
 <Tip>
-  For models version 3.5 and above, if you need output longer than 4096 tokens, be sure to explicitly specify the `"max_tokens"` parameter, referring to the `Max Output` column in the table above.
+  1.For models version 3.5 and above, if you need output longer than 4096 tokens, be sure to explicitly specify the `"max_tokens"` parameter, referring to the `Max Output` column in the table above.
+  2. For Sonnet 3.7, you can increase the max output from 64K to 128K by passing `default_headers={"anthropic-beta": "output-128k-2025-02-19"}`. See the "Streaming 128K" example below.
 </Tip>
 
 **Endpoint:** `POST` /v1/messages
@@ -37,7 +38,7 @@ pip install -U anthropic
 
 ```shell Curl
 curl https://aihubmix.com/v1/messages \ # Replace the official endpoint with AiHubMix’s API endpoint
-     --header "x-api-key: $ANTHROPIC_API_KEY" \ # Replace with the key you generated in AiHubMix
+     --header "x-api-key: $AIHUBMIX_API_KEY" \ # Replace with the key you generated in AiHubMix
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --data \
@@ -56,8 +57,7 @@ import anthropic
 
 # Initialize the Anthropics client
 client = anthropic.Anthropic(
-    # Replace this with the API key you generated on AiHubMix
-    api_key="ANTHROPIC_API_KEY",
+    api_key="sk-***", # Replace it by your AiHubMix Key
     base_url="https://aihubmix.com"
 )
 
@@ -72,6 +72,28 @@ message = client.messages.create(
 
 # Print the response content
 print(message.content)
+```
+
+```py Python Streaming 128K
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # Replace it by your AiHubMix Key
+    base_url="https://aihubmix.com",
+    default_headers={
+        "anthropic-beta": "output-128k-2025-02-19"
+    }
+)
+
+with client.messages.stream(
+    model="claude-3-7-sonnet-20250219",  # claude-opus-4-20250514, claude-sonnet-4-20250514
+    max_tokens=128000,
+    messages=[
+        {"role": "user", "content": "Please generate the beginning of a novel that will span 100,000 tokens."}
+    ],
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
 ```
 
 </CodeGroup>

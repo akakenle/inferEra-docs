@@ -26,7 +26,8 @@ pip install -U anthropic
 | 训练数据截止时间 | 2025年3月       | 2025年3月         | 2024年11月          | 2024年4月           | 2024年7月          | 2023年8月       | 2023年8月        |
 
 <Tip>
-  对于 3.5 及以上的模型，如果需要超过 4096 Tokens 的输出，请传入明确的 "max_tokens" 数值，参考上方表格中的`最长输出长度`。
+  1. 对于 3.5 及以上的模型，如果需要超过 4096 Tokens 的输出，请传入明确的 "max_tokens" 数值，参考上方表格中的`最长输出长度`。
+  2. 对于 Sonnet 3.7，你可以通过传入 `default_headers={"anthropic-beta": "output-128k-2025-02-19"}` 来把最大输出从 64K 扩展到 128K，见下方「流式 128K」调用。
 </Tip>
 
 **端点（Endpoint）：** `POST` /v1/messages
@@ -51,7 +52,7 @@ curl https://aihubmix.com/v1/messages \
 ```
 
 
-```py Python
+```py Python 非流式
 import anthropic
 
 client = anthropic.Anthropic(
@@ -66,6 +67,28 @@ message = client.messages.create(
     ]
 )
 print(message.content)
+```
+
+```py Python 流式 128K
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com",
+    default_headers={
+        "anthropic-beta": "output-128k-2025-02-19"
+    }
+)
+
+with client.messages.stream(
+    model="claude-3-7-sonnet-20250219",  # claude-opus-4-20250514, claude-sonnet-4-20250514
+    max_tokens=128000,
+    messages=[
+        {"role": "user", "content": "请生成一个 10 万 tokens 的小说开头。"}
+    ],
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
 ```
 
 </CodeGroup>
