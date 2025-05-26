@@ -1,7 +1,7 @@
 ---
 title: "Claude 原生接口调用"
 description: " "
-icon: 'c'
+icon: "c"
 ---
 
 ## 说明
@@ -11,15 +11,30 @@ Claude 系列模型支持通过官方原生接口调用，使用之前确保安�
 ```bash
 pip install -U anthropic
 ```
+
 <Info>
-非 claude 模型请用 openai 的接口格式调用。
+  非 claude 模型请用 openai 的接口格式调用。
 </Info>
+
+## 模型信息
+
+| 模型名称     | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
+| -------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
+| 是否支持扩展思考 | 是             | 是               | 是                 | 否                 | 否                | 否             | 否              |
+| 上下文窗口大小  | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
+| 最长输出长度   | 32000 tokens  | 64000 tokens    | 64000 tokens      | 8192 tokens       | 8192 tokens      | 4096 tokens   | 4096 tokens    |
+| 训练数据截止时间 | 2025年3月       | 2025年3月         | 2024年11月          | 2024年4月           | 2024年7月          | 2023年8月       | 2023年8月        |
+
+<Tip>
+  对于 3.5 及以上的模型，如果需要超过 4096 Tokens 的输出，请传入明确的 "max_tokens" 数值，参考上方表格中的`最长输出长度`。
+</Tip>
 
 **端点（Endpoint）：** `POST` /v1/messages
 
 ## 调用
 
 <CodeGroup>
+
 ```shell Curl
 curl https://aihubmix.com/v1/messages \
      --header "x-api-key: $ANTHROPIC_API_KEY" \ # 换成你在 AiHubMix 生成的密钥
@@ -34,6 +49,7 @@ curl https://aihubmix.com/v1/messages \
     ]
 }'
 ```
+
 
 ```py Python
 import anthropic
@@ -51,6 +67,7 @@ message = client.messages.create(
 )
 print(message.content)
 ```
+
 </CodeGroup>
 
 ### Body 请求结构
@@ -70,16 +87,16 @@ print(message.content)
 
 ### 请求参数
 
-|名称 | 位置 | 类型 | 必选 | 说明|
-|---|---|---|---|---|
-|x-api-key|header|string| 否 |Bearer AIHUBMIX_API_KEY|
-|Content-Type|header|string| 否 |none|
-|body|body|object| 否 |none|
-|» model|body|string| 是 |none|
-|» messages|body|[object]| 是 |none|
-|»» role|body|string| 否 |none|
-|»» content|body|string| 是 |none|
-|» max_tokens|body|number| 是 |none|
+| 名称           | 位置     | 类型       | 必选 | 说明                      |
+| ------------ | ------ | -------- | --- | ----------------------- |
+| x-api-key    | header | string   | 否  | Bearer AIHUBMIX_API_KEY |
+| Content-Type | header | string   | 否  | none                    |
+| body         | body   | object   | 否  | none                    |
+| » model      | body   | string   | 是  | none                    |
+| » messages   | body   | [object] | 是  | none                    |
+| »» role      | body   | string   | 否  | none                    |
+| »» content   | body   | string   | 是  | none                    |
+| » max_tokens | body   | number   | 是  | none                    |
 
 ### 返回示例
 
@@ -112,9 +129,9 @@ print(message.content)
 
 ### 返回结果
 
-|状态码 | 状态码含义 | 说明 | 数据模型|
-|---|---|---|---|
-|200|OK|none|Inline|
+| 状态码 | 状态码含义 | 说明   | 数据模型   |
+| --- | ----- | ---- | ------ |
+| 200 | OK    | none | Inline |
 
 ## 在应用中使用（以 Lobe-Chat 为例）
 

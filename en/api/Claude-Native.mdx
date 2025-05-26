@@ -1,7 +1,7 @@
 ---
 title: "Claude Native API Integration"
 description: " "
-icon: 'c'
+icon: "c"
 ---
 
 ## Instructions
@@ -13,14 +13,28 @@ pip install -U anthropic
 ```
 
 <Info>
-For non-Claude models, please use the OpenAI API format instead.
+  For non-Claude models, please use the OpenAI API format instead.
 </Info>
+
+## Models Information
+
+| Model             | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
+| ----------------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
+| Extended Thinking | Yes           | Yes             | Yes               | No                | No               | No            | No             |
+| Context Window    | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
+| Max Output        | 32000 tokens  | 64000 tokens    | 64000 tokens      | 8192 tokens       | 8192 tokens      | 4096 tokens   | 4096 tokens    |
+| Training Cut-off  | Mar 2025      | Mar 2025        | Nov 2024          | Apr 2024          | July 2024        | Aug 2023      | Aug 2023       |
+
+<Tip>
+  For models version 3.5 and above, if you need output longer than 4096 tokens, be sure to explicitly specify the `"max_tokens"` parameter, referring to the `Max Output` column in the table above.
+</Tip>
 
 **Endpoint:** `POST` /v1/messages
 
 ## Usage
 
 <CodeGroup>
+
 ```shell Curl
 curl https://aihubmix.com/v1/messages \ # Replace the official endpoint with AiHubMix’s API endpoint
      --header "x-api-key: $ANTHROPIC_API_KEY" \ # Replace with the key you generated in AiHubMix
@@ -35,6 +49,7 @@ curl https://aihubmix.com/v1/messages \ # Replace the official endpoint with AiH
     ]
 }'
 ```
+
 
 ```py Python
 import anthropic
@@ -58,6 +73,7 @@ message = client.messages.create(
 # Print the response content
 print(message.content)
 ```
+
 </CodeGroup>
 
 ### Request Body
@@ -77,16 +93,16 @@ print(message.content)
 
 ### Request Parameters
 
-|Name | Location | Type | Required | Description|
-|---|---|---|---|---|
-|x-api-key|header|string| No |Bearer AIHUBMIX_API_KEY|
-|Content-Type|header|string| No |none|
-|body|body|object| No |none|
-|» model|body|string| Yes |none|
-|» messages|body|[object]| Yes |none|
-|»» role|body|string| No |none|
-|»» content|body|string| Yes |none|
-|» max_tokens|body|number| Yes |none|
+| Name         | Location | Type     | Required | Description             |
+| ------------ | -------- | -------- | -------- | ----------------------- |
+| x-api-key    | header   | string   | No       | Bearer AIHUBMIX_API_KEY |
+| Content-Type | header   | string   | No       | none                    |
+| body         | body     | object   | No       | none                    |
+| » model      | body     | string   | Yes      | none                    |
+| » messages   | body     | [object] | Yes      | none                    |
+| »» role      | body     | string   | No       | none                    |
+| »» content   | body     | string   | Yes      | none                    |
+| » max_tokens | body     | number   | Yes      | none                    |
 
 ### Response Example
 
@@ -119,9 +135,9 @@ print(message.content)
 
 ### Response Results
 
-|Status Code | Status Description | Description | Data Model|
-|---|---|---|---|
-|200|OK|none|Inline|
+| Status Code | Status Description | Description | Data Model |
+| ----------- | ------------------ | ----------- | ---------- |
+| 200         | OK                 | none        | Inline     |
 
 ## Using Claude in Applications (Example: Lobe-Chat)
 
@@ -130,9 +146,10 @@ Here’s how you can configure Claude models in a third-party application like L
 1. Navigate to the settings page and select **Claude** as your model provider.
 2. Enter your [API Key](https://aihubmix.com/token) from AiHubMix.
 3. Set the API proxy endpoint to:
-    ```
-    https://aihubmix.com
-    ```
+
+   ```
+   https://aihubmix.com
+   ```
 4. (Recommended) Enable the "Client Request Mode" option.
 5. Add your chosen model to the model list.
    - It’s recommended to copy the model name from AiHubMix's settings page and paste it in the application.
