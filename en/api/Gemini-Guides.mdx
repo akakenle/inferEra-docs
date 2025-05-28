@@ -229,7 +229,7 @@ print(completion.choices[0].message.content)
 ```
 
 
-```shell Curl
+```shell Curl-Basic
 curl -X POST https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
@@ -244,13 +244,32 @@ curl -X POST https://aihubmix.com/v1/chat/completions \
   }'
 ```
 
+```shell Curl-Show Thinking
+curl https://aihubmix.com/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer sk-***" \
+-d '{
+  "model": "gemini-2.5-pro-preview-05-06",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain the Occam'\''s Razor concept and provide an everyday example of it."
+    }
+  ],
+  "reasoning": {
+    "enabled": true,
+    "budget": 1024
+  }
+}'
+```
+
 </CodeGroup>
 
-For complex tasks, simply set the model id to the default `gemini-2.5-flash-preview-04-17` to enable thinking.
-
-<Info>
-  Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 24K. The default budget is 1024, and the optimal marginal effect is 16K.
-</Info>
+<Tip>
+  1. For complex tasks, simply set the model id to the default `gemini-2.5-flash-preview-04-17` to enable thinking.
+  2. Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 24K. The default budget is 1024, and the optimal marginal effect is 16K.
+  3. Only by including the parameter "reasoning": { "enabled": true, "budget": 1024 } in the HTTP request can the thinking content (reasoning_content) be explicitly displayed. 
+</Tip>
 
 ## Media Understanding
 

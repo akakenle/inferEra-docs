@@ -204,7 +204,6 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-
 ```py Python 控制预算
 from openai import OpenAI
 
@@ -227,8 +226,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-
-```shell Curl
+```shell Curl-基础调用
 curl -X POST https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
@@ -243,13 +241,32 @@ curl -X POST https://aihubmix.com/v1/chat/completions \
   }'
 ```
 
+```shell Curl-Thinking 显示
+curl https://aihubmix.com/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer sk-***" \
+-d '{
+  "model": "gemini-2.5-pro-preview-05-06",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain the Occam'\''s Razor concept and provide an everyday example of it."
+    }
+  ],
+  "reasoning": {
+    "enabled": true,
+    "budget": 1024
+  }
+}'
+```
+
 </CodeGroup>
 
-用于复杂任务时，只需要将模型 id 设置为默认开启思考的 `gemini-2.5-flash-preview-04-17` 即可。
-
-<Info>
-  Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
-</Info>
+<Tip>
+  1. 用于复杂任务时，只需要将模型 id 设置为默认开启思考的 `gemini-2.5-flash-preview-04-17` 即可。
+  2. Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
+  3. 只能通过 http 请求入参 `"reasoning": { "enabled": true, "budget": 1024 }` 来显示 thinking 内容（`reasoning_content`）
+</Tip>
 
 ## 多媒体文件
 
@@ -523,18 +540,22 @@ CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, compl
 ## Tokens 用量追踪
 
 1. Gemini 原生采用 `usage_metadata` 来[追踪使用的 token](https://ai.google.dev/gemini-api/docs/tokens?lang=python)，其中的字段对应如下：
-  - prompt_token_count: 输入 token 数
-  - candidates_token_count: 输出 token 数
-  - thoughts_token_count: 推理使用的 token 数，性质上也是输出 token
-  - total_token_count: 总 token 使用量（输入+输出）
+
+- prompt_token_count: 输入 token 数
+- candidates_token_count: 输出 token 数
+- thoughts_token_count: 推理使用的 token 数，性质上也是输出 token
+- total_token_count: 总 token 使用量（输入\+输出）
+
 2. 对于 OpenAI 兼容格式，则采用 `.usage` 来追踪，字段对应如下：
-  - usage.completion_tokens: 输入 token 数
-  - usage.prompt_tokens: 输出 token 数（包含推理使用的 token 数）
-  - usage.total_tokens:总 token 使用量
+
+- usage.completion_tokens: 输入 token 数
+- usage.prompt_tokens: 输出 token 数（包含推理使用的 token 数）
+- usage.total_tokens:总 token 使用量
 
 **使用方法如下:**
+
 <CodeGroup>
-  
+
 ```py Gemini 原生
 from google import genai
 from google.genai import types
@@ -576,8 +597,8 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-
 ```
+
 
 ```py OpenAI 兼容
 from openai import OpenAI
