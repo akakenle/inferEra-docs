@@ -1,7 +1,7 @@
 ---
 title: "TTS 文本转语音"
 description: "使用 AI 模型将文本转换为自然语音，支持多种语音风格和输出格式"
-icon: 'monitor-waveform'
+icon: "monitor-waveform"
 ---
 
 ## 介绍
@@ -13,8 +13,9 @@ icon: 'monitor-waveform'
 - 提供实时音频输出流
 
 **可用模型列表：**
-- **gpt-4o-audio-preview** - OpenAI 最新的音频生成模型，支持对话式音频生成
-- **gpt-4o-mini-tts** - 智能实时应用的首选模型，支持高级语音控制，可以通过提示词控制多种语音特性：
+
+- **gpt-4o-audio-preview** —— OpenAI 最新的音频生成模型，支持对话式音频生成
+- **gpt-4o-mini-tts** —— 智能实时应用的首选模型，支持高级语音控制，可以通过提示词控制多种语音特性：
   - 口音 (Accent)
   - 情感范围 (Emotional range)
   - 语调 (Intonation)
@@ -22,24 +23,27 @@ icon: 'monitor-waveform'
   - 语速 (Speed of speech)
   - 语调 (Tone)
   - 轻声说话 (Whispering)
-- **tts-1-hd** - 高清音质的 TTS 模型
-- **tts-1** - 标准 TTS 模型，平衡质量和速度
+- **tts-1-hd** —— 高清音质的上一代 TTS 模型
+- **tts-1** —— 标准 TTS 模型，平衡质量和速度
 
 <Tip>
-**性能建议：** 为获得最快的响应时间，建议使用 `wav` 或 `pcm` 作为响应格式。对于高质量音频，建议使用 `tts-1-hd`；对于更快的生成速度，使用 `tts-1`；对于智能语音应用，推荐使用 `gpt-4o-mini-tts`。
+  **性能建议：** 为获得最快的响应时间，建议使用 `wav` 或 `pcm` 作为响应格式。对于高质量音频，建议使用 `tts-1-hd`；对于更快的生成速度，使用 `tts-1`；对于智能语音应用，推荐使用 `gpt-4o-mini-tts`。
 
-**音色预览：** 你可以在 [OpenAI.fm](https://www.openai.fm/) 试听不同音色效果。
+  **音色预览：** 你可以在 [OpenAI.fm](https://www.openai.fm/) 试听不同音色效果。
 </Tip>
 
 ## 模型调用方式
 
 ### 标准 TTS 模型（tts-1, tts-1-hd）
+
 使用 `/v1/audio/speech` 端点，通过 `client.audio.speech.create()` 方法调用。
 
 ### gpt-4o-mini-tts 模型
+
 使用 `/v1/audio/speech` 端点，支持 `instructions` 参数进行高级语音控制。
 
 ### gpt-4o-audio-preview 模型
+
 使用 `/v1/chat/completions` 端点，需要设置 `modalities: ["text", "audio"]` 和 `audio` 配置。
 
 ### 请求参数
@@ -58,15 +62,15 @@ icon: 'monitor-waveform'
   用于合成的语音。可选值：`alloy`、`echo`、`fable`、`onyx`、`nova`、`shimmer`
 </ParamField>
 
-<ParamField body="response_format" type="string" optional>
+<ParamField body="response_format" type="string">
   音频输出格式。支持格式：`mp3`、`opus`、`aac`、`flac`、`wav`、`pcm`。默认为 `mp3`
 </ParamField>
 
-<ParamField body="speed" type="number" optional>
-  生成音频的语速。取值范围 0.25 到 4.0。默认为 1.0。**注意：`gpt-4o-mini-tts` 不支持此参数，但你可以通过自然语言描述来控制语速**
+<ParamField body="speed" type="number">
+  生成音频的语速。取值范围 0.25 到 4.0。默认为 1.0。**`注意：gpt-4o-mini-tts 不支持此参数，但你可以通过自然语言描述来控制语速`**
 </ParamField>
 
-<ParamField body="instructions" type="string" optional>
+<ParamField body="instructions" type="string">
   语音生成指令（仅适用于 `gpt-4o-mini-tts` 模型），可以详细指定语音风格、语调、情感等特性
 </ParamField>
 
@@ -104,6 +108,7 @@ curl https://aihubmix.com/v1/audio/speech \
   --output speech.mp3
 ```
 
+
 ```py gpt-4o-audio-preview
 import base64
 from openai import OpenAI
@@ -133,6 +138,7 @@ with open("output.wav", "wb") as f:
     f.write(wav_bytes)
 ```
 
+
 ```py gpt-4o-mini-tts
 from pathlib import Path
 from openai import OpenAI
@@ -153,6 +159,7 @@ with client.audio.speech.with_streaming_response.create(
 ) as response:
   response.stream_to_file(speech_file_path)
 ```
+
 
 ```py 标准 TTS 模型
 from pathlib import Path
