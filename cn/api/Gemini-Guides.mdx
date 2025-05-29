@@ -256,10 +256,7 @@ curl https://aihubmix.com/v1/chat/completions \
       "content": "Explain the Occam'\''s Razor concept and provide an everyday example of it."
     }
   ],
-  "reasoning": {
-    "enabled": true,
-    "budget": 1024
-  }
+  "reasoning_effort": "low"
 }'
 ```
 
@@ -268,7 +265,6 @@ curl https://aihubmix.com/v1/chat/completions \
 <Tip>
   1. 用于复杂任务时，只需要将模型 id 设置为默认开启思考的 `gemini-2.5-flash-preview-04-17` 即可。
   2. Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
-  3. 只能通过 http 请求入参 `"reasoning": { "enabled": true, "budget": 1024 }` 来显示推理内容（`reasoning_content`）
 </Tip>
 
 ## 多媒体文件
