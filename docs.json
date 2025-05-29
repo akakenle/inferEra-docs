@@ -45,13 +45,14 @@
                   "cn/api/Claude-Text-Edit-Tool",
                   "cn/api/Claude-Cache",
                   "cn/api/Qwen",
+                  "cn/api/TTS",
                   "cn/api/IdeogramAI",
                   "cn/api/Jina-AI",
                   "cn/api/Cli"
                 ]
               },
               {
-                "group": "隐私和条款",
+                "group": "隐私&条款",
                 "pages": [
                   "cn/terms-and-privacy/Terms",
                   "cn/terms-and-privacy/Privacy"
@@ -147,6 +148,7 @@
                   "en/api/Claude-Text-Edit-Tool",
                   "en/api/Claude-Cache",
                   "en/api/Qwen",
+                  "en/api/TTS",
                   "en/api/IdeogramAI",
                   "en/api/Jina-AI",
                   "en/api/Cli"

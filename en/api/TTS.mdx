@@ -1,0 +1,179 @@
+---
+title: "Text to Speech"
+description: "Use AI models to convert text into natural speech, supporting multiple speech styles and output formats"
+icon: 'monitor-waveform'
+---
+
+## Introduction
+
+Text to Speech (TTS) API is based on advanced generative AI models that can convert input text into realistic speech audio. It supports multiple uses:
+
+- Voice blog articles
+- Generate speech audio in multiple languages
+- Provide real-time audio output stream
+
+**Available model list:**
+- **gpt-4o-audio-preview** - The latest audio generation model from OpenAI, supports conversational audio generation
+- **gpt-4o-mini-tts** - The preferred model for smart real-time applications, supports advanced voice control, and can control multiple voice characteristics through prompts:
+  - Accent
+  - Emotional range
+  - Intonation
+  - Impressions
+  - Speed of speech
+  - Tone
+  - Whispering
+- **tts-1-hd** - High-quality TTS model
+- **tts-1** - Standard TTS model, balance quality and speed
+
+<Tip>
+**Performance suggestions:** For the fastest response time, it is recommended to use `wav` or `pcm` as the response format. For high-quality audio, it is recommended to use `tts-1-hd`; for faster generation speed, use `tts-1`; for smart voice applications, it is recommended to use `gpt-4o-mini-tts`.
+
+**Voice preview:** You can listen to different voice effects on [OpenAI.fm](https://www.openai.fm/).
+</Tip>
+
+## Model calling method
+
+### Standard TTS model (tts-1, tts-1-hd)
+Use the `/v1/audio/speech` endpoint, and call the `client.audio.speech.create()` method.
+
+### gpt-4o-mini-tts
+Use the `/v1/audio/speech` endpoint, and support the `instructions` parameter for advanced voice control.
+
+### gpt-4o-audio-preview
+Use the `/v1/chat/completions` endpoint, and set the `modalities: ["text", "audio"]` and `audio` configuration.
+
+### Request parameters
+
+#### Standard TTS parameters (applicable to tts-1, tts-1-hd, gpt-4o-mini-tts)
+
+<ParamField body="model" type="string" required>
+  The model ID to use. Optional values: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  The text to generate audio, with a maximum length of 4096 characters
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  The voice to use for synthesis. Optional values: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
+</ParamField>
+
+<ParamField body="response_format" type="string" optional>
+  The audio output format. Supported formats: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`. Default is `mp3`
+</ParamField>
+
+<ParamField body="speed" type="number" optional>
+  The speed of generating audio. The range is 0.25 to 4.0. Default is 1.0. **Note: `gpt-4o-mini-tts` does not support this parameter, but you can control the speed through natural language description**
+</ParamField>
+
+<ParamField body="instructions" type="string" optional>
+  Voice generation instructions (only applicable to `gpt-4o-mini-tts` model), can specify voice style, tone, emotion, etc.
+</ParamField>
+
+#### gpt-4o-audio-preview parameters
+
+<ParamField body="model" type="string" required>
+  Set to `gpt-4o-audio-preview`
+</ParamField>
+
+<ParamField body="modalities" type="array" required>
+  Set to `["text", "audio"]` to enable audio output
+</ParamField>
+
+<ParamField body="audio" type="object" required>
+  Audio configuration object, containing `voice` and `format` fields
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  Chat message array, same as standard chat format
+</ParamField>
+
+## Usage
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tts-1",
+    "input": "The quick brown 🦊 jumped over the lazy dog.",
+    "voice": "alloy"
+  }' \
+  --output speech.mp3
+```
+
+```py gpt-4o-audio-preview
+import base64
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key=os.getenv("AIHUBMIX_API_KEY"),
+  base_url="https://aihubmix.com/v1"
+)
+
+completion = client.chat.completions.create(
+    model="gpt-4o-audio-preview",
+    modalities=["text", "audio"],
+    audio={"voice": "alloy", "format": "wav"},
+    messages=[
+        {
+            "role": "user",
+            "content": "The quick brown 🦊 jumped over the lazy dog."
+        }
+    ]
+)
+
+print(completion.choices[0])
+
+wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
+with open("output.wav", "wb") as f:
+    f.write(wav_bytes)
+```
+
+```py gpt-4o-mini-tts
+from pathlib import Path
+from openai import OpenAI
+import os
+
+# aihubmix forwarding
+client = OpenAI(
+  api_key="sk-***", # Replace with your AiHubMix API key
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+with client.audio.speech.with_streaming_response.create(
+  model="gpt-4o-mini-tts",
+  voice="alloy", # Best balanced voice, clear pronunciation
+  instructions="""Play as a Patient Teacher""",
+  input="The quick brown 🦊 jumped over the lazy dog."
+) as response:
+  response.stream_to_file(speech_file_path)
+```
+
+```py Standard TTS model
+from pathlib import Path
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key="sk-***", # Replace with your AiHubMix API key
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+response = client.audio.speech.create(
+  model="tts-1-hd",
+  voice="alloy",
+  input="The quick brown 🦊 jumped over the lazy dog.",
+  response_format="mp3",
+  speed=1.0
+)
+
+response.stream_to_file(speech_file_path)
+```
+
+</CodeGroup>
