@@ -124,7 +124,7 @@ def generate():
     ]
     generate_content_config = types.GenerateContentConfig(
         thinking_config = types.ThinkingConfig(
-            thinking_budget=2048, #range: 0-24576。1024 as default，16000 for best performance
+            thinking_budget=2048, #range: 0-16K。1024 as default，16000 for best performance
         ),
         response_mime_type="text/plain",
     )
@@ -216,7 +216,7 @@ client = OpenAI(
 
 completion = client.chat.completions.create(
     model="gemini-2.5-flash-preview-04-17",
-    reasoning_effort="low", #"low", "medium", and "high", map to 1K, 8K, and 24K thinking token budgets
+    reasoning_effort="low", #"low", "medium", and "high", map to 1K, 8K, and 16K thinking token budgets
     messages=[
         {
             "role": "user",
@@ -265,7 +265,7 @@ curl https://aihubmix.com/v1/chat/completions \
 
 <Tip>
   1. For complex tasks, simply set the model id to the default `gemini-2.5-flash-preview-04-17` to enable thinking.
-  2. Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 24K. The default budget is 1024, and the optimal marginal effect is 16K.
+  2. Gemini 2.5 Flash uses the `budget` parameter to control the depth of thinking, ranging from 0 to 16K. The default budget is 1024, and the optimal marginal effect is 16K.
 </Tip>
 
 ## Media Understanding

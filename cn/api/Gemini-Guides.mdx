@@ -123,7 +123,7 @@ def generate():
     ]
     generate_content_config = types.GenerateContentConfig(
         thinking_config = types.ThinkingConfig(
-            thinking_budget=2048, #范围 0-24576。默认 1024，最佳边际效果 16000
+            thinking_budget=2048, #范围 0-16384。默认 1024，最佳边际效果 16000
         ),
         response_mime_type="text/plain",
     )
@@ -215,7 +215,7 @@ client = OpenAI(
 
 completion = client.chat.completions.create(
     model="gemini-2.5-flash-preview-04-17",
-    reasoning_effort="low", # 可选 "low", "medium" 和 "high", 分别对应 1K, 8K 和 24K thinking token budgets
+    reasoning_effort="low", # 可选 "low", "medium" 和 "high", 分别对应 1024, 8192 和 16384 推理预算
     messages=[
         {
             "role": "user",
@@ -264,7 +264,7 @@ curl https://aihubmix.com/v1/chat/completions \
 
 <Tip>
   1. 用于复杂任务时，只需要将模型 id 设置为默认开启思考的 `gemini-2.5-flash-preview-04-17` 即可。
-  2. Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-24K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
+  2. Gemini 2.5 Flash 通过 `budget`（思考预算）来控制思考的深度，范围 0-16K，目前转发采用的是默认预算 1024，最佳边际效果为 16K。
 </Tip>
 
 ## 多媒体文件
