@@ -28,6 +28,14 @@ client = OpenAI(
 )
 ```
 
+3️⃣ For the 2.5 series, if you need to display the reasoning process, there are two ways to do it:
+
+1. **Native invocation:** Pass `include_thoughts=True`
+2. **OpenAI-compatible method:** Pass `reasoning_effort`
+
+You can refer to the code examples below for detailed usage.
+
+
 ### About Gemini 2.5 Inference Models
 
 1. The entire 2.5 series consists of **inference models**.
@@ -140,11 +148,9 @@ if __name__ == "__main__":
     generate()
 ```
 
-
 ```py 2.5 Pro-Stream
 from google import genai
 from google.genai import types
-import os
 
 def generate():
     client = genai.Client(
@@ -171,6 +177,61 @@ def generate():
         config=generate_content_config,
     ):
         print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 Show Thinking
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 Replace it by your AiHubMix Key
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-05-06"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""How is the "Rule of 72" in finance derived?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True  # Show Thinking Content
+        ),
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        if chunk.candidates and len(chunk.candidates) > 0:
+            for part in chunk.candidates[0].content.parts:
+                if part.text:
+                    if part.thought:
+                        print(part.text, end="")
+                    else:
+                        print(part.text, end="")
+
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    if final_usage_metadata:
+        print(f"\n\n📊 Token Usage:")
+        print(f"Thinking tokens: {getattr(final_usage_metadata, 'thoughts_token_count', '不可用')}")
+        print(f"Output tokens: {getattr(final_usage_metadata, 'candidates_token_count', '不可用')}")
+        print(f"Total: {final_usage_metadata}")
 
 if __name__ == "__main__":
     generate()
