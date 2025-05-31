@@ -9,11 +9,27 @@ Claude 可以使用 Anthropic 定义的文本编辑工具来查看和修改文�
 ## 使用文本编辑工具前的准备
 
 选择兼容的模型
-Anthropic 的文本编辑工具仅支持以下 Claude 模型：
+Anthropic 的文本编辑工具支持以下 Claude 模型：
 
-- `Claude 3.7 Sonnet`: `text_editor_20250124`
-- `Claude 3.5 Sonnet`: `text_editor_20241022`
-这两个版本提供相同的功能 - 你需要选择与你使用的模型相匹配的版本。
+- **Claude 4 模型** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
+
+<Warning>
+Claude 4 模型使用了全新的文本编辑工具，与旧版本不兼容。请确保使用正确的工具类型和名称。
+</Warning>
+
+## 模型对应的工具配置
+
+| 模型版本 | 工具类型 | 工具名称 | 支持的功能 |
+|---------|---------|---------|-----------|
+| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
+| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+
+<Tip>
+**重要变化：** Claude 4 模型不再支持 `undo_edit` 命令，请在代码中移除对此功能的依赖。
+</Tip>
 
 ## 评估使用场景
 以下是使用文本编辑工具的一些典型场景：
@@ -24,7 +40,7 @@ Anthropic 的文本编辑工具仅支持以下 Claude 模型：
 测试创建：根据对实现的理解创建单元测试。
 
 ## 使用文本编辑工具
-通过 Messages API 向 Claude 提供文本编辑工具（命名为 `str_replace_editor`）：
+通过 Messages API 向 Claude 提供文本编辑工具：
 需要安装 `anthropic` 包：
 ```shell
 pip install anthropic
@@ -32,7 +48,37 @@ pip install anthropic
 
 **调用示例：**
 <CodeGroup>
-```python Python
+```python Claude 4 模型
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 或 claude-opus-4-20250514
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250429",
+            "name": "str_replace_based_edit_tool"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "There's a syntax error in my primes.py file. Can you help me fix it?"
+        }
+    ]
+)
+
+print("Response content:")
+for message in response.content:
+    print(message.text)
+```
+
+```python Claude 3.7 Sonnet
 import anthropic
 
 client = anthropic.Anthropic(
@@ -62,7 +108,30 @@ for message in response.content:
     print(message.text)
 ```
 
-```shell Curl
+```shell Curl - Claude 4
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
+      }
+    ]
+  }'
+```
+
+```shell Curl - Claude 3.7
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: xxx" \
@@ -79,12 +148,41 @@ curl -X POST https://aihubmix.com/v1/messages \
     "messages": [
       {
         "role": "user",
-        "content": "There\'s a syntax error in my primes.py file. Can you help me fix it?"
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
       }
     ]
   }'
 ```
 </CodeGroup>
+
+## 迁移到 Claude 4
+
+如果您正在从 Claude 3.7 Sonnet 迁移到 Claude 4 模型，请注意以下变化：
+
+### 更新工具配置
+
+```python
+# Claude 3.7 Sonnet
+tools=[
+    {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+    }
+]
+
+# Claude 4 (Opus/Sonnet)
+tools=[
+    {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+    }
+]
+```
+
+### 移除不支持的功能
+
+- **`undo_edit` 命令**：Claude 4 模型不再支持撤销编辑功能
+- 请从您的代码中移除任何依赖 `undo_edit` 的逻辑
 
 返回示例：
 ```json
@@ -101,14 +199,14 @@ curl -X POST https://aihubmix.com/v1/messages \
       "type": "tool_use",
       "text": "",
       "id": "toolu_bdrk_01P6jQG6suDSsDjzugqGVHWC",
-      "name": "str_replace_editor",
+      "name": "str_replace_based_edit_tool",
       "input": {
         "command": "view",
         "path": "/repo/primes.py"
       }
     }
   ],
-  "model": "claude-3-7-sonnet-20250219",
+  "model": "claude-sonnet-4-20250514",
   "stop_reason": "tool_use",
   "usage": {
     "input_tokens": 1042,

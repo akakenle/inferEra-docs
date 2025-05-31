@@ -30,6 +30,52 @@ pip install -U anthropic
   2. 对于 Sonnet 3.7，你可以通过在请求体中传入 `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}` 来把最大输出从 64K 扩展到 128K，见下方「流式 128K」调用，或者参考 Claude 官方的[Beta headers 说明](https://docs.anthropic.com/en/api/beta-headers)。
 </Tip>
 
+## Claude 4 新功能
+
+### 新的拒绝停止原因 (Refusal Stop Reason)
+
+Claude 4 模型引入了新的 `refusal` 停止原因，用于处理模型因安全原因拒绝生成的内容：
+
+```json
+{
+  "id": "msg_014XEDjypDjFzgKVWdFUXxZP",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-20250514",
+  "content": [{"type": "text", "text": "I would be happy to assist you. You can "}],
+  "stop_reason": "refusal",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 564,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 22
+  }
+}
+```
+
+在迁移到 Claude 4 时，您应该更新应用程序以处理 `refusal` 停止原因。
+
+### 扩展思考 (Extended Thinking)
+
+启用扩展思考后，Claude 4 模型的 Messages API 会返回 Claude 完整思考过程的摘要。摘要思考提供了扩展思考的全部智能优势，同时防止滥用。
+
+虽然 API 在 Claude 3.7 和 4 模型之间保持一致，但扩展思考的流式响应可能以"块状"传递模式返回，流式事件之间可能存在延迟。
+
+摘要由与您在请求中指定的模型不同的模型处理。思考模型不会看到摘要输出。
+
+### 交错思考 (Interleaved Thinking)
+
+Claude 4 模型支持将工具使用与扩展思考交错，允许更自然的对话，其中工具使用和响应可以与常规消息混合。
+
+交错思考目前处于测试阶段。要启用交错思考，请在 API 请求中添加测试头 `interleaved-thinking-2025-05-14`：
+
+```python
+extra_headers={
+    "anthropic-beta": "interleaved-thinking-2025-05-14"
+}
+```
+
 **端点（Endpoint）：** `POST` /v1/messages
 
 ## 调用
@@ -89,6 +135,33 @@ with client.messages.stream(
 ) as stream:
     for text in stream.text_stream:
         print(text, end="", flush=True)
+```
+
+```py Python 交错思考
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 或 claude-opus-4-20250514
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "帮我分析这个数据并生成图表"}
+    ],
+    tools=[
+        {
+            "type": "computer_20241022",
+            "name": "computer"
+        }
+    ],
+    extra_headers={
+        "anthropic-beta": "interleaved-thinking-2025-05-14"
+    }
+)
+print(response.content)
 ```
 
 </CodeGroup>
@@ -155,6 +228,44 @@ with client.messages.stream(
 | 状态码 | 状态码含义 | 说明   | 数据模型   |
 | --- | ----- | ---- | ------ |
 | 200 | OK    | none | Inline |
+
+## 迁移到 Claude 4
+
+如果您正在从 Claude 3.7 迁移到 Claude 4 模型，请注意以下变化：
+
+### 更新模型名称
+
+```python
+# 从 Claude 3.7
+model="claude-3-7-sonnet-20250219"
+
+# 迁移到 Claude 4
+model="claude-sonnet-4-20250514"  # 或 "claude-opus-4-20250514"
+```
+
+### 处理新的停止原因
+
+更新您的应用程序以处理新的 `refusal` 停止原因：
+
+```python
+if response.stop_reason == "refusal":
+    print("Claude 拒绝生成此内容")
+elif response.stop_reason == "end_turn":
+    print("正常完成")
+```
+
+### 移除不支持的功能
+
+- **令牌高效工具使用**：仅在 Claude Sonnet 3.7 中可用，Claude 4 中不再支持
+- **扩展输出**：`output-128k-2025-02-19` 测试头仅在 Claude Sonnet 3.7 中可用
+
+如果您正在从 Claude Sonnet 3.7 迁移，建议从请求中移除这些测试头：
+
+```python
+# 移除这些头部（如果存在）
+# "token-efficient-tools-2025-02-19"
+# "output-128k-2025-02-19"
+```
 
 ## 在应用中使用（以 Lobe-Chat 为例）
 
