@@ -45,7 +45,7 @@ import os
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),  # 或直接使用 "sk-***"
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
     base_url="https://aihubmix.com"
 )
 

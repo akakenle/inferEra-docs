@@ -45,7 +45,7 @@ import os
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),  # or use "sk-***" directly
+    api_key="sk-***", # Replace with the key you generated in AiHubMix
     base_url="https://aihubmix.com"
 )
 
@@ -103,7 +103,7 @@ import requests
 url = "https://aihubmix.com/v1/messages"
 headers = {
     "content-type": "application/json",
-    "x-api-key": "AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    "x-api-key": "sk-***", # Replace with the key you generated in AiHubMix
     "anthropic-version": "2023-06-01"
 }
 data = {
