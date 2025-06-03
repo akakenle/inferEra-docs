@@ -11,9 +11,9 @@ Claude 可以使用 Anthropic 定义的文本编辑工具来查看和修改文�
 选择兼容的模型
 Anthropic 的文本编辑工具支持以下 Claude 模型：
 
-- `Claude 3.7 Sonnet`: `text_editor_20250124`
-- `Claude 3.5 Sonnet`: `text_editor_20241022`
-  这两个版本提供相同的功能 - 你需要选择与你使用的模型相匹配的版本。
+- **Claude 4 系列模型** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
 
 <Warning>
 Claude 4 模型使用了全新的文本编辑工具，与旧版本不兼容。请确保使用正确的工具类型和名称。
@@ -53,7 +53,7 @@ pip install anthropic
 
 <CodeGroup>
 
-```python Python
+```python Python-Claude 4
 import anthropic
 
 client = anthropic.Anthropic(
@@ -83,7 +83,7 @@ for message in response.content:
     print(message.text)
 ```
 
-```python Claude 3.7 Sonnet
+```py Python-Claude 3.7
 import anthropic
 
 client = anthropic.Anthropic(
@@ -114,7 +114,7 @@ for message in response.content:
 ```
 
 
-```shell Curl
+```shell Curl-Claude 4
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: xxx" \
@@ -137,7 +137,7 @@ curl -X POST https://aihubmix.com/v1/messages \
   }'
 ```
 
-```shell Curl - Claude 3.7
+```shell Curl-Claude 3.7
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: xxx" \
@@ -168,8 +168,7 @@ curl -X POST https://aihubmix.com/v1/messages \
 
 ### 更新工具配置
 
-```python
-# Claude 3.7 Sonnet
+```py python Claude 3.7 Sonnet
 tools=[
     {
         "type": "text_editor_20250124",

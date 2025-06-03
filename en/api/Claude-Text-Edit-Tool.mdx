@@ -48,7 +48,8 @@ pip install anthropic
 
 **Usage Example:**
 <CodeGroup>
-```python Claude 4 Models
+  
+```py python-Claude 4
 import anthropic
 
 client = anthropic.Anthropic(
@@ -78,7 +79,7 @@ for message in response.content:
     print(message.text)
 ```
 
-```python Claude 3.7 Sonnet
+```py python-Claude 3.7
 import anthropic
 
 client = anthropic.Anthropic(
@@ -108,7 +109,7 @@ for message in response.content:
     print(message.text)
 ```
 
-```shell Curl - Claude 4
+```shell Curl-Claude 4
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: xxx" \
@@ -131,7 +132,7 @@ curl -X POST https://aihubmix.com/v1/messages \
   }'
 ```
 
-```shell Curl - Claude 3.7
+```shell Curl-Claude 3.7
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: xxx" \
@@ -153,6 +154,7 @@ curl -X POST https://aihubmix.com/v1/messages \
     ]
   }'
 ```
+
 </CodeGroup>
 
 ## Migrating to Claude 4
@@ -161,8 +163,7 @@ If you're migrating from Claude 3.7 Sonnet to Claude 4 models, please note the f
 
 ### Update Tool Configuration
 
-```python
-# Claude 3.7 Sonnet
+```py python Claude 3.7 Sonnet
 tools=[
     {
         "type": "text_editor_20250124",
