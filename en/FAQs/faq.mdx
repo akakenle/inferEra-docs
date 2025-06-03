@@ -83,6 +83,17 @@ Implement detection logic to flag statements like “I am GPT-4,” assigning lo
 
 Language models are not reliable sources for identifying their own backend, provider, or performance tier. To build trustworthy AI systems, **model identity must come from the system—not from the model's own mouth**.
 
+## Why do I get different outputs when using the same prompt and input on Claude.ai versus the API?
+
+Claude’s web app (Claude.ai) and mobile apps prepend a **system prompt** to each conversation by default. This prompt provides critical context, such as the current date, stylistic guidance (e.g., prefer Markdown for code), tone calibration, and behavioral shaping for the assistant.
+
+Anthropic regularly updates these prompts to improve model performance. **Importantly, the full system prompts used on Claude.ai are publicly available**, and you can find the latest version for each model in [Anthropic’s official documentation](https://docs.anthropic.com/en/release-notes/system-prompts).
+
+In contrast, API calls do **not** include any default system prompt unless you provide one. This difference in context explains why the same prompt may yield different outputs between the web interface and the API.
+
+**To replicate Claude.ai’s behavior via API, you can explicitly include the published system prompt in your call.**
+
+
 ## Why does GPT-4 consume tokens so quickly?
 - GPT-4 consumes tokens 20 to 40 times faster than GPT-3.5-turbo. Assuming you purchase 90,000 tokens, using an average multiplier of 30, you get about 3,000 words. Including historical messages further reduces the number of messages you can send. In extreme cases, a single message can consume all 90,000 tokens, so please use them cautiously.
 
