@@ -23,8 +23,13 @@ OpenAI’s official interface `gpt-image-1` has been released. Considering the c
 
 | Model              | Price (\$/IMG) |
 | ------------------ | -------------- |
-| `gpt-4o-image-vip` | \$0.007        |
-| `gpt-4o-image`     | \$0.003        |
+| `gpt-4o-image-vip` | \$0.009        |
+| `gpt-4o-image`     | \$0.005        |
+
+<Info>
+  Due to the rising maintenance costs of reverse-engineered interfaces, the price per call has been increased.
+  <sub>(Updated on: 2025-06-04)</sub>.
+</Info>
 
 ## Python Example
 
@@ -289,7 +294,6 @@ for i, image_data in enumerate(result.data):
             print(f"Error occurred while processing image #{i}: {e}")
     else:
         print(f"No b64_json or url found in image #{i}, skipping save.")
-
 ```
 
 ## Effect Demonstration
