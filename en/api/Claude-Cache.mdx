@@ -371,4 +371,16 @@ Note that changes to `tool_choice` or the presence/absence of images anywhere in
 - OpenAI supports Prompt Caching by default. Cached prompts are not billed, cached token retrieval costs half the normal rate, and caches are automatically cleared after 5-10 minutes of inactivity. [Details](https://openai.com/index/api-prompt-caching/)
 - Claude requires the native `cache_control: { type: "ephemeral" }` declaration. Caching rate is 1.25 times the standard input cost (5-minute) or 2 times (1-hour), cached token retrieval costs 0.1 times the normal rate, with a 5-minute or 1-hour lifecycle. [Details](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#how-to-implement-prompt-caching)
 - Deepseek V3 and R1 natively support caching. Caching rate equals the standard input cost, cached token retrieval costs 0.1 times the normal rate. [Details](https://api-docs.deepseek.com/)
-- Gemini currently only supports Gemini 1.5 Pro and Gemini 1.5 Flash, using the `client.caches.create` field. Minimum requirement is 32,768 tokens, with a default cache lifecycle of 1 hour. [Details](https://ai.google.dev/gemini-api/docs/caching?lang=python)
+- Gemini models support [https://ai.google.dev/gemini-api/docs/caching?lang=python](https://ai.google.dev/gemini-api/docs/caching?lang=python):
+
+- **Implicit Caching**: Enabled by default for all Gemini 2.5 models. If your request hits the cache, cost savings are automatically applied. This feature is effective as of May 8, 2025. The minimum input token count for context caching is 1,024 for Gemini 2.5 Flash and 2,048 for Gemini 2.5 Pro.
+
+- Tips to improve implicit cache hit rate:
+
+  - Try placing large, frequently reused content at the beginning of the prompt.
+
+  - Try sending requests with similar prefixes within a short time window.
+
+- You can view the number of cache-hit tokens in the `usage_metadata` field of the response object.
+
+- Cost savings are calculated based on prefilled cache hits. Only prefill cache and YouTube video preprocessing cache are eligible for implicit caching.

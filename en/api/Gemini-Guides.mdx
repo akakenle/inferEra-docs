@@ -403,7 +403,6 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
-
 ```py Video
 from google import genai
 from google.genai import types
@@ -515,6 +514,59 @@ for part in response.candidates[0].content.parts:
     if getattr(part, "code_execution_result", None) is not None:
         print("Execution result:\n", part.code_execution_result.output)
 ```
+
+## Context caching
+
+Gemini’s native API **enables implicit context caching by default**—no setup required. For every `generate_content` request, the system automatically caches the input content. If a subsequent request uses the exact same content, model, and parameters, the system will instantly return the previous result, dramatically speeding up response time and potentially reducing input token costs.
+
+- **Caching is automatic—no manual configuration needed.**
+- The cache is only hit when the content, model, and all parameters are exactly the same; any difference will result in a cache miss.
+- The cache time-to-live (TTL) can be set by the developer, or left unset (defaults to 1 hour). There is no minimum or maximum TTL enforced by Google. Costs depend on the number of cached tokens and the cache duration.
+  - While Google places no restriction on TTL, as a forwarding platform, **we only support a limited TTL range**. For requirements beyond our platform’s limits, please contact us.
+
+### Notes
+
+- **No guaranteed cost savings:** Cache tokens are billed at 25% of the standard input price—so theoretically, caching can save you up to 75% of input token costs. However, [Google’s official docs](https://ai.google.dev/gemini-api/docs/caching?lang=python) make no guarantee of cost savings; the real-world effect depends on your cache hit rate, token types, and storage duration.
+- **Cache hit conditions:** To maximize cache effectiveness, place repeatable context at the start of your input and dynamic content (like user input) at the end.
+- **How to detect cache hits:** If a response comes from the cache, `response.usage_metadata` will include the `cache_tokens_details` field and `cached_content_token_count`. You can use these to determine cache usage.  
+  Example fields when a cache hit occurs:
+  ```
+  cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+  cached_content_token_count=2003
+  ```
+
+**Code example:**
+
+```python
+from google import genai
+
+client = genai.Client(
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+    api_key="sk-***",  # Replace with your AiHubMix API key
+)
+
+prompt = """
+        <the entire contents of 'Pride and Prejudice'>
+"""
+
+def generate_content_sync():
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-preview-05-20",
+        contents=prompt + "Analyze the major themes in 'Pride and Prejudice'.",
+    )
+    print(response.usage_metadata)  # When cache is hit, cache_tokens_details and cached_content_token_count will appear
+    return response
+
+generate_content_sync()
+```
+
+> When a cache hit occurs, `response.usage_metadata` will contain:
+> ```
+> cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+> cached_content_token_count=2003
+> ```
+
+**Core conclusion:** Implicit caching is automatic and provides clear cache hit feedback. Developers can check usage_metadata for cache status. **Cost savings are not guaranteed**—actual benefit depends on request structure and cache hit rates.
 
 ## Function calling
 
