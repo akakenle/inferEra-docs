@@ -1,12 +1,13 @@
 ---
 title: "Claude Prompt Caching"
 description: "Prompt caching significantly reduces processing time for repetitive tasks or prompts containing consistent elements, effectively lowering token costs."
-icon: 'badge-percent'
+icon: "badge-percent"
 ---
 
-Here's an example of how to implement prompt caching with the Messages API using a cache_control block:  
+Here's an example of how to implement prompt caching with the Messages API using a cache_control block:
 
 <CodeGroup>
+
 ```shell Curl
 curl https://aihubmix.com/v1/messages \
   -H "content-type: application/json" \
@@ -39,6 +40,7 @@ curl https://aihubmix.com/v1/messages \
     ]
   }'
 ```
+
 
 ```py Python (Anthropic SDK - Recommended)
 import os
@@ -97,6 +99,7 @@ message = client.messages.create(
 print(message.content)
 ```
 
+
 ```py Python (Requests - Alternative)
 import requests
 
@@ -138,55 +141,57 @@ if response.status_code == 200:
             print(line.decode('utf-8'))
 else:
     print(f"Error: {response.status_code}, {response.text}")
-
 ```
+
 </CodeGroup>
 
-**Response:**  
+**Response:**
 
 ```json
 {"cache_creation_input_tokens":188086,"cache_read_input_tokens":0,"input_tokens":21,"output_tokens":393}
 {"cache_creation_input_tokens":0,"cache_read_input_tokens":188086,"input_tokens":21,"output_tokens":393}
 ```
 
-In this example, the entire text of "Pride and Prejudice" is cached using the cache_control parameter. This enables reuse of this large text across multiple API calls without reprocessing it each time. Changing only the user message allows you to ask various questions about the book while utilizing the cached content, leading to faster responses and improved efficiency.  
+In this example, the entire text of "Pride and Prejudice" is cached using the cache_control parameter. This enables reuse of this large text across multiple API calls without reprocessing it each time. Changing only the user message allows you to ask various questions about the book while utilizing the cached content, leading to faster responses and improved efficiency.
 
 ## How prompt caching works
+
 When you send a request with prompt caching enabled:
 
 1. The system checks if a prompt prefix, up to a specified cache breakpoint, is already cached from a recent query.
 2. If found, it uses the cached version, reducing processing time and costs.
 3. Otherwise, it processes the full prompt and caches the prefix once the response begins.
-This is especially useful for:  
+   This is especially useful for:
 
 - Prompts with many examples
 - Large amounts of context or background information
 - Repetitive tasks with consistent instructions
-- Long multi-turn conversations  
+- Long multi-turn conversations
 
 By default, the cache has a 5-minute lifetime. The cache is refreshed for no additional cost each time the cached content is used. We also support **1-hour cache version (Beta)** for scenarios requiring longer cache duration.
 
 <Tip>
-## Prompt caching caches the full prefix
+  ## Prompt caching caches the full prefix
 
-Prompt caching references the entire prompt - `tools`, `system`, and `messages` (in that order) up to and including the block designated with `cache_control`.
+  Prompt caching references the entire prompt - `tools`, `system`, and `messages` (in that order) up to and including the block designated with `cache_control`.
 </Tip>
 
 ## Pricing
 
 Prompt caching introduces a new pricing structure. The table below shows the price per million tokens for each supported model:
 
-| Model | Base Input Tokens | 5m Cache Writes | 1h Cache Writes | Cache Hits & Refreshes | Output Tokens |
-|-------|------------------|----------------|----------------|----------------------|---------------|
-| Claude Opus 4 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Sonnet 4 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Sonnet 3.7 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Sonnet 3.5 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Haiku 3.5 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Opus 3 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
-| Claude Haiku 3 | Platform pricing | 1.25x base price | 2x base price | 0.1x base price | Platform pricing |
+| Model             | Base Input Tokens | 5m Cache Writes  | 1h Cache Writes | Cache Hits & Refreshes | Output Tokens    |
+| ----------------- | ----------------- | ---------------- | --------------- | ---------------------- | ---------------- |
+| Claude Opus 4     | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Sonnet 4   | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Sonnet 3.7 | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Sonnet 3.5 | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Haiku 3.5  | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Opus 3     | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
+| Claude Haiku 3    | Platform pricing  | 1.25x base price | 2x base price   | 0.1x base price        | Platform pricing |
 
 Note:
+
 - 5-minute cache write tokens are 1.25 times the base input tokens price
 - 1-hour cache write tokens are 2 times the base input tokens price
 - Cache read tokens are 0.1 times the base input tokens price
@@ -195,6 +200,7 @@ Note:
 ## How to implement prompt caching
 
 ### Supported models
+
 Prompt caching is currently supported on:
 
 - Claude Opus 4
@@ -206,6 +212,7 @@ Prompt caching is currently supported on:
 - Claude Opus 3
 
 ### Structuring your prompt
+
 Place static content (tool definitions, system instructions, context, examples) at the beginning of your prompt. Mark the end of the reusable content for caching using the `cache_control` parameter.
 
 Cache prefixes are created in the following order: `tools`, `system`, then `messages`.
@@ -213,16 +220,18 @@ Cache prefixes are created in the following order: `tools`, `system`, then `mess
 Using the `cache_control` parameter, you can define up to 4 cache breakpoints, allowing you to cache different reusable sections separately. For each breakpoint, the system will automatically check for cache hits at previous positions and use the longest matching prefix if one is found.
 
 ### Cache limitations
+
 The minimum cacheable prompt length is:
 
 - 1024 tokens for Claude Opus 4, Claude Sonnet 4, Claude Sonnet 3.7, Claude Sonnet 3.5 and Claude Opus 3
-- 2048 tokens for Claude Haiku 3.5 and Claude Haiku 3  
+- 2048 tokens for Claude Haiku 3.5 and Claude Haiku 3
 
 Shorter prompts cannot be cached, even if marked with `cache_control`. Any requests to cache fewer than this number of tokens will be processed without caching. To see if a prompt was cached, see the response usage [fields](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#tracking-cache-performance).
 
 For concurrent requests, note that a cache entry only becomes available after the first response begins. If you need cache hits for parallel requests, wait for the first response before sending subsequent requests.
 
 Currently, two cache types are supported:
+
 - **"ephemeral"**: Default 5-minute lifetime
 - **1-hour cache (Beta)**: For scenarios requiring longer cache duration
 
@@ -266,6 +275,7 @@ curl https://aihubmix.com/v1/messages \
 #### When to use 1-hour cache
 
 1-hour cache is particularly suitable for:
+
 - **Batch processing**: Processing large volumes of requests with common prefixes
 - **Long-running sessions**: Conversations requiring context maintenance over extended periods
 - **Large document analysis**: Multiple different types of analysis on the same document
@@ -299,15 +309,16 @@ You can mix different cache durations within the same request:
 ```
 
 ### What can be cached
+
 Every block in the request can be designated for caching with cache_control. This includes:
 
 - Tools: Tool definitions in the `tools` array
 - System messages: Content blocks in the `system` array
 - Messages: Content blocks in the `messages.content` array, for both user and assistant turns
 - Images & Documents: Content blocks in the `messages.content` array, in user turns
-- Tool use and tool results: Content blocks in the `messages.content` array, in both user and assistant turns  
+- Tool use and tool results: Content blocks in the `messages.content` array, in both user and assistant turns
 
-Each of these elements can be marked with `cache_control` to enable caching for that portion of the request.   
+Each of these elements can be marked with `cache_control` to enable caching for that portion of the request.
 
 ### What cannot be cached
 
@@ -318,6 +329,7 @@ While most request blocks can be cached, there are some exceptions:
 - **Empty text blocks** cannot be cached.
 
 ### Tracking cache performance
+
 Monitor cache performance using these API response fields, within `usage` in the response (or `message_start` event if [streaming](https://docs.anthropic.com/en/api/messages-streaming)):
 
 - `cache_creation_input_tokens`: Number of tokens written to the cache when creating a new entry.
@@ -325,7 +337,8 @@ Monitor cache performance using these API response fields, within `usage` in the
 - `input_tokens`: Number of input tokens which were not read from or used to create a cache.
 
 ### Best practices for effective caching
-To optimize prompt caching performance:  
+
+To optimize prompt caching performance:
 
 - Cache stable, reusable content like system instructions, background information, large contexts, or frequent tool definitions.
 - Place cached content at the prompt's beginning for best performance.
@@ -334,53 +347,49 @@ To optimize prompt caching performance:
 - For long-term content, consider using 1-hour cache for better cost efficiency.
 
 ### Optimizing for different use cases
+
 Tailor your prompt caching strategy to your scenario:
 
 - Conversational agents: Reduce cost and latency for extended conversations, especially those with long instructions or uploaded documents.
 - Coding assistants: Improve autocomplete and codebase Q&A by keeping relevant sections or a summarized version of the codebase in the prompt.
 - Large document processing: Incorporate complete long-form material including images in your prompt without increasing response latency.
-- Detailed instruction sets: Share extensive lists of instructions, procedures, and examples to fine-tune Claude's responses. Developers often include an example or two in the prompt, but with prompt caching you can get even better performance by including 20+ diverse examples of high quality answers.
+- Detailed instruction sets: Share extensive lists of instructions, procedures, and examples to fine-tune Claude's responses. Developers often include an example or two in the prompt, but with prompt caching you can get even better performance by including 20\+ diverse examples of high quality answers.
 - Agentic tool use: Enhance performance for scenarios involving multiple tool calls and iterative code changes, where each step typically requires a new API call.
-- Talk to books, papers, documentation, podcast transcripts, and other longform content: Bring any knowledge base alive by embedding the entire document(s) into the prompt, and letting users ask it questions.  
+- Talk to books, papers, documentation, podcast transcripts, and other longform content: Bring any knowledge base alive by embedding the entire document(s) into the prompt, and letting users ask it questions.
 
 ### Troubleshooting common issues
-If experiencing unexpected behavior:  
+
+If experiencing unexpected behavior:
 
 - Ensure cached sections are identical and marked with cache_control in the same locations across calls
 - Check that calls are made within the cache lifetime (5 minutes or 1 hour)
 - Verify that `tool_choice` and image usage remain consistent between calls
 - Validate that you are caching at least the minimum number of tokens
-- While the system will attempt to use previously cached content at positions prior to a cache breakpoint, you may use an additional `cache_control` parameter to guarantee cache lookup on previous portions of the prompt, which may be useful for queries with very long lists of content blocks  
+- While the system will attempt to use previously cached content at positions prior to a cache breakpoint, you may use an additional `cache_control` parameter to guarantee cache lookup on previous portions of the prompt, which may be useful for queries with very long lists of content blocks
 
 <Warning>
-Note that changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.
+  Note that changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.
 </Warning>
-  
+
 ### Cache storage and sharing
+
 - **Organization Isolation:** Caches are isolated between organizations. Different organizations never share caches, even if they use identical prompts.
-
 - **Exact Matching:** Cache hits require 100% identical prompt segments, including all text and images up to and including the block marked with cache control. The same block must be marked with cache_control during cache reads and creation.
-
 - **Output Token Generation:** Prompt caching has no effect on output token generation. The response you receive will be identical to what you would get if prompt caching was not used.
 
 ---
 
 ## Support Across Different Models
+
 - Whether Prompt Caching is supported depends on the model itself.
 - If the model inherently supports caching without requiring explicit parameter declarations, it can be supported through OpenAI-compatible forwarding.
 - OpenAI supports Prompt Caching by default. Cached prompts are not billed, cached token retrieval costs half the normal rate, and caches are automatically cleared after 5-10 minutes of inactivity. [Details](https://openai.com/index/api-prompt-caching/)
 - Claude requires the native `cache_control: { type: "ephemeral" }` declaration. Caching rate is 1.25 times the standard input cost (5-minute) or 2 times (1-hour), cached token retrieval costs 0.1 times the normal rate, with a 5-minute or 1-hour lifecycle. [Details](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#how-to-implement-prompt-caching)
 - Deepseek V3 and R1 natively support caching. Caching rate equals the standard input cost, cached token retrieval costs 0.1 times the normal rate. [Details](https://api-docs.deepseek.com/)
-- Gemini models support [https://ai.google.dev/gemini-api/docs/caching?lang=python](https://ai.google.dev/gemini-api/docs/caching?lang=python):
-
-- **Implicit Caching**: Enabled by default for all Gemini 2.5 models. If your request hits the cache, cost savings are automatically applied. This feature is effective as of May 8, 2025. The minimum input token count for context caching is 1,024 for Gemini 2.5 Flash and 2,048 for Gemini 2.5 Pro.
-
-- Tips to improve implicit cache hit rate:
-
-  - Try placing large, frequently reused content at the beginning of the prompt.
-
-  - Try sending requests with similar prefixes within a short time window.
-
-- You can view the number of cache-hit tokens in the `usage_metadata` field of the response object.
-
-- Cost savings are calculated based on prefilled cache hits. Only prefill cache and YouTube video preprocessing cache are eligible for implicit caching.
+- Gemini [implicit caching support](https://ai.google.dev/gemini-api/docs/caching?lang=python):
+  - **Implicit Caching**: Enabled by default for all Gemini 2.5 models. If your request hits the cache, cost savings are automatically applied. This feature is effective as of May 8, 2025. The minimum input token count for context caching is 1,024 for Gemini 2.5 Flash and 2,048 for Gemini 2.5 Pro.
+  - Tips to improve implicit cache hit rate:
+    - Try placing large, frequently reused content at the beginning of the prompt.
+    - Try sending requests with similar prefixes within a short time window.
+  - You can view the number of cache-hit tokens in the `usage_metadata` field of the response object.
+  - Cost savings are calculated based on prefilled cache hits. Only prefill cache and YouTube video preprocessing cache are eligible for implicit caching.

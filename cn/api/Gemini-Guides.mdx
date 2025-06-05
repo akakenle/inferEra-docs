@@ -181,6 +181,7 @@ if __name__ == "__main__":
     generate()
 ```
 
+
 ```py 显示推理内容
 from google import genai
 from google.genai import types
@@ -531,14 +532,15 @@ Gemini 在原生 API 下默认启用了**隐式上下文缓存**，无需开发�
 - **缓存自动生效，无需手动配置。**
 - 缓存仅在内容、模型、参数完全一致时生效；任何字段不同都会视为新请求，不命中缓存。
 - 缓存有效期（TTL）由开发者设定，也可以不设置。如果未指定，默认为 1 小时。无最小或最大时长限制，费用取决于缓存 token 数与缓存时间。
-  - 虽然 Google 官方对 TTL 不设上下限，但由于我们作为转发平台，**仅支持有限的 TTL 配置范围**。
+  - 虽然 Google 官方对 TTL 不设上下限，但由于我们作为转发平台，**仅支持有限的 TTL 配置范围，不保证永久有效**。
 
 ### 注意事项
 
-- **无成本节省保证**：缓存 token 的计费为输入原价的 25%，理论上输入部分可最多节省 75% 成本，**但 [Google 官方](https://ai.google.dev/gemini-api/docs/caching?lang=python)并未承诺必然节省**，实际账单还需结合缓存命中率、token 类型与存储时长共同评估。
+- **无成本节省保证**：缓存 token 的计费为输入原价的 25%，理论上输入部分可最多节省 75% 成本，[**但 Google 官方并未承诺必然节省**](https://ai.google.dev/gemini-api/docs/caching?lang=python)，实际账单还需结合缓存命中率、token 类型与存储时长共同评估。
 - **缓存命中条件**：建议将重复的上下文放在请求前部，将易变内容（如用户输入）置于后部，以提高缓存命中率。
-- **缓存命中反馈**：如果响应结果命中缓存，在 `response.usage_metadata` 中会包含 `cache_tokens_details` 字段，并有 `cached_content_token_count`，开发者可以据此判断本次请求是否命中缓存。  
+- **缓存命中反馈**：如果响应结果命中缓存，在 `response.usage_metadata` 中会包含 `cache_tokens_details` 字段，并有 `cached_content_token_count`，开发者可以据此判断本次请求是否命中缓存。\
   示例响应字段（命中缓存时）：
+
   ```
   cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
   cached_content_token_count=2003
@@ -570,6 +572,7 @@ generate_content_sync()
 ```
 
 > 命中缓存时，`response.usage_metadata` 会包含如下结构：
+>
 > ```
 > cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
 > cached_content_token_count=2003

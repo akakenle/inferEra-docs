@@ -35,7 +35,6 @@ client = OpenAI(
 
 You can refer to the code examples below for detailed usage.
 
-
 ### About Gemini 2.5 Inference Models
 
 1. The entire 2.5 series consists of **inference models**.
@@ -147,6 +146,7 @@ def generate():
 if __name__ == "__main__":
     generate()
 ```
+
 
 ```py 2.5 Pro-Stream
 from google import genai
@@ -403,6 +403,7 @@ response = client.models.generate_content(
 print(response.text)
 ```
 
+
 ```py Video
 from google import genai
 from google.genai import types
@@ -517,7 +518,7 @@ for part in response.candidates[0].content.parts:
 
 ## Context caching
 
-Gemini’s native API **enables implicit context caching by default**—no setup required. For every `generate_content` request, the system automatically caches the input content. If a subsequent request uses the exact same content, model, and parameters, the system will instantly return the previous result, dramatically speeding up response time and potentially reducing input token costs.
+Gemini's native API **enables implicit context caching by default**—no setup required. For every `generate_content` request, the system automatically caches the input content. If a subsequent request uses the exact same content, model, and parameters, the system will instantly return the previous result, dramatically speeding up response time and potentially reducing input token costs.
 
 - **Caching is automatic—no manual configuration needed.**
 - The cache is only hit when the content, model, and all parameters are exactly the same; any difference will result in a cache miss.
@@ -528,8 +529,9 @@ Gemini’s native API **enables implicit context caching by default**—no setup
 
 - **No guaranteed cost savings:** Cache tokens are billed at 25% of the standard input price—so theoretically, caching can save you up to 75% of input token costs. However, [Google’s official docs](https://ai.google.dev/gemini-api/docs/caching?lang=python) make no guarantee of cost savings; the real-world effect depends on your cache hit rate, token types, and storage duration.
 - **Cache hit conditions:** To maximize cache effectiveness, place repeatable context at the start of your input and dynamic content (like user input) at the end.
-- **How to detect cache hits:** If a response comes from the cache, `response.usage_metadata` will include the `cache_tokens_details` field and `cached_content_token_count`. You can use these to determine cache usage.  
+- **How to detect cache hits:** If a response comes from the cache, `response.usage_metadata` will include the `cache_tokens_details` field and `cached_content_token_count`. You can use these to determine cache usage.\
   Example fields when a cache hit occurs:
+
   ```
   cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
   cached_content_token_count=2003
@@ -561,6 +563,7 @@ generate_content_sync()
 ```
 
 > When a cache hit occurs, `response.usage_metadata` will contain:
+>
 > ```
 > cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
 > cached_content_token_count=2003
