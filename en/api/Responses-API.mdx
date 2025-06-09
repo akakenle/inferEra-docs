@@ -25,6 +25,12 @@ client = OpenAI(
 )
 ```
 
+For inference models, the output inference summary can be controlled using the following parameter, with the detail richness of the summary ranked as detailed > auto > None, where auto provides the best balance.
+
+```py
+"summary": "auto"
+```
+
 <CodeGroup>
 
 ```py Text input
@@ -160,7 +166,8 @@ response = client.responses.create(
     model="o4-mini", # codex-mini-latest, o4-mini, o3-mini, o3, o1
     input="How much wood would a woodchuck chuck?",
     reasoning={
-        "effort": "medium" #low, medium, high
+        "effort": "medium", # low, medium, high
+        "summary": "auto", # resoning summary
     }
 )
 
