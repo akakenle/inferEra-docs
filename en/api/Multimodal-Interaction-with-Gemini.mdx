@@ -396,7 +396,136 @@ except Exception as e:
 4. **Save metadata**: Save prompts and timestamps along with images to track and replicate successful results.
 5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of service.
 
----
+## Veo 3.0 Video Generation
+
+VEO 3.0 is the latest advanced video generation model developed by Google DeepMind. With VEO 3.0, you can generate videos with the following features:
+
+- Enhanced quality from text and image prompts
+- Speech, such as dialogue and voiceovers  
+- Audio, such as music and sound effects
+
+<Tip>
+1. Currently, VEO 3.0 only supports English prompts, automatic translation is recommended for integration
+2. Videos are usually generated within a few minutes, but may take longer during peak times
+3. Currently does not support video generation from image-based conversations
+</Tip>
+
+### Known Limitations
+
+Currently, VEO 3.0 parameters are fixed and cannot be changed:
+- **Resolution**: 720p (landscape)
+- **Frame Rate**: 24fps
+- **Video Length**: 8 seconds
+
+### Pricing
+
+The cost of the VEO 3.0 API is **$0.675/second** (Aihubmix offers a 10% limited-time discount)
+
+### Usage Example
+
+VEO 3.0 currently only supports curl command calls, using a two-step process:
+Note: `sk-***` is your key generated on AiHubMix.
+
+<CodeGroup>
+
+```shell Step 1: Initiate Generation Request
+curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview:predictLongRunning?key=sk-***" \
+  -H "Content-Type: application/json" \
+  -X "POST" \
+  -d '{
+    "instances":
+    [
+        {
+            "prompt": "A cat playing with a ball"
+        }
+    ],
+    "parameters":
+    {
+        "numberOfVideos": 1,
+        "durationSeconds": 8,
+        "aspectRatio": "16:9",
+        "personGeneration": "dont_allow"
+    }
+}'
+```
+
+```shell Step 2: Get Generation Result
+# Use the operation ID from the name field returned in Step 1
+curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview/operations/ff5***?key=sk-***"
+```
+
+```py Video Extraction Script
+import json
+import base64
+
+# 1. Read the response JSON file
+with open('yourpath/response.json', 'r') as f:
+    data = json.load(f)
+
+# 2. Get the base64 encoded video string
+b64_str = data['response']['videos'][0]['bytesBase64Encoded']
+
+# 3. Decode and write to mp4 file
+with open('output.mp4', 'wb') as f:
+    f.write(base64.b64decode(b64_str))
+
+print("Video saved as output.mp4")
+```
+
+</CodeGroup>
+
+### Response Examples
+
+**Step 1 Response:**
+```json
+{
+  "name": "models/veo-3.0-generate-preview/operations/ff5***"
+}
+```
+
+**Step 2 Response (Generation Complete):**
+```json
+{
+  "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/ff5***",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/cloud.ai.large_models.vision.GenerateVideoResponse",
+    "raiMediaFilteredCount": 0,
+    "videos": [
+      {
+        "bytesBase64Encoded": "AAA...2xl",
+        "mimeType": "video/mp4"
+      }
+    ]
+  }
+}
+```
+
+**Step 2 Response (Still Processing):**
+```json
+{
+  "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/777***"
+}
+```
+
+If you receive a processing response, please wait a few minutes and resend the Step 2 request.
+
+**Video Effect:**
+
+<video
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="./../media/veo3-output.mp4"
+></video>
+
+### Best Practices
+
+1. **Be Patient**: Video generation usually takes a few minutes, longer during peak times
+2. **Check Status**: If the response doesn't contain `done: true`, it's still processing
+3. **Save Operation ID**: Make sure to save the operation ID returned from Step 1 for subsequent queries
+4. **Comply with Usage Policies**: Ensure your usage complies with Google's content policies and terms of use
+
+For more information, please refer to the [Vertex AI Official Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/video/generate-videos)
 
 ## Veo 2.0 Video Generation
 

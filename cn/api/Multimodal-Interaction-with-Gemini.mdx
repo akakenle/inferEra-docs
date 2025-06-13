@@ -410,7 +410,136 @@ except Exception as e:
 4. **保存元数据**：将提示词和时间戳与图像一起保存，以便追踪和复制成功的结果。
 5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。
 
----
+## Veo 3.0 视频生成
+
+VEO 3.0 是由 Google DeepMind 开发的最新先进视频生成模型。使用 VEO 3.0，您可以生成具有以下特点的视频：
+
+- 从文本和图像提示中生成的质量提升
+- 语音，例如对话和配音
+- 音频，例如音乐和声音效果
+
+<Tip>
+1. 目前 VEO 3.0 仅支持英文提示词（prompt），集成时建议增加自动翻译
+2. 视频通常在几分钟内生成完成，但高峰期可能需要更长时间
+3. 目前不支持用图片进行对话生成的视频
+</Tip>
+
+### 已知限制
+
+目前 VEO 3.0 的参数固定，无法更改：
+- **分辨率**: 720p（横屏）
+- **帧率**: 24fps
+- **视频长度**: 8秒
+
+### 费率
+
+使用 VEO 3.0 API 的费用是 **$0.675/秒**（Aihubmix 提供 10% 限时优惠）
+
+### 调用示例
+
+VEO 3.0 目前仅支持 curl 命令调用，采用两步处理方式：
+其中：`sk-***` 换成你在 AiHubMix 生成的密钥。
+
+<CodeGroup>
+
+```shell 步骤 1：发起生成请求
+curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview:predictLongRunning?key=sk-***" \
+  -H "Content-Type: application/json" \
+  -X "POST" \
+  -d '{
+    "instances":
+    [
+        {
+            "prompt": "A cat playing with a ball"
+        }
+    ],
+    "parameters":
+    {
+        "numberOfVideos": 1,
+        "durationSeconds": 8,
+        "aspectRatio": "16:9",
+        "personGeneration": "dont_allow"
+    }
+}'
+```
+
+```shell 步骤 2：获取生成结果
+# 使用步骤 1 返回的 name 字段中的操作ID
+curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview/operations/ff5***?key=sk-***"
+```
+
+```py 视频提取脚本
+import json
+import base64
+
+# 1. 读入响应 JSON 文件
+with open('yourpath/response.json', 'r') as f:
+    data = json.load(f)
+
+# 2. 获取 base64 编码的视频字符串
+b64_str = data['response']['videos'][0]['bytesBase64Encoded']
+
+# 3. 解码并写入 mp4 文件
+with open('output.mp4', 'wb') as f:
+    f.write(base64.b64decode(b64_str))
+
+print("视频已保存为 output.mp4")
+```
+
+</CodeGroup>
+
+### 返回示例
+
+**步骤 1 返回：**
+```json
+{
+  "name": "models/veo-3.0-generate-preview/operations/ff5***"
+}
+```
+
+**步骤 2 返回（生成完成）：**
+```json
+{
+  "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/ff5***",
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/cloud.ai.large_models.vision.GenerateVideoResponse",
+    "raiMediaFilteredCount": 0,
+    "videos": [
+      {
+        "bytesBase64Encoded": "AAA...2xl",
+        "mimeType": "video/mp4"
+      }
+    ]
+  }
+}
+```
+
+**步骤 2 返回（仍在处理中）：**
+```json
+{
+  "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/777***"
+}
+```
+
+如果收到处理中的返回，请稍等几分钟后重新发送步骤 2 的请求。
+
+**视频效果：**
+
+<video
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="./../media/veo3-output.mp4"
+></video>
+
+### 最佳实践
+
+1. **耐心等待**：视频生成通常需要几分钟，高峰期可能更长
+2. **检查状态**：如果返回中没有 `done: true`，说明仍在处理中
+3. **保存操作ID**：确保保存步骤1返回的操作 ID 用于后续查询
+4. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款
+
+更多信息请参考 [Vertex AI 官方文档](https://cloud.google.com/vertex-ai/generative-ai/docs/video/generate-videos)
 
 ## Veo 2.0 视频生成
 
