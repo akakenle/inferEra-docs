@@ -1,7 +1,7 @@
 ---
 title: "Gemini Imagine"
 description: "Gemini image/video generation"
-icon: 'eyes'
+icon: "eyes"
 ---
 
 ## Imagen Guide
@@ -9,13 +9,14 @@ icon: 'eyes'
 Imagen is an advanced series of image generation AI models developed by Google, capable of creating high-quality, realistic images based on text prompts. This guide will help you understand how to use the Imagen API to generate images, including parameter settings, model selection, and code examples.
 
 Available Models：
+
 - imagen-4.0-generate-preview-05-20
 - imagen-4.0-ultra-generate-exp-05-20
 - imagen-3.0-generate-002
 
 <Tip>
-1. Currently, Imagen only supports English prompts. When integrating, it's recommended to add automatic translation to allow users to use it without language barriers.
-2. Performance is unstable when rendering large amounts of text. It's recommended to only include key keywords.
+  1. Currently, Imagen only supports English prompts. When integrating, it's recommended to add automatic translation to allow users to use it without language barriers.
+  2. Performance is unstable when rendering large amounts of text. It's recommended to only include key keywords.
 </Tip>
 
 ### Model Parameters
@@ -31,7 +32,7 @@ Imagen currently only supports English prompts and provides the following parame
 
 ### Usage Pricing
 
-The cost of using the Imagen API to generate images is **$0.03 per image**. Please note that each API call can generate 1-4 images, and you will be charged based on the actual number of images generated.
+The cost of using the Imagen API to generate images is **\$0.03 per image**. Please note that each API call can generate 1-4 images, and you will be charged based on the actual number of images generated.
 
 ### API Call Example
 
@@ -99,6 +100,7 @@ Creating effective prompts is crucial for obtaining desired images:
 Gemini also offers image generation capabilities as an alternative. Compared to Imagen, Gemini's image generation is better suited for scenarios that require contextual understanding and reasoning, rather than pursuing ultimate artistic expression and visual quality.
 
 **Instructions:**
+
 - Model id: `gemini-2.0-flash-preview-image-generation`
 - Input/Outpt pricing: $0.1→$0.4/M tokens
 - Need to add parameters to experience new features: `"modalities":["text","image"]`
@@ -109,6 +111,7 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 - For more information, visit the [Gemini official documentation](https://ai.google.dev/gemini-api/docs/image-generation)
 
 **Input Reference Structure:**
+
 ```json
 "modalities": ["text","image"]
 {
@@ -125,6 +128,7 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 ```
 
 **Output Reference Structure:**
+
 ```json
 "choices":
     [
@@ -162,8 +166,9 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 ```
 
 ### Text-to-Image Generation
+
 Input: text
-Output: text + image
+Output: text \+ image
 
 <CodeGroup>
 
@@ -207,6 +212,7 @@ curl https://aihubmix.com/v1/chat/completions \
   | cut -d'"' -f4 \
   | base64 --decode > /your_path/imageGen.jpg
 ```
+
 
 ```py Python
 import os
@@ -277,16 +283,18 @@ except Exception as e:
 
 </CodeGroup>
 
-**Output Example:**  
+**Output Example:**
+
 ![Image](./../media/gemini-s-flash-exp-usage-shot.png)
 
 ### Edit Image
-Input: text + image  
-Output: text + image  
+
+Input: text \+ image\
+Output: text \+ image
 
 <CodeGroup>
 
-```py Python 
+```py Python
 import os
 from openai import OpenAI
 from PIL import Image
@@ -370,7 +378,8 @@ except Exception as e:
 
 </CodeGroup>
 
-**Output Example:**  
+**Output Example:**
+
 ![Image](./../media/gemini-s-flash-exp-usage-shot-2.png)
 
 ## Choosing the Right Model
@@ -401,25 +410,26 @@ except Exception as e:
 VEO 3.0 is the latest advanced video generation model developed by Google DeepMind. With [VEO 3.0](https://aihubmix.com/models?model=veo-3.0-generate-preview), you can generate videos with the following features:
 
 - Enhanced quality from text and image prompts
-- Speech, such as dialogue and voiceovers  
+- Speech, such as dialogue and voiceovers
 - Audio, such as music and sound effects
 
 <Tip>
-1. Currently, VEO 3.0 only supports English prompts, automatic translation is recommended for integration
-2. Videos are usually generated within a few minutes, but may take longer during peak times
-3. Currently does not support video generation from image-based conversations
+  1. Currently, VEO 3.0 only supports English prompts, automatic translation is recommended for integration
+  2. Videos are usually generated within a few minutes, but may take longer during peak times
+  3. Currently does not support video generation from image-based conversations
 </Tip>
 
 ### Known Limitations
 
 Currently, VEO 3.0 parameters are fixed and cannot be changed:
+
 - **Resolution**: 720p (landscape)
 - **Frame Rate**: 24fps
 - **Video Length**: 8 seconds
 
 ### Pricing
 
-The cost of the VEO 3.0 API is **$0.675/second** (Aihubmix offers a 10% limited-time discount)
+The cost of the VEO 3.0 API is **\$0.675/second** (Aihubmix offers a 10% limited-time discount)
 
 ### Usage Example
 
@@ -449,10 +459,12 @@ curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview:predict
 }'
 ```
 
+
 ```shell Step 2: Get Generation Result
 # Use the operation ID from the name field returned in Step 1
 curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview/operations/ff5***?key=sk-***"
 ```
+
 
 ```py Video Extraction Script
 import json
@@ -477,6 +489,7 @@ print("Video saved as output.mp4")
 ### Response Examples
 
 **Step 1 Response:**
+
 ```json
 {
   "name": "models/veo-3.0-generate-preview/operations/ff5***"
@@ -484,6 +497,7 @@ print("Video saved as output.mp4")
 ```
 
 **Step 2 Response (Generation Complete):**
+
 ```json
 {
   "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/ff5***",
@@ -502,6 +516,7 @@ print("Video saved as output.mp4")
 ```
 
 **Step 2 Response (Still Processing):**
+
 ```json
 {
   "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/777***"
@@ -512,11 +527,7 @@ If you receive a processing response, please wait a few minutes and resend the S
 
 **Video Effect:**
 
-<video
-  controls
-  className="w-full aspect-video rounded-2xl"
-  src="./../media/veo-3-output.mp4"
-></video>
+<video controls className="w-full aspect-video rounded-2xl" src="./../media/veo-3-output.mp4" />
 
 ### Best Practices
 
@@ -527,13 +538,83 @@ If you receive a processing response, please wait a few minutes and resend the S
 
 For more information, please refer to the [Vertex AI Official Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/video/generate-videos)
 
+## Veo 3.0 Reverse API Access
+
+AIhubmix offers a reverse access method that delivers the same output quality as the official API but at a lower rate—just \$0.41/second, which is 45% cheaper than Google’s official \$0.75/second.
+
+However, please note that **any reverse method cannot guarantee stable generation**. It is recommended for use in development environments as early experimentation or for personal exploration only.
+
+Known limitations are consistent with the official API. See the "Veo 3.0 Video Generation" section above.
+
+### Example Call
+
+The VEO 3.0 reverse API is OpenAI-compatible. Simply specify the model ID `veo-3` along with your video prompt.
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 Replace with your API key from AiHubMix
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="veo-3",
+    messages=[
+        {
+            "role": "user",
+            "content": "a mechanical butterfly flying in the futuristic garden"
+        }
+    ],
+    stream=False
+)
+
+print(completion.choices[0].message.content)
+```
+
+</CodeGroup>
+
+### Example Response
+
+The output is a video URL. Please save it locally in time.
+
+```json
+{
+  "prompt": "A sleek, metallic mechanical butterfly with intricate, glowing blue circuitry patterns on its wings flies gracefully through a futuristic garden. The garden is filled with bioluminescent plants, floating orbs of light, and holographic flowers that change colors. The butterfly's wings reflect the ambient light, creating a mesmerizing shimmer as it moves. The background features a sleek, minimalist cityscape with towering glass structures and hovering drones. The scene is bathed in a soft, ethereal glow from a setting sun, casting long shadows and enhancing the futuristic ambiance. The camera follows the butterfly in a smooth, cinematic motion, capturing the delicate movements of its wings and the vibrant, otherworldly beauty of the garden."
+}
+```
+
+```json
+> Video generation task created
+> Task ID: `8167db37-2b7c-4794-9232-891d02ca7fa3`
+> To prevent task interruption, you can continuously track progress from the following links:
+> [Data Preview](https://asyncdata.net/web/8167db37-2b7c-4794-9232-891d02ca7fa3) | [Source Data](https://asyncdata.net/source/8167db37-2b7c-4794-9232-891d02ca7fa3)
+> Waiting for processing
+
+> Type: Text-to-video generation
+> 🎬 Starting video generation...................
+
+> ⚠️ Retrying (0/3)
+
+> Type: Text-to-video generation
+> 🎬 Starting video generation.....................
+
+> 🔄 Optimizing video quality.................
+
+> 🎉 High-quality video generated
+
+[▶️ Watch Online](https://filesystem.site/cdn/20250615/T7yfqW229fox4gJA1ys0eMAGLkcSfd.mp4) | [⏬ Download Video](https://filesystem.site/cdn/download/20250615/T7yfqW229fox4gJA1ys0eMAGLkcSfd.mp4)
+```
+
 ## Veo 2.0 Video Generation
 
 VEO 2.0 is an advanced video generation AI model launched by Google, capable of creating high-quality, realistic short videos based on text prompts. This part will help you understand how to use the VEO 2.0 API to generate videos, including parameter settings, model selection, and code examples.
 
 <Tip>
-1. Currently, VEO 2.0 only supports English prompts
-2. Video generation takes approximately 2-3 minutes, please be patient
+  1. Currently, VEO 2.0 only supports English prompts
+  2. Video generation takes approximately 2-3 minutes, please be patient
 </Tip>
 
 ### Model Parameters
@@ -549,7 +630,7 @@ VEO 2.0 provides the following parameters:
 
 ### Pricing
 
-The cost of the VEO 2.0 API is $0.35/s
+The cost of the VEO 2.0 API is \$0.35/s
 
 ### Usage Example
 
@@ -588,6 +669,7 @@ for n, generated_video in enumerate(operation.response.generated_videos):
     client.files.download(file=generated_video.video)
     generated_video.video.save(f"video{n}.mp4")  # Save the video
 ```
+
 
 ```py Generate from images
 import os
@@ -647,4 +729,4 @@ Creating effective prompts is crucial for obtaining desired videos:
 2. **Patience is key**: Video generation takes 2-3 minutes, please wait for completion.
 3. **Test different parameters**: Try different aspect ratios and durations to find the settings that best suit your needs.
 4. **Save generation records**: Record prompts along with generated videos to track successful results.
-5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of use. 
+5. **Comply with usage policies**: Ensure your usage complies with Google's content policies and terms of use.

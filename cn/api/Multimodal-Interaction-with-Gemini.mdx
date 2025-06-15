@@ -9,6 +9,7 @@ icon: "eyes"
 Imagen 是 Google 推出的先进图像生成 AI 模型系列，能够根据文本提示创建高质量、逼真的图像。本指南将帮助您了解如何使用 Imagen 系列 API 生成图像，包括参数设置、模型选择和代码示例。
 
 可用模型列表：
+
 - `imagen-4.0-generate-preview-05-20`：最新的正式预览版
 - `imagen-4.0-ultra-generate-exp-05-20`：更高级的 4.0 实验款
 - `imagen-3.0-generate-002`：3.0 正式版
@@ -104,6 +105,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 - 显著减少过滤拦截 → 得益于更智能、宽松的过滤机制，创作时几乎不再被打断。
 
 **说明：**
+
 - 模型 id：`gemini-2.0-flash-preview-image-generation`
 - 费率（输入→输出）：$0.1→$0.4/M tokens
 - 需要新增参数来体验新特性 `"modalities":["text","image"]`
@@ -116,7 +118,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 <Tip>
   `gemini-2.0-flash-exp` 已经正式升级为 `gemini-2.0-flash-preview-image-generation`，让你的创作流程更流畅、更精彩。
 </Tip>
-  
+
 **输入参考结构：**
 
 ```json
@@ -290,7 +292,8 @@ except Exception as e:
 
 </CodeGroup>
 
-**输出实例：**\
+**输出实例：**
+
 ![图片](./../media/gemini-s-flash-exp-usage-shot.png)
 
 ### 图片编辑
@@ -384,7 +387,8 @@ except Exception as e:
 
 </CodeGroup>
 
-**输出实例：**\
+**输出实例：**
+
 ![图片](./../media/gemini-s-flash-exp-usage-shot-2.png)
 
 ## 选择正确的绘图模型
@@ -419,21 +423,22 @@ VEO 3.0 是由 Google DeepMind 开发的最新先进视频生成模型。使用 
 - 音频，例如音乐和声音效果
 
 <Tip>
-1. 目前 VEO 3.0 仅支持英文提示词（prompt），集成时建议增加自动翻译
-2. 视频通常在几分钟内生成完成，但高峰期可能需要更长时间
-3. 目前不支持用图片进行对话生成的视频
+  1. 目前 VEO 3.0 仅支持英文提示词（prompt），集成时建议增加自动翻译
+  2. 视频通常在几分钟内生成完成，但高峰期可能需要更长时间
+  3. 目前不支持用图片进行对话生成的视频
 </Tip>
 
 ### 已知限制
 
 目前 VEO 3.0 的参数固定，无法更改：
+
 - **分辨率**: 720p（横屏）
 - **帧率**: 24fps
 - **视频长度**: 8秒
 
 ### 费率
 
-使用 VEO 3.0 API 的费用是 **$0.675/秒**（Aihubmix 提供 10% 限时优惠）
+使用 VEO 3.0 API 的费用是 **\$0.675/秒**（Aihubmix 提供 10% 限时优惠）
 
 ### 调用示例
 
@@ -463,10 +468,12 @@ curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview:predict
 }'
 ```
 
+
 ```shell 步骤 2：获取生成结果
 # 使用步骤 1 返回的 name 字段中的操作ID
 curl "https://aihubmix.com/gemini/v1beta/models/veo-3.0-generate-preview/operations/ff5***?key=sk-***"
 ```
+
 
 ```py 视频提取脚本
 import json
@@ -491,6 +498,7 @@ print("视频已保存为 output.mp4")
 ### 返回示例
 
 **步骤 1 返回：**
+
 ```json
 {
   "name": "models/veo-3.0-generate-preview/operations/ff5***"
@@ -498,6 +506,7 @@ print("视频已保存为 output.mp4")
 ```
 
 **步骤 2 返回（生成完成）：**
+
 ```json
 {
   "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/ff5***",
@@ -516,6 +525,7 @@ print("视频已保存为 output.mp4")
 ```
 
 **步骤 2 返回（仍在处理中）：**
+
 ```json
 {
   "name": "projects/ahm-gemini-03/locations/us-central1/publishers/google/models/veo-3.0-generate-preview/operations/777***"
@@ -526,11 +536,7 @@ print("视频已保存为 output.mp4")
 
 **视频效果：**
 
-<video
-  controls
-  className="w-full aspect-video rounded-2xl"
-  src="./../media/veo-3-output.mp4"
-></video>
+<video controls className="w-full aspect-video rounded-2xl" src="./../media/veo-3-output.mp4" />
 
 ### 最佳实践
 
@@ -541,13 +547,83 @@ print("视频已保存为 output.mp4")
 
 更多信息请参考 [Vertex AI 官方文档](https://cloud.google.com/vertex-ai/generative-ai/docs/video/generate-videos)
 
+## Veo 3.0 逆向接口调用方式
+
+AIhubmix 提供和官方效果一致但费率更低的逆向调用方式——单次生成费用为 \$0.41/秒，比谷歌官方的 \$0.75/秒还要低 45%。
+
+但请注意，任何逆向的调用方式都不能保障稳定的生成，推荐在开发环境作为早期实验或仅用于个人体验。
+
+已知限制和官方正式接口一致，见上方「Veo 3.0 视频生成」章节。
+
+### 调用示例
+
+VEO 3.0 逆向接口使用 Openai 兼容方式，只需要传入模型 id `veo-3`和视频提示词即可。
+
+<CodeGroup>
+
+```py Pthon
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="veo-3",
+    messages=[
+        {
+            "role": "user",
+            "content": "a mechanical butterfly flying in the futuristic garden"
+        }
+    ],
+    stream=False
+)
+
+print(completion.choices[0].message.content)
+```
+
+</CodeGroup>
+
+### 返回示例
+
+生成结果是链接，请及时保存到本地。
+
+```json
+{
+  "prompt": "A sleek, metallic mechanical butterfly with intricate, glowing blue circuitry patterns on its wings flies gracefully through a futuristic garden. The garden is filled with bioluminescent plants, floating orbs of light, and holographic flowers that change colors. The butterfly's wings reflect the ambient light, creating a mesmerizing shimmer as it moves. The background features a sleek, minimalist cityscape with towering glass structures and hovering drones. The scene is bathed in a soft, ethereal glow from a setting sun, casting long shadows and enhancing the futuristic ambiance. The camera follows the butterfly in a smooth, cinematic motion, capturing the delicate movements of its wings and the vibrant, otherworldly beauty of the garden."
+}
+```
+
+```json
+> Video generation task created
+> Task ID: `8167db37-2b7c-4794-9232-891d02ca7fa3`
+> To prevent task interruption, you can continuously track progress from the following links:
+> [Data Preview](https://asyncdata.net/web/8167db37-2b7c-4794-9232-891d02ca7fa3) | [Source Data](https://asyncdata.net/source/8167db37-2b7c-4794-9232-891d02ca7fa3)
+> Waiting for processing
+
+> Type: Text-to-video generation
+> 🎬 Starting video generation...................
+
+> ⚠️ Retrying (0/3)
+
+> Type: Text-to-video generation
+> 🎬 Starting video generation.....................
+
+> 🔄 Optimizing video quality.................
+
+> 🎉 High-quality video generated
+
+[▶️ Watch Online](https://filesystem.site/cdn/20250615/T7yfqW229fox4gJA1ys0eMAGLkcSfd.mp4) | [⏬ Download Video](https://filesystem.site/cdn/download/20250615/T7yfqW229fox4gJA1ys0eMAGLkcSfd.mp4)
+```
+
 ## Veo 2.0 视频生成
 
 VEO 2.0 是 Google 推出的先进视频生成 AI 模型，能够根据文本提示创建高质量、逼真的短视频。下面的指南将帮助您了解如何使用 VEO 2.0 API 生成视频，包括参数设置、模型选择和代码示例。
 
 <Tip>
-1. 目前 VEO 2.0 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
-2. 生成视频需要耗时 2-3 分钟，请耐心等待
+  1. 目前 VEO 2.0 仅支持英文提示词（prompt），集成时建议增加自动翻译，让用户能够无障碍使用
+  2. 生成视频需要耗时 2-3 分钟，请耐心等待
 </Tip>
 
 ### 模型参数
@@ -563,7 +639,7 @@ VEO 2.0 提供以下参数：
 
 ### 费率
 
-使用 VEO 2.0 API 的费用是 $0.35/秒
+使用 VEO 2.0 API 的费用是 \$0.35/秒
 
 ### 调用示例
 
@@ -602,6 +678,7 @@ for n, generated_video in enumerate(operation.response.generated_videos):
     client.files.download(file=generated_video.video)
     generated_video.video.save(f"video{n}.mp4")  # 保存视频
 ```
+
 
 ```py 参考图驱动
 import os
@@ -661,4 +738,4 @@ for n, generated_video in enumerate(operation.response.generated_videos):
 2. **耐心等待**：视频生成需要 2-3 分钟，请耐心等待完成。
 3. **测试不同参数**：尝试不同的宽高比和时长，找到最适合您需求的设置。
 4. **保存生成记录**：将提示词与生成的视频一起记录，以便追踪成功的结果。
-5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。 
+5. **遵守使用政策**：确保您的使用符合 Google 的内容政策和使用条款。
