@@ -4,13 +4,36 @@ description: ""
 icon: 'comment-code'
 ---
 
-| Status Code | Description |
-|-------------|-------------|
-| 400 Bad Request | The request format is incorrect or cannot be understood by the server. This typically indicates a client error. |
-| 401 Unauthorized | API key authentication failed. You need to verify that your API key is correct. Other reasons generally involve insufficient permissions. |
-| 403 Forbidden | Generally indicates insufficient permissions. |
-| 404 Not Found | The requested resource was not found. You may be attempting to access an endpoint that doesn't exist. |
-| 413 Request Entity Too Large | The request body is too large. You may need to reduce the size of your request payload. |
-| 429 Too Many Requests | Due to frequent requests exceeding limits, you have exceeded your rate limit. |
-| 500 Internal Server Error | An error within the server. This may be an issue with the OpenAI server, not your problem. |
-| 503 Service Unavailable | The server is temporarily unavailable. This may be due to OpenAI performing maintenance or server overload. |
+## Key Error Code Mapping Table
+
+<Note>
+400 status codes usually indicate parameter errors. Please check the API documentation. Most 400 errors are upstream pass-through errors.
+</Note>
+
+<Info>
+The response ID in error responses has been changed to tid (traceId) for error tracking and troubleshooting purposes.
+</Info>
+
+| HTTP Status Code | Error Identifier | Error Message | Common Cause |
+|------------------|------------------|---------------|--------------|
+| 503 | - | Incorrect model ID. Please request to view the model page or you do not have permission to use this model | No available channel to handle request |
+| 503 | - | Rate limited by provider – contact support to request higher concurrency or try again later. | Model encounters official rate limiting |
+| 429 | - | The xx model Too many requests; please try again later. | Request frequency exceeds limit |
+| 403 | insufficient_user_quota | Your account balance is insufficient. Please recharge your account to continue using the API. | User balance insufficient, needs recharge |
+| 403 | - | Account suspended. | User status disabled or blacklisted |
+| 403 | - | Forbidden – insufficient permissions. | User role permissions insufficient |
+| 403 | - | Forbidden – key(last 6 digits of request key) allowed only from approved IP ranges. | IP not in token's allowed network range |
+| 403 | - | Forbidden – key(last 6 digits of request key) not authorized to access the requested model. | Token doesn't support requested model |
+| 403 | - | Key error；(last 6 digits of request key) | Non-admin user attempting to specify channel |
+| 403 | - | Forbidden – channel has been disabled. | Channel status is disabled |
+| 401 | - | Unauthorized – no access token supplied; please log in and include a valid token. | No Authorization header provided |
+| 401 | - | Unauthorized – access token is invalid or expired. | Access token validation failed |
+| 400 | - | Bad Request – invalid channel ID. | Channel ID format error or doesn't exist |
+| 400 | prompt_missing | prompt is required | Missing prompt for image generation |
+| 400 | prompt_too_long | prompt is too long | Prompt exceeds length limit |
+| 400 | text_too_long | input is too long | Audio input text too long |
+| 400 | size_not_supported | size not supported | Image size not supported by model |
+| 400 | n_not_within_range | invalid value of n | n parameter value not in valid range |
+
+## Add customer service WeChat
+The customer service WeChat is available on the [topup page](https://aihubmix.com/topup). After topping up, you can leave a message, and the customer service will reply within 24 hours.
