@@ -1,7 +1,7 @@
 ---
 title: "AiHubMix CLI"
 description: "Manage API keys, view account information, and access available models through the AiHubMix CLI utility scripts"
-icon: 'terminal'
+icon: "terminal"
 ---
 
 AiHubMix CLI is a collection of utility management scripts that allows you to manage your AiHubMix API keys, query account information, and use AI services without needing to access the web interface. It essentially wraps API calls (curl or Python requests) for easier command-line usage.
@@ -19,7 +19,7 @@ pip install -U requests openai
 ```
 
 <Info>
-The aihubmix_cli.py script can be [downloaded here](https://github.com/jerlinn/inferHub)
+  The aihubmix_cli.py script can be [downloaded here](https://github.com/jerlinn/inferHub)
 </Info>
 
 ## Model
@@ -30,18 +30,18 @@ AiHubMix CLI provides the following main functions:
 
 ### API Endpoints Overview
 
-| Endpoint | HTTP Method | Description |
-|------|---------|------|
-| `/api/user/self` | GET | Get current user information and account balance |
-| `/api/token/` | GET | Get list of all API keys |
-| `/api/token/` | POST | Create a new API key |
-| `/api/token/` | PUT | Update an existing API key |
-| `/api/token/{token_id}` | GET | Get details of a specific API key |
-| `/api/token/{token_id}` | DELETE | Delete a specific API key |
-| `/api/token/search` | GET | Search for API keys (using `?keyword=search_term`) |
-| `/api/user/token` | GET | Get user API key |
-| `/api/models` | GET | Get list of all available models |
-| `/api/user/available_models` | GET | Get list of models available to the current user |
+| Endpoint                     | HTTP Method | Description                                        |
+| ---------------------------- | ----------- | -------------------------------------------------- |
+| `/api/user/self`             | GET         | Get current user information and account balance   |
+| `/api/token/`                | GET         | Get list of all API keys                           |
+| `/api/token/`                | POST        | Create a new API key                               |
+| `/api/token/`                | PUT         | Update an existing API key                         |
+| `/api/token/{token_id}`      | GET         | Get details of a specific API key                  |
+| `/api/token/{token_id}`      | DELETE      | Delete a specific API key                          |
+| `/api/token/search`          | GET         | Search for API keys (using `?keyword=search_term`) |
+| `/api/user/token`            | GET         | Get user API key                                   |
+| `/api/models`                | GET         | Get list of all available models                   |
+| `/api/user/available_models` | GET         | Get list of models available to the current user   |
 
 ### Account Management
 
@@ -52,6 +52,7 @@ curl -X GET "https://aihubmix.com/api/user/self" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Get Account Balance
 import requests
@@ -83,6 +84,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Get Account Balance
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
 ```
@@ -105,6 +107,7 @@ curl -X POST "https://aihubmix.com/api/token/" \
     "subnet": ""
   }'
 ```
+
 
 ```py Python Create New API Key
 import requests
@@ -140,6 +143,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Create New API Key
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "New Key Name" --expires -1 --quota 500000
 ```
@@ -153,6 +157,7 @@ curl -X GET "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Get API Key List
 import requests
@@ -183,6 +188,7 @@ if response.status_code == 200:
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
+
 
 ```shell CLI Get API Key List
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
@@ -480,21 +486,15 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 If you encounter issues, try the following solutions:
 
 1. **Connection Problems**: If the main domain connection fails, try using the backup domain:
+
    ```bash
    python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
    ```
-
 2. **Invalid Access Token**: Ensure the provided access token is a valid key obtained from the AiHubMix website. Access tokens typically have a format like `fd***`.
-
 3. **Insufficient Permissions**: Some operations may require specific permissions; ensure your account has sufficient privileges.
-
 4. **Request Failures**: Check your network connection or try again later.
 
 ## Notes
 
 - The access token is different from the regular API keys used to access AI models
 - Each user has their own system access token, with access levels determined by the user role (regular user, administrator, or root user)
-
-
-
-

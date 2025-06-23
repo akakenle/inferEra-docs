@@ -1,10 +1,10 @@
 ---
 title: "通过接口直接管理后台"
 description: "通过 AiHubMix CLI 实用管理脚本在命令行中管理密钥、查看账户和可用模型列表等"
-icon: 'terminal'
+icon: "terminal"
 ---
 
-AiHubMix CLI 是一个实用管理脚本集合，无需通过网页界面，就可以管理你的 AiHubMix API 密钥、查询账户信息以及使用 AI 服务。它本质上是封装了API调用（curl或Python请求）以便于命令行使用。
+AiHubMix CLI 是一个实用管理脚本集合，无需通过网页界面，就可以管理你的 AiHubMix API 密钥、查询账户信息以及使用 AI 服务。它本质上是封装了 API 调用（curl或Python请求）以便于命令行使用。
 
 ## 准备工作
 
@@ -19,7 +19,7 @@ pip install -U requests openai
 ```
 
 <Info>
-aihubmix_cli.py 脚本可以[在此获取](https://github.com/jerlinn/inferHub)
+  aihubmix_cli.py 脚本可以[在此获取](https://github.com/jerlinn/inferHub)
 </Info>
 
 ## 功能列表
@@ -28,18 +28,18 @@ AiHubMix CLI 提供以下主要功能：
 
 ### API 端点一览表
 
-| 端点 | HTTP 方法 | 描述 |
-|------|---------|------|
-| `/api/user/self` | GET | 获取当前用户信息和账户余额 |
-| `/api/token/` | GET | 获取所有 KEY 列表 |
-| `/api/token/` | POST | 创建新的 API KEY |
-| `/api/token/` | PUT | 更新现有 API KEY |
-| `/api/token/{token_id}` | GET | 获取特定 KEY 的详细信息 |
-| `/api/token/{token_id}` | DELETE | 删除特定 KEY |
-| `/api/token/search` | GET | 搜索 KEY (使用 `?keyword=搜索关键词`) |
-| `/api/user/token` | GET | 获取用户 KEY |
-| `/api/models` | GET | 获取所有可用模型列表 |
-| `/api/user/available_models` | GET | 获取当前用户可用的模型列表 |
+| 端点                           | HTTP 方法 | 描述                           |
+| ---------------------------- | ------- | ---------------------------- |
+| `/api/user/self`             | GET     | 获取当前用户信息和账户余额                |
+| `/api/token/`                | GET     | 获取所有 KEY 列表                  |
+| `/api/token/`                | POST    | 创建新的 API KEY                 |
+| `/api/token/`                | PUT     | 更新现有 API KEY                 |
+| `/api/token/{token_id}`      | GET     | 获取特定 KEY 的详细信息               |
+| `/api/token/{token_id}`      | DELETE  | 删除特定 KEY                     |
+| `/api/token/search`          | GET     | 搜索 KEY (使用 `?keyword=搜索关键词`) |
+| `/api/user/token`            | GET     | 获取用户 KEY                     |
+| `/api/models`                | GET     | 获取所有可用模型列表                   |
+| `/api/user/available_models` | GET     | 获取当前用户可用的模型列表                |
 
 ### 账户管理
 
@@ -50,6 +50,7 @@ curl -X GET "https://aihubmix.com/api/user/self" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 获取账户余额
 import requests
@@ -81,6 +82,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 获取账户余额
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
 ```
@@ -103,6 +105,7 @@ curl -X POST "https://aihubmix.com/api/token/" \
     "subnet": ""
   }'
 ```
+
 
 ```py Python 创建新 KEY
 import requests
@@ -138,6 +141,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 创建新 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "新KEY名称" --expires -1 --quota 500000
 ```
@@ -151,6 +155,7 @@ curl -X GET "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 获取 KEY 列表
 import requests
@@ -182,6 +187,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 获取 KEY 列表
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
 ```
@@ -195,6 +201,7 @@ curl -X GET "https://aihubmix.com/api/token/search?keyword=搜索关键词" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 搜索 KEY
 import requests
@@ -229,6 +236,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 搜索 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "搜索关键词"
 ```
@@ -249,6 +257,7 @@ curl -X PUT "https://aihubmix.com/api/token/" \
     "status": 1
   }'
 ```
+
 
 ```py Python 更新 KEY
 import requests
@@ -287,6 +296,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 更新 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "新名称" --expires 86400 --quota 100000 --status 1
 ```
@@ -300,6 +310,7 @@ curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 删除 KEY
 import requests
@@ -327,6 +338,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 删除 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
 ```
@@ -340,6 +352,7 @@ curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 获取用户 KEY
 import requests
@@ -366,6 +379,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 获取用户 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
@@ -381,6 +395,7 @@ curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 获取所有可用模型
 import requests
@@ -418,6 +433,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 获取所有可用模型
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
@@ -431,6 +447,7 @@ curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 获取用户可用模型
 import requests
@@ -459,6 +476,7 @@ else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
+
 ```shell CLI 获取用户可用模型
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
 ```
@@ -478,21 +496,15 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 如果遇到问题，可以尝试以下解决方案：
 
 1. **连接问题**：如果主域名连接失败，尝试使用备用域名：
+
    ```bash
    python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
    ```
-
 2. **访问令牌无效**：确保提供的访问令牌是从 AiHubMix 网站获取的有效密钥。访问令牌格式通常是 `fd***` 这样的形式。
-
 3. **权限不足**：某些操作可能需要特定的权限，请确保您的账户有足够的权限。
-
 4. **请求失败**：检查网络连接，或尝试稍后再试。
 
 ## 注意事项
 
 - 访问令牌与用于访问 AI 模型的普通 API KEY 不同
 - 每个用户拥有自己的系统访问令牌，其访问级别由用户角色决定（普通用户、管理员或根用户）
-
-
-
-
