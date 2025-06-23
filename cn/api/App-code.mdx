@@ -1,0 +1,76 @@
+---
+title: "构建 AI 共赢生态，立享 10% 优惠"
+description: "Aihubmix 推出应用标识码 APP-Code，为开发者们提供全部模型 10% 优惠；"
+icon: "badge-percent"
+---
+
+## 1️⃣ 调用方法：
+
+<CodeGroup>
+
+```shell Curl 方式
+curl https://aihubmix.com/v1/responses \       
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -H "APP-Code:***" \
+  -d '{
+    "model": "gpt-4o-2024-11-20",
+    "input": "Hello! Please say Hello back to me."
+  }'
+```
+
+```py Openai sdk 方式
+completion = client.chat.completions.create(
+  extra_headers={
+    "APP-Code":"***"
+  },
+  model="openai/gpt-4o",
+  messages=[
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+)
+```
+
+</CodeGroup>
+
+## 2️⃣ 注意事项
+
+1. gemini 的 header 稍微特殊，这样加：
+
+```py Python
+    client = genai.Client(
+        api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+        http_options={
+            "base_url": "https://api.aihubmix.com/gemini",
+            "headers": {
+                "APP-Code": "***"
+            }
+        },
+    )
+```
+
+2. Claude 原生调用也是加 extra_headers：
+
+```py Python
+import os
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 🔑 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+message = client.messages.create(
+    extra_headers={"APP-Code":"MLTG2087"},
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hello, Claude"}
+    ]
+)
+
+print(message.content) 
+```

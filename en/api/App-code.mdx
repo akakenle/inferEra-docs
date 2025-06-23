@@ -1,0 +1,76 @@
+---
+title: "Build AI Ecosystem, Enjoy 10% Discount"
+description: "Aihubmix introduces APP-Code, providing 10% discounts for all models for developers."
+icon: "badge-percent"
+---
+
+## 1️⃣ Call Method：
+
+<CodeGroup>
+
+```shell Curl Method
+curl https://aihubmix.com/v1/responses \       
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -H "APP-Code:***" \
+  -d '{
+    "model": "gpt-4o-2024-11-20",
+    "input": "Hello! Please say Hello back to me."
+  }'
+```
+
+```py Openai SDK Method
+completion = client.chat.completions.create(
+  extra_headers={
+    "APP-Code":"***"
+  },
+  model="openai/gpt-4o",
+  messages=[
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+)
+```
+
+</CodeGroup>
+
+## 2️⃣ Notes
+
+1. Gemini's header is slightly special, so add it like this:
+
+```py Python
+    client = genai.Client(
+        api_key="sk-***", # 🔑 Replace with your API key generated on AiHubMix
+        http_options={
+            "base_url": "https://api.aihubmix.com/gemini",
+            "headers": {
+                "APP-Code": "***"
+            }
+        },
+    )
+```
+
+2. Claude native call also adds extra_headers:
+
+```py Python
+import os
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 🔑 Replace with your API key generated on AiHubMix
+    base_url="https://aihubmix.com"
+)
+
+message = client.messages.create(
+    extra_headers={"APP-Code":"MLTG2087"},
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hello, Claude"}
+    ]
+)
+
+print(message.content) 
+```

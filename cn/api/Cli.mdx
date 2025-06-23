@@ -44,6 +44,7 @@ AiHubMix CLI 提供以下主要功能：
 ### 账户管理
 
 <CodeGroup>
+
 ```shell Curl 获取账户余额
 curl -X GET "https://aihubmix.com/api/user/self" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -83,11 +84,13 @@ else:
 ```shell CLI 获取账户余额
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
 ```
+
 </CodeGroup>
 
 ### KEY 管理
 
 <CodeGroup>
+
 ```shell Curl 创建新 KEY
 curl -X POST "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -138,9 +141,11 @@ else:
 ```shell CLI 创建新 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "新KEY名称" --expires -1 --quota 500000
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 获取 KEY 列表
 curl -X GET "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -180,9 +185,11 @@ else:
 ```shell CLI 获取 KEY 列表
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 搜索 KEY
 curl -X GET "https://aihubmix.com/api/token/search?keyword=搜索关键词" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -225,9 +232,11 @@ else:
 ```shell CLI 搜索 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "搜索关键词"
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 更新 KEY
 curl -X PUT "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -281,9 +290,11 @@ else:
 ```shell CLI 更新 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "新名称" --expires 86400 --quota 100000 --status 1
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 删除 KEY
 curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -319,9 +330,11 @@ else:
 ```shell CLI 删除 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 获取用户 KEY
 curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -356,11 +369,13 @@ else:
 ```shell CLI 获取用户 KEY
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
+
 </CodeGroup>
 
 ### 模型管理
 
 <CodeGroup>
+
 ```shell Curl 获取所有可用模型
 curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -406,9 +421,11 @@ else:
 ```shell CLI 获取所有可用模型
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
+
 </CodeGroup>
 
 <CodeGroup>
+
 ```shell Curl 获取用户可用模型
 curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
@@ -445,6 +462,7 @@ else:
 ```shell CLI 获取用户可用模型
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
 ```
+
 </CodeGroup>
 
 ## 使用 JSON 格式输出
