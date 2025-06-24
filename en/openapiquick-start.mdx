@@ -1,0 +1,180 @@
+---
+/**
+ * English translation of the OpenAPI quick-start guide.
+ */
+---
+
+---
+title: "AIHubMix OpenAPI Specification"
+description: "OpenAPI specification document for the AIHubMix API"
+icon: "code"
+---
+
+```yaml
+openapi: 3.0.0
+info:
+  title: AIHubMix API
+  version: '1.0'
+  description: AIHubMix API schema – OpenAPI 3.0 compatible
+servers:
+  - url: https://aihubmix.com/v1
+    description: AIHubMix API server
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Use your Bearer token in the Authorization header
+
+  schemas:
+    Message:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system, developer]
+          description: Role of the message
+        content:
+          type: string
+          description: Message content
+
+    ChatCompletionRequest:
+      type: object
+      required:
+        - model
+        - messages
+      properties:
+        model:
+          type: string
+          description: ID of the model to use
+          example: gpt-4o-mini
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        temperature:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 2
+          default: 0.8
+          description: Sampling temperature
+        max_tokens:
+          type: integer
+          default: 1024
+          description: Maximum number of tokens to generate
+        top_p:
+          type: number
+          format: float
+          default: 1
+          description: Nucleus sampling threshold
+        frequency_penalty:
+          type: number
+          format: float
+          default: 0
+          description: Frequency penalty coefficient
+        presence_penalty:
+          type: number
+          format: float
+          default: 0
+          description: Presence penalty coefficient
+        stream:
+          type: boolean
+          default: false
+          description: Enable streaming response
+        web_search_options:
+          type: object
+          description: Search options (search-enabled models only)
+
+paths:
+  /chat/completions:
+    post:
+      summary: Create chat completion
+      description: |
+        Generate a chat completion using various models such as gpt-4o-mini.
+        For search-enabled models (e.g. gpt-4o-search-preview, gpt-4o-mini-search-preview),
+        you can enable web search via the `web_search_options` parameter.
+      operationId: createChatCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Response ID
+                  model:
+                    type: string
+                    description: Model used
+                  object:
+                    type: string
+                    description: Object type
+                  created:
+                    type: integer
+                    description: Creation timestamp
+                  choices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        index:
+                          type: integer
+                          description: Choice index
+                        message:
+                          $ref: '#/components/schemas/Message'
+                        finish_reason:
+                          type: string
+                          description: Reason for finishing
+                  usage:
+                    type: object
+                    properties:
+                      prompt_tokens:
+                        type: integer
+                        description: Number of prompt tokens
+                      completion_tokens:
+                        type: integer
+                        description: Number of completion tokens
+                      total_tokens:
+                        type: integer
+                        description: Total token count
+```
+
+This OpenAPI specification defines the main features of the **AIHubMix API**:
+
+1. Basic information:
+   • Server URL  
+   • API version  
+   • Authentication method
+
+2. Component definitions:
+   • Message schema  
+   • ChatCompletionRequest schema
+
+3. API endpoint:
+   • **POST /chat/completions** – create a chat completion, with detailed request parameters and response format.
+
+4. Authentication:
+   • Bearer token  
+   • Provide your API key in the `Authorization` header
+
+5. Special features:
+   • Streaming responses (`stream` parameter)  
+   • Web search support (specific models)  
+   • Extensive model parameters (temperature, max_tokens, etc.) 

@@ -2,13 +2,13 @@
   "openapi": "3.0.1",
   "info": {
     "title": "AIHubMix API",
-    "description": "AIHubMix 提供的 API 服务，支持多种 AI 模型的调用。支持 OpenAI 兼容接口，可以直接替换官方 SDK 使用。\n\n获取 API 密钥：[https://aihubmix.com/token/add](https://aihubmix.com/token/add)\n查看可用模型：[https://aihubmix.com/models](https://aihubmix.com/models)",
+    "description": "AIHubMix provides API services for multiple AI models. The endpoints are fully compatible with the OpenAI specification, so you can use them as a drop-in replacement for the official SDKs.\n\nGet your API key: [https://aihubmix.com/token/add](https://aihubmix.com/token/add)\nView available models: [https://aihubmix.com/models](https://aihubmix.com/models)",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "https://aihubmix.com/v1",
-      "description": "生产环境服务器"
+      "description": "Production server"
     }
   ],
   "security": [
@@ -19,23 +19,23 @@
   "paths": {
     "/chat/completions": {
       "post": {
-        "summary": "创建聊天补全",
-        "description": "根据提供的消息生成 AI 回复，支持多种模型和参数配置",
+        "summary": "Create chat completion",
+        "description": "Generate an AI response based on the provided messages. Supports multiple models and tunable parameters.",
         "x-codeSamples": [
           {
             "lang": "python",
             "label": "Python",
-            "source": "from openai import OpenAI\n\nclient = OpenAI(\n    base_url=\"https://aihubmix.com/v1\",\n    api_key=\"AIHUBMIX_API_KEY\"\n)\n\ncompletion = client.chat.completions.create(\n    model=\"gpt-3.5-turbo\",\n    messages=[{\"role\": \"user\", \"content\": \"你好\"}]\n)\n\nprint(completion.choices[0].message)"
+            "source": "from openai import OpenAI\n\nclient = OpenAI(\n    base_url=\"https://aihubmix.com/v1\",\n    api_key=\"AIHUBMIX_API_KEY\"\n)\n\ncompletion = client.chat.completions.create(\n    model=\"gpt-3.5-turbo\",\n    messages=[{\"role\": \"user\", \"content\": \"Hello\"}]\n)\n\nprint(completion.choices[0].message)"
           },
           {
             "lang": "javascript",
             "label": "Node.js",
-            "source": "import OpenAI from 'openai';\n\nconst openai = new OpenAI({\n  baseURL: 'https://aihubmix.com/v1',\n  apiKey: 'AIHUBMIX_API_KEY'\n});\n\nasync function main() {\n  const completion = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [\n      {\n        'role': 'user',\n        'content': '你好'\n      }\n    ]\n  });\n\n  console.log(completion.choices[0].message);\n}\n\nmain();"
+            "source": "import OpenAI from 'openai';\n\nconst openai = new OpenAI({\n  baseURL: 'https://aihubmix.com/v1',\n  apiKey: 'AIHUBMIX_API_KEY'\n});\n\nasync function main() {\n  const completion = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [\n      {\n        'role': 'user',\n        'content': 'Hello'\n      }\n    ]\n  });\n\n  console.log(completion.choices[0].message);\n}\n\nmain();"
           },
           {
             "lang": "curl",
             "label": "Curl",
-            "source": "curl https://aihubmix.com/v1/chat/completions \\\n  -H \"Authorization: Bearer AIHUBMIX_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"model\\\": \\\"gpt-3.5-turbo\\\",\\\"messages\\\": [{\\\"role\\\": \\\"user\\\", \\\"content\\\": \\\"你好\\\"}]}\""
+            "source": "curl https://aihubmix.com/v1/chat/completions \\\n  -H \"Authorization: Bearer AIHUBMIX_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"model\\\": \\\"gpt-3.5-turbo\\\",\\\"messages\\\": [{\\\"role\\\": \\\"user\\\", \\\"content\\\": \\\"Hello\\\"}]}\""
           }
         ],
         "requestBody": {
@@ -48,59 +48,59 @@
                 "properties": {
                   "model": {
                     "type": "string",
-                    "description": "要使用的模型 ID，可在 [模型广场](https://aihubmix.com/models) 查看可用模型列表"
+                    "description": "Model ID to use. See the full list in the [Model Hub](https://aihubmix.com/models)."
                   },
                   "messages": {
                     "type": "array",
-                    "description": "对话消息列表，包含角色和内容信息",
+                    "description": "Conversation messages including role and content.",
                     "items": {
                       "type": "object",
                       "required": ["role", "content"],
                       "properties": {
                         "role": {
                           "type": "string",
-                          "description": "消息角色，支持 user、assistant、system、developer 等"
+                          "description": "Message role. Supported values include user, assistant, system, developer, etc."
                         },
                         "content": {
                           "type": "string",
-                          "description": "消息内容"
+                          "description": "Message content."
                         }
                       }
                     }
                   },
                   "temperature": {
                     "type": "number",
-                    "description": "采样温度，控制输出的随机性，范围 0-2，值越大随机性越高",
+                    "description": "Sampling temperature (0-2). Higher values yield more randomness.",
                     "default": 0.8
                   },
                   "max_tokens": {
                     "type": "integer",
-                    "description": "生成文本的最大长度，根据模型能力可设置不同值",
+                    "description": "Maximum number of tokens to generate (depends on model).",
                     "default": 1024
                   },
                   "top_p": {
                     "type": "number",
-                    "description": "核采样参数，控制输出文本的多样性",
+                    "description": "Top-p nucleus sampling parameter controlling diversity.",
                     "default": 1
                   },
                   "frequency_penalty": {
                     "type": "number",
-                    "description": "频率惩罚参数，避免重复生成相似内容",
+                    "description": "Frequency penalty to reduce repetition.",
                     "default": 0
                   },
                   "presence_penalty": {
                     "type": "number",
-                    "description": "存在惩罚参数，鼓励生成新的内容",
+                    "description": "Presence penalty to encourage new topics.",
                     "default": 0
                   },
                   "stream": {
                     "type": "boolean",
-                    "description": "是否启用流式输出，实时返回生成内容",
+                    "description": "Enable streaming responses for real-time output.",
                     "default": false
                   },
                   "web_search_options": {
                     "type": "object",
-                    "description": "搜索模型的网络搜索选项，仅支持特定搜索模型"
+                    "description": "Web search options (only supported by specific search models)."
                   }
                 }
               }
@@ -109,7 +109,7 @@
         },
         "responses": {
           "200": {
-            "description": "成功响应",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
@@ -125,17 +125,17 @@
                             "properties": {
                               "role": {
                                 "type": "string",
-                                "description": "消息角色，通常为 assistant"
+                                "description": "Message role, usually 'assistant'."
                               },
                               "content": {
                                 "type": "string",
-                                "description": "生成的回复内容"
+                                "description": "Generated reply content."
                               }
                             }
                           },
                           "finish_reason": {
                             "type": "string",
-                            "description": "生成结束的原因，如 stop、length 等"
+                            "description": "Reason the generation finished (e.g., stop, length)."
                           }
                         }
                       }
@@ -145,15 +145,15 @@
                       "properties": {
                         "prompt_tokens": {
                           "type": "integer",
-                          "description": "输入消息使用的 token 数量"
+                          "description": "Number of tokens in the prompt."
                         },
                         "completion_tokens": {
                           "type": "integer",
-                          "description": "生成回复使用的 token 数量"
+                          "description": "Number of tokens in the completion."
                         },
                         "total_tokens": {
                           "type": "integer",
-                          "description": "总共使用的 token 数量"
+                          "description": "Total tokens consumed."
                         }
                       }
                     }
@@ -163,16 +163,16 @@
             }
           },
           "400": {
-            "description": "请求参数错误"
+            "description": "Invalid request parameters"
           },
           "401": {
-            "description": "认证失败"
+            "description": "Authentication failed"
           },
           "429": {
-            "description": "请求过于频繁"
+            "description": "Too many requests"
           },
           "500": {
-            "description": "服务器内部错误"
+            "description": "Internal server error"
           }
         }
       }
@@ -183,8 +183,8 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Bearer 认证，需要在请求头中添加 Authorization: Bearer AIHUBMIX_API_KEY，可在 [这里](https://aihubmix.com/token/add) 获取 API 密钥"
+        "description": "Bearer authentication. Add Authorization: Bearer AIHUBMIX_API_KEY in request headers. Get your API key [here](https://aihubmix.com/token/add)."
       }
     }
   }
-}
+} 
