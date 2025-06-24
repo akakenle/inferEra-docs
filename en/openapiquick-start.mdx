@@ -1,14 +1,73 @@
 ---
-/**
- * English translation of the OpenAPI quick-start guide.
- */
+0: "/"
+1: "*"
+2: "*"
+3: " "
+4: "*"
+5: " "
+6: "E"
+7: "n"
+8: "g"
+9: "l"
+10: "i"
+11: "s"
+12: "h"
+13: " "
+14: "t"
+15: "r"
+16: "a"
+17: "n"
+18: "s"
+19: "l"
+20: "a"
+21: "t"
+22: "i"
+23: "o"
+24: "n"
+25: " "
+26: "o"
+27: "f"
+28: " "
+29: "t"
+30: "h"
+31: "e"
+32: " "
+33: "O"
+34: "p"
+35: "e"
+36: "n"
+37: "A"
+38: "P"
+39: "I"
+40: " "
+41: "q"
+42: "u"
+43: "i"
+44: "c"
+45: "k"
+46: "-"
+47: "s"
+48: "t"
+49: "a"
+50: "r"
+51: "t"
+52: " "
+53: "g"
+54: "u"
+55: "i"
+56: "d"
+57: "e"
+58: "."
+59: " "
+60: "*"
+61: "/"
 ---
 
 ---
-title: "AIHubMix OpenAPI Specification"
+
+## title: "AIHubMix OpenAPI Specification"
 description: "OpenAPI specification document for the AIHubMix API"
 icon: "code"
----
 
 ```yaml
 openapi: 3.0.0
@@ -55,7 +114,7 @@ components:
         model:
           type: string
           description: ID of the model to use
-          example: gpt-4o-mini
+          example: gpt-4o
         messages:
           type: array
           items:
@@ -159,22 +218,18 @@ paths:
 This OpenAPI specification defines the main features of the **AIHubMix API**:
 
 1. Basic information:
-   • Server URL  
-   • API version  
+   • Server URL\
+   • API version\
    • Authentication method
-
 2. Component definitions:
-   • Message schema  
+   • Message schema\
    • ChatCompletionRequest schema
-
 3. API endpoint:
    • **POST /chat/completions** – create a chat completion, with detailed request parameters and response format.
-
 4. Authentication:
-   • Bearer token  
+   • Bearer token\
    • Provide your API key in the `Authorization` header
-
 5. Special features:
-   • Streaming responses (`stream` parameter)  
-   • Web search support (specific models)  
-   • Extensive model parameters (temperature, max_tokens, etc.) 
+   • Streaming responses (`stream` parameter)\
+   • Web search support (specific models)\
+   • Extensive model parameters (temperature, max_tokens, etc.)

@@ -48,7 +48,7 @@
                 "properties": {
                   "model": {
                     "type": "string",
-                    "description": "要使用的模型 ID，可在 [模型广场](https://aihubmix.com/models) 查看可用模型列表"
+                    "description": "要使用的模型 ID，可在 [模型广场](https://aihubmix.com/models) 查看"
                   },
                   "messages": {
                     "type": "array",

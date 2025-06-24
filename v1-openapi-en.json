@@ -48,7 +48,7 @@
                 "properties": {
                   "model": {
                     "type": "string",
-                    "description": "Model ID to use. See the full list in the [Model Hub](https://aihubmix.com/models)."
+                    "description": "Model ID to use. Check in the [Model Hub](https://aihubmix.com/models)."
                   },
                   "messages": {
                     "type": "array",
