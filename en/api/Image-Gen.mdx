@@ -1,7 +1,7 @@
 ---
 title: "Universal Image Generation API"
 description: "Unified API for multiple image generation models"
-icon: 'palette'
+icon: "palette"
 ---
 
 ## API Overview
@@ -14,6 +14,7 @@ To simplify the integration of different image generation models, Aihubmix provi
 - [Google Imagen Series](#google-imagen)
 
 **API Specification:**
+
 ```shell Curl
 curl https://api.aihubmix.com/v1/models/<model_path>/predictions \
     -H "Content-Type: application/json" \
@@ -26,20 +27,24 @@ curl https://api.aihubmix.com/v1/models/<model_path>/predictions \
 ```
 
 **Where:**
+
 - `https://api.aihubmix.com/v1/models/` is the fixed prefix
 - `<model_path>` is the model path, such as `ideogram/V3`, `stability/Stable-Diffusion-3-5-Large`, `opanai/gpt-image-1`, `google/gemini-2.0-pro-exp-02-05`
 - `sk-***` is your API Key generated in Aihubmix
+
+---
 
 Below are the calling methods for each model.
 
 ## OpenAI
 
 ### Supported Models:
+
 - gpt-image-1
 - dall-e-3
 
 <Note>
-The 2 reverse-engineered models `gpt-4o-image-vip` and `gpt-4o-image` are not supported
+  The 2 reverse-engineered models `gpt-4o-image-vip` and `gpt-4o-image` are not supported
 </Note>
 
 ### Usage:
@@ -62,6 +67,7 @@ curl https://api.aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
 }'
 ```
 
+
 ```shell Curl dall-e-3
 curl https://api.aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     -H "Content-Type: application/json" \
@@ -80,11 +86,12 @@ curl https://api.aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 ## Ideogram V3
 
 ### Supported Models:
+
 - V3
 
 <Note>
-1. Versions below V3 (V_2, V_1, etc.) use the legacy API and are currently not supported
-2. The returned links require a proxy network to access
+  1. Versions below V3 (V_2, V_1, etc.) use the legacy API and are currently not supported
+  2. The returned links require a proxy network to access
 </Note>
 
 ### Usage:
@@ -109,6 +116,7 @@ curl https://api.aihubmix.com/v1/models/ideogram/V3/predictions \
 ## Stability
 
 ### Supported Models:
+
 - Stable-Diffusion-3-5-Large
 
 ### Usage:
@@ -132,12 +140,13 @@ curl https://api.aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/pre
 ## Google Imagen
 
 ### Supported Models:
+
 - imagen-3.0-generate-002
 - imagen-4.0-generate-preview-05-20
 - imagen-4.0-ultra-generate-exp-05-20
 
 <Note>
-Gemini series models are not supported
+  Gemini series models are not supported
 </Note>
 
 ### Usage:

@@ -1,7 +1,7 @@
 ---
 title: "通用图形接口"
 description: " "
-icon: 'palette'
+icon: "palette"
 ---
 
 ## 接口说明
@@ -14,6 +14,7 @@ icon: 'palette'
 - [Google Imagen 系列](#google-imagen)
 
 **接口规格：**
+
 ```shell Curl
 curl https://api.aihubmix.com/v1/models/<model_path>/predictions \
     -H "Content-Type: application/json" \
@@ -26,20 +27,24 @@ curl https://api.aihubmix.com/v1/models/<model_path>/predictions \
 ```
 
 **其中：**
+
 - `https://api.aihubmix.com/v1/models/` 为固定前缀
 - `<model_path>` 为模型路径，如 `ideogram/V3`、`stability/Stable-Diffusion-3-5-Large`、`opanai/gpt-image-1`、`google/gemini-2.0-pro-exp-02-05`
 - `sk-***` 为你在 Aihubmix 生成的 API Key
+
+---
 
 下面是各个模型的调用方法。
 
 ## OpenAI
 
 ### 支持的模型：
+
 - gpt-image-1
 - dall-e-3
 
 <Note>
-不支持 2 个逆向模型 `gpt-4o-image-vip` 和 `gpt-4o-image`
+  不支持 2 个逆向模型 `gpt-4o-image-vip` 和 `gpt-4o-image`
 </Note>
 
 ### 调用方法：
@@ -62,6 +67,7 @@ curl https://api.aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
 }'
 ```
 
+
 ```shell Curl dall-e-3
 curl https://api.aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     -H "Content-Type: application/json" \
@@ -80,11 +86,12 @@ curl https://api.aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 ## Ideogram V3
 
 ### 支持的模型：
+
 - V3
 
 <Note>
-1. V3 以下版本（V_2、V_1 等）为旧接口，暂不支持
-2. 返回的链接需要打开代理网络才能获取
+  1. V3 以下版本（V_2、V_1 等）为旧接口，暂不支持
+  2. 返回的链接需要打开代理网络才能获取
 </Note>
 
 ### 调用方法：
@@ -109,6 +116,7 @@ curl https://api.aihubmix.com/v1/models/ideogram/V3/predictions \
 ## Stability
 
 ### 支持的模型：
+
 - Stable-Diffusion-3-5-Large
 
 ### 调用方法：
@@ -132,12 +140,13 @@ curl https://api.aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/pre
 ## Google Imagen
 
 ### 支持的模型：
+
 - imagen-3.0-generate-002
 - imagen-4.0-generate-preview-05-20
 - imagen-4.0-ultra-generate-exp-05-20
 
 <Note>
-不支持 gemini 系列
+  不支持 gemini 系列
 </Note>
 
 ### 调用方法：
