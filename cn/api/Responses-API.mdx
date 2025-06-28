@@ -9,6 +9,7 @@ icon: "o"
 - ✅ Image input：图文输入
 - ✅ Streaming：流式调用
 - ✅ Functions：函数调用
+- ✅ image_generation 工具调用：绘图，图片生成部分按 \``` gpt-image-1` 计价 ``
 - ✅ Web search：搜索
 - ✅ Computer Use：自动操作
 - ✅ Reasoning：推理深度，支持 3 档
@@ -25,7 +26,7 @@ client = OpenAI(
 )
 ```
 
-对于推理模型，支持通过以下参数来输出推理总结，总结细节的丰富程度为 detailed > auto > None，其中 auto 为最佳平衡。
+对于推理模型，支持通过以下参数来输出推理总结，总结细节的丰富程度为 detailed \> auto \> None，其中 auto 为最佳平衡。
 
 ```py
 "summary": "auto" 
@@ -49,7 +50,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 图文
 from openai import OpenAI
@@ -78,7 +78,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py 流式
 from openai import OpenAI
 
@@ -98,7 +97,6 @@ for event in response:
   print(event)
 ```
 
-
 ```py 搜索
 from openai import OpenAI
 
@@ -115,7 +113,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 函数调用
 from openai import OpenAI
@@ -154,6 +151,33 @@ response = client.responses.create(
 print(response)
 ```
 
+```py 图片生成工具
+from openai import OpenAI
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Generate an image of gray tabby cat hugging an otter with an orange scarf",
+    tools=[{"type": "image_generation"}],
+)
+
+# 保存为图片文件
+image_data = [
+    output.result
+    for output in response.output
+    if output.type == "image_generation_call"
+]
+
+if image_data:
+    image_base64 = image_data[0]
+    with open("cat_and_otter.png", "wb") as f:
+        f.write(base64.b64decode(image_base64))
+```
 
 ```py 推理
 from openai import OpenAI
