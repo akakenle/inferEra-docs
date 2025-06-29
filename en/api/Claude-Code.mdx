@@ -1,19 +1,23 @@
 ---
 title: "Claude Code"
 description: " "
-icon: 'terminal'
+icon: "terminal"
 ---
 
 Powered by Aihubmix, Claude Code ensures a stable connection and eliminates worries about purchasing quotas.
 
 ## Quick Setup Guide:
+
 ### 1️⃣ Install the npm Package Globally
 
 Run the following command in your terminal:
+
 ```shell
 npm install -g @anthropic-ai/claude-code
 ```
+
 Example image:
+
 ![install](./../media/aihubmix-claude-code-npm.png)
 
 ### 2️⃣ Configure Environment Variables
@@ -21,12 +25,14 @@ Example image:
 Go to Aihubmix [Keys page](https://aihubmix.com/token) to generate your API key, then add this key and the forwarding URL to your system environment variables.
 
 For example, add the following lines to your ~/.zshrc file:
+
 ```shell
 export ANTHROPIC_API_KEY="sk-***"
 export ANTHROPIC_BASE_URL="https://aihubmix.com"
 ```
+
 <Tip>
-For Mac users, you can reveal the hidden .zshrc file in your home directory by pressing `⌘ + ⇧ + .`. Open it with the system’s “TextEdit” app and add the above lines.
+  For Mac users, you can reveal the hidden .zshrc file in your home directory by pressing `⌘ + ⇧ + .`. Open it with the system’s “TextEdit” app and add the above lines.
 </Tip>
 
 ### 3️⃣ Apply the Configuration
@@ -35,7 +41,7 @@ After adding the configuration, run `source ~/.zshrc` in your terminal and press
 
 ### 4️⃣ Launch in Terminal
 
-Navigate to your project directory, for example `cd ~/Desktop/my-project`  
+Navigate to your project directory, for example `cd ~/Desktop/my-project`\
 Then type `claude` to start and begin using Claude Code.
 
 ## Initialization Configuration
@@ -48,9 +54,23 @@ If you see an authorization page, click to jump to the Claude website for confir
 
 ### Launch
 
-After launching, Claude Code will display the current configuration details, including your API Key and API Base URL.  
+After launching, Claude Code will display the current configuration details, including your API Key and API Base URL.\
 Confirm the prompts by selecting Yes and pressing Enter to complete the setup.
 
 ![initialization](./../media/aihubmix-claude-code.png)
 
-Enjoy coding with Claude!
+For example: Claude detects a custom KEY in the system environment variables — select `Yes`.
+
+```
+Detected a custom API key in your environment
+
+ANTHROPIC_API_KEY: sk-***
+Do you want to use this API key?
+
+> 1. Yes
+2. No(recommended)
+
+Enter to confirm .Esc to cancel
+```
+
+Enjoy coding with Claude\!
