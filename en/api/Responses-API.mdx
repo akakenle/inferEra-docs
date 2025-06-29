@@ -5,14 +5,15 @@ icon: "o"
 
 Support the Openai Responses API multi-function interface, the following functions have been launched:
 
-- ✅ Text input：Text input
-- ✅ Image input：Image input
-- ✅ Streaming：Streaming
-- ✅ Functions：Functions
+- ✅ Text input: Text input
+- ✅ Image input: Image input
+- ✅ Streaming: Streaming
+- ✅ Reasoning: Reasoning
+- ✅ Functions: Functions
 - ✅ image_generation tool usage: Image drawing and generation are billed under `gpt-image-1`.
-- ✅ Web search：Web search
-- ✅ Computer Use：Computer Use
-- ✅ Reasoning：Reasoning
+- ✅ Web search: Web search
+- ✅ Computer Use: Computer Use
+- ✅ Remote MCP: Calling a remote MCP server
 
 ## Usage (Python call)：
 
@@ -98,7 +99,6 @@ for event in response:
   print(event)
 ```
 
-
 ```py Web search
 from openai import OpenAI
 
@@ -116,6 +116,25 @@ response = client.responses.create(
 print(response)
 ```
 
+```py Reasoning
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
+    base_url="https://aihubmix.com/v1/"
+)
+
+response = client.responses.create(
+    model="o4-mini", # codex-mini-latest, o4-mini, o3-mini, o3, o1
+    input="How much wood would a woodchuck chuck?",
+    reasoning={
+        "effort": "medium", # low, medium, high
+        "summary": "auto", # resoning summary
+    }
+)
+
+print(response)
+```
 
 ```py Functions
 from openai import OpenAI
@@ -154,7 +173,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py Image Generation Tool
 from openai import OpenAI
 import base64
@@ -183,25 +201,27 @@ if image_data:
         f.write(base64.b64decode(image_base64))
 ```
 
-
-```py Reasoning
+```py Remote MCP
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
-    base_url="https://aihubmix.com/v1/"
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
 )
 
-response = client.responses.create(
-    model="o4-mini", # codex-mini-latest, o4-mini, o3-mini, o3, o1
-    input="How much wood would a woodchuck chuck?",
-    reasoning={
-        "effort": "medium", # low, medium, high
-        "summary": "auto", # resoning summary
-    }
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "never",
+        "allowed_tools": ["ask_question"],
+    }],
+    input="What transport protocols does the 2025-03-26 version of the MCP spec (modelcontextprotocol/modelcontextprotocol) support?",
 )
 
-print(response)
+print(resp.output_text)
 ```
 
 </CodeGroup>

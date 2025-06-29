@@ -8,11 +8,12 @@ icon: "o"
 - ✅ Text input：文本输入
 - ✅ Image input：图文输入
 - ✅ Streaming：流式调用
+- ✅ Reasoning：推理深度，支持 3 档
 - ✅ Functions：函数调用
 - ✅ image_generation：绘图工具调用，图片生成部分按 `gpt-image-1` 计价
 - ✅ Web search：搜索
 - ✅ Computer Use：自动操作
-- ✅ Reasoning：推理深度，支持 3 档
+- ✅ Remote MCP：MCP 调用
 
 ## 使用 (Python 调用)：
 
@@ -51,6 +52,7 @@ response = client.responses.create(
 print(response)
 ```
 
+
 ```py 图文
 from openai import OpenAI
 
@@ -77,6 +79,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py 流式
 from openai import OpenAI
@@ -109,6 +112,26 @@ response = client.responses.create(
   model="gpt-4o-mini", # codex-mini-latest 不支持搜索📍
   tools=[{ "type": "web_search_preview" }],
   input="What was a positive news story from today?",
+)
+
+print(response)
+```
+
+```py 推理
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1/"
+)
+
+response = client.responses.create(
+    model="o4-mini", # 支持 codex-mini-latest, o4-mini, o3-mini, o3, o1
+    input="How much wood would a woodchuck chuck?",
+    reasoning={
+        "effort": "medium", # 支持 low, medium, high
+        "summary": "auto" # 推理总结
+    }
 )
 
 print(response)
@@ -179,24 +202,27 @@ if image_data:
         f.write(base64.b64decode(image_base64))
 ```
 
-```py 推理
+```py Remote MCP
 from openai import OpenAI
 
 client = OpenAI(
     api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
-    base_url="https://aihubmix.com/v1/"
+    base_url="https://aihubmix.com/v1"
 )
 
-response = client.responses.create(
-    model="o4-mini", # 支持 codex-mini-latest, o4-mini, o3-mini, o3, o1
-    input="How much wood would a woodchuck chuck?",
-    reasoning={
-        "effort": "medium", # 支持 low, medium, high
-        "summary": "auto" # 推理总结
-    }
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "never",
+        "allowed_tools": ["ask_question"],
+    }],
+    input="What transport protocols does the 2025-03-26 version of the MCP spec (modelcontextprotocol/modelcontextprotocol) support?",
 )
 
-print(response)
+print(resp.output_text)
 ```
 
 </CodeGroup>
