@@ -8,11 +8,12 @@ Support the Openai Responses API multi-function interface, the following functio
 - ✅ Text input: Text input
 - ✅ Image input: Image input
 - ✅ Streaming: Streaming
+- ✅ Web search: Web search
 - ✅ Reasoning: Reasoning
 - ✅ Functions: Functions
 - ✅ image_generation tool usage: Image drawing and generation are billed under `gpt-image-1`.
-- ✅ Web search: Web search
 - ✅ Computer Use: Computer Use
+- ✅ Code Interpreter: Allow models to write and run Python to solve problems
 - ✅ Remote MCP: Calling a remote MCP server
 
 ## Usage (Python call)：
@@ -99,6 +100,7 @@ for event in response:
   print(event)
 ```
 
+
 ```py Web search
 from openai import OpenAI
 
@@ -115,6 +117,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py Reasoning
 from openai import OpenAI
@@ -135,6 +138,7 @@ response = client.responses.create(
 
 print(response)
 ```
+
 
 ```py Functions
 from openai import OpenAI
@@ -173,6 +177,7 @@ response = client.responses.create(
 print(response)
 ```
 
+
 ```py Image Generation Tool
 from openai import OpenAI
 import base64
@@ -201,11 +206,41 @@ if image_data:
         f.write(base64.b64decode(image_base64))
 ```
 
+
+```py Code Interpreter
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+instructions = """
+You are a personal math tutor. When asked a math question, 
+write and run code using the python tool to answer the question.
+"""
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[
+        {
+            "type": "code_interpreter",
+            "container": {"type": "auto"}
+        }
+    ],
+    instructions=instructions,
+    input="I need to solve the equation 3x + 11 = 14. Can you help me?",
+)
+
+print(resp.output)
+```
+
+
 ```py Remote MCP
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
     base_url="https://aihubmix.com/v1"
 )
 
