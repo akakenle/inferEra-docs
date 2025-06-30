@@ -52,7 +52,8 @@
                   "cn/api/IdeogramAI",
                   "cn/api/Jina-AI",
                   "cn/api/Cli",
-                  "cn/api/App-code"
+                  "cn/api/App-code",
+                  "cn/api/Auth"
                 ]
               },
               {
@@ -159,7 +160,8 @@
                   "en/api/IdeogramAI",
                   "en/api/Jina-AI",
                   "en/api/Cli",
-                  "en/api/App-code"
+                  "en/api/App-code",
+                  "en/api/Auth"
                 ]
               },
               {
@@ -255,6 +257,10 @@
       {
         "header": "Resources",
         "items": [
+          {
+            "label": "Auth Reference",
+            "href": "https://docs.aihubmix.com/cn/api/Auth"
+          },
           {
             "label": "Feedback",
             "href": "mailto:feedback@aihubmix.com"

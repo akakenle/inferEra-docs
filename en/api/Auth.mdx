@@ -1,0 +1,1033 @@
+---
+title: "Third-party Application Integration Guide"
+description: " "
+icon: "webhook"
+---
+
+## Important Security Statement
+
+Security first principle: When developing and deploying third-party applications, security is the most important consideration. You must strictly follow the security principles below to ensure the safety of user data and the authorization process.
+
+<Warning>
+1. Never expose `client_secret` in frontend JavaScript code
+2. The OAuth authorization code to token exchange must be handled on the server side
+3. All access to protected user resources must go through backend API proxying
+4. All OAuth communication must be protected using HTTPS
+</Warning>
+
+Violating any of the above security principles may result in serious security vulnerabilities!
+
+## 📋 Table of Contents
+
+1. [Overview](#overview)
+2. [Getting Started](#getting-started)
+3. [OAuth2 Authorization Flow](#oauth2-authorization-flow)
+4. [API Reference](#api-reference)
+5. [SDK and Code Examples](#sdk-and-code-examples)
+6. [Security Best Practices](#security-best-practices)
+7. [FAQ](#faq)
+8. [Technical Support](#technical-support)
+
+## Overview
+
+We provide an open API based on the OAuth2 standard, allowing third-party applications to securely access users' basic information and account balance. Through our OAuth2 service, your application can:
+
+- 🚀 One-click login: Users do not need to register again, login automatically grants authorization for a truly seamless experience
+- 👤 Get user info: Access users' basic profile (username, email, etc.)
+- 💰 View account balance: Get users' account balance in real time
+- 🔄 Top-up redirect: Guide users to our top-up page for account recharge
+- 🔐 Automatic token refresh: Built-in refresh token mechanism for seamless token renewal, improving user experience
+
+## Getting Started
+
+### 1. Register a Developer Account
+
+First, you need to register a developer account in our system.
+
+### 2. Create an OAuth Application
+
+Create your OAuth application in the developer console:
+
+```shell API call example
+curl -X POST https://api.aihubmix.com/api/oauth_apps \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_DEVELOPER_TOKEN" \
+  -d '{
+    "name": "My Third-party App",
+    "description": "App description",
+    "redirect_uri": "https://yourapp.com/oauth/callback"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "success": true,
+  "message": "Application created successfully",
+  "data": {
+    "id": 1,
+    "name": "My Third-party App",
+    "client_id": "client_abc123def456...",
+    "client_secret": "secret_xyz789uvw012...",
+    "redirect_uri": "https://yourapp.com/oauth/callback",
+    "created_time": 1640995200
+  }
+}
+```
+
+Important Security Reminder:
+<Warning>
+- client_id can be used on the frontend (public information)
+- `client_secret` can only be used on the server side and must never be exposed to the browser
+- Store client_secret in environment variables; do not hardcode it in your code
+</Warning>
+
+### 3. Configure Redirect URI
+
+Make sure your redirect URI meets the following requirements:
+
+- Uses HTTPS protocol (for production)
+- Points to your server endpoint (not a frontend page)
+- The domain is registered and accessible
+- The path is specific to the API endpoint handling the callback
+
+## OAuth2 Authorization Flow
+
+### Secure Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Browser  as User Browser
+    participant Backend  as Your Server
+    participant OAuthSrv as Our Server
+
+    %% Login entry point
+    Browser  ->> Backend : GET /auth<br>(user clicks login)
+
+    %% Generate/save state, then redirect
+    Backend  ->> Backend : Generate state<br>store state
+    Backend  ->> OAuthSrv: Redirect to authorization<br>(with client_id)
+
+    %% Show authorization page and complete
+    OAuthSrv -->> Browser : Show authorization page
+    Browser  ->> Browser : User completes authorization
+
+    %% Authorization server calls back via browser
+    Browser  ->> Backend : GET /callback
+    Backend  ->> Backend : Validate state
+    Backend  ->> OAuthSrv: Exchange code for token<br>(with secret)
+    OAuthSrv -->> Backend : Validate and return token
+
+    %% Save token and return to frontend
+    Backend  ->> Backend : Store token
+    Backend  -->> Browser : Redirect to frontend
+
+    %% Fetch user info
+    Browser  ->> Browser : Show user info
+    Browser  ->> Backend : GET /api/user
+    Backend  ->> OAuthSrv: Request user info with token
+    OAuthSrv -->> Backend : Return user info
+    Backend  -->> Browser : Return user info
+```
+
+### Step-by-step Instructions
+
+#### Step 1: Guide User to Authorize
+
+Add a login button on your frontend page. When clicked, redirect to your server-side authorization endpoint:
+
+```js // Frontend code - only responsible for redirecting
+function startLogin() {
+    // Redirect to your server-side authorization handler
+    window.location.href = '/auth/oauth/start';
+}
+```
+
+#### Step 2: Server-side Authorization Handler
+
+Implement the authorization handler on your server:
+
+```js // Server-side code
+app.get('/auth/oauth/start', (req, res) => {
+    // Generate and store state parameter
+    const state = generateSecureRandomString();
+    req.session.oauth_state = state;
+    
+    // Build authorization URL
+    const authUrl = new URL('https://your-domain.com/api/oauth2/authorize');
+    authUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID);
+    authUrl.searchParams.append('redirect_uri', process.env.OAUTH_REDIRECT_URI);
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('scope', 'profile balance');
+    authUrl.searchParams.append('state', state);
+    authUrl.searchParams.append('auto_authorize', 'true'); // One-click login
+    
+    // Redirect to authorization server
+    res.redirect(authUrl.toString());
+});
+```
+
+#### Step 3: Handle Authorization Callback (Server-side)
+
+```js // Server-side authorization callback handler
+app.get('/oauth/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    
+    // Error handling
+    if (error) {
+        return res.redirect(`/?error=${encodeURIComponent(error)}`);
+    }
+    
+    // Parameter validation
+    if (!code || !state) {
+        return res.redirect('/?error=missing_parameters');
+    }
+    
+    // Validate state parameter (prevent CSRF attacks)
+    if (state !== req.session.oauth_state) {
+        return res.redirect('/?error=invalid_state');
+    }
+    
+    try {
+        // Exchange authorization code for access token (server-side)
+        const tokenResponse = await fetch('https://your-domain.com/api/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: process.env.OAUTH_REDIRECT_URI,
+                client_id: process.env.OAUTH_CLIENT_ID,
+                client_secret: process.env.OAUTH_CLIENT_SECRET // Server-side only
+            })
+        });
+        
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenResponse.ok) {
+            throw new Error(tokenData.error || 'Token exchange failed');
+        }
+        
+        // Securely store token (server session or database)
+        req.session.access_token = tokenData.access_token;
+        req.session.refresh_token = tokenData.refresh_token;
+        req.session.token_expires_at = Date.now() + (tokenData.expires_in * 1000);
+        
+        // Clean up temporary state
+        delete req.session.oauth_state;
+        
+        // Redirect to frontend page
+        res.redirect('/?login=success');
+        
+    } catch (error) {
+        console.error('OAuth callback error:', error);
+        res.redirect(`/?error=server_error`);
+    }
+});
+```
+
+#### Step 4: Frontend Fetches User Info
+
+```js // Frontend fetches user info via API proxy
+async function loadUserInfo() {
+    try {
+        const response = await fetch('/api/user/info');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch user info');
+        }
+        
+        const userInfo = await response.json();
+        displayUserInfo(userInfo);
+        
+    } catch (error) {
+        console.error('Failed to load user info:', error);
+        showLoginButton();
+    }
+}
+```
+
+```js // Server-side API proxy
+app.get('/api/user/info', async (req, res) => {
+    const accessToken = req.session.access_token;
+    
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    try {
+        // Proxy request to OAuth server
+        const response = await fetch('https://your-domain.com/api/oauth2/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('User info request failed');
+        }
+        
+        const userInfo = await response.json();
+        res.json(userInfo);
+        
+    } catch (error) {
+        console.error('User info proxy error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+```
+
+<Tips>
+One-click login experience: By setting `auto_authorize=true`, after the user logs in, the system will automatically grant authorization without any extra confirmation steps.
+</Tips>
+
+## API Reference
+
+### 1. Authorization Endpoint
+
+GET `/api/oauth2/authorize`
+
+Guides the user through OAuth2 authorization.
+
+Parameters:
+| Parameter | Type   | Required | Description |
+|-----------|--------|----------|-------------|
+| `client_id` | string | Yes      | Application client ID (can be used on frontend) |
+| `redirect_uri` | string | Yes      | Callback URI after authorization (must point to server endpoint) |
+| `response_type` | string | Yes      | Fixed: `code` |
+| `scope` | string | No       | Scope, separated by spaces |
+| `state` | string | Yes      | Random string to prevent CSRF attacks (generated server-side) |
+| `auto_authorize` | string | No       | Set to `true` to enable auto-authorization |
+
+Security requirements:
+- `redirect_uri` must exactly match the address registered
+- `state` must be a random string generated server-side
+- HTTPS must be used (in production)
+
+Scope explanation:
+- `profile`: Access user's basic info (username, email)
+- `balance`: Access user's account balance
+
+### 2. Token Endpoint
+
+POST `/api/oauth2/token`
+
+<Warning>
+Security Warning: This endpoint must only be called from the server side, never from the frontend!
+</Warning>
+
+Used for two scenarios:
+1. Exchange authorization code for access token
+2. Use refresh token to get a new access token
+
+Authorization code grant parameters:
+| Parameter | Type   | Required | Description |
+|-----------|--------|----------|-------------|
+| `grant_type` | string | Yes      | Fixed: `authorization_code` |
+| `code` | string | Yes      | Authorization code |
+| `redirect_uri` | string | Yes      | Must match the URI used in authorization |
+| `client_id` | string | Yes      | Application client ID |
+| `client_secret` | string | Yes      | Application client secret (server-side only) |
+
+Refresh token grant parameters:
+| Parameter | Type   | Required | Description |
+|-----------|--------|----------|-------------|
+| `grant_type` | string | Yes      | Fixed: `refresh_token` |
+| `refresh_token` | string | Yes      | Refresh token |
+| `client_id` | string | Yes      | Application client ID |
+| `client_secret` | string | Yes      | Application client secret (server-side only) |
+
+Example response:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "refresh_token": "refresh_abc123def456...",
+  "scope": "profile balance"
+}
+```
+
+### 3. User Info Endpoint
+
+GET `/api/oauth2/userinfo`
+
+Get user's basic info and account balance.
+
+Request header:
+```json header
+Authorization: Bearer {access_token}
+```
+
+Example response:
+```json response
+{
+  "id": 12345,
+  "username": "user123",
+  "email": "user@example.com",
+  "quota": 1000000,
+  "used_quota": 250000,
+  "balance_formatted": "750.00",
+  "created_time": 1640995200,
+  "status": 1
+}
+```
+
+## SDK and Code Examples
+
+### JavaScript SDK
+
+We provide a complete JavaScript SDK you can use directly:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Third-party App Example</title>
+    <style>
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .user-info { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .login-section { text-align: center; padding: 40px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>我的第三方应用</h1>
+        
+        <!-- Loading status -->
+        <div id="loading">
+            <p>Checking login status...</p>
+        </div>
+        
+        <!-- Logged-in user info -->
+        <div id="user-info" class="user-info hidden">
+            <h2>Welcome back!</h2>
+            <p><strong>Username:</strong> <span id="username"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Account Balance:</strong> <span id="balance"></span></p>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="refreshBalance()">Refresh Balance</button>
+                <button class="btn btn-primary" onclick="goToTopup()">Top Up Account</button>
+                <button class="btn btn-secondary" onclick="logout()">Log Out</button>
+            </div>
+        </div>
+        
+        <!-- Not logged in status -->
+        <div id="login-section" class="login-section hidden">
+            <h2>Please log in to view account info</h2>
+            <p>Use one-click login for quick access to your account</p>
+            <button class="btn btn-primary" onclick="oneClickLogin()">
+                🚀 One-click Login
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // OAuth configuration
+        const OAUTH_CONFIG = {
+            authServer: 'https://your-domain.com',
+            clientId: 'YOUR_CLIENT_ID',
+            clientSecret: 'YOUR_CLIENT_SECRET', // 生产环境应该在后端处理
+            redirectUri: window.location.origin + '/oauth/callback.html',
+            scope: 'profile balance'
+        };
+
+        class OAuthManager {
+            constructor() {
+                this.accessToken = localStorage.getItem('oauth_access_token');
+                this.refreshToken = localStorage.getItem('oauth_refresh_token');
+                this.tokenExpiresAt = localStorage.getItem('oauth_token_expires_at');
+                this.isRefreshing = false; // 防止并发刷新
+                this.init();
+            }
+
+            async init() {
+                // 检查URL中是否有授权码
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const state = urlParams.get('state');
+
+                if (code) {
+                    await this.handleAuthCallback(code, state);
+                    // 清理URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else if (this.accessToken) {
+                    try {
+                        // 检查token是否过期，如果过期尝试刷新
+                        if (this.isTokenExpired()) {
+                            await this.refreshTokenIfNeeded();
+                        }
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    } catch (error) {
+                        console.log('Token可能已过期或无效，需要重新登录');
+                        this.clearTokens();
+                        this.showLoginSection();
+                    }
+                } else {
+                    this.showLoginSection();
+                }
+
+                document.getElementById('loading').classList.add('hidden');
+            }
+
+            // Check if access token is expired
+            isTokenExpired() {
+                if (!this.tokenExpiresAt) return false;
+                const expiryTime = parseInt(this.tokenExpiresAt);
+                const bufferTime = 5 * 60 * 1000; // 5 minutes buffer
+                return Date.now() > (expiryTime - bufferTime);
+            }
+
+            // Automatically refresh token
+            async refreshTokenIfNeeded() {
+                if (!this.refreshToken || this.isRefreshing) {
+                    return false;
+                }
+
+                this.isRefreshing = true;
+                
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'refresh_token',
+                            refresh_token: this.refreshToken,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                        })
+                    });
+
+                    if (response.ok) {
+                        const tokenData = await response.json();
+                        this.updateTokens(tokenData);
+                        return true;
+                    } else {
+                        throw new Error('Token refresh failed');
+                    }
+                } catch (error) {
+                    console.error('Failed to refresh token:', error);
+                    this.clearTokens();
+                    return false;
+                } finally {
+                    this.isRefreshing = false;
+                }
+            }
+
+            // Update token info
+            updateTokens(tokenData) {
+                this.accessToken = tokenData.access_token;
+                this.refreshToken = tokenData.refresh_token;
+                this.tokenExpiresAt = Date.now() + (tokenData.expires_in * 1000);
+
+                localStorage.setItem('oauth_access_token', this.accessToken);
+                localStorage.setItem('oauth_refresh_token', this.refreshToken);
+                localStorage.setItem('oauth_token_expires_at', this.tokenExpiresAt.toString());
+            }
+
+            oneClickLogin() {
+                const state = this.generateState();
+                localStorage.setItem('oauth_state', state);
+
+                const authUrl = `${OAUTH_CONFIG.authServer}/api/oauth2/authorize?` +
+                    `client_id=${OAUTH_CONFIG.clientId}&` +
+                    `redirect_uri=${encodeURIComponent(OAUTH_CONFIG.redirectUri)}&` +
+                    `response_type=code&` +
+                    `scope=${encodeURIComponent(OAUTH_CONFIG.scope)}&` +
+                    `state=${state}&` +
+                    `auto_authorize=true`; // Enable auto-authorization for true one-click login
+
+                // Open authorization page in popup
+                const popup = window.open(authUrl, 'oauth_login', 'width=500,height=600,scrollbars=yes');
+
+                // Listen for popup close
+                const checkClosed = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(checkClosed);
+                        // 检查是否获得了授权
+                        setTimeout(() => this.init(), 1000);
+                    }
+                }, 1000);
+            }
+
+            async handleAuthCallback(code, state) {
+                const savedState = localStorage.getItem('oauth_state');
+                if (state !== savedState) {
+                    console.error('State parameter mismatch');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'authorization_code',
+                            code: code,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                            redirect_uri: OAUTH_CONFIG.redirectUri
+                        })
+                    });
+
+                    const tokenData = await response.json();
+                    
+                    if (tokenData.access_token) {
+                        this.updateTokens(tokenData);
+                        localStorage.removeItem('oauth_state');
+                        
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    }
+                } catch (error) {
+                    console.error('获取访问令牌失败:', error);
+                }
+            }
+
+            // API request method with auto-refresh
+            async apiRequest(url, options = {}) {
+                // Check and refresh token if needed
+                if (this.isTokenExpired()) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (!refreshed) {
+                        throw new Error('Unable to refresh token');
+                    }
+                }
+
+                const headers = {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    ...options.headers
+                };
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                // If a 401 error is received, try to refresh token and retry once
+                if (response.status === 401 && !options._retry) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (refreshed) {
+                        return this.apiRequest(url, { ...options, _retry: true });
+                    }
+                }
+
+                return response;
+            }
+
+            async fetchUserInfo() {
+                const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to get user info');
+                }
+
+                this.userInfo = await response.json();
+            }
+
+            showUserInfo() {
+                document.getElementById('username').textContent = this.userInfo.username;
+                document.getElementById('email').textContent = this.userInfo.email;
+                document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('login-section').classList.add('hidden');
+            }
+
+            showLoginSection() {
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('login-section').classList.remove('hidden');
+            }
+
+            async refreshBalance() {
+                try {
+                    await this.fetchUserInfo();
+                    document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+                    alert('Balance updated');
+                } catch (error) {
+                    alert('Refresh failed, please log in again');
+                    this.clearTokens();
+                    this.showLoginSection();
+                }
+            }
+
+            async goToTopup() {
+                try {
+                    const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/topup`);
+
+                    const data = await response.json();
+                    if (data.topup_url) {
+                        window.open(data.topup_url, '_blank');
+                    }
+                } catch (error) {
+                    console.error('Failed to get top-up link:', error);
+                }
+            }
+
+            logout() {
+                this.clearTokens();
+                this.showLoginSection();
+            }
+
+            clearTokens() {
+                this.accessToken = null;
+                this.refreshToken = null;
+                this.tokenExpiresAt = null;
+                this.userInfo = null;
+                
+                localStorage.removeItem('oauth_access_token');
+                localStorage.removeItem('oauth_refresh_token');
+                localStorage.removeItem('oauth_token_expires_at');
+            }
+
+            generateState() {
+                return Math.random().toString(36).substring(2, 15) + 
+                       Math.random().toString(36).substring(2, 15);
+            }
+        }
+
+        // 全局函数
+        let oauthManager;
+
+        function oneClickLogin() {
+            oauthManager.oneClickLogin();
+        }
+
+        function refreshBalance() {
+            oauthManager.refreshBalance();
+        }
+
+        function goToTopup() {
+            oauthManager.goToTopup();
+        }
+
+        function logout() {
+            oauthManager.logout();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            oauthManager = new OAuthManager();
+        });
+    </script>
+</body>
+</html>
+```
+
+### OAuth Callback Page
+
+Create a `/oauth/callback.html` file:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logging in...</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .loading { color: #666; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+        <h2>Logging in, please wait...</h2>
+        <div id="status" class="loading">Verifying authorization information...</div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+
+        if (error) {
+            document.getElementById('status').innerHTML = 
+                `<div class="error">Authorization failed: ${error}</div>`;
+            setTimeout(() => {
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.location.href = '/';
+                }
+            }, 3000);
+        } else if (code) {
+            if (window.opener) {
+                // 如果是弹窗，关闭并让父窗口处理
+                window.opener.location.href = 
+                    window.opener.location.pathname + `?code=${code}&state=${state}`;
+                window.close();
+            } else {
+                // 如果不是弹窗，重定向到主页面
+                window.location.href = `/?code=${code}&state=${state}`;
+            }
+        } else {
+            document.getElementById('status').innerHTML = 
+                '<div class="error">No valid authorization information received</div>';
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```
+
+### Node.js Backend Example
+
+For better security, it is recommended to handle `client_secret` on the backend:
+
+```js
+const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const OAUTH_CONFIG = {
+    authServer: 'https://your-domain.com',
+    clientId: 'YOUR_CLIENT_ID',
+    clientSecret: 'YOUR_CLIENT_SECRET'
+};
+
+// Backend handles token exchange
+app.post('/api/oauth/exchange-token', async (req, res) => {
+    const { code, redirectUri, state } = req.body;
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+                redirect_uri: redirectUri
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Token exchange failed' });
+    }
+});
+
+// Refresh token endpoint
+app.post('/api/oauth/refresh-token', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({ error: 'Missing refresh token' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Token refresh failed' });
+    }
+});
+
+// Proxy user info request (with auto-refresh)
+app.get('/api/oauth/userinfo', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ error: 'Missing authorization header' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`, {
+            headers: {
+                'Authorization': authHeader
+            }
+        });
+
+        const userData = await response.json();
+        
+        if (response.ok) {
+            res.json(userData);
+        } else {
+            res.status(response.status).json(userData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch user info' });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+```
+
+## Security Best Practices
+
+### 1. Client Secret Protection
+
+- ✅ Recommended: Store `client_secret` on the backend server
+- ❌ Avoid: Exposing `client_secret` in frontend JavaScript
+
+### 2. State Parameter Validation
+
+```js
+// Generate random state
+const state = crypto.randomBytes(16).toString('hex');
+localStorage.setItem('oauth_state', state);
+
+// Validate state
+const savedState = localStorage.getItem('oauth_state');
+if (receivedState !== savedState) {
+    throw new Error('CSRF attack detected');
+}
+```
+
+### 3. HTTPS Usage
+
+- Must use `HTTPS` in production
+- Callback URI must use `HTTPS`
+- All API requests use `HTTPS`
+
+### 4. Token Secure Storage
+
+```js
+// Set token expiry time
+const expiryTime = Date.now() + (tokenData.expires_in * 1000);
+localStorage.setItem('oauth_token_expiry', expiryTime);
+
+// Check if token is expired
+function isTokenExpired() {
+    const expiry = localStorage.getItem('oauth_token_expiry');
+    return !expiry || Date.now() > parseInt(expiry);
+}
+```
+
+### 5. Error Handling
+
+```js
+try {
+    const response = await fetch('/api/oauth2/userinfo', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+        if (response.status === 401) {
+            // Token expired, need to re-login
+            clearToken();
+            showLoginSection();
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    }
+    
+    const userInfo = await response.json();
+    return userInfo;
+} catch (error) {
+    console.error('API request failed:', error);
+    // Handle network errors etc.
+}
+```
+
+## FAQ
+
+Q1: How to achieve a true one-click login experience?
+
+A: Just add the `auto_authorize=true` parameter to the authorization URL. After the user logs in, authorization will be granted automatically, with no extra confirmation step:
+
+```js
+const authUrl = 'https://your-domain.com/api/oauth2/authorize?' +
+  'client_id=YOUR_CLIENT_ID&' +
+  'auto_authorize=true&' + // Key parameter
+  '...other parameters';
+```
+
+Q2: Will tokens refresh automatically?
+
+A: Yes, our SDK has built-in automatic token refresh:
+
+- Access token: valid for 2 hours, auto-refresh 5 minutes before expiry
+- Refresh token: valid for 30 days, used to obtain new access tokens
+- Seamless refresh: All API calls will automatically check and refresh expired tokens
+- Retry on failure: If the API returns a 401 error, it will automatically try to refresh the token and retry
+
+```js
+// The SDK will handle token refresh automatically, no manual handling needed
+const userInfo = await oauthManager.fetchUserInfo(); // token auto-refresh
+```
+
+Only if the refresh token also expires does the user need to log in again.
+
+Q3: What user info can I get?
+
+A: According to the authorized scope, you can get:
+- `profile` scope: username, email
+- `balance` scope: account balance info
+
+Q4: How do I test OAuth integration?
+
+A: 
+1. Use `HTTP localhost` in development for testing
+2. Use our provided test tools to verify the authorization flow
+3. Check network requests in your browser's developer tools
+
+Q5: Which programming languages are supported?
+
+A: Our OAuth2 API is standard and supports all major programming languages:
+- JavaScript/Node.js
+- Python
+- PHP
+- Java
+- C#/.NET
+- Go
+- Ruby
+
+Q6: How can a user revoke authorization?
+
+A: Users can revoke third-party app authorization in our User Center > Authorization Management page.
+
+## Technical Support
+
+### Developer Resources
+
+- API Docs: https://your-domain.com/docs/api
+- SDK Download: https://your-domain.com/docs/sdk
+- Example Code: https://github.com/your-org/oauth-examples
