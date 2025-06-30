@@ -970,7 +970,7 @@ try {
 
 ## FAQ
 
-Q1: How to achieve a true one-click login experience?
+### Q1: How to achieve a true one-click login experience?
 
 A: Just add the `auto_authorize=true` parameter to the authorization URL. After the user logs in, authorization will be granted automatically, with no extra confirmation step:
 
@@ -981,7 +981,7 @@ const authUrl = 'https://your-domain.com/api/oauth2/authorize?' +
   '...other parameters';
 ```
 
-Q2: Will tokens refresh automatically?
+### Q2: Will tokens refresh automatically?
 
 A: Yes, our SDK has built-in automatic token refresh:
 
@@ -997,20 +997,20 @@ const userInfo = await oauthManager.fetchUserInfo(); // token auto-refresh
 
 Only if the refresh token also expires does the user need to log in again.
 
-Q3: What user info can I get?
+### Q3: What user info can I get?
 
 A: According to the authorized scope, you can get:
 - `profile` scope: username, email
 - `balance` scope: account balance info
 
-Q4: How do I test OAuth integration?
+### Q4: How do I test OAuth integration?
 
 A: 
 1. Use `HTTP localhost` in development for testing
 2. Use our provided test tools to verify the authorization flow
 3. Check network requests in your browser's developer tools
 
-Q5: Which programming languages are supported?
+### Q5: Which programming languages are supported?
 
 A: Our OAuth2 API is standard and supports all major programming languages:
 - JavaScript/Node.js
@@ -1021,6 +1021,6 @@ A: Our OAuth2 API is standard and supports all major programming languages:
 - Go
 - Ruby
 
-Q6: How can a user revoke authorization?
+### Q6: How can a user revoke authorization?
 
 A: Users can revoke third-party app authorization in our User Center > Authorization Management page.

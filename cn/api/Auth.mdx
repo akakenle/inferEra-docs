@@ -970,7 +970,7 @@ try {
 
 ## 常见问题
 
-Q1: 如何实现真正的一键登录体验？
+### Q1: 如何实现真正的一键登录体验？
 
 A: 在授权URL中添加 `auto_authorize=true` 参数即可。这样用户登录完成后会自动完成授权，无需额外的确认步骤：
 
@@ -981,7 +981,7 @@ const authUrl = 'https://your-domain.com/api/oauth2/authorize?' +
   '...其他参数';
 ```
 
-Q2: Token 会自动刷新吗？
+### Q2: Token 会自动刷新吗？
 
 A: 是的，我们的 SDK 内置了自动 token 刷新机制：
 
@@ -997,20 +997,20 @@ const userInfo = await oauthManager.fetchUserInfo(); // 自动刷新token
 
 只有在刷新令牌也过期时，才需要用户重新登录。
 
-Q3: 可以获取哪些用户信息？
+### Q3: 可以获取哪些用户信息？
 
 A: 根据授权 scope，您可以获取：
 - `profile` scope: 用户名、邮箱
 - `balance` scope: 账户余额信息
 
-Q4: 如何测试 OAuth 集成？
+### Q4: 如何测试 OAuth 集成？
 
 A: 
 1. 在开发环境中使用 `HTTP localhost` 进行测试
 2. 使用我们提供的测试工具验证授权流程
 3. 检查浏览器开发者工具中的网络请求
 
-Q5: 支持哪些编程语言？
+### Q5: 支持哪些编程语言？
 
 A: 我们提供标准的OAuth2 API，支持所有主流编程语言：
 - JavaScript/Node.js
@@ -1021,6 +1021,6 @@ A: 我们提供标准的OAuth2 API，支持所有主流编程语言：
 - Go
 - Ruby
 
-Q6: 如何撤销用户授权？
+### Q6: 如何撤销用户授权？
 
 A: 用户可以在我们的用户中心 > 授权管理页面撤销对第三方应用的授权。
