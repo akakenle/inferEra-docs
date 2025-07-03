@@ -128,7 +128,7 @@ Geminiも画像生成機能を提供しており、代替案として利用で�
     "messages": [
       {
         "role": "user",
-        "content": "山水画を生成し、それを説明する詩を書いてください"
+        "content": "Generate a landscape painting and provide a poem to describe it"
       }
     ],
     "modalities":["text","image"], // imageを追加する必要があります
@@ -203,7 +203,7 @@ curl https://aihubmix.com/v1/chat/completions \
         "content": [
           {
             "type":"text",
-            "text":"画像を簡潔で魅力的な段落で説明し、子供のクレヨンスタイルで色を塗ってください"
+            "text":"describe the image with a concise and engaging paragraph, then fill color as children's crayon style"
           },
           {
             "type": "image_url",
@@ -244,7 +244,7 @@ response = client.chat.completions.create(
             "content": [
                 {
                     "type": "text",
-                    "text": "海にかわいい人魚を生成し、太い輪郭、ちび漫画、子供の塗り絵のスタイル、白黒、HD",
+                    "text": "generate an adorable mermaid in the sea, bold outline, chibi cartoon, in the style of Children coloring book, B&W",
                 }
             ],
         },
@@ -335,7 +335,7 @@ response = client.chat.completions.create(
             "content": [
                 {
                     "type": "text",
-                    "text": "画像を簡潔で魅力的な段落で説明し、子供のクレヨンスタイルで色を塗ってください",
+                    "text": "describe the image with a concise and engaging paragraph, then fill color as children's crayon style",
                 },
                 {
                     "type": "image_url", 
@@ -572,7 +572,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "未来的な庭園を飛ぶ機械仕掛けの蝶"
+            "content": "a mechanical butterfly flying in the futuristic garden"
         }
     ],
     stream=False
@@ -658,7 +658,7 @@ client = genai.Client(
 
 operation = client.models.generate_videos(
     model="veo-2.0-generate-001",
-    prompt="日差しの中で眠る三毛猫の子猫のパンニングワイドショット",
+    prompt="Panning wide shot of a calico kitten sleeping in the sunshine",
     config=types.GenerateVideosConfig(
         person_generation="dont_allow",  # "dont_allow" または "allow_adult"
         aspect_ratio="16:9",  # "16:9" または "9:16"
@@ -695,7 +695,7 @@ client = genai.Client(
 
 operation = client.models.generate_videos(
     model="veo-2.0-generate-001",
-    prompt="背景の波は流れ続けている",
+    prompt="The waves in the background keep flowing",
     image=types.Image(
         mime_type="image/png", 
         image_bytes=load_image("img/inferbanner.png")  # あなたの画像パスを使用

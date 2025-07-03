@@ -32,6 +32,7 @@ rules：
 - 保护链接和代码块：多语言版本，图片和视频都是共用 ../../public/en 目录的资源，不需改动
 - 代码主要翻译注释和关键输入
 - 价格/费率不改动，统一口径 $
+- 特殊处理 Multimodal-Interaction-with-Gemini.mdx: gemini 多模态只支持 English 输入，代码块的 prompt 维持英语
 ```
 
 ## 注意事项
