@@ -408,8 +408,8 @@
       "destination": "/en/index"
     },
     {
-      "source": "/public/llms.txt",
-      "destination": "/llms",
+      "source": "/llms",
+      "destination": "/public/llms.txt",
       "permanent": false
     }
   ],
