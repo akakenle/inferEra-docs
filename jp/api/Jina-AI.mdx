@@ -22,9 +22,9 @@ Jina AIの3つのコアインターフェースを統合し、強力なインテ
 
 **エンドポイントの置き換え：**
 
-- **ベクトル埋め込み (Embeddings)**：`https://jina.ai/embeddings` -> `https://aihubmix.com/v1/embeddings`
-- **再ランキング (Rerank)**：`https://api.jina.ai/v1/rerank` -> `https://aihubmix.com/v1/rerank`
-- **ディープサーチ (DeepSearch)**：`https://deepsearch.jina.ai/v1/chat/completions` -> `https://aihubmix.com/v1/chat/completions`
+- **ベクトル埋め込み (Embeddings)**：`https://jina.ai/embeddings` -\> `https://aihubmix.com/v1/embeddings`
+- **再ランキング (Rerank)**：`https://api.jina.ai/v1/rerank` -\> `https://aihubmix.com/v1/rerank`
+- **ディープサーチ (DeepSearch)**：`https://deepsearch.jina.ai/v1/chat/completions` -\> `https://aihubmix.com/v1/chat/completions`
 
 ## 一、ベクトル埋め込み (Embeddings)
 
@@ -56,6 +56,7 @@ Jina AIのEmbeddingは、通常のテキストとマルチモーダルな画像�
 
 <ParamField body="dimensions" default="1024" type="integer">
   計算次元。オプション：
+
   - 1024
   - 768
 </ParamField>
@@ -350,6 +351,8 @@ curl https://aihubmix.com/v1/rerank \
 EOFEOF
 ```
 
+</CodeGroup>
+
 ### 応答の説明
 
 ```json
@@ -414,6 +417,7 @@ curl https://aihubmix.com/v1/rerank \
 EOFEOF
 ```
 
+
 ```py Python
 import requests
 
@@ -444,6 +448,7 @@ response = requests.post(url, headers=headers, json=data)
 
 print(response.json())
 ```
+
 
 ```ts TypeScript
 const https = require('https');
@@ -490,6 +495,7 @@ const req = https.request(options, res => {
 req.write(JSON.stringify(requestData));
 req.end();
 ```
+
 </CodeGroup>
 
 ## 三、ディープサーチ (DeepSearch)
@@ -501,6 +507,7 @@ DeepSearchは、検索、読み取り、推論の機能を組み合わせて、�
 
 <ParamField body="model" type="string" required>
   モデル名。利用可能なモデルのリスト：
+
   - `jina-deepsearch-v1`：デフォルトモデル。最適な回答が見つかるまで検索、読み取り、推論を実行します。
 </ParamField>
 
