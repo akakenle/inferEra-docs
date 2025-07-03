@@ -1,0 +1,66 @@
+---
+title: "汎用モデル転送"
+description: " "
+icon: 'person-from-portal'
+---
+
+エンドポイント（Endpoint）： `POST` /v1/chat/completions
+
+**Body リクエストパラメータ：**
+
+```json
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+}
+```
+
+### リクエストパラメータ
+
+|名前 | 位置 | タイプ | 必須 | 説明|
+|---|---|---|---|---|
+|Authorization|header|string| いいえ |Bearer AIHUBMIX_API_KEY|
+|Content-Type|header|string| いいえ |なし|
+|body|body|object| いいえ |なし|
+
+**戻り値の例：**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "chatcmpl-AzJqsyf2h02BKjrqHMA1HVUQpiDfL",
+  "model": "gpt-4o-mini",
+  "object": "chat.completion",
+  "created": 1739177682,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "人生の意味は、何世紀にもわたって議論されてきた哲学的な問いです。人や文化によって、人生の目的や意義について異なる信念を持つことがあります。人生の意味は幸福と充実を追求することだと信じる人もいれば、より高い力に仕えることや運命を全うすることのような精神的または宗教的な意味を信じる人もいます。最終的に、人生の意味は、各人が自分で答えを見つけなければならない、深く個人的な問いであるかもしれません。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_0165350fbb",
+  "usage": {
+    "prompt_tokens": 14,
+    "completion_tokens": 86,
+    "total_tokens": 100
+  }
+}
+```
+
+### 戻り値の結果
+
+|ステータスコード | ステータスコードの意味 | 説明 | データモデル|
+|---|---|---|---|
+|200|OK|なし|インライン|

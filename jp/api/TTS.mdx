@@ -1,0 +1,186 @@
+---
+title: "TTS テキスト読み上げ"
+description: "AIモデルを使用してテキストを自然な音声に変換し、複数の音声スタイルと出力形式をサポート"
+icon: "monitor-waveform"
+---
+
+## はじめに
+
+テキスト読み上げ（TTS）APIは、高度な生成AIモデルに基づいており、入力されたテキストをリアルな音声オーディオに変換できます。さまざまな用途をサポートしています。
+
+- 書かれたブログ記事にナレーションを付ける
+- 複数の言語で音声オーディオを生成する
+- リアルタイムの音声出力ストリームを提供する
+
+**利用可能なモデルリスト：**
+
+- **gpt-4o-audio-preview** —— OpenAIの最新の音声生成モデルで、対話型音声生成をサポート
+- **gpt-4o-mini-tts** —— スマートなリアルタイムアプリケーションに最適なモデルで、高度な音声制御をサポートし、プロンプトを通じてさまざまな音声特性を制御できます。
+  - アクセント (Accent)
+  - 感情の範囲 (Emotional range)
+  - イントネーション (Intonation)
+  - 印象/スタイル (Impressions)
+  - 話す速度 (Speed of speech)
+  - トーン (Tone)
+  - ささやき (Whispering)
+- **tts-1-hd** —— 高音質の旧世代TTSモデル
+- **tts-1** —— 標準TTSモデルで、品質と速度のバランスが取れています
+
+<Tip>
+  **パフォーマンスの推奨事項：** 最速の応答時間を実現するには、応答形式として `wav` または `pcm` を使用することをお勧めします。高品質のオーディオには `tts-1-hd` を、より高速な生成には `tts-1` を、スマートな音声アプリケーションには `gpt-4o-mini-tts` を使用することをお勧めします。
+
+  **音色のプレビュー：** [OpenAI.fm](https://www.openai.fm/) でさまざまな音色の効果を試聴できます。
+</Tip>
+
+## モデル呼び出し方法
+
+### 標準TTSモデル（tts-1, tts-1-hd）
+
+`/v1/audio/speech` エンドポイントを使用し、`client.audio.speech.create()` メソッドを介して呼び出します。
+
+### gpt-4o-mini-tts モデル
+
+`/v1/audio/speech` エンドポイントを使用し、高度な音声制御のために `instructions` パラメータをサポートします。
+
+### gpt-4o-audio-preview モデル
+
+`/v1/chat/completions` エンドポイントを使用し、`modalities: ["text", "audio"]` と `audio` 設定が必要です。
+
+### リクエストパラメータ
+
+#### 標準TTSパラメータ（tts-1, tts-1-hd, gpt-4o-mini-ttsに適用）
+
+<ParamField body="model" type="string" required>
+  使用するモデルID。オプション：`tts-1`、`tts-1-hd`、`gpt-4o-mini-tts`
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  オーディオを生成するテキスト。最大長は4096文字です。
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  合成に使用する音声。オプション：`alloy`、`echo`、`fable`、`onyx`、`nova`、`shimmer`
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  オーディオ出力形式。サポートされている形式：`mp3`、`opus`、`aac`、`flac`、`wav`、`pcm`。デフォルトは `mp3`
+</ParamField>
+
+<ParamField body="speed" type="number">
+  生成されるオーディオの速度。範囲は0.25から4.0。デフォルトは1.0。**`注意：gpt-4o-mini-ttsはこのパラメータをサポートしていませんが、自然言語で速度を制御できます`**
+</ParamField>
+
+<ParamField body="instructions" type="string">
+  音声生成指示（`gpt-4o-mini-tts`モデルのみ）。音声スタイル、イントネーション、感情などの特性を詳細に指定できます。
+</ParamField>
+
+#### gpt-4o-audio-preview パラメータ
+
+<ParamField body="model" type="string" required>
+  `gpt-4o-audio-preview` に設定します。
+</ParamField>
+
+<ParamField body="modalities" type="array" required>
+  音声出力を有効にするために `["text", "audio"]` に設定します。
+</ParamField>
+
+<ParamField body="audio" type="object" required>
+  `voice` と `format` フィールドを含むオーディオ設定オブジェクト。
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  チャットメッセージの配列。標準のチャット形式と同じです。
+</ParamField>
+
+## 使用方法
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tts-1",
+    "input": "The quick brown 🦊 jumped over the lazy dog.",
+    "voice": "alloy"
+  }' \
+  --output speech.mp3
+```
+
+
+```py gpt-4o-audio-preview
+import base64
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key=os.getenv("AIHUBMIX_API_KEY"),
+  base_url="https://aihubmix.com/v1"
+)
+
+completion = client.chat.completions.create(
+    model="gpt-4o-audio-preview",
+    modalities=["text", "audio"],
+    audio={"voice": "alloy", "format": "wav"},
+    messages=[
+        {
+            "role": "user",
+            "content": "The quick brown 🦊 jumped over the lazy dog."
+        }
+    ]
+)
+
+print(completion.choices[0])
+
+wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
+with open("output.wav", "wb") as f:
+    f.write(wav_bytes)
+```
+
+
+```py gpt-4o-mini-tts
+from pathlib import Path
+from openai import OpenAI
+import os
+
+# aihubmix 転送
+client = OpenAI(
+  api_key="sk-***", # あなたのAiHubMix APIキーに置き換えてください
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+with client.audio.speech.with_streaming_response.create(
+  model="gpt-4o-mini-tts",
+  voice="alloy", # 最適なバランスの音色、クリアな発音
+  instructions="""Play as a Patient Teacher""",
+  input="The quick brown 🦊 jumped over the lazy dog."
+) as response:
+  response.stream_to_file(speech_file_path)
+```
+
+
+```py 標準 TTS モデル
+from pathlib import Path
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key="sk-***", # あなたのAiHubMix APIキーに置き換えてください
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+response = client.audio.speech.create(
+  model="tts-1-hd",
+  voice="alloy",
+  input="The quick brown 🦊 jumped over the lazy dog.",
+  response_format="mp3",
+  speed=1.0
+)
+
+response.stream_to_file(speech_file_path)
+```
+
+</CodeGroup>

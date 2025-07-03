@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "AIHubMix API",
+    "description": "AIHubMix は複数の AI モデルに対する API サービスを提供します。エンドポイントは OpenAI 仕様と完全に互換性があるため、公式 SDK のドロップイン代替として使用できます。\n\nAPI キーの取得: [https://aihubmix.com/token/add](https://aihubmix.com/token/add)\n利用可能なモデルを表示: [https://aihubmix.com/models](https://aihubmix.com/models)",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://aihubmix.com/v1",
+      "description": "本番サーバー"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/chat/completions": {
+      "post": {
+        "summary": "チャット補完の作成",
+        "description": "提供されたメッセージに基づいて AI レスポンスを生成します。複数のモデルと調整可能なパラメータをサポートします。",
+        "x-codeSamples": [
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from openai import OpenAI\n\nclient = OpenAI(\n    base_url=\"https://aihubmix.com/v1\",\n    api_key=\"AIHUBMIX_API_KEY\"\n)\n\ncompletion = client.chat.completions.create(\n    model=\"gpt-3.5-turbo\",\n    messages=[{\"role\": \"user\", \"content\": \"Hello\"}]\n)\n\nprint(completion.choices[0].message)"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "import OpenAI from 'openai';\n\nconst openai = new OpenAI({\n  baseURL: 'https://aihubmix.com/v1',\n  apiKey: 'AIHUBMIX_API_KEY'\n});\n\nasync function main() {\n  const completion = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [\n      {\n        'role': 'user',\n        'content': 'Hello'\n      }\n    ]\n  });\n\n  console.log(completion.choices[0].message);\n}\n\nmain();"
+          },
+          {
+            "lang": "curl",
+            "label": "Curl",
+            "source": "curl https://aihubmix.com/v1/chat/completions \\\n  -H \"Authorization: Bearer AIHUBMIX_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"model\\\": \\\"gpt-3.5-turbo\\\",\\\"messages\\\": [{\\\"role\\\": \\\"user\\\", \\\"content\\\": \\\"Hello\\\"}]}\""
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["model", "messages"],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "使用するモデル ID。[モデルハブ](https://aihubmix.com/models) でご確認ください。"
+                  },
+                  "messages": {
+                    "type": "array",
+                    "description": "ロールとコンテンツを含む会話メッセージ。",
+                    "items": {
+                      "type": "object",
+                      "required": ["role", "content"],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "description": "メッセージロール。サポートされる値には user、assistant、system、developer などがあります。"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "メッセージコンテンツ。"
+                        }
+                      }
+                    }
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "description": "サンプリング温度（0-2）。高い値ほどランダム性が増します。",
+                    "default": 0.8
+                  },
+                  "max_tokens": {
+                    "type": "integer",
+                    "description": "生成する最大トークン数（モデルに依存）。",
+                    "default": 1024
+                  },
+                  "top_p": {
+                    "type": "number",
+                    "description": "多様性を制御する Top-p nucleus サンプリングパラメータ。",
+                    "default": 1
+                  },
+                  "frequency_penalty": {
+                    "type": "number",
+                    "description": "繰り返しを減らすための頻度ペナルティ。",
+                    "default": 0
+                  },
+                  "presence_penalty": {
+                    "type": "number",
+                    "description": "新しいトピックを促進するためのプレゼンスペナルティ。",
+                    "default": 0
+                  },
+                  "stream": {
+                    "type": "boolean",
+                    "description": "リアルタイム出力のためのストリーミング応答を有効にします。",
+                    "default": false
+                  },
+                  "web_search_options": {
+                    "type": "object",
+                    "description": "ウェブ検索オプション（特定の検索モデルでのみサポート）。"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "description": "メッセージロール、通常は 'assistant'。"
+                              },
+                              "content": {
+                                "type": "string",
+                                "description": "生成された返信コンテンツ。"
+                              }
+                            }
+                          },
+                          "finish_reason": {
+                            "type": "string",
+                            "description": "生成が終了した理由（例：stop、length）。"
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "prompt_tokens": {
+                          "type": "integer",
+                          "description": "プロンプトのトークン数。"
+                        },
+                        "completion_tokens": {
+                          "type": "integer",
+                          "description": "完了部分のトークン数。"
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "description": "消費された総トークン数。"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "無効なリクエストパラメータ"
+          },
+          "401": {
+            "description": "認証失敗"
+          },
+          "429": {
+            "description": "リクエスト過多"
+          },
+          "500": {
+            "description": "内部サーバーエラー"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer 認証。リクエストヘッダーに Authorization: Bearer AIHUBMIX_API_KEY を追加してください。API キーは[こちら](https://aihubmix.com/token/add)で取得できます。"
+      }
+    }
+  }
+} 

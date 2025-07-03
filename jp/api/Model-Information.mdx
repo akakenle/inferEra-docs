@@ -1,0 +1,78 @@
+---
+title: "モデル情報"
+description: "モデル情報を確認"
+icon: 'circle-info'
+---
+
+エンドポイント（Endpoint）：`GET /v1/models/:model`
+
+### リクエストパラメータ
+
+|名前 | 位置 | タイプ | 必須 | 説明|
+|---|---|---|---|---|
+|model|path|string| はい |なし|
+
+**戻り値の例：**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "string",
+  "object": "string",
+  "created": 0,
+  "owned_by": "string",
+  "permission": [
+    {
+      "id": "string",
+      "object": "string",
+      "created": 0,
+      "allow_create_engine": true,
+      "allow_sampling": true,
+      "allow_logprobs": true,
+      "allow_search_indices": true,
+      "allow_view": true,
+      "allow_fine_tuning": true,
+      "organization": "string",
+      "group": null,
+      "is_blocking": true
+    }
+  ],
+  "root": "string",
+  "parent": null
+}
+```
+
+### 戻り値の結果
+
+|ステータスコード | ステータスコードの意味 | 説明 | データモデル|
+|---|---|---|---|
+|200|OK|なし|インライン|
+
+### 戻り値のデータ構造
+
+ステータスコード **200**
+
+|名前 | タイプ | 必須 | 制約 | 日本語名 | 説明|
+|---|---|---|---|---|---|
+|id|string|true|なし|モデルID|なし|
+|object|string|true|なし|モデル|なし|
+|created|integer|true|なし|作成時間|なし|
+|owned_by|string|true|なし|開発者|なし|
+|permission|[object]|true|なし||なし|
+|» id|string|false|なし||なし|
+|» object|string|false|なし||なし|
+|» created|integer|false|なし||なし|
+|» allow_create_engine|boolean|false|なし||なし|
+|» allow_sampling|boolean|false|なし||なし|
+|» allow_logprobs|boolean|false|なし||なし|
+|» allow_search_indices|boolean|false|なし||なし|
+|» allow_view|boolean|false|なし||なし|
+|» allow_fine_tuning|boolean|false|なし||なし|
+|» organization|string|false|なし||なし|
+|» group|null|false|なし||なし|
+|» is_blocking|boolean|false|なし||なし|
+|root|string|true|なし|モデル名|なし|
+|parent|null|true|なし|親ノード|なし|

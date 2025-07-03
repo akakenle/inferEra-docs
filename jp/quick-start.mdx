@@ -1,0 +1,152 @@
+---
+title: "クイックスタート"
+description: ""
+"icon": "rocket-launch"
+---
+
+## 1️⃣ AiHubMix APIを直接呼び出す
+
+<Tip>
+`<AIHUBMIX_API_KEY>` を [Aihubmix Key](https://aihubmix.com/token) に置き換えてください。キーの有効期限とクレジット制限にご注意ください。
+</Tip>
+
+利用可能な `model` のリストは [モデル一覧](https://aihubmix.com/models) で確認し、モデル名をコピーして置き換えることができます。
+
+<CodeGroup>
+```py Python
+import requests
+import json
+
+response = requests.post(
+  url="https://aihubmix.com/v1/chat/completions",
+  headers={
+    "Authorization": "Bearer <AIHUBMIX_API_KEY>",
+    "Content-Type": "application/json",
+  },
+  data=json.dumps({
+    "model": "gpt-4o-mini", # モデルIDを置き換える
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the meaning of life?"
+      }
+    ]
+  })
+)
+
+```
+
+```typescript Javascript
+// https://aihubmix.com ドメインでお試しください。そうしないと、ブラウザのクロスドメインの問題が発生します。
+fetch('https://aihubmix.com/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer <AIHUBMIX_API_KEY>',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: "gpt-4o-mini", // モデルIDを置き換える
+    messages: [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+    ]
+  }),
+})
+```
+
+```Shell Curl
+curl 'https://aihubmix.com/v1/chat/completions' \
+-H 'Authorization: Bearer <AIHUBMIX_API_KEY>' \
+-H 'Content-Type: application/json' \
+-d '{
+   "model": "gpt-4o-mini",
+   "messages": [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+   ]
+}'
+```
+</CodeGroup>
+
+ストリーミング呼び出しをサポートするには、`stream: true` パラメータを追加するだけです。
+
+## 2️⃣ OpenAI SDKを使用する
+
+`<AIHUBMIX_API_KEY>` を [Aihubmix Key](https://aihubmix.com/token) に置き換えてください。キーの有効期限とクレジット制限にご注意ください。
+利用可能な `model` のリストは [モデル一覧](https://aihubmix.com/models) で確認し、モデル名をコピーして置き換えることができます。
+
+<CodeGroup>
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+  base_url="https://aihubmix.com/v1",
+  api_key="<AIHUBMIX_API_KEY>",
+)
+
+completion = client.chat.completions.create(
+  model="gpt-4o-mini", # モデルIDを置き換える
+  messages=[
+    {
+      "role": "developer",
+      "content": "常に日本語で返信してください"
+    },    
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ],
+  temperature=0.8,
+  max_tokens=1024,
+  top_p=1,
+  frequency_penalty=0,
+  presence_penalty=0,
+  seed=random.randint(1, 1000000000),
+)
+
+print(completion.choices[0].message.content)
+```
+
+```js Javascript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://aihubmix.com/v1',
+  apiKey: '<AIHUBMIX_API_KEY>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini", // モデルIDを置き換える
+    messages: [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+    ]
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+
+```
+</CodeGroup>
+
+検索をサポートするモデルの場合、以下のパラメータを追加してサポートできます。
+```Python
+  web_search_options={}, # 検索パラメータ
+```
+利用可能なモデル：`gpt-4o-search-preview`、`gpt-4o-mini-search-preview`。  
+<Info>
+検索モデルは `temperature` などの詳細なパラメータをサポートしていないことに注意してください。
+</Info>
+
+## 3️⃣ サードパーティクライアントを介してリクエストを送信する
+
+[ユースケース](/jp/clients/AnythingLLM) を参照してください。

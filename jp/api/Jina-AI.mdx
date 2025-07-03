@@ -1,0 +1,857 @@
+---
+title: "Jina AI 統合"
+icon: "j"
+---
+
+## 説明
+
+Jina AIの3つのコアインターフェースを統合し、強力なインテリジェントエージェントを簡単に構築できるようにしました。これらのインターフェースは主に以下のシナリオに適用されます。
+
+- **ベクトル埋め込み (Embeddings)**：マルチモーダルRAG質問応答シナリオに適しています。例えば、インテリジェントカスタマーサービス、インテリジェント採用、ナレッジベース質問応答など。
+- **再ランキング (Rerank)**：Embedding候補結果を最適化し、トピックの関連性に基づいて再ランキングすることで、大規模言語モデルの回答品質を大幅に向上させます。
+- **ディープサーチ (DeepSearch)**：最適な回答が見つかるまで、ディープサーチと推論を実行します。特に、課題研究や製品ソリューションの策定などの複雑なタスクに適しています。
+
+<Tip>
+  Jina AIインターフェースをベースに機能を拡張しているため、公式のネイティブ呼び出しとは若干使用方法が異なります。
+</Tip>
+
+## クイックガイド
+
+`API_KEY`を[AIHUBMIX_API_KEY](https://aihubmix.com/token)とモデルエンドポイントリンクに置き換える以外は、他のパラメータと使用方法は[Jina AI公式](https://jina.ai/)と完全に同じです。
+
+**エンドポイントの置き換え：**
+
+- **ベクトル埋め込み (Embeddings)**：`https://jina.ai/embeddings` -> `https://aihubmix.com/v1/embeddings`
+- **再ランキング (Rerank)**：`https://api.jina.ai/v1/rerank` -> `https://aihubmix.com/v1/rerank`
+- **ディープサーチ (DeepSearch)**：`https://deepsearch.jina.ai/v1/chat/completions` -> `https://aihubmix.com/v1/chat/completions`
+
+## 一、ベクトル埋め込み (Embeddings)
+
+Jina AIのEmbeddingは、通常のテキストとマルチモーダルな画像とテキストをサポートしており、多言語タスクの処理において優れた性能を発揮します。
+
+### リクエストパラメータ
+
+<ParamField body="model" type="string" required>
+  モデル名。利用可能な埋め込みモデルのリストは以下の通りです。
+
+  - `jina-clip-v2`：マルチモーダル、多言語、1024次元、8Kコンテキストウィンドウ、865Mパラメータ
+  - `jina-embeddings-v3`：テキストモデル、多言語、1024次元、8Kコンテキストウィンドウ、570Mパラメータ
+  - `jina-colbert-v2`：多言語ColBERTモデル、8Kトークンコンテキスト、560Mパラメータ、埋め込みと再ランキングに使用
+  - `jina-embeddings-v2-base-code`：コードとドキュメント検索に最適化されたモデル、768次元、8Kコンテキストウィンドウ、137Mパラメータ
+</ParamField>
+
+<ParamField body="input" type="array" required>
+  入力テキストまたは画像。モデルによって異なる入力形式をサポートします。テキストの場合は文字列配列を直接提供し、マルチモーダルモデルの場合はテキストまたは画像フィールドを含むオブジェクト配列を提供できます。
+</ParamField>
+
+<ParamField body="embedding_format" default="float" type="string">
+  返されるデータ型。オプション：
+
+  - `float`：デフォルト。浮動小数点数配列を返します。最も一般的で使いやすい形式で、浮動小数点数のリストとして返されます。
+  - `binary_int8`：int8でパックされたバイナリ形式を返します。より効率的なストレージ、検索、転送方法です。
+  - `binary_uint8`：uint8でパックされたバイナリ形式を返します。より効率的なストレージ、検索、転送方法です。
+  - `base64`：base64エンコードされた文字列を返します。より効率的な転送方法です。
+</ParamField>
+
+<ParamField body="dimensions" default="1024" type="integer">
+  計算次元。オプション：
+  - 1024
+  - 768
+</ParamField>
+
+### 1. マルチモーダルな使用法
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "A beautiful sunset over the beach"
+        },
+        {
+            "text": "Un beau coucher de soleil sur la plage"
+        },
+        {
+            "text": "海滩上美丽的日落"
+        },
+        {
+            "text": "浜辺に沈む美しい夕日"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+  }
+EOFEOF
+```
+
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # あなたのAiHubMixキーに置き換えてください
+}
+
+data = {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "A beautiful sunset over the beach"
+        },
+        {
+            "text": "Un beau coucher de soleil sur la plage"
+        },
+        {
+            "text": "海滩上美丽的日落"
+        },
+        {
+            "text": "浜辺に沈む美しい夕日"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+print(response.json())
+```
+
+
+```ts TypeScript
+import fetch from 'node-fetch';
+
+const url = 'https://aihubmix.com/v1/embeddings';
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer sk-***' // あなたのAiHubMixキーに置き換えてください
+};
+const data = {
+  "model": "jina-clip-v2",
+  "input": [
+    {
+      "text": "A beautiful sunset over the beach"
+    },
+    {
+      "text": "Un beau coucher de soleil sur la plage"
+    },
+    {
+      "text": "海滩上美丽的日落"
+    },
+    {
+      "text": "浜辺に沈む美しい夕日"
+    },
+    {
+      "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+    },
+    {
+      "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+    },
+    {
+      "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+    }
+  ]
+};
+
+fetch(url, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify(data)
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+```
+
+</CodeGroup>
+
+### 2. 純粋なテキストの使用法
+
+テキスト文字列の配列を提供するだけで、`image`フィールドを提供する必要はありません。
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-embeddings-v3",
+    "input": [
+        "A beautiful sunset over the beach",
+        "Un beau coucher de soleil sur la plage",
+        "海滩上美丽的日落",
+        "浜辺に沈む美しい夕日"
+    ]
+  }
+EOFEOF
+```
+
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # あなたのAiHubMixキーに置き換えてください
+}
+data = {
+    'model': 'jina-embeddings-v3',
+    'input': [
+        'A beautiful sunset over the beach',
+        'Un beau coucher de soleil sur la plage',
+        '海滩上美丽的日落',
+        '浜辺に沈む美しい夕日'
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+
+```ts TypeScript
+import * as https from 'https';
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/embeddings',   
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' // あなたのAiHubMixキーに置き換えてください
+  }
+};
+
+const data = JSON.stringify({
+  "model": "jina-embeddings-v3",
+  "input": [
+    "A beautiful sunset over the beach",
+    "Un beau coucher de soleil sur la plage",
+    "海滩上美丽的日落",
+    "浜辺に沈む美しい夕日"
+  ]
+});
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(data);
+req.end();
+```
+
+</CodeGroup>
+
+## 二、再ランキング (Rerank)
+
+再ランキングの目的は、検索関連性とRAGの精度を向上させることです。初期検索結果を詳細に分析し、クエリとドキュメントコンテンツ間の微妙な相互作用を考慮することで、検索結果を再配置し、最も関連性の高い結果を上位に表示します。
+
+### リクエストパラメータ
+
+<ParamField body="model" type="string" required>
+  モデル名。利用可能なモデルのリストは以下の通りです。
+
+  - `jina-reranker-m0`：マルチモーダル多言語ドキュメント再ランキングツール、10Kコンテキスト、2.4Bパラメータ、視覚ドキュメントのソートに使用
+</ParamField>
+
+<ParamField body="query" type="string" required>
+  候補ドキュメントと比較するための検索クエリテキスト
+</ParamField>
+
+<ParamField body="top_n" type="integer">
+  返される最も関連性の高いドキュメントの数。デフォルトではすべてのドキュメントが返されます。
+</ParamField>
+
+<ParamField body="documents" type="array" required>
+  クエリとの関連性に基づいて再ランキングされる候補ドキュメントの配列
+</ParamField>
+
+<ParamField body="max_chunk_per_doc" default="4096" type="integer">
+  ドキュメントの最大チャンク長。Cohereにのみ適用され、Jinaには適用されません。デフォルト値は4096です。
+  この長さを超える長いドキュメントは、指定されたトークン数に自動的に切り詰められます。
+</ParamField>
+
+### 1. マルチモーダルな使用法
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-m0",
+    "query": "small language model data extraction",
+    "documents": [
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png"
+        },
+        {
+            "text": "We present ReaderLM-v2, a compact 1.5 billion parameter language model designed for efficient web content extraction. Our model processes documents up to 512K tokens, transforming messy HTML into clean Markdown or JSON formats with high accuracy -- making it an ideal tool for grounding large language models. The models effectiveness results from two key innovations: (1) a three-stage data synthesis pipeline that generates high quality, diverse training data by iteratively drafting, refining, and critiquing web content extraction; and (2) a unified training framework combining continuous pre-training with multi-objective optimization. Intensive evaluation demonstrates that ReaderLM-v2 outperforms GPT-4o-2024-08-06 and other larger models by 15-20% on carefully curated benchmarks, particularly excelling at documents exceeding 100K tokens, while maintaining significantly lower computational requirements."
+        },
+        {
+            "image": "https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp"
+        },
+        {
+            "text": "データ抽出ですか？なぜ正規表現を使わないのですか？正規表現を使えばすべて解決するのではないでしょうか？"
+        },
+        {
+            "text": "カリフォルニアのゴールドラッシュ中、一部の商人は、鉱夫が金を見つけるよりも、鉱夫に物資を売ることでより多くのお金を稼ぎました。"
+        },
+        {
+            "text": "Die wichtigsten Beiträge unserer Arbeit sind zweifach: Erstens führen wir eine neuartige dreistufige Datensynthese-Pipeline namens Draft-Refine-Critique ein, die durch iterative Verfeinerung hochwertige Trainingsdaten generiert; und zweitens schlagen wir eine umfassende Trainingsstrategie vor, die kontinuierliches Vortraining zur Längener拡張、überwachtes Feintuning mit spezialisierten Kontrollpunkten、direkte Präferenzoptimierung (DPO) und iteratives Self-Play-Tuning kombiniert. Um die weitere Forschung und Anwendung der strukturierten Inhaltsextraktion zu erleichtern, ist das Modell auf Hugging Face öffentlich verfügbar."
+        },
+        {
+            "image": "iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWo BoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns83rC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGresuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYI... [truncated]"
+        }
+    ]
+  }
+EOFEOF
+```
+
+### 応答の説明
+
+```json
+{
+  "model": "jina-reranker-m0",
+  "results": [
+    {
+      "index": 1,
+      "relevance_score": 0.8814517277012487
+    },
+    {
+      "index": 3,
+      "relevance_score": 0.7756727858283531
+    },
+    {
+      "index": 7,
+      "relevance_score": 0.6128658982982312
+    }
+  ],
+  "usage": {
+    "total_tokens": 2894
+  }
+}
+```
+
+成功した応答には以下のフィールドが含まれます。
+
+- `model`: 使用されたモデル名
+- `results`: 関連性スコアの降順でソートされた再ランキング結果の配列。各要素には以下が含まれます。
+  - `index`: 元のドキュメント配列内のインデックス位置
+  - `relevance_score`: 0〜1の関連性スコア。高いほどクエリとの関連性が高いことを示します。
+  - `total_tokens`: このリクエストで処理された合計トークン数
+
+### 2. テキストの使用法
+
+テキストの再ランキングには多言語タスクと通常のタスクが含まれ、埋め込みの使用法と同様に配列を渡します。
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "Organic skincare products for sensitive skin",
+    "top_n": 3,
+    "documents": [
+        "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+        "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+        "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohる作用を持つアロエベラとカモミールを配合し、肌を自然にケアし保護します。肌の刺激にさようなら、輝く健康な肌にこんにちは。",
+        "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farbenと革新的な技術 setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+        "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+        "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+        "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+        "新しい化粧のトレンドは鮮やかな色と革新的な技術に焦点を当てています：今シーズンの化粧のトレンドは、大胆な色と革新的な技術が中心です。ネオンアイライナーからホログラフィックハイライターまで、あなたの創造性を解き放ち、あらゆるルックで主張しましょう。",
+        "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+        "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/rerank'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # あなたのAiHubMixキーに置き換えてください
+}
+data = {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "Organic skincare products for sensitive skin",
+    "top_n": 3,
+    "documents": [
+        "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+        "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+        "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohる作用を持つアロエベラとカモミールを配合し、肌を自然にケアし保護します。肌の刺激にさようなら、輝く健康な肌にこんにちは。",
+        "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farbenと革新的な技術 setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+        "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+        "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+        "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+        "新しい化粧のトレンドは鮮やかな色と革新的な技術に焦点を当てています：今シーズンの化粧のトレンドは、大胆な色と革新的な技術が中心です。ネオンアイライナーからホログラフィックハイライターまで、あなたの創造性を解き放ち、あらゆるルックで主張しましょう。",
+        "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+        "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+```ts TypeScript
+const https = require('https');
+
+const requestData = {
+  model: "jina-reranker-v2-base-multilingual",
+  query: "Organic skincare products for sensitive skin",
+  top_n: 3,
+  documents: [
+    "Organic skincare for sensitive skin with aloe vera and chamomile: Imagine the soothing embrace of nature with our organic skincare range, crafted specifically for sensitive skin. Infused with the calming properties of aloe vera and chamomile, each product provides gentle nourishment and protection. Say goodbye to irritation and hello to a glowing, healthy complexion.",
+    "New makeup trends focus on bold colors and innovative techniques: Step into the world of cutting-edge beauty with this seasons makeup trends. Bold, vibrant colors and groundbreaking techniques are redefining the art of makeup. From neon eyeliners to holographic highlighters, unleash your creativity and make a statement with every look.",
+    "Bio-Hautpflege für empfindliche Haut mit Aloe Vera und Kamille: Erleben Sie die wohltuende Wirkung unserer Bio-Hautpflege, speziell für empfliche Haut entwickelt. Mit den beruhigenden Eigenschaften von Aloe Vera und Kamille pflegen und schützen unsere Produkte Ihre Haut auf natürliche Weise. Verabschieden Sie sich von Hautirritationen und genießen Sie einen strahlenden Teint.",
+    "Neue Make-up-Trends setzen auf kräftige Farben und innovative Techniken: Tauchen Sie ein in die Welt der modernen Schönheit mit den neuesten Make-up-Trends. Kräftige, lebendige Farbenと革新的な技術 setzen neue Maßstäbe. Von auffälligen Eyelinern bis hin zu holografischen Highlightern – lassen Sie Ihrer Kreativität freien Lauf und setzen Sie jedes Mal ein Statement.",
+    "Cuidado de la piel orgánico para piel sensible con aloe vera y manzanilla: Descubre el poder de la naturaleza con nuestra línea de cuidado de la piel orgánico, diseñada especialmente para pieles sensibles. Enriquecidos con aloe vera y manzanilla, estos productos ofrecen una hidratación y protección suave. Despídete de las irritaciones y saluda a una piel radiante y saludable.",
+    "Las nuevas tendencias de maquillaje se centran en colores vivos y técnicas innovadoras: Entra en el fascinante mundo del maquillaje con las tendencias más actuales. Colores vivos y técnicas innovadoras están revolucionando el arte del maquillaje. Desde delineadores neón hasta iluminadores holográficos, desata tu creatividad y destaca en cada look.",
+    "针对敏感肌专门设计的天然有机护肤产品：体验由芦荟和洋甘菊提取物带来的自然呵护。我们的护肤产品特别为敏感肌设计，温和滋润，保护您的肌肤不受刺激。让您的肌肤告别不适，迎来健康光彩。",
+    "新しい化粧のトレンドは鮮やかな色と革新的な技術に焦点を当てています：今シーズンの化粧のトレンドは、大胆な色と革新的な技術が中心です。ネオンアイライナーからホログラフィックハイライターまで、あなたの創造性を解き放ち、あらゆるルックで主張しましょう。",
+    "敏感肌のために特別に設計された天然有機スキンケア製品: アロエベラとカモミールのやさしい力で、自然の抱擁を感じてください。敏感肌用に特別に設計された私たちのスキンケア製品は、肌に優しく栄養を与え、保護します。肌トラブルにさようなら、輝く健康な肌にこんにちは。",
+    "新しいメイクのトレンドは鮮やかな色と革新的な技術に焦点を当てています: 今シーズンのメイクアップトレンドは、大胆な色彩と革新的な技術に注目しています。ネオンアイライナーからホログラフィックハイライターまで、クリエイティビティを解き放ち、毎回ユニークなルックを演出しましょう。"
+  ]
+};
+
+const options = {
+  hostname: 'aihubmix.com',
+  port: 443,
+  path: '/v1/rerank',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # あなたのAiHubMixキーに置き換えてください
+  }
+};
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(JSON.stringify(requestData));
+req.end();
+```
+</CodeGroup>
+
+## 三、ディープサーチ (DeepSearch)
+
+DeepSearchは、検索、読み取り、推論の機能を組み合わせて、最適な回答が見つかるまで実行します。OpenAIのChat API形式と完全に互換性があり、`api.openai.com`を`aihubmix.com`に置き換えるだけで使用を開始できます。
+ストリーミング呼び出し(stream)は思考プロセスを返します。
+
+### リクエストパラメータ
+
+<ParamField body="model" type="string" required>
+  モデル名。利用可能なモデルのリスト：
+  - `jina-deepsearch-v1`：デフォルトモデル。最適な回答が見つかるまで検索、読み取り、推論を実行します。
+</ParamField>
+
+<ParamField body="stream" default="true" type="boolean">
+  ストリーミング応答を有効にするかどうか。DeepSearchリクエストは完了に時間がかかる場合があるため、このオプションを有効にしておくことを強くお勧めします。ストリーミングを無効にすると、「524タイムアウト」エラーが発生する可能性があります。
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  ユーザーとアシスタント間の会話メッセージのリスト。テキスト(.txt, .pdf)、画像(.png, .webp, .jpeg)など、複数のタイプ(モダリティ)のメッセージをサポートします。ファイルサイズは最大10MBまでサポートされます。
+</ParamField>
+
+### マルチモーダルメッセージ形式
+
+DeepSearchは、純粋なテキスト(message)、ファイル(file)、画像(image)を含む複数のメッセージ形式をサポートしています。以下は異なる形式の例です。
+
+#### 1. 純粋なテキストメッセージ
+
+```json
+{
+  "role": "user",
+  "content": "hi"
+}
+```
+
+#### 2. ファイル添付付きメッセージ
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "このファイルには何が入っていますか？"
+    },
+    {
+      "type": "file",
+      "data": "data:application/pdf;base64,JVBERi0xLjQKJfbk...", // PDFファイルのbase64エンコード
+      "mimeType": "application/pdf"
+    }
+  ]
+}
+```
+
+#### 3. 画像付きメッセージ
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "画像には何が写っていますか？"
+    },
+    {
+      "type": "image",
+      "image": "data:image/webp;base64,UklGRoDOAAB...", // 画像のbase64エンコード
+      "mimeType": "image/webp"
+    }
+  ]
+}
+```
+
+すべてのファイルと画像は、データURI形式で事前にエンコードする必要があります。最大10MBまでサポートされます。
+
+### 呼び出し例
+
+**Jina AI公式サイトのPythonストリーミング呼び出しは応答がない**ことに注意してください。当社の例を参照してください。
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hi!"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi, how can I help you?"
+        },
+        {
+            "role": "user",
+            "content": "jina aiの最新のブログ記事は何ですか？"
+        }
+    ],
+    "stream": true
+  }
+EOFEOF
+```
+
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/chat/completions'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # あなたのAiHubMixキーに置き換えてください
+}
+
+data = {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hi!"
+        },
+        {
+            "role": "assistant",
+            "content": "Hi, how can I help you?"
+        },
+        {
+            "role": "user",
+            "content": "jina aiの最新のブログ記事は何ですか？"
+        }
+    ],
+    "stream": True
+}
+
+# ストリーミング応答を処理するために、リクエストでstream=Trueを使用
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+# リクエストが成功したかどうかを確認
+if response.status_code == 200:
+    # 応答コンテンツを1行ずつ反復処理
+    for line in response.iter_lines():
+        if line:
+            # 行をデコードして出力（SSE形式を想定：「data: {...}」）
+            decoded_line = line.decode('utf-8')
+            if decoded_line.startswith('data: '):
+                # 「data: [DONE]」のような終了シグナルを処理
+                if decoded_line[len('data: '):].strip() == '[DONE]':
+                    print("\nストリームが終了しました。")
+                    break
+                try:
+                    # JSON部分を抽出
+                    json_data = json.loads(decoded_line[len('data: '):])
+                    # JSONデータを処理
+                    if 'choices' in json_data and len(json_data['choices']) > 0:
+                        delta = json_data['choices'][0].get('delta', {})
+                        content_to_print = delta.get('content') or delta.get('reasoning_content') # 両方のフィールドを確認
+
+                        if content_to_print:
+                            print(content_to_print, end='', flush=True)
+                except json.JSONDecodeError:
+                    # 「data: 」の後に有効なJSONではない行を無視
+                    # print(f"\n行からJSONをデコードできませんでした: {decoded_line}")
+                    pass # 必要に応じて、JSON以外のデータ行をログに記録または処理
+            # 必要に応じて、「data: 」で始まらない行を処理
+            # else:
+            #    print(f"データ以外の行を受信しました: {decoded_line}")
+
+    print() # 最後に改行を追加
+elif response.status_code == 401:
+     print(f"エラー: {response.status_code} - 認証されていません。APIキーを確認してください。")
+     try:
+         print(response.json())
+     except json.JSONDecodeError:
+         print(response.text)
+else:
+    print(f"エラー: {response.status_code}")
+    try:
+        print(response.json()) # 利用可能な場合はエラー詳細を出力
+    except json.JSONDecodeError:
+        print(response.text) # JSONでない場合は生のテキストを出力
+```
+
+
+```ts TypeScript
+const https = require('https');
+
+const data = JSON.stringify({
+  model: "jina-deepsearch-v1",
+  messages: [
+    {
+      role: "user",
+      content: "Hi!"
+    },
+    {
+      role: "assistant",
+      content: "Hi, how can I help you?"
+    },
+    {
+      role: "user",
+      content: "jina aiの最新のブログ記事は何ですか？"
+    }
+  ],
+  stream: true
+});
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/chat/completions',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Length': data.length,
+    'Authorization': 'Bearer sk-***' // あなたのAiHubMixキーに置き換えてください
+  }
+};
+
+const req = https.request(options, res => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on('data', d => {
+    process.stdout.write(d);
+  });
+});
+
+req.on('error', error => {
+  console.error(error);
+});
+
+req.write(data);
+req.end();
+```
+
+</CodeGroup>
+
+### 応答の説明
+
+DeepSearchの応答はデフォルトでストリーミングが有効になっており、推論ステップと最終的な回答が含まれます。最後のブロックには、最終的な回答、アクセスされたURL、およびトークンの使用状況が含まれます。ストリーミングを無効にすると、思考内容は出力されません。
+このオブジェクトはJina AIとは異なります。
+
+```json
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "reasoning_content": "<think>"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// ストリーミング推論コンテンツ
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "推論内容の断片"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// 推論終了
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "</think>\n\n"
+      },
+      "finish_reason": "thinking_end"
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// 最終応答コンテンツ（コメントとURL参照を含む）
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "応答内容",
+        "type": "text",
+        "annotations": [
+          {
+            "type": "url_citation",
+            "url_citation": {
+              "url": "https://example.com",
+              "title": "ページタイトル",
+              "start_index": 0,
+              "end_index": 0
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379",
+  "usage": {
+    "prompt_tokens": 673423,
+    "completion_tokens": 109286,
+    "total_tokens": 583555
+  }
+}
+
+data: [DONE]
+```
+
+**Python 戻り値の例：**
+
+```py Python
+<think>Jina AIの最新のブログ記事について、最新の情報が必要なので確認する必要があります。Jina AIの最新のブログ記事を見つける必要があります。検索エンジンを使用してJina AIのブログを見つけ、最新の投稿を特定します。Jina AIの最新のブログ記事を検索して、さらに情報を収集します。よし、Jina AIの最新のブログ記事を見つけるためのクエリをいくつか作成しました。まず、過去1週間に更新されたJina AIブログの一般的な検索。次に、DeepSearchやニューラル検索などの特定のJina AI製品に焦点を当てたクエリで、過去1ヶ月間の更新を確認します。また、過去1ヶ月間の埋め込みモデルとAPIの更新に関するクエリも追加しました。そして、過去1年間のElasticsearch統合に関するクエリも追加しました。最後に、Jina AIの批判や制限を見つけるためのクエリを追加し、バランスの取れた視点を得るようにしました。Jina AI Elasticsearch統合、Jina AI批判制限、Jina AI DeepSearch更新、Jina AIニューラル検索、Jina AI埋め込みモデルを検索して、さらに情報を収集します。ユーザーのJina AIの最新のブログ記事に関する質問に正確に答えるには、提供されたURLにアクセスし、ブログ記事の公開日とタイトルを抽出する必要があります。これにより、最新のものを特定できます。検索アクション中に割り当てられた重みに基づいて、最も関連性の高いURLから始めます。https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch、https://jina.ai/news/auto-gpt-unmasked-hype-hard-truths-production-pitfalls、https://jinaai.cn/news/a-practical-guide-to-implementing-deepsearch-deepresearch、https://businesswire.com/news/home/20250220781575/en/Elasticsearch-Open-Inference-API-now-Supports-Jina-AI-Embeddings-and-Rerank-Model、https://gurufocus.com/news/2709507/elastic-nv-estc-enhances-elasticsearch-with-jina-ai-integrationを読んで、さらに情報を収集します。https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearchのコンテンツは... [省略]
+
+より良い検索を絶え間なく追求することは、厳しい現実と向き合うことを要求します。つまり、サイズは重要であり、常に良い意味で重要であるとは限りません。Jina AIの最新のブログ記事「テキスト埋め込みのサイズバイアスとその検索への影響」は、2025年4月16日に公開され、この問題に正面から取り組んでいます。これは単なるコンテンツではありません。テキスト入力の長さが類似性指標をどのように歪め、検索システムが簡潔で正確な一致よりも冗長で、しばしば無関係なドキュメントを優先するようになるかを批判的に検証しています。
+
+なぜ気にする必要があるのでしょうか？情報過多の時代において、関連性が重要だからです。私たちはデータに溺れており、検索エンジンは私たちの救命ボートです。しかし、それらの救命ボートが単なる量に簡単に騙されるアルゴリズムによって操縦されているとしたら、私たちは皆、船と一緒に沈んでしまいます。
+
+この投稿は、テキスト埋め込みのメカニズム、つまり機械が意味を理解し比較できるようにするテキストの数値表現について掘り下げている可能性があります。Jina AIが指摘するように、核心的な問題は、これらの埋め込みが入力テキストの長さに影響される可能性があるという点であり、彼らはこの現象を「サイズバイアス」と呼んでいます。これは、たとえわずかに関連性があるだけでも、より長いドキュメントが、より短く、より焦点を絞ったドキュメントよりもクエリに類似しているように見える可能性があることを意味します。[1]
+
+その影響を真に理解するために、以下を考慮してください。
+
+*   **サイズバイアスとは？** サイズバイアスとは、テキスト入力の長さが意味的な関連性に関係なく類似性にどのように影響するかを指します。これは、検索システムが、クエリに対してより短く、より正確な一致ではなく、長く、ほとんど関連性のないドキュメントを返すことがある理由を説明しています。[2]
+*   **誰が影響を受けるのか？** 学術論文をふるいにかける研究者から、顧客にとって最も関連性の高い情報を探し出そうとしている企業まで、セマンティック検索に依存している人は誰でも、サイズバイアスによって引き起こされる歪みに脆弱です。
+*   **この問題はどこで現れるのか？** この問題は、特定の検索エンジンやプラットフォームに限定されません。多くのテキスト埋め込みモデルが設計および実装されている方法に固有のシステム的な課題です。
+*   **いつからこれが喫緊の課題になったのか？** コンテキストウィンドウが拡大し、モデルがますます大きなドキュメントを取り込むにつれて、サイズバイアスの問題は増幅されます。
+*   **なぜこれが起こるのか？** その理由は複雑ですが、高次元空間の数学的特性と、類似性が計算される方法に帰着します。長いベクトルは、意味的な整合性が弱くても、クエリベクトルと重なる「表面積」が単純に大きくなります。
+*   **どうすればこれを修正できるのか？** Jina AIのブログ記事は、潜在的な緩和戦略を探求している可能性があります。これには、正規化技術、埋め込みモデルのアーキテクチャの変更、または長さに関連する歪みの影響を受けにくい新しい類似性指標が含まれる可能性があります。
+
+Jina AIのここでの取り組みは、単なる学術的なものではありません。それは実践的な介入です。サイズバイアスを特定し分析することで、より正確で信頼性の高い検索技術への道を開いています。これは、情報検索からコンテンツ推奨、そしてそれ以降のすべてに影響を与える、現実世界への影響を及ぼします。
+
+最新のブログ記事はこちらでご覧いただけます：https://jina.ai/news
+
+最終的に、テキスト埋め込みに関する不都合な真実と向き合うというJina AIの意欲は、この分野を進歩させるという彼らのコミットメントの証です。それは、進歩とは単に大きく複雑なモデルを構築することだけではなく、それらのモデルのニュアンスと限界を理解し、何よりも精度と関連性を優先するソリューションを追求することであるということを思い出させてくれます。そして、それはサイズに依存しない真実であり、受け入れる価値があります。
+
+
+
+[^1]: サイズバイアスとは、テキスト入力の長さが意味的な関連性に関係なく類似性にどのように影響するかを指します。これは、検索システムが、クエリに対してより短く、より正確な一致ではなく、長く、ほとんど関連性のないドキュメントを返すことがある理由を説明しています。[ニュースルーム - Jina AI](https://jina.ai/news)
+
+[^2]: サイズバイアスとは、テキスト入力の長さが意味的な関連性に関係なく類似性にどのように影響するかを指します。これは、検索システムが、クエリに対してより短く、より正確な一致ではなく、長く、ほとんど関連性のないドキュメントを返すことがある理由を説明しています。[ニュースルーム - Jina AI](https://jina.ai/news?tag=tech-blog)
+ストリーム終了。
+```

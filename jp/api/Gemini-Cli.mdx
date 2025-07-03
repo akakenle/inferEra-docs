@@ -1,0 +1,77 @@
+---
+title: "Gemini CLI"
+description: " "
+icon: "terminal"
+---
+
+AiHubmixでGemini CLIを強化し、安定した効率的なGeminiモデルサービスをお楽しみください。
+
+## クイック設定ガイド：
+
+### 1️⃣ npmパッケージをグローバルインストール
+
+ターミナルで以下を実行します。
+
+```shell
+npm install -g @google/gemini-cli
+```
+
+Node.jsのバージョンが18以上であることを確認してください。
+
+詳細については、以下を参照してください。
+
+1. [公式リポジトリ](https://github.com/google-gemini/gemini-cli)
+2. [詳細設定](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md)
+
+### 2️⃣ 環境変数設定
+
+システム環境変数にAiHubmixのキーと転送アドレスを入力します。キーはAiHubmixの[「Keys」ページ](https://aihubmix.com/token)で生成できます。
+
+例えば、~/.zshrcに以下を追加します。
+
+```shell
+export GOOGLE_GEMINI_BASE_URL="https://aihubmix.com/gemini"
+export GEMINI_API_KEY="sk-***"
+```
+
+<Tip>
+  Macユーザーの場合、`ユーザー名`ディレクトリでショートカット `⌘ + ⇧ + .` を使用して隠しファイル.zshrcを表示し、システムの「テキストエディット」アプリで開いて上記の内容を追加できます。
+</Tip>
+
+### 3️⃣ 設定を有効にする
+
+設定を追加した後、ターミナルで`source ~/.zshrc`を実行し、Enterキーを押します。
+
+### 4️⃣ ターミナル起動
+
+ターミナルで以下を入力します。
+
+```shell
+gemini
+```
+
+## 初期設定
+
+### アクセス方法の選択
+
+![アクセス方法](./../media/gemini-cli-auth.png)
+
+起動後、`/auth`と入力してEnterキーを押し、「Gemini API Key (AI Studio)」を選択します。
+
+```shell
+○ Googleでログイン
+● Gemini API Key (AI Studio)
+○ Vertex AI
+```
+
+<Note>
+  `/auth`コマンドでいつでも認証方法を切り替えることができます。
+</Note>
+
+### 起動成功
+
+上記の設定が完了すれば、正常に使用できます。
+
+![アクセス方法](./../media/gemini-cli-aihubmix.png)
+
+どうぞお楽しみください！

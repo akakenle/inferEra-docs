@@ -1,0 +1,36 @@
+---
+title: "HTTPステータスコード一覧"
+description: "重要なエラーコードマッピングテーブル"
+icon: 'comment-code'
+---
+
+<Note>
+- 400ステータスコードは通常パラメータエラーです。インターフェースドキュメントをご確認ください。ほとんどの400エラーは上流から透過的に転送されたエラーです。
+- エラーレスポンスのresponse IDはtid (traceId) に変更され、エラートレースと問題特定に使用されます。
+</Note>
+
+
+| HTTPステータスコード | エラー識別子 | エラーメッセージ | 一般的な原因 | 英語エラーメッセージ |
+|------------|------------|----------|----------|--------------|
+| 503 | - | モデル名エラー、モデル広場で確認するか、現在のグループでそのモデルの使用権限がありません | リクエストを処理できるチャネルがない | Incorrect model ID. Please request to view the model page or you do not have permission to use this model |
+| 503 | - | このモデルは公式制限に遭遇しています。カスタマーサポートに連絡して並行性を増やすか、後でもう一度お試しください | モデルが公式制限に遭遇 | Rate limited by provider – contact support to request higher concurrency or try again later. |
+| 429 | - | リクエスト頻度が制限を超えています | リクエスト頻度が制限を超えています | The xx（xx: model id） model Too many requests; please try again later. |
+| 403 | insufficient_user_quota | ユーザー残高不足、チャージが必要です | ユーザー残高不足、チャージが必要です | Your account balance is insufficient. Please recharge your account to continue using the API. |
+| 403 | - | ユーザーが禁止されています | ユーザーステータスが無効またはブラックリストに登録 | Account suspended. |
+| 403 | - | この操作を行う権限がありません、権限不足 | ユーザー役割の権限が不十分 | Forbidden – insufficient permissions. |
+| 403 | - | このトークンは指定されたネットワークセグメントでのみ使用できます | IPがトークンで許可されたネットワークセグメント内にない | Forbidden – key(リクエストされたキーの後6桁) allowed only from approved IP ranges. |
+| 403 | - | このトークンはモデルを使用する権限がありません | トークンがリクエストされたモデルをサポートしていない | Forbidden – key(リクエストされたキーの後6桁) not authorized to access the requested model. |
+| 403 | - | 一般ユーザーは指定チャネルをサポートしていません | 非管理者ユーザーがチャネルを指定しようとした | Key error；(リクエストされたキーの後6桁) |
+| 403 | - | このチャネルは無効化されています | チャネルステータスが無効 | Forbidden – channel has been disabled. |
+| 401 | - | この操作を行う権限がありません、ログインしておらずaccess tokenが提供されていません | Authorizationヘッダーが提供されていない | Unauthorized – no access token supplied; please log in and include a valid token. |
+| 401 | - | この操作を行う権限がありません、access tokenが無効です | access token検証失敗 | Unauthorized – access token is invalid or expired. |
+| 400 | - | 無効なチャネルID | チャネルID形式エラーまたは存在しない | Bad Request – invalid channel ID. |
+| 400 | prompt_missing | prompt is required | 画像生成でプロンプトが不足 | prompt is required |
+| 400 | prompt_too_long | prompt is too long | プロンプトが長さ制限を超えています | prompt is too long |
+| 400 | text_too_long | input is too long | 音声入力テキストが長すぎます | input is too long |
+| 400 | size_not_supported | size not supported | 画像サイズがモデルでサポートされていません | size not supported |
+| 400 | n_not_within_range | invalid value of n | nパラメータ値が有効範囲内にありません | invalid value of n |
+
+## カスタマーサポートWeChatを追加
+カスタマーサポートWeChatは[チャージページ](https://aihubmix.com/topup)をご確認ください 
+チャージ後のご質問はメッセージを残してください。カスタマーサポートが24時間以内に返信いたします

@@ -1,0 +1,268 @@
+---
+title: "アリババ通義シリーズ"
+icon: "a"
+---
+
+## Qwen 3 シリーズ
+
+Qwen3シリーズは、アリババがリリースした新世代のオープンソース大規模モデルで、その能力は大幅に向上しています。コード理解、数学的推論、多言語表現、複雑な推論タスクにおいて、現在の市場のトップモデル（o1、DeepSeek-R1など）に匹敵するか、それを超える性能を発揮します。**その核心的なブレークスルーは、「思考モード」と「非思考モード」の切り替えメカニズムを導入したことにあり、モデルが異なる難易度のタスクに直面した際に、推論の深さを自律的に調整し、速度と精度の両方で優れたバランスを実現しました。** フラッグシップ版のQwen3-235Bは、スパースアクティベーションを採用しており、わずか22Bのパラメータで推論を行い、コストと卓越した能力を両立しています。全シリーズのモデルは完全にオープンソース化されており、軽量から超大規模なニーズまでをカバーしています。
+
+**1. 基本的な使用法：** OpenAI互換形式で転送します。
+**2. ツール呼び出し：** 通常のTools呼び出しはOpenAI互換形式をサポートします（V2.5、V3に適用）。MCP Toolsは`qwen-agent`に依存するため、まず`pip install -U qwen-agent mcp`コマンドを実行して依存関係をインストールする必要があります。
+詳細については、[アリババ公式ドキュメント](https://huggingface.co/Qwen/Qwen3-235B-A22B)を参照してください。
+
+<CodeGroup>
+
+```py 基本的な使用法
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ],
+    stream=True
+)
+
+# 一部のチャンクオブジェクトにはchoices属性がないか、choicesが空のリストである場合があります。処理方法：
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+```py Tools
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+# ツールを定義
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "指定された場所の現在の天気を取得",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "都市名、例：東京、大阪など"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "温度単位"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+# ツール定義を含むチャット完了リクエストを作成
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B", # 2.5と3はサポート、QwQはサポートしていません
+    messages=[
+        {
+            "role": "user",
+            "content": "東京の今日の天気はどうですか？"
+        }
+    ],
+    tools=tools,
+    tool_choice="auto",  # モデルがツールを使用するかどうかを自動的に決定
+    stream=True
+)
+
+# ツール呼び出し情報を収集するための辞書
+tool_calls = {}
+
+# ストリーミング応答を処理
+for chunk in completion:
+    if not hasattr(chunk.choices, '__len__') or len(chunk.choices) == 0:
+        continue
+        
+    delta = chunk.choices[0].delta
+    
+    # テキストコンテンツを処理
+    if hasattr(delta, 'content') and delta.content:
+        print(delta.content, end="")
+    
+    # ツール呼び出しを処理
+    if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        for tool_call in delta.tool_calls:
+            if not hasattr(tool_call, 'index'):
+                continue
+                
+            idx = tool_call.index
+            if idx not in tool_calls:
+                tool_calls[idx] = {"name": "", "arguments": ""}
+                
+            if hasattr(tool_call, 'function'):
+                if hasattr(tool_call.function, 'name') and tool_call.function.name:
+                    tool_calls[idx]["name"] = tool_call.function.name
+                if hasattr(tool_call.function, 'arguments') and tool_call.function.arguments:
+                    tool_calls[idx]["arguments"] += tool_call.function.arguments
+
+# 完了後、収集したツール呼び出し情報を出力
+for idx, info in tool_calls.items():
+    if info["name"]:
+        print(f"\nツール呼び出し：{info['name']}")
+    if info["arguments"]:
+        print(f"引数：{info['arguments']}")
+
+```
+
+```py MCP Tools
+from qwen_agent.agents import Assistant
+import os
+
+# LLMを定義
+llm_cfg = {
+    'model': 'Qwen/Qwen3-30B-A3B',
+
+    # OpenAI APIと互換性のあるカスタムエンドポイントを使用：
+    'model_server': 'https://aihubmix.com/v1',
+    'api_key': os.getenv('AIHUBMIX_API_KEY'),
+
+    # その他のパラメータ：
+    # 'generate_cfg': {
+    #         # 追加：応答コンテンツが`<think>this is the thought</think>this is the answer`の場合
+    #         # 追加しない：応答がreasoning_contentとcontentで分離されている場合
+    #         'thought_in_content': True,
+    #     },
+}
+
+# ツールを定義
+tools = [
+    {'mcpServers': {  # MCP設定ファイルを指定できます
+            'time': {
+                'command': 'uvx',
+                'args': ['mcp-server-time', '--local-timezone=Asia/Shanghai']
+            },
+            "fetch": {
+                "command": "uvx",
+                "args": ["mcp-server-fetch"]
+            }
+        }
+    },
+  'code_interpreter',  # 組み込みツール
+]
+
+# エージェントを定義
+bot = Assistant(llm=llm_cfg, function_list=tools)
+
+# ストリーミング生成
+messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Qwenの最新の開発状況を紹介してください'}]
+for responses in bot.run(messages=messages):
+    pass
+print(responses)
+```
+
+</CodeGroup>
+
+## QvQ、Qwen 2.5、および QwQ シリーズ
+
+OpenAI互換形式で転送するだけで、違いはストリーミング呼び出しの抽出にあり、空の`chunk.choices[0].delta.content`を削除する必要があります。以下を参照してください。
+
+**1. QvQ、Qwen 2.5 VL：** 画像認識  
+**2. QwQ：** テキストタスク  
+
+<Info>
+  `Qwen/QVQ-72B-Preview`は、`Qwen2-VL-72B`に基づいて構築されたオープンソースのマルチモーダル推論モデルで、視覚推論とクロスモーダルタスクに特化しています。
+</Info>
+
+<CodeGroup>
+
+```py Qwen 2.5 VL
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+image_path = "yourpath/file.png"
+
+# 画像を読み込み、エンコード
+def encode_image(image_path):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"画像ファイルが存在しません：{image_path}")
+    
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 画像のbase64エンコードを取得
+base64_image = encode_image(image_path)
+
+# テキストと画像を含むメッセージを作成
+completion = client.chat.completions.create(
+    model="qwen2.5-vl-72b-instruct", # qwen2.5-vl-72b-instruct または Qwen/QVQ-72B-Preview
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "この画像を詳細に説明してください。画像の内容、スタイル、および可能性のある意味を含めてください。"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    # 安全にコンテンツがあるかを確認
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+
+```py QwQ
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/QwQ-32B",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "宇宙を支配する元々のルールは何ですか？"}
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+</CodeGroup>

@@ -1,0 +1,76 @@
+---
+title: "モデルリスト"
+description: "利用可能なモデルリストを取得"
+icon: 'list-ul'
+---
+
+エンドポイント（Endpoint）： `GET /v1/models`
+
+- ユーザーがログインしている場合はユーザーグループの利用可能なリストを取得し、ログインしていない場合はデフォルトグループの利用可能なリストを取得します。
+- ヘッダーにAuthorizationフィールドがある場合は、キーに対応するトークンで設定されたモデルリストを照会します。
+
+**戻り値の例：**
+
+```json
+{
+  "data": [
+    {
+      "id": "gpt-4o-mini",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "OpenAI",
+      "permission": [
+        {
+          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
+          "object": "model_permission",
+          "created": 1626777600,
+          "allow_create_engine": true,
+          "allow_sampling": true,
+          "allow_logprobs": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "allow_fine_tuning": false,
+          "organization": "*",
+          "group": null,
+          "is_blocking": false
+        }
+      ],
+      "root": "gpt-4o-mini",
+      "parent": null
+    }
+  ]
+}
+```
+
+### 戻り値の結果
+
+|ステータスコード | ステータスコードの意味 | 説明 | データモデル|
+|---|---|---|---|
+|200|OK|なし|インライン|
+
+### 戻り値のデータ構造
+
+ステータスコード **200**
+
+|名前 | タイプ | 必須 | 制約 | 日本語名 | 説明|
+|---|---|---|---|---|---|
+|» data|[object]|true|なし||なし|
+|»» id|string|true|なし|モデルID|なし|
+|»» object|string|true|なし|モデル|なし|
+|»» created|integer|true|なし|作成時間|なし|
+|»» owned_by|string|true|なし|開発者|なし|
+|»» permission|[object]¦null|true|なし||なし|
+|»»» id|string|true|なし||なし|
+|»»» object|string|true|なし||なし|
+|»»» created|integer|true|なし||なし|
+|»»» allow_create_engine|boolean|true|なし||なし|
+|»»» allow_sampling|boolean|true|なし||なし|
+|»»» allow_logprobs|boolean|true|なし||なし|
+|»»» allow_search_indices|boolean|true|なし||なし|
+|»»» allow_view|boolean|true|なし||なし|
+|»»» allow_fine_tuning|boolean|true|なし||なし|
+|»»» organization|string|true|なし||なし|
+|»»» group|null|true|なし||なし|
+|»»» is_blocking|boolean|true|なし||なし|
+|»» root|string|true|なし|モデル名|なし|
+|»» parent|null|true|なし|親ノード|なし|

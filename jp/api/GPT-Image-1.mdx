@@ -1,0 +1,206 @@
+---
+title: "GPT Image"
+description: " "
+icon: "palette"
+---
+
+## インターフェースの説明
+
+OpenAIの描画インターフェース`gpt-image-1`は、テキストから画像を生成する機能（generate）と、画像とテキストから画像を編集する機能（edit）をサポートしています。
+使用する前に、`pip install -U openai`を実行して最新のOpenAIパッケージにアップグレードしてください。
+
+## 注意事項
+
+<Warning>
+- 生成中に、いかなる状況で中断または失敗した場合でも、**インターフェース呼び出しが一度発行されると、料金が請求されます**
+- 存命のアーティスト名（例：「宮崎駿」、「新海誠」など）は`moderation_blocked`エラーをトリガーし、**生成が失敗します**。これを回避するには、「ジブリ」、「明るい現代的な日本のアニメスタイル」などの非機密語を使用できます。露出度の高い服装や暗示的な画像も同様です。
+- 全体的に、「スタイル」は「アーティスト」よりも安全です。「ピクサー」などもサポートされています。
+- より確実な方法は、故人アーティストまたは対応するスタイルを使用することです。例：「ゴッホ」、「モナリザ」など。
+</Warning>
+
+## モデルと料金
+
+| モデル | 品質 | 1024x1024 | 1024x1536 | 1536x1024 |
+| ------------------ | ------------ | ------------ | ------------ | ------------ |
+| gpt-image-1 | low | $0.011 | $0.016 | $0.016 |
+| gpt-image-1 | medium | $0.042 | $0.063 | $0.063 |
+| gpt-image-1 | high | $0.167 | $0.25 | $0.25 |
+
+<Info>
+注意：入力テキストトークン部分の料金は100万トークンあたり$5で、別途計算されます。
+</Info>
+  
+## 呼び出し方法
+
+**エンドポイント (Endpoints)**
+1. 描画：`https://aihubmix.com/v1/images/generations`
+2. 編集：`https://aihubmix.com/v1/images/edits`
+
+**Python呼び出しの例は以下の通りです。**  
+<CodeGroup>
+```py 生成 (テキストから画像)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """映画[ブラック・スワン]のポスターを再デザインしてください。3Dカートゥーン、スムーズなレンダリング、明るいトーン、2:3のポートレート。"""
+
+result = client.images.generate(
+    model="gpt-image-1",
+    prompt=prompt,
+    n=1, # 一度に生成する画像の数、最大10枚
+    size="1024x1536", # 1024x1024 (正方形), 1536x1024 (3:2横長), 1024x1536 (2:3縦長), auto (デフォルト) 
+    quality="high", # high, medium, low, auto (デフォルト)
+    moderation="low", # low, auto (デフォルト) openaiパッケージのアップグレードが必要 📍
+    background="auto", # transparent, opaque, auto (デフォルト)
+)
+
+print(result.usage)
+
+# ファイル名のプレフィックスと保存ディレクトリを定義
+output_dir = "." # 他のディレクトリを指定できます
+file_prefix = "image_gen"
+
+# 出力ディレクトリが存在することを確認
+os.makedirs(output_dir, exist_ok=True)
+
+# 返されたすべての画像データを反復処理
+for i, image_data in enumerate(result.data):
+    image_base64 = image_data.b64_json
+    if image_base64: # b64_jsonが空でないことを確認
+        image_bytes = base64.b64decode(image_base64)
+
+        # --- ファイル名の衝突処理ロジック開始 ---
+        current_index = i
+        while True:
+            # 自動インクリメント付きのファイル名を構築
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name) # 完全なファイルパスを構築
+
+            # ファイルが存在するかどうかを確認
+            if not os.path.exists(file_path):
+                break # ファイル名が衝突しないので、ループを抜ける
+
+            # ファイル名が衝突するので、インデックスを増やす
+            current_index += 1
+
+        # 見つかった一意のfile_pathに画像をファイルとして保存
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"画像は以下に保存されました：{file_path}")
+    else:
+        print(f"画像 {i} のデータが空なので、保存をスキップします。")
+
+```
+
+```py 編集 (複数画像+テキストから画像)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """映画[ブラック・スワン]のポスターを再デザインしてください。3Dカートゥーン、スムーズなレンダリング、明るいトーン、2:3のポートレート。"""
+
+result = client.images.edit(
+    model="gpt-image-1",
+    image=open("yourpath/edit.jpg", "rb"), # 複数の参照画像は[リスト、]を使用
+    n=2, # 一度に生成する画像の数
+    prompt=prompt,
+    size="1024x1536", # 1024x1024 (正方形), 1536x1024 (3:2横長), 1024x1536 (2:3縦長), auto (デフォルト)
+    # moderation="low", # editはmoderationをサポートしていません
+    quality="high" # high, medium, low, auto (デフォルト)
+)
+
+print(result.usage)
+
+# ファイル名のプレフィックスと保存ディレクトリを定義
+output_dir = "." # 他のディレクトリを指定できます
+file_prefix = "image_edit" # ファイル名のプレフィックスを変更
+
+# 出力ディレクトリが存在することを確認
+os.makedirs(output_dir, exist_ok=True)
+
+# --- APIから返された各画像データを反復処理 ---
+for i, image_item in enumerate(result.data):
+    image_base64 = image_item.b64_json
+    if image_base64 is None:
+        print(f"警告：画像 {i+1} はbase64データを返しませんでした。保存をスキップします。")
+        continue # b64_jsonデータがない場合は、次の画像へスキップ
+
+    image_bytes = base64.b64decode(image_base64)
+
+    # --- 現在の画像に衝突しないファイル名を見つける ---
+    current_index = 0 # 毎回0からチェックするか、グローバルにインクリメントするインデックスを維持
+    while True:
+        # 自動インクリメント付きのファイル名を構築
+        file_name = f"{file_prefix}_{current_index}.png"
+        file_path = os.path.join(output_dir, file_name) # 完全なファイルパスを構築
+
+        # ファイルが存在するかどうかを確認
+        if not os.path.exists(file_path):
+            break # ファイル名が衝突しないので、内部ループを抜ける
+
+        # ファイル名が衝突するので、インデックスを増やす
+        current_index += 1
+
+    # 見つかった一意のfile_pathに現在の画像をファイルとして保存
+    try:
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"画像 {i+1} の編集済み画像は以下に保存されました：{file_path}")
+    except Exception as e:
+        print(f"画像 {i+1} の保存中にエラーが発生しました ({file_path}): {e}")
+```
+</CodeGroup>
+その他のパラメータの詳細については、[OpenAI公式ドキュメント](https://platform.openai.com/docs/api-reference/images/create)を参照してください。
+
+## 出力例
+<CodeGroup>
+```json 生成
+Usage(input_tokens=150, input_tokens_details=UsageInputTokensDetails(image_tokens=0, text_tokens=150), output_tokens=6240, total_tokens=6390)
+画像は以下に保存されました：./image_gen_14.png
+```
+
+```json 編集
+Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_tokens=646, text_tokens=346), output_tokens=12480, total_tokens=13472)
+画像 1 の編集済み画像は以下に保存されました：./image_edit_1.png
+画像 2 の編集済み画像は以下に保存されました：./image_edit_2.png
+```
+</CodeGroup>
+
+## 拒否されるケース
+
+リクエストが拒否された場合のエラーメッセージは以下の通りです。
+```json
+Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
+```
+
+一度のリクエストで2〜10枚の画像を生成する場合、システムがリクエストがプラットフォームポリシーに違反していると判断した場合、そのリクエストの違反部分は生成されません。これにより、実際に生成される画像の数がユーザーが要求した数よりも少なくなる可能性がありますが、複数枚の場合、`moderation_blocked`はスローされません。
+したがって、作成時には潜在的な知的財産権（IP）や著作権の問題を積極的に回避し、システムによる生成ブロックのリスクを減らし、作成がスムーズに完了するようにしてください。
+
+**✍️ 重要なヒント：**
+- 既知の著作権保護されたキャラクター、ブランドロゴ、有名人の肖像などを直接使用することは避けてください。
+- 「スタイルを参考にする」「クリエイティブな改変」「一般的な記述」などの方法で表現できます。
+- 特定の要素を引用する必要がある場合は、その要素がパブリックドメインにあることを事前に確認してください。
+
+## 実用的なヒント
+
+<Tip>
+- どの言語でもサポートされており、中国語の描画も非常に安定していますが、大量のテキストを描画することはお勧めしません。
+- sizeパラメータは`size="auto"`を明示的に渡すことをサポートしていません。デフォルトはautoです。
+- 描画比率はプロンプトで指定できます。2:3、3:2、1:1をサポートしており、sizeパラメータで設定することもできます。
+- 敏感度を制御する`moderation`パラメータをサポートしていますが、このパラメータをlowに設定しても拒否される可能性があります。例えば、ヴィーナスが露出度が高すぎる場合などです。
+- editsポートは`moderation`パラメータをサポートしていません。
+- テキスト記述と参照画像を組み合わせることで、画像合成の効果がより正確になります。
+- アップロードする画像を圧縮前処理することで、速度を向上させることができます。
+- 透明な背景をサポートしており、切り抜き不要です。——プロンプトで要求を追加するだけです。
+</Tip>

@@ -1,0 +1,1305 @@
+---
+title: "Ideogram AI 描画サポート"
+icon: "paintbrush"
+---
+
+## Ideogram V3 インターフェース
+
+Ideogram V3モデルは、高度な画像生成および処理機能を提供します。V3インターフェースは以前のバージョンとはパラメータと使用方法が異なります。このセクションでは、V3の各インターフェースと使用例を詳しく説明します。
+
+### V3 Generate
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/generate](https://aihubmix.com/ideogram/v1/ideogram-v3/generate)
+
+指定されたプロンプトに基づいて画像を生成します。V3モデルは、より高品質な画像生成機能を提供し、より豊かなスタイルとパラメータ制御をサポートします。
+
+<ParamField body="prompt" type="string" required>
+  画像を生成するためのプロンプト
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  レンダリング速度オプション。`TURBO`、`DEFAULT`、`QUALITY`から選択可能
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8  
+  画像の数を増やしても、生成にかかる時間はほとんど増えません
+</ParamField>
+
+<ParamField body="aspect_ratio" default="1x1" type="string">
+  画像生成に使用するアスペクト比。非常に多くの仕様をサポート  
+  選択可能: ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']  
+  V3以下のモデルで使用される`ASPECT_10_16`タイプの仕様とは異なります。
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：`AUTO`、`ON`、`OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成する画像のスタイルタイプ。`AUTO`、`GENERAL`、`REALISTIC`、`DESIGN`から選択可能  
+  V2バージョンと比較して、タイプがより絞り込まれています
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  画像に表示したくない内容を記述
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  ランダムシード。範囲：0〜2147483647  
+  一度に複数の画像を生成する場合は、同じ画像が生成されるためシードを使用しないでください
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  スタイル参照画像。スタイルガイドとして使用可能
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```shell Curl テキストから画像
+curl -X POST https://aihubmix.com/ideogram/v1/ideogram-v3/generate \
+  -H "Api-Key: sk-***" \
+  -H "Content-Type: multipart/form-data" \
+  -F prompt="様々な戦闘機械がポータルから飛び出す繊細な3Dカバーデザイン。機械は様々な形、サイズ、色をしている。ポータルは渦巻くエネルギーを放出している。背景には高層ビルが立ち並ぶ未来都市がある。「One Gateway, Infinite Models」というテキストが中央にネオンライトで配置され、広大な景色、映画のような照明、鮮やかな色彩、明るいトーン。クリーンなテキスト、サイバーパンク、スムーズなレンダリング" \
+  -F rendering_speed="QUALITY" \
+  -F num_images="2" \
+  -F aspect_ratio="2x1"
+```
+
+```py Python テキストから画像
+import requests
+import os
+
+# リクエストデータを準備 - JSONではなく辞書を使用
+data = {
+  "prompt": "様々な戦闘機械がポータルから飛び出す繊細な3Dカバーデザイン。機械は様々な形、サイズ、色をしている。ポータルは渦巻くエネルギーを放出している。背景には高層ビルが立ち並ぶ未来都市がある。「One Gateway, Infinite Models」というテキストが中央にネオンライトで配置され、広大な景色、映画のような照明、鮮やかな色彩、明るいトーン。クリーンなテキスト、サイバーパンク、スムーズなレンダリング",
+  "rendering_speed": "QUALITY",
+  "num_images": "2",
+  "aspect_ratio": "2x1",
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark"
+}
+
+# Content-Type は multipart/form-data
+files = {}
+for key, value in data.items():
+    files[key] = (None, str(value))  # 各データフィールドをフォームフィールドとして送信
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # あなたのAiHubMixで生成したキーに置き換えてください
+  },
+  files=files
+)
+print(response.json())
+
+# 出力画像をファイルに保存
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+```
+
+```py Python 参考画像+テキストから画像
+import requests
+import os
+
+data = {
+  "prompt": "様々な戦闘機械がポータルから飛び出す繊細な3Dカバーデザイン。機械は様々な形、サイズ、色をしている。ポータルは渦巻くエネルギーを放出している。背景には高層ビルが立ち並ぶ未来都市がある。「One Gateway, Infinite Models」というテキストが中央にネオンライトで配置され、広大な景色、映画のような照明、鮮やかな色彩、明るいトーン。クリーンなテキスト、サイバーパンク、スムーズなレンダリング",
+  "rendering_speed": "QUALITY",
+  "num_images": 2,
+  # "seed": "998", # 複数枚の画像の場合、シードは使用しないでください
+  "aspect_ratio": "2x1", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, watermark",
+}
+
+# filesパラメータを初期化
+files = None
+
+# スタイル参照画像のパス
+style_reference_path = "yourpath/reference-image.jpeg"
+use_reference_image = True
+
+if use_reference_image and os.path.exists(style_reference_path):
+    # 参考画像を使用し、ファイルが存在する場合、filesパラメータを設定
+    files = [
+        ("style_reference_images", open(style_reference_path, "rb")),
+        # 複数のスタイル参照画像を追加する必要がある場合は、以下のように追加できます。
+        # ("style_reference_images", open("2番目の参考画像のパス", "rb")),
+    ]
+elif use_reference_image:
+    print(f"警告：スタイル参照画像が見つかりません：{style_reference_path}")
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # あなたのAiHubMixで生成したキーに置き換えてください
+  },
+  data=data,
+  files=files
+)
+print(response.json())
+
+# 出力画像をファイルに保存
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+    print(f"エラー詳細：{response_json}")
+```
+
+</CodeGroup>
+
+### V3 Remix
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/remix](https://aihubmix.com/ideogram/v1/ideogram-v3/remix)
+
+参照画像に基づいて、プロンプトに従って画像を再生成します。V3のRemix機能は、元の画像のスタイルとコンテンツをより良く保持する能力があります。
+
+<ParamField body="prompt" type="string" required>
+  画像を再描画するためのプロンプト
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  元の画像ファイル
+</ParamField>
+
+<ParamField body="image_weight" default="50" type="integer">
+  元の画像の影響度。範囲は1〜100で、数値が大きいほど元の画像に似た結果になります。
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  レンダリング速度オプション。`TURBO`、`DEFAULT`、`QUALITY`から選択可能
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  出力画像のアスペクト比。選択可能: ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  スタイル参照画像。スタイルガイドとして使用可能
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：`AUTO`、`ON`、`OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成する画像のスタイルタイプ。`AUTO`、`GENERAL`、`REALISTIC`、`DESIGN`から選択可能
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  画像に表示したくない内容を記述
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python 画像合成
+import requests
+import os
+
+data = {
+  "prompt": "雪の中で猫と遊ぶ鳥、ピクセルアートスタイル",
+  "image_weight": "60",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  "aspect_ratio": "16x9", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "blurry, bad anatomy, watermark",
+}
+
+# 元画像 - 必須
+source_image_path = "yourpath/image.jpeg"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"ソース画像が見つかりません：{source_image_path}")
+
+# filesパラメータを初期化
+files = None
+
+# スタイル参照画像のパス
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# ファイルアップロードの準備
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 参考画像を使用し、ファイルが存在する場合、filesパラメータを設定
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"警告：スタイル参照画像が見つかりません：{style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/remix",
+      headers={
+        "Api-Key": "sk-***" # あなたのAiHubMixで生成したキーに置き換えてください
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# 出力画像をファイルに保存
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+    print(f"エラー詳細：{response_json}")
+```
+
+</CodeGroup>
+
+### V3 Edit
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/edit](https://aihubmix.com/ideogram/v1/ideogram-v3/edit)
+
+V3のローカル編集機能を使用すると、元の画像とマスクを提供することで、画像の特定の領域を正確に編集し、他の領域は変更せずに維持できます。
+
+<ParamField body="prompt" type="string" required>
+  画像を編集するためのプロンプト
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  元の画像ファイル
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  マスク画像。黒い領域は編集が必要な部分、白い領域は変更しない部分を示します。
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  レンダリング速度オプション。`TURBO`、`DEFAULT`、`QUALITY`から選択可能
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  出力画像のアスペクト比
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：`AUTO`、`ON`、`OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成する画像のスタイルタイプ。`AUTO`、`GENERAL`、`REALISTIC`、`DESIGN`から選択可能
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  画像に表示したくない内容を記述
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python ローカル編集
+import requests
+import os
+
+# 元画像 - 必須
+source_image_path = "yourpath/image.jpeg"
+# マスク - 必須
+mask_image_path = "yourpath/mask.jpg"
+
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"ソース画像が見つかりません：{source_image_path}")
+
+with open(source_image_path, "rb") as image_file, open(mask_image_path, "rb") as mask_file:
+    response = requests.post(
+        "https://aihubmix.com/ideogram/v1/ideogram-v3/edit",
+        headers={
+            "Api-Key": "sk-***" # あなたのAiHubMixで生成したキーに置き換えてください
+        },
+        data={
+            "prompt": "テキストを削除",
+            "rendering_speed": "DEFAULT",
+            "num_images": 1,
+            "seed": 1,
+            "aspect_ratio": "16x9",
+            "magic_prompt": "AUTO",
+            "style_type": "AUTO",
+            "negative_prompt": "blurry, bad anatomy, watermark",
+        },
+        files={
+            "image": image_file,
+            "mask": mask_file,
+        }
+    )
+
+print(response.json())
+
+# 出力画像をファイルに保存
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+    print(f"エラー詳細：{response_json}")
+```
+
+</CodeGroup>
+
+### V3 Replace Background
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background](https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background)
+
+V3の背景置換機能は、画像の前景と背景をインテリジェントに認識し、プロンプトに基づいて背景を置換しながら、前景オブジェクトは変更せずに維持します。
+
+<ParamField body="prompt" type="string" required>
+  背景を置換するためのプロンプト
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  元の画像ファイル
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  レンダリング速度オプション。`TURBO`、`DEFAULT`、`QUALITY`から選択可能
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  スタイル参照画像。スタイルガイドとして使用可能
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：`AUTO`、`ON`、`OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  生成する画像のスタイルタイプ。`AUTO`、`GENERAL`、`REALISTIC`、`DESIGN`から選択可能
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python 背景置換
+import requests
+import os
+
+data = {
+  "prompt": "雪の中で猫と遊ぶ鳥、ピクセルアートスタイル",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  # "aspect_ratio"なし
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  # "negative_prompt"なし
+}
+
+# 元画像 - 必須
+source_image_path = "yourpath/image.png"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"ソース画像が見つかりません：{source_image_path}")
+
+# filesパラメータを初期化
+files = None
+
+# スタイル参照画像のパス
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# ファイルアップロードの準備
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 参考画像を使用し、ファイルが存在する場合、filesパラメータを設定
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"警告：スタイル参照画像が見つかりません：{style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background",
+      headers={
+        "Api-Key": "sk-***" # あなたのAiHubMixで生成したキーに置き換えてください
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# 出力画像をファイルに保存
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+    print(f"エラー詳細：{response_json}")
+```
+
+</CodeGroup>
+
+その他のオプションパラメータについては、[Ideogram AI 公式ガイド](https://developer.ideogram.ai/api-reference/api-reference/generate-v3)を参照してください。
+
+### 💰 V3 料金
+
+| Ideogram モデル | Generate | Remix | Edit | Reframe | Replace BG |
+|-------------|---------|-------|------|---------|-----------|
+| 3.0 Turbo | US $0.03 | US $0.03 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 Default | US $0.06 | US $0.06 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 Quality | US $0.09 | US $0.09 | US $0.09 | US $0.09 | US $0.09 |
+
+---
+
+## V2-V1 インターフェースの説明
+Ideogram AI V2-V1描画インターフェースは、強力なテキスト描画機能を持ち、画像生成（generate）、混合（remix）、部分編集（edit）、拡大（upscale）、記述（describe）などをサポートしています。
+
+- **混合：** 参照画像に基づいて、プロンプトに従って画像を再描画し、新しい画像を生成します。
+- **編集：** 参照画像に基づいて、プロンプトとマスクに従って画像を部分的に編集し、新しい画像を生成します。
+- **拡大：** 低解像度の画像を高解像度に拡大し、細部を再描画します（類似度と細部の比率を制御可能）。
+- **記述：** プロンプトの逆推論で、画像を記述するために使用されます。
+
+**サポートされているスタイル：**
+
+- AUTO：デフォルトの自動選択
+- GENERAL：汎用
+- REALISTIC：写実的
+- DESIGN：デザイン
+- RENDER_3D：3D
+- ANIME：アニメ
+
+<Tip>
+  - スタイルパラメータ`style_type`はV_2以降のモデルにのみ適用され、V_1バージョンでは指定しないでください。
+  - V3のサポートは近日公開予定です
+</Tip>
+
+<Warning>
+  1. AiHubMix公式インターフェースまたは[Cherry Studio APP](https://cherry-ai.com/)を介して呼び出すことができます。現在、画像を生成するにはプロキシを有効にする必要があることに注意してください。将来的には国内からの直接接続をサポートする予定ですので、ご期待ください。
+  2. Cherry Studioは現在、Ideogramの描画（generate）インターフェースのみを公開しています。
+</Warning>
+
+### Generate
+
+`POST` [https://aihubmix.com/ideogram/generate\](https://api.aihubmix.com/ideogram/generate\) 指定されたプロンプトとオプションのパラメータに基づいて画像を同期的に生成します。画像リンクの有効期限は限られています。画像を保持したい場合は、ダウンロードして保存する必要があります。
+
+**リクエストパラメータ**
+
+<ParamField body="image_request" type="object" required>
+  画像を生成するためのリクエストオブジェクト
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string" required>
+  画像を生成するためのプロンプト
+</ParamField>
+
+<ParamField body="image_request.aspect_ratio" default="ASPECT_1_1" type="string">
+  画像生成に使用するアスペクト比。画像の解像度を決定します。解像度パラメータと同時に使用することはできません。
+
+  利用可能な比率：
+
+  - ASPECT_1_1
+  - ASPECT_3_1
+  - ASPECT_1_3
+  - ASPECT_3_2
+  - ASPECT_2_3
+  - ASPECT_4_3
+  - ASPECT_3_4
+  - ASPECT_16_9
+  - ASPECT_9_16
+  - SPECT_16_10
+  - ASPECT_10_16
+</ParamField>
+
+<ParamField body="image_request.model" default="V_2" type="string">
+  画像を生成または編集するためのモデル。/generateと/remixはすべてのモデルタイプをサポートしますが、/editはV_2とV_2_TURBOのみをサポートします。
+
+  利用可能なモデルバージョン：
+
+  - V_1
+  - V_1_TURBO
+  - V_2
+  - V_2_TURBO
+  - V_2A
+  - V_2A_TURBO
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：AUTO、ON、OFF
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="image_request.style_type" default="AUTO" type="string">
+  画像を生成する際に使用するスタイルタイプ。このパラメータはV_2以降のモデルにのみ適用され、V_1バージョンでは指定しないでください。
+
+  利用可能なスタイル：
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+<ParamField body="image_request.negative_prompt" type="string">
+  画像に表示したくない内容を記述します。モデルバージョンV_1、V_1_TURBO、V_2、V_2_TURBOにのみ適用されます。プロンプトの記述はネガティブプロンプトの記述よりも優先されます。
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8
+</ParamField>
+
+<ParamField body="image_request.resolution" type="string">
+  画像生成に使用する解像度（モデルバージョン2.0にのみ適用され、aspect_ratioと同時に使用することはできません）。幅x高さで表されます。指定しない場合、デフォルトでaspect_ratioが使用されます。
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/generate"
+
+payload = { "image_request": {
+        "prompt": "3Dカートゥーン、頭を傾げた愛らしい白いフクロウの赤ちゃん、ハイライトの入った輝く琥珀色の目、ふわふわの体、苔とたくさんの光るキノコのある幹の上に立っている、クローズアップ、映画のような照明、ローアングル、深い奥行き感。背景は魔法のような春の風景、キュートで美的、巨大なタイトルデザイン「Always curious」", #string オプション
+        "negative_prompt": "blurry, bad anatomy, watermark",
+        "aspect_ratio": "ASPECT_3_2",  # オプション ASPECT_1_1(デフォルト), ASPECT_3_2, ASPECT_2_3, ASPECT_4_3, ASPECT_3_4, ASPECT_16_9, ASPECT_9_16, SPECT_16_10, ASPECT_10_16 を含む
+        "model": "V_2",
+        "num_images": 2, #integer オプション >=1 <=8 デフォルトは1
+        "magic_prompt_option": "AUTO", # string オプション AUTO, ON, OFF
+        #"seed": "2" #integer オプション >=0 <=2147483647
+        "style_type": "RENDER_3D" # string オプション AUTO/GENERAL/REALISTIC/DESIGN/RENDER_3D/ANIME, V_2以降のバージョンにのみ適用
+    } }
+headers = {
+    "Api-Key": os.getenv("AIHUBMIX_API_KEY"),
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.json())
+
+# ファイルに画像を出力
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']  # 正しく画像URLを取得
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("画像はoutput.pngに保存されました")
+    else:
+        print(f"画像の取得に失敗しました：{image_response.status_code}")
+else:
+    print("APIリクエストが失敗したか、返されたデータに画像がありません")
+```
+
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/describe';
+const form = new FormData();
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/generate \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "image_request": {
+    "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+    "aspect_ratio": "ASPECT_10_16",
+    "model": "V_2",
+    "magic_prompt_option": "AUTO"
+  }
+}'
+```
+
+</CodeGroup>
+
+### Response
+
+画像が正常に生成されました。
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### エラーコード
+
+- `400` : 画像生成リクエストの不正なリクエストエラー
+- `401` : 画像生成リクエストの認証エラー
+- `422` : 画像生成リクエストの処理不能エンティティエラー
+- `429` : 画像生成リクエストの多すぎるリクエストエラー
+
+### Edit
+
+`POST` [https://aihubmix.com/ideogram/edit](https://api.aihubmix.com/ideogram/edit)
+
+提供されたマスクを使用して、指定された画像を同期的に編集します。マスクは編集すべき画像の部分を示し、プロンプトと選択されたスタイルタイプは編集の方向をさらにガイドします。サポートされている画像形式はJPEG、PNG、WebPです。画像リンクの有効期限は限られています。画像を保持したい場合は、ダウンロードして保存する必要があります。
+
+**リクエストパラメータ**
+
+<ParamField body="image_file" type="file" required>
+  元の画像ファイル。JPEG、PNG、WebP形式をサポート
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  マスク画像。以下の要件を満たす必要があります。
+
+  - 黒と白のピクセルのみを含み、RGB、RGBA、またはグレースケール画像形式をサポート
+  - 元の画像と完全に同じサイズ
+  - 黒い領域は変更が必要な部分、白い領域は変更しない部分を示します
+  - 純粋な白色であってはなりません
+  - 変更領域（黒い部分）は画像の少なくとも10%以上を占めることを推奨
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  部分編集用のプロンプト
+</ParamField>
+
+<ParamField body="model" type="string" required>
+  画像を生成または編集するためのモデル。/generateと/remixはすべてのモデルタイプをサポートしますが、/editはV_2とV_2_TURBOのみをサポートします。
+
+  利用可能なモデルバージョン：
+
+  - V_2
+  - V_2_TURBO
+</ParamField>
+
+<ParamField body="magic_prompt_option" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：AUTO、ON、OFF
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲は1〜8
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  画像を生成する際に使用するスタイルタイプ。このパラメータはV_2以降のモデルにのみ適用されます。
+
+  利用可能なスタイル：
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/eidt"
+
+files = {
+    "image_file": open('<file1>', 'rb'), # 必須
+    "mask": "open('<file1>', 'rb')" # 必須
+}
+
+payload = {
+    "prompt": "\"prompt\"", # 必須
+    "model": "V_2",  # 必須、only supported for V_2 and V_2_TURBO.
+    "magic_prompt_option": ,
+    "num_images":1, # integer オプション >=1 <=8 Defaults to 1
+    "seed": , # integer オプション >=0 <=2147483647
+    "style_type":
+16}
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json())
+
+# ファイルを閉じる
+files["image_file"].close()
+files["mask"].close()
+```
+
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/edit';
+const form = new FormData();
+form.append('image_file', '<file1>');
+form.append('mask', '<file1>');
+form.append('prompt', '"prompt"');
+form.append('model', '"V_1"');
+form.append('magic_prompt_option', '');
+form.append('num_images', '');
+form.append('seed', '');
+form.append('style_type', '');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/edit \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_file=@<file1> \
+     -F mask=@<file1> \
+     -F prompt="prompt" \
+     -F model="V_1"
+```
+
+</CodeGroup>
+
+### Response
+
+画像編集が正常に生成されました。
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### エラーコード
+
+- `400` : 画像編集リクエストの不正なリクエストエラー
+- `401` : 画像編集リクエストの認証エラー
+- `422` : 画像編集リクエストの処理不能エンティティエラー
+- `429` : 画像編集リクエストの多すぎるリクエストエラー
+
+### Remix
+
+`POST` [https://aihubmix.com/ideogram/remix](https://api.aihubmix.com/ideogram/remix)
+
+提供された画像とプロンプトに基づいて新しい画像を生成します。入力画像は、選択されたアスペクト比に合わせてトリミングされます。サポートされている画像形式はJPEG、PNG、WebPです。画像リンクの有効期限は限られています。画像を保持したい場合は、ダウンロードして保存する必要があります。
+
+**リクエストパラメータ**
+
+<ParamField body="image_request" type="object" required>
+  提供された画像とプロンプトを使用して新しい画像を生成するためのリクエスト。提供された画像は、選択された出力アスペクト比に合わせてトリミングされます。
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string" required>
+  画像を生成するためのプロンプト
+</ParamField>
+
+<ParamField body="image_request.aspect_ratio" default="ASPECT_1_1" type="string">
+  画像生成に使用するアスペクト比。画像の解像度を決定します。解像度パラメータと同時に使用することはできません。
+
+  利用可能な比率：
+
+  - ASPECT_1_1
+  - ASPECT_3_1
+  - ASPECT_1_3
+  - ASPECT_3_2
+  - ASPECT_2_3
+  - ASPECT_4_3
+  - ASPECT_3_4
+  - ASPECT_16_9
+  - ASPECT_9_16
+  - SPECT_16_10
+  - ASPECT_10_16
+</ParamField>
+
+<ParamField body="image_request.image_weight" default="50" type="integer">
+  参照画像の重み。範囲：1〜100
+</ParamField>
+
+<ParamField body="image_request.model" default="V_2" type="string">
+  画像を生成または編集するためのモデル。/generateと/remixはすべてのモデルタイプをサポートしますが、/editはV_2とV_2_TURBOのみをサポートします。
+</ParamField>
+
+<ParamField body="image_request.negative_prompt" type="string">
+  画像に表示したくない内容を記述します。モデルバージョンV_1、V_1_TURBO、V_2、V_2_TURBOにのみ適用されます。プロンプトの記述はネガティブプロンプトの記述よりも優先されます。
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：AUTO、ON、OFF
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  一度に生成する画像の数。範囲：1〜8
+</ParamField>
+
+<ParamField body="image_request.resolution" type="string">
+  画像生成に使用する解像度（モデルバージョン2.0にのみ適用され、aspect_ratioと同時に使用することはできません）。幅x高さで表されます。指定しない場合、デフォルトでaspect_ratioが使用されます。
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="image_request.style_type" default="AUTO" type="string">
+  画像を生成する際に使用するスタイルタイプ。V_2以降のモデルにのみ適用され、V_1バージョンでは指定しないでください。
+
+  利用可能なスタイル：
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+<ParamField body="image_file" type="file" required>
+  元の画像ファイル。JPEG、PNG、WebP形式をサポート
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/remix"
+
+files = { "image_file": open('<file1>', 'rb') }
+payload = {"image_request": '''{
+    "prompt": "水彩画",
+    "aspect_ratio": "ASPECT_10_16",
+    "image_weight": 50,
+    "magic_prompt_option": "ON",
+    "model": "V_2"
+}'''}
+
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json())
+```
+
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/remix';
+const form = new FormData();
+form.append('image_request', '{
+  "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+  "aspect_ratio": "ASPECT_10_16",
+  "image_weight": 50,
+  "magic_prompt_option": "ON",
+  "model": "V_2"
+}');
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/remix \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_request='{
+  "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+  "aspect_ratio": "ASPECT_10_16",
+  "image_weight": 50,
+  "magic_prompt_option": "ON",
+  "model": "V_2"
+}' \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### Response
+
+画像が正常に生成されました。
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### エラーコード
+
+- `400` : 画像合成リクエストの不正なリクエストエラー
+- `401` : 画像合成リクエストの認証エラー
+- `422` : 画像合成リクエストの処理不能エンティティエラー
+- `429` : 画像合成リクエストの多すぎるリクエストエラー
+
+### Upscale
+
+`POST` [https://aihubmix.com/ideogram/upscale](https://api.aihubmix.com/ideogram/upscale)
+
+オプションのプロンプトを使用して、提供された画像を同期的に拡大（超解像）します。サポートされている画像形式はJPEG、PNG、WebPです。画像リンクの有効期限は限られています。画像を保持したい場合は、ダウンロードして保存する必要があります。
+
+**リクエストパラメータ**
+
+<ParamField body="image_request" type="object" required>
+  オプションのプロンプトを使用して、提供された画像を拡大するためのリクエストオブジェクト
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string">
+  拡大プロセスをガイドするためのオプションのプロンプト
+</ParamField>
+
+<ParamField body="image_request.resemblance" default="50" type="integer">
+  類似度。範囲：1〜100
+</ParamField>
+
+<ParamField body="image_request.detail" default="50" type="integer">
+  詳細度。範囲：1〜100
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  プロンプト強化オプション。利用可能なパラメータ：AUTO、ON、OFF
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  生成数。範囲：1〜8
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  ランダムシード。範囲：0〜2147483647
+</ParamField>
+
+<ParamField body="image_file" type="file" required>
+  元の画像ファイル。JPEG、PNG、WebP形式をサポート
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/upscale"
+
+files = { "image_file": open('<file1>', 'rb') }
+payload = { "image_request": "{}" }
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json())
+```
+
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/upscale';
+const form = new FormData();
+form.append('image_request', '{}');
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/upscale \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_request='{}' \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### Response
+
+画像が正常に生成されました。
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "穏やかな熱帯のビーチの風景。前景には豊かな緑の葉を持つ背の高いヤシの木がそびえ立ち、砂浜を背景に立っている。ビーチは海の紺碧の海へと続き、優しく海岸線にキスしている。遠くには、灯台か塔のように見えるシルエットを持つ島または陸地がある。上空の空にはふわふわした白い雲が描かれており、その一部はピンクとオレンジの色合いを帯びており、日の出か日の入りを示唆している。",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### エラーコード
+
+- `400` : 画像拡大リクエストの不正なリクエストエラー
+- `401` : 画像拡大リクエストの認証エラー
+- `422` : 画像拡大リクエストの処理不能エンティティエラー
+- `429` : 画像拡大リクエストの多すぎるリクエストエラー
+
+### Describe
+
+`POST` [https://aihubmix.com/ideogram/describe](https://api.aihubmix.com/ideogram/describe)
+
+アップロードされた画像を記述分析します。サポートされている画像形式はJPEG、PNG、WebPです。
+
+**リクエストパラメータ**
+
+<ParamField body="image_file" type="file" required>
+  記述が必要な画像ファイル。JPEG、PNG、WebP形式をサポート
+</ParamField>
+
+### 呼び出し例
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/describe"
+
+files = { "image_file": open('<file1>', 'rb') }
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, files=files, headers=headers)
+
+print(response.json())
+
+# ファイルを閉じる
+files["image_file"].close()
+```
+
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/describe';
+const form = new FormData();
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/describe \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### Response
+
+記述が正常に作成されました。
+
+```json
+{
+  "descriptions": [
+    {
+      "text": "縞模様の猫がきちんと座っている、細密に描かれた猫。猫の目は魅惑的な黄色で、何かを熱心に見つめているようだ。背景は黒、白、ベージュの色合いの抽象的な渦巻き模様で構成されており、まるで流動的または波打つような外観を作り出している。猫は前景に配置され、背景の要素は遠景にフェードアウトしており、画像に奥行き感を与えている。"
+    },
+    {
+      "text": "縞模様の猫がきちんと座っている、細密に描かれた猫。猫の目は魅惑的な黄色で、何かを熱心に見つめているようだ。背景は黒、白、ベージュの色合いの抽象的な渦巻き模様で構成されており、まるで流動的または波打つような外観を作り出している。猫は前景に配置され、背景の要素は遠景にフェードアウトしており、画像に奥行き感を与えている。"
+    }
+  ]
+}
+```
+
+### エラーコード
+
+- `400` : 記述リクエストの不正なリクエストエラー
+- `422` : 記述リクエストの処理不能エンティティエラー
+- `429` : 記述リクエストの多すぎるリクエストエラー
+
+---
+
+### 💰 V2 & V1 料金
+
+#### 画像生成
+
+| モデル        | 機能                          | 1枚あたりの料金     |
+| --------- | --------------------------- | ---------- |
+| 2a        | テキストから画像、またはテキスト + 参考画像から画像           | US $0.04  |
+| 2a Turbo  | テキストから画像、またはテキスト + 参考画像から画像（より高速だが品質はやや低い） | US $0.025 |
+| 2.0       | テキストから画像、またはテキスト + 参考画像から画像           | US $0.08  |
+| 2.0 Turbo | テキストから画像、またはテキスト + 参考画像から画像（より高速だが品質はやや低い） | US $0.05  |
+| 1.0       | テキストから画像、またはテキスト + 参考画像から画像           | US $0.06  |
+| 1.0 Turbo | テキストから画像、またはテキスト + 参考画像から画像（より高速だが品質はやや低い） | US $0.02  |
+
+#### 画像編集
+
+| モデル             | 機能                                | 1枚あたりの料金    |
+| -------------- | --------------------------------- | --------- |
+| 2.0 Edit       | テキストプロンプト、参照画像、バイナリマスクを使用して画像を再生成           | US $0.08 |
+| 2.0 Turbo Edit | テキストプロンプト、参照画像、バイナリマスクを使用して画像を再生成（より高速だが品質はやや低い） | US $0.05 |
+
+#### 画像強化
+
+| モデル      | 機能                        | 1枚あたりの料金    |
+| ------- | ------------------------- | --------- |
+| Upscale | 参照画像の解像度を2倍に向上させ、画像効果を強化する可能性あり | US $0.06 |
+
+詳細については[公式ドキュメント](https://developer.ideogram.ai/api-reference/api-reference/generate)をご覧ください。

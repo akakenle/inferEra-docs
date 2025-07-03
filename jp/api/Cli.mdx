@@ -1,0 +1,510 @@
+---
+title: "インターフェースを介したバックエンドの直接管理"
+description: "AiHubMix CLIユーティリティ管理スクリプトを介して、コマンドラインでキーの管理、アカウントの表示、利用可能なモデルリストの確認などを行う"
+icon: "terminal"
+---
+
+AiHubMix CLIは、ウェブインターフェースを介さずに、AiHubMix APIキーの管理、アカウント情報の照会、AIサービスの利用を可能にするユーティリティ管理スクリプトの集合体です。本質的には、コマンドラインでの使用を容易にするためにAPI呼び出し（curlまたはPythonリクエスト）をカプセル化したものです。
+
+## 準備
+
+AiHubMix CLIを使用する前に、以下が必要です。
+
+1. [AiHubMixアカウント](https://aihubmix.com)
+2. [AiHubMix設定ページ](https://aihubmix.com/setting)から「システムアクセストークンを生成」をクリックしてアクセストークンを生成します。
+3. 必要なPython依存関係をインストールします。
+
+```bash
+pip install -U requests openai
+```
+
+<Info>
+  aihubmix_cli.pyスクリプトは[こちら](https://github.com/jerlinn/inferHub)から入手できます。
+</Info>
+
+## 機能リスト
+
+AiHubMix CLIは以下の主要機能を提供します。
+
+### APIエンドポイント一覧
+
+| エンドポイント                           | HTTPメソッド | 説明                           |
+| ---------------------------- | ------- | ---------------------------- |
+| `/api/user/self`             | GET     | 現在のユーザー情報とアカウント残高を取得                |
+| `/api/token/`                | GET     | すべてのKEYリストを取得                  |
+| `/api/token/`                | POST    | 新しいAPI KEYを作成                 |
+| `/api/token/`                | PUT     | 既存のAPI KEYを更新                 |
+| `/api/token/{token_id}`      | GET     | 特定のKEYの詳細情報を取得               |
+| `/api/token/{token_id}`      | DELETE  | 特定のKEYを削除                     |
+| `/api/token/search`          | GET     | KEYを検索 ( `?keyword=検索キーワード`を使用) |
+| `/api/user/token`            | GET     | ユーザーKEYを取得                     |
+| `/api/models`                | GET     | すべての利用可能なモデルリストを取得                   |
+| `/api/user/available_models` | GET     | 現在のユーザーが利用可能なモデルリストを取得                |
+
+### アカウント管理
+
+<CodeGroup>
+
+```shell Curl アカウント残高を取得
+curl -X GET "https://aihubmix.com/api/user/self" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python アカウント残高を取得
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# アカウント残高を取得
+response = requests.get(f"{api_url}/api/user/self", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        user_data = data.get("data", {})
+        quota = user_data.get('quota', 0)
+        usd_balance = quota / 500000  # $1は500,000クレジットに相当
+        print(f"ユーザー名: {user_data.get('username', '不明')}")
+        print(f"表示名: {user_data.get('display_name', '不明')}")
+        print(f"現在のクレジット: {quota}")
+        print(f"利用可能なドル: ${usd_balance:.2f}")
+    else:
+        print(f"リクエスト失敗: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI アカウント残高を取得
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+```
+
+</CodeGroup>
+
+### KEY管理
+
+<CodeGroup>
+
+```shell Curl 新しいKEYを作成
+curl -X POST "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "新しいKEY名",
+    "expired_time": -1,
+    "remain_quota": 500000,
+    "unlimited_quota": false,
+    "subnet": ""
+  }'
+```
+
+
+```py Python 新しいKEYを作成
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 新しいKEYを作成
+payload = {
+    "name": "新しいKEY名",
+    "expired_time": -1,  # 永続
+    "remain_quota": 500000,
+    "unlimited_quota": False,
+    "subnet": ""
+}
+
+response = requests.post(f"{api_url}/api/token/", headers=headers, json=payload)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        token_data = data.get("data", {})
+        print(f"新しいKEY: {token_data.get('key', '不明')}")
+        print(f"KEY ID: {token_data.get('id', '不明')}")
+    else:
+        print(f"KEYの作成に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI 新しいKEYを作成
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "新しいKEY名" --expires -1 --quota 500000
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl KEYリストを取得
+curl -X GET "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python KEYリストを取得
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# KEYリストを取得
+response = requests.get(f"{api_url}/api/token/", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        tokens_data = data.get("data", [])
+        print(f"KEYリスト (合計 {len(tokens_data)} 個):")
+        for token in tokens_data:
+            print(f"KEY ID: {token.get('id', '不明')}")
+            print(f"KEY名: {token.get('name', '不明')}")
+            print(f"KEY: {token.get('key', '不明')}")
+            print("---")
+    else:
+        print(f"KEYリストの取得に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI KEYリストを取得
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl KEYを検索
+curl -X GET "https://aihubmix.com/api/token/search?keyword=検索キーワード" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python KEYを検索
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 検索キーワード
+query = "検索キーワード"
+
+# KEYを検索
+response = requests.get(f"{api_url}/api/token/search?keyword={query}", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        tokens_data = data.get("data", [])
+        print(f"検索結果 (合計 {len(tokens_data)} 個):")
+        for token in tokens_data:
+            print(f"KEY ID: {token.get('id', '不明')}")
+            print(f"KEY名: {token.get('name', '不明')}")
+            print(f"KEY: {token.get('key', '不明')}")
+            print("---")
+    else:
+        print(f"KEYの検索に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI KEYを検索
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "検索キーワード"
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl KEYを更新
+curl -X PUT "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "KEY_ID",
+    "name": "新しい名前",
+    "expired_time": 86400,
+    "remain_quota": 100000,
+    "status": 1
+  }'
+```
+
+
+```py Python KEYを更新
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# KEYを更新
+key_id = "KEY_ID"  # 実際のKEY IDに置き換えてください
+payload = {
+    "id": key_id,
+    "name": "新しい名前",
+    "expired_time": 86400,  # 24時間後に期限切れ
+    "remain_quota": 100000,
+    "status": 1  # 1-有効、0-無効
+}
+
+response = requests.put(f"{api_url}/api/token/", headers=headers, json=payload)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        print(f"KEYの更新に成功しました")
+        if "data" in data:
+            token_data = data.get("data", {})
+            print(f"名前: {token_data.get('name', '不明')}")
+            print(f"有効期限: {token_data.get('expired_time', '不明')}")
+    else:
+        print(f"KEYの更新に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI KEYを更新
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "新しい名前" --expires 86400 --quota 100000 --status 1
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl KEYを削除
+curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python KEYを削除
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# KEYを削除
+key_id = "KEY_ID"  # 実際のKEY IDに置き換えてください
+
+response = requests.delete(f"{api_url}/api/token/{key_id}", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        print(f"KEYの削除に成功しました")
+    else:
+        print(f"KEYの削除に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI KEYを削除
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl ユーザーKEYを取得
+curl -X GET "https://aihubmix.com/api/user/token" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python ユーザーKEYを取得
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# ユーザーKEYを取得
+response = requests.get(f"{api_url}/api/user/token", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        user_token = data.get("data", {}).get("token")
+        print(f"ユーザーKEY: {user_token}")
+    else:
+        print(f"ユーザーKEYの取得に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI ユーザーKEYを取得
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
+```
+
+</CodeGroup>
+
+### モデル管理
+
+<CodeGroup>
+
+```shell Curl すべての利用可能なモデルを取得
+curl -X GET "https://aihubmix.com/api/models" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python すべての利用可能なモデルを取得
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# すべての利用可能なモデルを取得
+response = requests.get(f"{api_url}/api/models", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        models_data = data.get("data", {})
+        
+        # すべての一意のモデル名を集める
+        total_models = set()
+        for channel_id, channel_models in models_data.items():
+            if channel_models and isinstance(channel_models, list):
+                for model in channel_models:
+                    total_models.add(model)
+        
+        # モデルリストを出力
+        print(f"利用可能なモデルリスト (合計 {len(total_models)} 個):")
+        for i, model in enumerate(sorted(list(total_models)), 1):
+            print(f"  {i}. {model}")
+    else:
+        print(f"モデルリストの取得に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI すべての利用可能なモデルを取得
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl ユーザーが利用可能なモデルを取得
+curl -X GET "https://aihubmix.com/api/user/available_models" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python ユーザーが利用可能なモデルを取得
+import requests
+import json
+
+# API設定
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# ユーザーが利用可能なモデルを取得
+response = requests.get(f"{api_url}/api/user/available_models", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        models_data = data.get("data", [])
+        print(f"ユーザーが利用可能なモデルリスト (合計 {len(models_data)} 個):")
+        for i, model in enumerate(models_data, 1):
+            print(f"  {i}. {model}")
+    else:
+        print(f"ユーザーが利用可能なモデルの取得に失敗しました: {data.get('message', '不明なエラー')}")
+else:
+    print(f"リクエスト失敗、ステータスコード: {response.status_code}")
+```
+
+
+```shell CLI ユーザーが利用可能なモデルを取得
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
+```
+
+</CodeGroup>
+
+## JSON形式での出力
+
+すべてのCLIコマンドは、プログラムによる処理を容易にするために、JSON形式で結果を出力することをサポートしています。
+
+```bash
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance --json
+```
+
+## トラブルシューティング
+
+問題が発生した場合は、以下の解決策を試してください。
+
+1. **接続の問題**：メインドメインへの接続が失敗した場合は、代替ドメインを使用してみてください。
+
+   ```bash
+   python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+   ```
+2. **アクセストークンが無効**：提供されたアクセストークンがAiHubMixウェブサイトから取得した有効なキーであることを確認してください。アクセストークンの形式は通常`fd***`のようになります。
+3. **権限不足**：一部の操作には特定の権限が必要な場合があります。アカウントに十分な権限があることを確認してください。
+4. **リクエスト失敗**：ネットワーク接続を確認するか、しばらくしてから再試行してください。
+
+## 注意事項
+
+- アクセストークンは、AIモデルにアクセスするための通常のAPI KEYとは異なります。
+- 各ユーザーは独自のシステムアクセストークンを持ち、そのアクセスレベルはユーザーの役割（一般ユーザー、管理者、またはルートユーザー）によって決定されます。

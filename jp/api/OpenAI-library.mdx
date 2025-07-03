@@ -1,0 +1,36 @@
+---
+title: "OpenAI公式ライブラリでの使用"
+description: ""
+icon: 'o'
+---
+
+これは最新のOpenAIパッケージの使用ガイドです。中国本土のユーザーは**直接接続して使用**でき、ビジネス構築がより簡単になります。
+
+<Tip>
+ポイント：client内に転送用の`base_url`とAiHubMixプラットフォームの[キー](https://aihubmix.com/token)を追加するだけです。
+AiHubMixプラットフォームのすべてのモデルに適用されます。
+</Tip>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Say this is a test",
+        }
+    ],
+    model="gpt-4o-mini",
+)
+
+print(chat_completion)
+```
+<Info>
+OpenAI公式の現在のサービス状況 [確認](https://status.openai.com/)
+</Info>

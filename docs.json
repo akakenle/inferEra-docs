@@ -225,6 +225,114 @@
             ]
           }
         ]
+      },
+      {
+        "language": "jp",
+        "tabs": [
+          {
+            "tab": "User Guide",
+            "groups": [
+              {
+                "group": "Basics",
+                "pages": [
+                  "jp/index",
+                  "jp/quick-start",
+                  "jp/api-playground/inferUsages",
+                  "jp/api/Dify-plugin"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": [
+                  "jp/api/Model-Information",
+                  "jp/api/Model-List",
+                  "jp/api/OpenAI-library",  
+                  "jp/api/Responses-API",  
+                  "jp/api/GPT-Image-1",
+                  "jp/api/GPT-4o-image",
+                  "jp/api/Image-Gen",
+                  "jp/api/FIM",
+                  "jp/api/Codex-CLI",
+                  "jp/api/Non-OpenAI-Models",
+                  "jp/api/LLM-Search",
+                  "jp/api/General-Model-Forwarding",
+                  "jp/api/Claude-Native",
+                  "jp/api/Claude-Code",
+                  "jp/api/Claude-Text-Edit-Tool",
+                  "jp/api/Claude-Cache",
+                  "jp/api/Gemini-Guides",
+                  "jp/api/Multimodal-Interaction-with-Gemini",
+                  "jp/api/Gemini-Cli",
+                  "jp/api/Qwen",
+                  "jp/api/TTS",
+                  "jp/api/IdeogramAI",
+                  "jp/api/Jina-AI",
+                  "jp/api/Cli",
+                  "jp/api/App-code",
+                  "jp/api/Auth"
+                ]
+              },
+              {
+                "group": "Terms and Privacy",
+                "pages": [
+                  "jp/terms-and-privacy/Terms",
+                  "jp/terms-and-privacy/Privacy"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Use Cases",
+            "pages": [
+              "jp/clients/Cherry-Studio",
+              "jp/clients/AnythingLLM",
+              "jp/clients/Avante.nvim",
+              "jp/clients/Bob",
+              "jp/clients/ChatAll",
+              "jp/clients/ChatBox",
+              "jp/clients/ChatGPT-Next-Web",
+              "jp/clients/ChatHub",
+              "jp/clients/Chatx",
+              "jp/clients/Cline",
+              "jp/clients/Cursor",
+              "jp/clients/Dify",
+              "jp/clients/GPT-Academic",
+              "jp/clients/Gptme",
+              "jp/clients/LangChain",
+              "jp/clients/LibreChat",
+              "jp/clients/Lobe-Chat",
+              "jp/clients/Obsidian",
+              "jp/clients/Open-WebUI",
+              "jp/clients/OpenAI-Translator",
+              "jp/clients/Pot-App",
+              "jp/clients/Utools-ChatGPT",
+              "jp/clients/Zotero",
+              "jp/clients/Immersive-Translate",
+              "jp/clients/On-CS",
+              "jp/clients/Oulu"
+            ]
+          },
+          {
+            "tab": "FAQs",
+            "pages": [
+              "jp/FAQs/faq",
+              "jp/FAQs/HTTP-Codes",
+              "jp/FAQs/Human-Customer-Support"
+            ]
+          },
+          {
+            "tab": "Updates",
+            "pages": [
+              "jp/changelog/News"
+            ]
+          },
+          {
+            "tab": "Blogs",
+            "pages": [
+              "jp/blogs/Building"
+            ]
+          }
+        ]
       }
     ]
   },
@@ -259,7 +367,7 @@
         "items": [
           {
             "label": "llms.txt",
-            "href": "https://docs.aihubmix.com/llms.txt"
+            "href": "https://docs.aihubmix.com/public/llms.txt"
           },
           {
             "label": "Auth Reference",
@@ -298,6 +406,11 @@
     {
       "source": "/en",
       "destination": "/en/index"
+    },
+    {
+      "source": "/llms.txt",
+      "destination": "/llms",
+      "permanent": false
     }
   ],
   "integrations": {

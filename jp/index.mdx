@@ -1,0 +1,69 @@
+---
+title: "製品紹介"
+description: "ようこそ **AiHubMix** が提供する AI モデル API ルーティングサービスへ！当社は統一された OpenAI API 標準に基づき、OpenAI 公式の全モデルおよび市場の他の主要な大規模モデル（Claude、Gemini、DeepSeek、アリババ Qwen など）をサポートしています。パラメータの`モデル名`を変更するだけで、簡単に接続する大規模モデルを切り替えることができます。"
+icon: 'face-smile-wink'
+---
+
+## 会社と協力の背景
+
+- **運営主体会社**：AiHubMix, LLC（米国）  
+- **公式認定代理店**：マイクロソフト Azure、AWS、GCP 公式代理店（額度の来源は正規であり、安心してご利用いただけます）  
+- **サービス保証**：  
+  - **安定**：OpenAI、Claude、Google Gemini などの主要モデルの高並列処理と安定したサービスを提供  
+  - **信頼**：多くの有名アプリケーションが本番環境で安定して接続済み
+
+## マルチエンドポイントサポートの説明
+
+- **OpenAI + Azure デュアルエンドポイント**  
+  - AiHubMix は OpenAI 公式とマイクロソフト Azure OpenAI の両方のエンドポイントに同時に接続し、リクエストをランダムに Azure にルーティングしてコンテンツの審査を行います  
+  - OpenAI 公式エンドポイントと比較して、Azure OpenAI は自動コンテンツフィルタリングが組み込まれているため、応答速度が若干遅くなる可能性があります  
+<Warning>
+**コンプライアンスにご注意ください**：暴力的、政治的、ポルノなどのデリケートなコンテンツをリクエストしないでください。アカウントが頻繁にコンテンツフィルタリングに抵触する場合、当社は統計を取り、お客様に連絡して確認します
+</Warning>
+
+import { ClaudeGuide } from 'api/Claude-Native.mdx';
+
+<ClaudeGuide title={'Claude ネイティブインターフェース呼び出し'} />
+
+## クイックスタート
+
+1. **チャージ**  
+   - [「チャージ」ページ](https://aihubmix.com/topup)にアクセスしてチャージを完了し、アカウントの残高が > 0 であることを確認してください  
+2. **API キーの作成**  
+   - [「キー」ページ](https://aihubmix.com/token)を開き、自分のキーを作成してコピーします。初心者は `キー名` のみを入力することをお勧めします
+3. **中継情報の取得**  
+   - 安定した中継インターフェースアドレス：`https://aihubmix.com`  
+   - 中継 API キー（プロジェクトにハードコーディングしないでください）：`sk-***` 
+   - 予備サーバーアドレス（新機能テスト専用）：`https://api.aihubmix.com`  
+4. **API アドレスの置換**  
+   - 開発者の場合は、[OpenAI 公式ドキュメント](https://platform.openai.com) を参照してください  
+   - 開発時、ドキュメントの `https://api.openai.com` を `https://aihubmix.com` に置き換えるだけです  
+   - Claude モデルはネイティブの `v1/messages` インターフェースもサポートしています。詳細は [Claude ネイティブインターフェース呼び出し](/jp/api/Claude-Native) を参照してください
+
+<Tip>
+**ヒント**：
+一部のサードパーティソフトウェアまたはプラットフォームでカスタム URL を入力する場合、`/v1` または `/v1/chat/completions` を追加する必要がある場合があります 
+</Tip>
+例：
+- `https://aihubmix.com`
+- `https://aihubmix.com/v1`（現在最も一般的）
+- `https://aihubmix.com/v1/chat/completions`
+
+## 一般的な機能とシーン
+
+- **モデル API に基づくアプリケーションソフトウェア**  
+  - 例：Lobe-chat、OpenAI Translator、Cursor、ChatX、Cherry Studio、ChatBox、Sider、ChatGPT Next Web、欧陸翻訳、没入型翻訳など  
+- **製品開発**  
+  - Langchain、LlamaIndex などのライブラリの呼び出しを完全にサポート  
+  - インストールと設定は OpenAI 公式と一致しており、API アドレスとキーを置き換えるだけです  
+- **サービスの特徴**  
+  - **安定**：強力な技術サービスチームがシステムを継続的に反復・最適化 
+  - **便利**：OpenAI 公式 API と完全に互換性があり、シームレスに切り替え可能  
+  - **高速**：回線を継続的に最適化し、アクセスと応答速度を保証  
+  - **安心**：月額料金、会員制なし、使った分だけ購入
+
+
+## お問い合わせ
+
+- **ビジネス提携**：business@aihubmix.com  
+- **ご意見・ご感想**：feedback@aihubmix.com

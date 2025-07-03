@@ -1,0 +1,754 @@
+---
+title: "Gemini ガイド"
+description: "Geminiの描画とビデオ生成ガイド"
+icon: "google"
+---
+
+## Gemini 呼び出し方法
+
+Geminiシリーズでは、ネイティブ呼び出しとOpenAI互換の2種類の呼び出し方法を提供しています。
+使用する前に、`pip install google-genai`または`pip install -U google-genai`を実行して、ネイティブの依存関係をインストール（更新）してください。
+
+1️⃣ ネイティブ呼び出しの場合、主にAiHubMixキーとリクエストリンクを内部に渡します。このリンクは通常の`base_url`の書き方とは異なることに注意してください。例を参照してください。
+
+```py
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+```
+
+2️⃣ OpenAI互換形式の場合、汎用`v1`エンドポイントを維持します。
+
+```py
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+```
+
+3️⃣ 2.5シリーズの場合、推論プロセスを表示する必要がある場合は、以下の2つの方法を使用できます。
+
+1. ネイティブ呼び出し：`include_thoughts=True`を渡す
+2. OpenAI互換方式：`reasoning_effort`を渡す
+
+関連する詳細な呼び出しは、以下のコード例を参照してください。
+
+### Gemini 2.5 シリーズの「推論」の説明
+
+1. 2.5シリーズはすべて推論モデルです。
+2. 2.5 Flashはハイブリッドモデルで、Claude Sonnet 3.7に似ており、`thinking_budget`を使用して推論予算を制御することで最適な効果を得ることができます。
+3. 2.5 Proは純粋な推論モデルであるため、思考をオフにしたり、推論予算を明示的に渡したりすることはできません。
+
+**Python呼び出しの例は以下の通りです。**
+
+<CodeGroup>
+
+```py 通常の非ストリーミング
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""一般の株式投資家にとって：財務諸表分析が役立つなら、運は必要ないのか？"""),
+            ],
+        ),
+    ]
+
+    print(client.models.generate_content(
+        model=model,
+        contents=contents,
+    ))
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.0 シリーズ - ストリーミング
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""一般の株式投資家にとって：財務諸表分析が役立つなら、運は必要ないのか？"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 Flash - ストリーミング
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-flash-preview-04-17" #gemini-2.5-pro-preview-03-25、gemini-2.5-flash-preview-04-17
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""一般の株式投資家にとって：財務諸表分析が役立つなら、運は必要ないのか？"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        thinking_config = types.ThinkingConfig(
+            thinking_budget=2048, #範囲 0-16384。デフォルト 1024、最適な限界効果 16000
+        ),
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 Pro - ストリーミング
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""どうすれば時間を無駄にしていないとわかるのか"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 推論内容の表示
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-05-06"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""金融分野の「72の法則」はどのように導き出されたのですか？"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True  # 🧠 思考プロセスの出力を有効にする
+        ),
+    )
+
+    # 最後のチャンクのusage_metadataを保存するための変数
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        # コンテンツ部分があるか確認
+        if chunk.candidates and len(chunk.candidates) > 0:
+            for part in chunk.candidates[0].content.parts:
+                if part.text:
+                    if part.thought:
+                        # 思考プロセスコンテンツ
+                        print(part.text, end="")
+                    else:
+                        # 最終回答コンテンツ
+                        print(part.text, end="")
+        
+        # 最新のusage_metadataを保存。最後のチャンクのみ完全な情報を含む
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    # すべてのチャンクの処理が完了した後、完全なトークン使用状況を出力
+    if final_usage_metadata:
+        print(f"\n\n📊 トークン使用状況:")
+        print(f"思考トークン: {getattr(final_usage_metadata, 'thoughts_token_count', '利用不可')}")
+        print(f"出力トークン: {getattr(final_usage_metadata, 'candidates_token_count', '利用不可')}")
+        print(f"合計: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+```
+
+</CodeGroup>
+
+## Gemini 2.5 Flash サポート
+
+OpenAI互換方式の呼び出しは以下の通りです。
+
+<CodeGroup>
+
+```py Python 高速タスクの場合、思考をオフにする
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17-nothink",
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+```
+
+
+```py Python 予算を制御する
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", # "low", "medium", "high"から選択可能で、それぞれ1K、8K、24Kの思考トークン予算に対応します。思考を無効にしたい場合は、reasoning_effortを"none"に設定できます。
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+```
+
+
+```shell Curl-基本呼び出し
+curl -X POST https://aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "gemini-2.5-flash-preview-04-17-nothink",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain the Occam'\''s Razor concept and provide an everyday example of it."
+      }
+    ]
+  }'
+```
+
+
+```shell Curl-思考表示
+curl https://aihubmix.com/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer sk-***" \
+-d '{
+  "model": "gemini-2.5-pro-preview-05-06",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain the Occam'\''s Razor concept and provide an everyday example of it."
+    }
+  ],
+  "reasoning_effort": "low"
+}'
+```
+
+</CodeGroup>
+
+<Tip>
+  1. 複雑なタスクの場合、モデルIDをデフォルトで思考が有効になっている`gemini-2.5-flash-preview-04-17`に設定するだけで済みます。
+  2. Gemini 2.5 Flashは`budget`（思考予算）によって思考の深さを制御します。範囲は0〜16Kで、現在の転送ではデフォルトの予算1024が使用されており、最適な限界効果は16Kです。
+</Tip>
+
+## マルチメディアファイル
+
+Aihubmixは現在、`inline_data`を使用してアップロードされた**20MB未満**のマルチメディアファイル（画像、音声、ビデオ）のみをサポートしています。
+20MBを超えるマルチメディアはFile API（未サポート）を使用する必要があります。`upload_url`を返すために、ステータスの追跡が完了するのを待っています。
+
+<CodeGroup>
+
+```py 画像
+from google import genai
+from google.genai import types
+
+# ファイルをバイナリデータとして読み込む
+file_path = "yourpath/file.jpeg"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="image/jpeg"
+                )
+            ),
+            types.Part(
+                text="画像を説明してください。"
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py 音声
+from google import genai
+from google.genai import types
+
+# ファイルをバイナリデータとして読み込む
+file_path = "yourpath/file.m4a"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="audio/m4a"
+                )
+            ),
+            types.Part(
+                text="音声をテキストに書き起こしてください。"
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py ビデオ
+from google import genai
+from google.genai import types
+
+# ファイルをバイナリデータとして読み込む
+file_path = "yourpath/file.mp4"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="video/mp4"
+                )
+            ),
+            types.Part(
+                text="このビデオを要約してください。次に、このビデオの情報に基づいて、解答付きのクイズを作成してください。"
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py Youtube リンク
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                file_data=types.FileData(
+                    file_uri="https://www.youtube.com/watch?v=OoU7PwNyYUw"
+                )
+            ),
+            types.Part(
+                text="このビデオを3文で要約してください。"
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+</CodeGroup>
+
+## コード実行
+
+自動コード解析器のユースケースの例：
+
+```py Python
+from google import genai
+from google.genai import types
+
+# ファイルをバイナリデータとして読み込む
+file_path = "yourpath/file.csv"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="text/csv"
+                )
+            ),
+            types.Part(
+                text="このCSVを分析し、主要な統計情報を要約してください。必要に応じてコード実行を使用してください。"
+            )
+        ]
+    ),
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(
+            code_execution=types.ToolCodeExecution
+        )]
+    )
+)
+
+for part in response.candidates[0].content.parts:
+    if part.text is not None:
+        print(part.text)
+    if getattr(part, "executable_code", None) is not None:
+        print("生成されたコード:\n", part.executable_code.code)
+    if getattr(part, "code_execution_result", None) is not None:
+        print("実行結果:\n", part.code_execution_result.output)
+```
+
+## コンテキストキャッシュ
+
+Geminiは、ネイティブAPIの下でデフォルトで**暗黙的なコンテキストキャッシュ**を有効にしており、開発者が手動で操作する必要はありません。`generate_content`リクエストごとに、システムは自動的に入力コンテンツのキャッシュを作成します。後続のリクエストが以前のコンテンツと完全に一致する場合、キャッシュが直接ヒットし、前回の推論結果が返され、応答速度が大幅に向上し、トークン消費を節約できる可能性があります。
+
+- **キャッシュは自動的に有効になり、手動設定は不要です。**
+- キャッシュは、コンテンツ、モデル、パラメータが完全に一致する場合にのみ有効になります。いずれかのフィールドが異なる場合、新しいリクエストとして扱われ、キャッシュはヒットしません。
+- キャッシュの有効期限（TTL）は開発者が設定できます。設定しないことも可能です。指定しない場合、デフォルトは1時間です。最小または最大期間の制限はなく、費用はキャッシュされたトークン数とキャッシュ時間によって異なります。
+  - Google公式はTTLに上限を設定していませんが、当社は転送プラットフォームであるため、**限られたTTL設定範囲のみをサポートしており、永続的な有効性を保証するものではありません**。
+
+### 注意事項
+
+- **コスト削減の保証なし**：キャッシュされたトークンの課金は入力元の価格の25%であり、理論的には入力部分で最大75%のコストを節約できますが、[**Google公式は必ずしも節約を保証していません**](https://ai.google.dev/gemini-api/docs/caching?lang=python)。実際の請求は、キャッシュヒット率、トークンタイプ、ストレージ期間を総合的に評価する必要があります。
+- **キャッシュヒット条件**：キャッシュヒット率を高めるために、重複するコンテキストをリクエストの先頭に配置し、変動するコンテンツ（ユーザー入力など）を後部に配置することをお勧めします。
+- **キャッシュヒットフィードバック**：応答結果がキャッシュにヒットした場合、`response.usage_metadata`に`cache_tokens_details`フィールドが含まれ、`cached_content_token_count`が表示されます。開発者はこれに基づいて、今回のリクエストがキャッシュにヒットしたかどうかを判断できます。
+  応答フィールドの例（キャッシュヒット時）：
+
+  ```
+  cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+  cached_content_token_count=2003
+  ```
+
+**コード例：**
+
+```python
+from google import genai
+
+client = genai.Client(
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+)
+
+prompt = """
+「三国志演義」の詩：辞書を開く 滔々たる長江は東へ流れ、波は英雄を洗い流す。是か非か、成功か失敗か、一瞬にして空となる：青山は依然としてそこにあり、夕日は何度か赤く染まる。白髪の漁師と樵は江のほとりで、秋の月と春の風を慣れ親しむ。一杯の濁酒で再会を喜び合う：古今東西の多くの出来事は、笑い話の中に消える。2 辞書を開く 桃園で宴会を催し、豪...：天下の情勢を語れば、分かれては必ず合し、合しては必ず分かれる：周の末期、七国が争い、秦に統一された。秦が滅びた後、楚と漢が争い、再び漢に統一された。漢王朝は高祖が白蛇を斬って蜂起し、天下を統一した。その後、光武帝が中興し、献帝に伝わり、ついに三国に分かれた。その乱の原因を推測すれば、おそらく桓帝と霊帝の二帝に始まる。桓帝は善人を禁固し、宦官を崇拝した。桓帝が崩御し、霊帝が即位すると、大将軍の竇武と太傅の陳蕃が共に補佐した。当時、宦官の曹節らが権力を弄び、竇武と陳蕃は彼らを誅殺しようと謀ったが、事が密でなく、かえって害された。中涓はこれ以来ますます横暴になった。3 辞書を開く 桃園で宴会を催し、豪...：建寧二年四月望日、帝は温徳殿に御した。座に着くと、殿の角から狂風が突然吹き荒れ、梁から一条の大きな青蛇が飛来し、椅子に巻き付いた。帝は驚き倒れ、左右は急いで宮中に救い入れたが、百官は皆逃げ惑った。しばらくすると、蛇は見えなくなった。突然、大雷雨と雹が降り始め、夜半まで止まず、無数の家屋を破壊した。建寧四年二月、洛陽で地震が発生し、また海水が氾濫し、沿岸の住民は皆大波に巻き込まれて海中に消えた。光和元年、雌鶏が雄に変化した。六月朔、黒い気が十余丈、温徳殿中に飛び込んだ。秋七月、玉堂に虹が見え、五原の山岸はすべて崩壊した。様々な不吉な出来事は、これだけではなかった。4 辞書を開く 桃園で宴会を催し、豪...：帝は詔を下し、群臣に災異の原因を問うた。議郎の蔡邕は上奏し、虹が落ち、鶏が変化したのは、婦人や宦官が政治に干渉したためであると述べ、その言葉はかなり率直であった。帝は奏を読んでため息をつき、衣を更えるために立ち上がった。曹節は後ろで盗み見て、左右にすべてを告げた。そして、他のことで蔡邕を罪に陥れ、田舎に帰らせた。その後、張譲、趙忠、封諝、段圭、曹節、候覧、蹇碩、程曠、夏恽、郭勝の十人が徒党を組んで悪事を働き、「十常侍」と呼ばれた。帝は張譲を深く信頼し、「阿父」と呼び、朝政は日ごとに乱れ、天下の人心は乱れ、盗賊が蜂起した。5 辞書を開く 桃園で宴会を催し、豪...：当時、鉅鹿郡に三兄弟がいた。一人は張角、一人は張宝、一人は張梁。その張角はもともと科挙に合格しなかった秀才であった。山に入って薬草を採っていたところ、碧眼童顔で藜杖を持った老人に出会い、角を洞窟に呼び寄せ、天書三巻を授けた。「これは太平要術という。汝これを得れば、天に代わって教化を広め、世人を救済するだろう。もし異心を抱けば、必ず悪報を受けるだろう。」角は拝して姓名を尋ねた。老人は「吾は南華老仙である。」と言い終えると、一陣の清風となって去った。6 辞書を開く 桃園で宴会を催し、豪...：角はこの書を得て、昼夜攻め習い、風を呼び雨を降らせることができ、太平道人と号した。中平元年正月、疫病が流行し、張角は符水を散布して人々の病気を治し、自らを大賢良師と称した。角には五百余人の弟子がおり、四方を遊歴し、皆符を書き呪文を唱えることができた。その後、弟子が日ごとに増え、角は三十六方（大方は一万余人、小方は六七千人）を設け、それぞれに渠帥を立て、将軍と称した。流言を広めて「蒼天はすでに死し、黄天が立つべし。」と言い、また「歳は甲子にあり、天下は大吉。」と言い、人々に白い土で「甲子」の二字を家々の大門に書かせた。青、幽、徐、冀、荊、揚、兗、豫の八州の人々は、家々で大賢良師張角の名を祀った。角はその党の馬元義を遣わし、密かに金帛を携え、中涓の封諝と結び、内応とした。唐州は省中に直行して告発した。帝は大将軍の何進を召し、兵を動かして馬元義を捕らえ、斬らせた。次に封諝ら一味を獄に下した。7 辞書を開く 桃園で宴会を催し、豪...：張角は事が露見したことを知り、夜を徹して挙兵し、自らを天公将軍と称した（張宝は地公将軍、張梁は人公将軍と称した）。衆に申して言った。「今、漢の運はまさに尽きようとしている。大聖人が現れる。汝らは皆、天意に従い、太平を助けるべきである。」四方の民衆は、黄巾を頭に巻き、張角に従って反乱を起こした者が四、五十万人に及んだ。賊の勢いは甚だしく、官軍は風を見て靡いた。何進は帝に急ぎ詔を下し、各地に防備を命じ、賊を討ち功を立てるよう奏上した。一方、中郎将の盧植、皇甫嵩、朱雋を遣わし、それぞれ精兵を率いて三路に分かれて討伐させた。8 辞書を開く 桃園で宴会を催し、豪...：さて、張角の一軍は、幽州の境を犯した。幽州太守の劉焉は、江夏竟陵の人で、漢の魯恭王の後裔である。当時、賊兵が迫っていると聞き、校尉の鄒靖を召して計議した。靖は言った。「賊兵は多く、我兵は少ない。明公は速やかに兵を募り、敵に応じるべきです。」劉焉はその言葉を是とし、すぐに榜文を出して義兵を募った。榜文が涿県に届くと、涿県の中から一人の英雄が現れた。9 辞書を開く 桃園で宴会を催し、豪...：その人はあまり読書を好まず、性格は寛大で、言葉少なく、喜怒を顔に出さなかった。常に大きな志を抱き、天下の豪傑と交わることを好んだ。身長は七尺五寸、両耳は肩まで垂れ、両手は膝を越え、目は自分の耳を見ることができ、顔は冠玉のようで、唇は紅を塗ったようであった。中山靖王劉勝の後裔で、漢景帝の玄孫にあたる。姓は劉、名は備、字は玄徳。昔、劉勝の子劉貞は、漢武帝の時に涿鹿亭侯に封じられたが、後に酬金で侯を失い、そのためこの一族が涿県に残った。玄徳の祖父は劉雄、父は劉弘。弘は孝廉に挙げられ、また役人になったこともあったが、早くに亡くなった。玄徳は幼くして孤児となり、母に孝を尽くした。家は貧しく、草履を売ったり筵を織ったりして生計を立てた。家は本県の楼桑村にあった。その家の東南には、高さ五丈余りの大きな桑の木があり、遠くから見ると、車蓋のようにこんもりとしていた。相者は言った。「この家からは必ず貴人が出るだろう。」10 辞書を開く 桃園で宴会を催し、豪...：玄徳が幼い頃、村の子供たちと木の下で遊んでいた時、「私は天子となり、この車蓋に乗るだろう。」と言った。叔父の劉元起はその言葉に驚き、「この子は並の人間ではない！」と言った。玄徳の家が貧しいのを見て、常に援助した。十五歳になると、母に命じられて遊学し、鄭玄、盧植に師事した。公孫瓚らと友となった。劉焉が兵を募る榜文を出した時、玄徳はすでに二十八歳であった。その日、榜文を見て、慨然とため息をついた。すると、一人の男が厳しい声で言った。「大丈夫が国のために尽力しないとは、なぜため息をつくのか？」11 辞書を開く 桃園で宴会を催し、豪...：玄徳はその男を振り返った。身長は八尺、豹の頭に環のような目、燕の顎に虎の髭、声は巨雷のよう、勢いは奔馬のようであった。玄徳はその容貌が尋常でないのを見て、姓名を尋ねた。その男は言った。「某は張といい、名は飛、字は翼徳。代々涿郡に住み、かなりの荘園を持ち、酒を売り豚を屠り、天下の豪傑と交わることを好んでおります。先ほど公が榜文を見てため息をつかれたのを見て、尋ねた次第です。」玄徳は言った。「私は漢室の宗親で、姓は劉、名は... [省略]"""
+
+def generate_content_sync():
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-preview-05-20",
+        contents=prompt + "三国志演義のこの回に登場する人物は何人ですか？ ",
+    )
+    print(response.usage_metadata)  # キャッシュヒット時にcache_tokens_detailsとcached_content_token_countフィールドが表示されます
+    return response
+
+generate_content_sync()
+```
+
+> キャッシュヒット時、`response.usage_metadata`は以下の構造を含みます。
+>
+> ```
+> cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+> cached_content_token_count=2003
+> ```
+
+**核心的な結論：**暗黙的なキャッシュは自動ヒットとヒットフィードバックをサポートします。開発者はusage_metadataを通じてヒット状況を判断できます。コスト削減は保証されず、実際の結果はリクエスト構造と使用シナリオによって異なります。
+
+## 関数呼び出し
+
+OpenAI互換方式でGeminiの関数呼び出し機能を使用する場合、リクエストボディ内に`tool_choice="auto"`を渡す必要があります。そうしないとエラーが発生します。
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+# モデルの関数宣言を定義
+schedule_meeting_function = {
+    "name": "schedule_meeting",
+    "description": "指定された参加者と日時で会議をスケジュールします。",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "attendees": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "会議に参加する人のリスト。",
+            },
+            "date": {
+                "type": "string",
+                "description": "会議の日付（例：'2024-07-29'）",
+            },
+            "time": {
+                "type": "string",
+                "description": "会議の時間（例：'15:00'）",
+            },
+            "topic": {
+                "type": "string",
+                "description": "会議の主題またはトピック。",
+            },
+        },
+        "required": ["attendees", "date", "time", "topic"],
+    },
+}
+
+# クライアントを設定
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+# OpenAI互換形式で関数宣言を含むリクエストを送信
+response = client.chat.completions.create(
+    model="gemini-2.0-flash",
+    messages=[
+        {"role": "user", "content": "BobとAliceとの会議を2025年3月14日午前10時にQ3計画についてスケジュールしてください。"}
+    ],
+    tools=[{"type": "function", "function": schedule_meeting_function}],
+    tool_choice="auto" ## 📍 ここにAiHubmix互換の、より安定したリクエスト方法を追加しました
+)
+
+# 関数呼び出しを確認
+if response.choices[0].message.tool_calls:
+    tool_call = response.choices[0].message.tool_calls[0]
+    function_call = tool_call.function
+    print(f"呼び出す関数: {function_call.name}")
+    print(f"引数: {function_call.arguments}")
+    print(response.usage)
+    # 実際のアプリでは、ここで関数を呼び出します。
+    # result = schedule_meeting(**json.loads(function_call.arguments))
+else:
+    print("応答に関数呼び出しが見つかりませんでした。")
+    print(response.choices[0].message.content)
+```
+
+</CodeGroup>
+
+**出力結果の例：**
+
+```bash
+呼び出す関数: schedule_meeting
+引数: {"attendees":["Bob","Alice"],"date":"2025-03-14","time":"10:00","topic":"Q3 planning"}
+CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, completion_tokens_details=None, prompt_tokens_details=None)
+```
+
+## トークン使用量追跡
+
+1. GeminiはネイティブAPIで`usage_metadata`を使用して[使用されたトークンを追跡](https://ai.google.dev/gemini-api/docs/tokens?lang=python)します。そのフィールドは以下の通りです。
+
+- prompt_token_count: 入力トークン数
+- candidates_token_count: 出力トークン数
+- thoughts_token_count: 推論に使用されたトークン数。性質上、これも出力トークンです。
+- total_token_count: 総トークン使用量（入力+出力）
+
+2. OpenAI互換形式の場合、`.usage`を使用して追跡します。フィールドは以下の通りです。
+
+- usage.completion_tokens: 入力トークン数
+- usage.prompt_tokens: 出力トークン数（推論に使用されたトークン数を含む）
+- usage.total_tokens: 総トークン使用量
+
+**使用方法は以下の通りです。**
+
+<CodeGroup>
+
+```py Gemini ネイティブ
+from google import genai
+from google.genai import types
+import time
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""金融分野の「72の法則」はどのように導き出されたのですか？"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    # すべてのチャンクの処理が完了した後、完全なトークン使用状況を出力
+    if final_usage_metadata:
+        print(f"\nUsage: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py OpenAI 互換
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", # "low", "medium", "high"から選択可能で、それぞれ1K、8K、24Kの思考トークン予算に対応します。思考を無効にしたい場合は、reasoning_effortを"none"に設定できます。
+    messages=[
+        {
+            "role": "user",
+            "content": "金融分野の「72の法則」はどのように導き出されたのですか？"
+        }
+    ],
+    stream=True
+)
+
+#print(completion.choices[0].message.content)
+
+for chunk in completion:
+    print(chunk.choices[0].delta)
+    # 最後のチャンク（完全な使用量データを含む）の場合にのみ使用量情報を出力
+    if chunk.usage and chunk.usage.completion_tokens > 0:
+        print(f"出力トークン: {chunk.usage.completion_tokens}")
+        print(f"入力トークン: {chunk.usage.prompt_tokens}")
+        print(f"総トークン: {chunk.usage.total_tokens}")
+```
+
+</CodeGroup>

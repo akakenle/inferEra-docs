@@ -1,0 +1,274 @@
+---
+title: "OpenAI Responses API サポート"
+icon: "o"
+---
+
+OpenAIのResponses APIの多機能インターフェースをサポートしており、現在利用可能な機能インターフェースは以下の通りです。
+
+- Text input：テキスト入力
+- Image input：画像とテキストの入力
+- Streaming：ストリーミング呼び出し
+- Web search：検索
+- Reasoning：推論の深さ、3段階をサポート
+- Functions：関数呼び出し
+- image_generation：描画ツール呼び出し、画像生成部分は `gpt-image-1` で課金されます
+- Code Interpreter：コード解析器
+- Remote MCP：MCP呼び出し
+- Computer Use：自動操作
+
+## 使用方法 (Python 呼び出し)：
+
+公式のOpenAI呼び出し方法と同じで、`api_key`と`base_url`を置き換えて転送するだけです。
+中国本土からも直接アクセスできます。
+
+```py
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+```
+
+推論モデルの場合、以下のパラメータを使用して推論の要約を出力できます。要約の詳細度は detailed > auto > None で、auto が最適なバランスです。
+
+```py
+"summary": "auto" 
+```
+
+<CodeGroup>
+
+```py テキスト
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest が利用可能
+  input="Tell me a three sentence bedtime story about a unicorn."
+)
+
+print(response)
+```
+
+
+```py 画像とテキスト
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4o-mini", # codex-mini-latest が利用可能
+    input=[
+        {
+            "role": "user",
+            "content": [
+                { "type": "input_text", "text": "what is in this image?" },
+                {
+                    "type": "input_image",
+                    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+                }
+            ]
+        }
+    ]
+)
+
+print(response)
+```
+
+
+```py ストリーミング
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest が利用可能
+  instructions="You are a helpful assistant.",
+  input="Hello!",
+  stream=True
+)
+
+for event in response:
+  print(event)
+```
+
+
+```py 検索
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest は検索をサポートしていません📍
+  tools=[{ "type": "web_search_preview" }],
+  input="What was a positive news story from today?",
+)
+
+print(response)
+```
+
+
+```py 推論
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1/"
+)
+
+response = client.responses.create(
+    model="o4-mini", # codex-mini-latest, o4-mini, o3-mini, o3, o1 をサポート
+    input="How much wood would a woodchuck chuck?",
+    reasoning={
+        "effort": "medium", # low, medium, high をサポート
+        "summary": "auto" # 推論の要約
+    }
+)
+
+print(response)
+```
+
+
+```py 関数呼び出し
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+tools = [
+    {
+        "type": "function",
+        "name": "get_current_weather",
+        "description": "Get the current weather in a given location",
+        "parameters": {
+          "type": "object",
+          "properties": {
+              "location": {
+                  "type": "string",
+                  "description": "The city and state, e.g. San Francisco, CA",
+              },
+              "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+          },
+          "required": ["location", "unit"],
+        }
+    }
+]
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest が利用可能
+  tools=tools,
+  input="What is the weather like in Boston today?",
+  tool_choice="auto"
+)
+
+print(response)
+```
+
+
+```py 画像生成ツール
+from openai import OpenAI
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Generate an image of gray tabby cat hugging an otter with an orange scarf",
+    tools=[{"type": "image_generation"}],
+)
+
+# 画像ファイルとして保存
+image_data = [
+    output.result
+    for output in response.output
+    if output.type == "image_generation_call"
+]
+
+if image_data:
+    image_base64 = image_data[0]
+    with open("cat_and_otter.png", "wb") as f:
+        f.write(base64.b64decode(image_base64))
+```
+
+
+```py コード解析器
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+instructions = """
+You are a personal math tutor. When asked a math question, 
+write and run code using the python tool to answer the question.
+"""
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[
+        {
+            "type": "code_interpreter",
+            "container": {"type": "auto"}
+        }
+    ],
+    instructions=instructions,
+    input="I need to solve the equation 3x + 11 = 14. Can you help me?",
+)
+
+print(resp.output)
+```
+
+
+```py Remote MCP
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "never",
+        "allowed_tools": ["ask_question"],
+    }],
+    input="What transport protocols does the 2025-03-26 version of the MCP spec (modelcontextprotocol/modelcontextprotocol) support?",
+)
+
+print(resp.output_text)
+```
+
+</CodeGroup>
+
+**注意：**
+
+1. 最新の `codex-mini-latest` は検索をサポートしていません
+2. Computer use は Praywright と連携して使用する必要があります。詳細は[公式リポジトリ](https://github.com/openai/openai-cua-sample-app)を参照してください。
+
+既知の詳細な問題：
+
+- 呼び出し例が複雑
+- スクリーンショットが多く、時間がかかり、タスクの成功率が低い
+- CAPTCHA認証またはCloudflareの人間認証がトリガーされ、無限ループに陥る可能性があります

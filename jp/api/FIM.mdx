@@ -1,0 +1,114 @@
+---
+title: "FIM補完"
+icon: "message-code"
+---
+
+### 1. 使用シナリオ
+
+FIM (Fill In the Middle) 補完タスクでは、ユーザーは保持したいプレフィックスとサフィックスの内容を入力し、モデルはこれらのヒントに基づいて中間で欠落している部分を生成します。この補完方法は、コードの自動補完やテキストの中間部分の生成などのアプリケーションシナリオでよく見られます。
+
+### 2. 使用方法
+
+chat/completionsインターフェースで使用し、`model id`を[モデル広場](https://aihubmix.com/models)のモデルIDに設定するだけで、モジュールカードの右上からコピーできます。
+
+```json
+{ 
+    "model": "model id",
+    "messages": "prompt",
+    "params": "params",
+    "extra_body": {"prefix":"プレフィックス内容", "suffix":"オプションのサフィックス内容"}
+}
+```
+
+completionsインターフェースで使用
+
+```json
+{
+    "model": "model info",
+    "prompt": "プレフィックス内容",
+    "suffix": "サフィックス内容"
+}
+```
+
+### 3. 使用例
+
+#### 3.1 OpenAIのchat.completionsインターフェースを使用したFIM補完：
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+messages = [
+    {"role": "user", "content": "合計関数コードを書いてください"},
+]
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    extra_body={
+            "prefix": f"""
+def sum_numbers(numbers):
+    # リストが空の場合、0を返す
+    if not numbers:
+        return 0
+""",
+            "suffix": f"""
+# テスト
+numbers = [1, 2, 3, 4, 5]
+result = sum_numbers(numbers)
+print("数字の合計:", result)
+"""
+    },
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end='')
+```
+
+</CodeGroup>
+
+
+
+#### 3.2 OpenAIのcompletionsインターフェースを使用したFIM補完：
+<CodeGroup>
+
+```py Python
+
+client = OpenAI(
+    api_key="Aihubmix APIKEY", 
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.completions.create(
+    model="deepseek-ai/DeepSeek-V2.5",
+    prompt=f"""
+def quick_sort(arr):
+    # 基本的なケース、配列の長さが1以下の場合、配列を返す
+    if len(arr) <= 1:
+        return arr
+    else:
+""",
+    suffix=f"""
+# quick_sort関数をテスト
+arr = [3, 6, 8, 10, 1, 2, 1]
+sorted_arr = quick_sort(arr)
+print("ソートされた配列:", sorted_arr)
+""",
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    print(chunk.choices[0].text, end='')
+```
+
+</CodeGroup>

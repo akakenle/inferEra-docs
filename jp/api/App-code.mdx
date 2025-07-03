@@ -1,0 +1,115 @@
+---
+title: "AI共栄エコシステムを構築"
+description: "Aihubmixは、開発者向けに全モデル10%割引を提供するアプリケーション識別コードAPP-Codeをリリースしました。"
+icon: "ticket"
+---
+
+主にAPI呼び出しコストを最適化するために使用され、**有効なドメインに基づいて識別コードの行を生成し、ヘッダーに追加するとすぐに有効になります。**
+
+- **プラットフォーム向け**：プラットフォーム側のすべてのAihubmix呼び出しコストが削減され、ユーザー自体には割引はありません。
+- **開発者または一般ユーザー向け**：あなたのツールから発行されたAihubmix呼び出しは、ユーザーが開始した場合でも割引の対象となります。
+
+統合して使用すると、使用量のログ詳細にリクエストの割引が表示されます。
+
+![画像](../media/app-code.png)
+
+## 1️⃣ 呼び出し方法：
+
+<CodeGroup>
+
+```shell Curl 方式
+curl https://aihubmix.com/v1/responses \       
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -H "APP-Code:***" \
+  -d '{
+    "model": "gpt-4o-2024-11-20",
+    "input": "Hello! Please say Hello back to me."
+  }'
+```
+
+
+```py Openai sdk 方式
+completion = client.chat.completions.create(
+  extra_headers={
+    "APP-Code":"***"
+  },
+  model="gpt-4o",
+  messages=[
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+)
+```
+
+</CodeGroup>
+
+## 2️⃣ 注意事項
+
+1. Geminiのヘッダーは少し特殊なので、次のように追加します。
+
+```py Python
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+        http_options={
+            "base_url": "https://api.aihubmix.com/gemini",
+            "headers": {
+                "APP-Code": "***"
+            }
+        },
+    )
+```
+
+2. Claudeのネイティブ呼び出しもextra_headersを追加します。
+
+```py Python
+import os
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 🔑 AiHubMixで生成したキーに置き換えてください
+    base_url="https://aihubmix.com"
+)
+
+message = client.messages.create(
+    extra_headers={"APP-Code":"***"},
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hello, Claude"}
+    ]
+)
+
+print(message.content) 
+```
+
+## 3️⃣ 割引利用規約
+
+APP-Codeを利用して割引を受ける際は、以下の利用規約を厳守してください。AiHubMixはすべての規約に対する最終的な解釈権を留保します。
+
+<Note>
+  **オープンソース製品の使用規範**
+
+  あなたの製品がオープンソースである場合、製品機能にAiHubMixをAIモデルプロバイダーの1つとして示すだけで十分です。形式は問いません。
+</Note>
+
+<Note>
+  **クローズドソース製品の使用規範**
+
+  あなたの製品がクローズドソースである場合、製品インターフェース、ユーザー契約、または関連する説明書にモデルサービス元を明記する必要があります。
+
+  例：
+
+  - 「AiHubMixがAIモデル技術サポートを提供」
+  - 「AIモデルサービスはAiHubMixから提供」
+  - アプリケーションの「バージョン情報」ページまたはヘルプドキュメントに関連情報を記載
+</Note>
+
+<Note>
+  **キャンペーン期間の説明**
+
+  APP-Code割引キャンペーンの有効期限は**2025年12月31日**までです。
+  割引ポリシーは変更される可能性がありますので、最新の割引情報は公式発表にご注意ください。
+</Note>
