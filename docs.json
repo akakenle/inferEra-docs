@@ -258,6 +258,10 @@
         "header": "Resources",
         "items": [
           {
+            "label": "llms.txt",
+            "href": "https://docs.aihubmix.com/en/llms.txt"
+          },
+          {
             "label": "Auth Reference",
             "href": "https://docs.aihubmix.com/cn/api/Auth"
           },
