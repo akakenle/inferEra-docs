@@ -367,7 +367,7 @@
         "items": [
           {
             "label": "llms.txt",
-            "href": "https://docs.aihubmix.com/llms.txt"
+            "href": "https://docs.aihubmix.com/public/llms.txt"
           },
           {
             "label": "Auth Reference",
@@ -408,7 +408,7 @@
       "destination": "/en/index"
     },
     {
-      "source": "/llms.txt",
+      "source": "/public/llms.txt",
       "destination": "/llms",
       "permanent": false
     }
