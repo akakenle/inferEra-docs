@@ -6,7 +6,7 @@
 
 **Comprehensive Model Support:**
 - **Language Models**: ChatGPT, Claude, Gemini, Qwen, Deepseek, and more
-- **Image Generation**: GPT Image-1, DALL-E 3, Ideogram V3, Stability SD 3.5, Google Imagen
+- **Image Generation**: GPT Image-1, DALL-E 3, Ideogram V3, Stability SD 3.5 Large, Google Imagen
 - **Audio & Speech**: Advanced text-to-speech with multiple voice options
 - **Embeddings & Search**: Jina AI embeddings, reranking, and enhanced search capabilities
 
