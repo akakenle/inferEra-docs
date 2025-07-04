@@ -441,6 +441,114 @@
             ]
           }
         ]
+      },
+      {
+        "language": "zh",
+        "tabs": [
+          {
+            "tab": "User Guide",
+            "groups": [
+              {
+                "group": "Basics",
+                "pages": [
+                  "zh/index",
+                  "zh/quick-start",
+                  "zh/api-playground/inferUsages",
+                  "zh/api/Dify-plugin"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": [
+                  "zh/api/Model-Information",
+                  "zh/api/Model-List",
+                  "zh/api/OpenAI-library",  
+                  "zh/api/Responses-API",  
+                  "zh/api/GPT-Image-1",
+                  "zh/api/GPT-4o-image",
+                  "zh/api/Image-Gen",
+                  "zh/api/FIM",
+                  "zh/api/Codex-CLI",
+                  "zh/api/Non-OpenAI-Models",
+                  "zh/api/LLM-Search",
+                  "zh/api/General-Model-Forwarding",
+                  "zh/api/Claude-Native",
+                  "zh/api/Claude-Code",
+                  "zh/api/Claude-Text-Edit-Tool",
+                  "zh/api/Claude-Cache",
+                  "zh/api/Gemini-Guides",
+                  "zh/api/Multimodal-Interaction-with-Gemini",
+                  "zh/api/Gemini-Cli",
+                  "zh/api/Qwen",
+                  "zh/api/TTS",
+                  "zh/api/IdeogramAI",
+                  "zh/api/Jina-AI",
+                  "zh/api/Cli",
+                  "zh/api/App-code",
+                  "zh/api/Auth"
+                ]
+              },
+              {
+                "group": "Terms and Privacy",
+                "pages": [
+                  "zh/terms-and-privacy/Terms",
+                  "zh/terms-and-privacy/Privacy"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Use Cases",
+            "pages": [
+              "zh/clients/Cherry-Studio",
+              "zh/clients/AnythingLLM",
+              "zh/clients/Avante.nvim",
+              "zh/clients/Bob",
+              "zh/clients/ChatAll",
+              "zh/clients/ChatBox",
+              "zh/clients/ChatGPT-Next-Web",
+              "zh/clients/ChatHub",
+              "zh/clients/Chatx",
+              "zh/clients/Cline",
+              "jp/clients/Cursor",
+              "zh/clients/Dify",
+              "zh/clients/GPT-Academic",
+              "zh/clients/Gptme",
+              "zh/clients/LangChain",
+              "zh/clients/LibreChat",
+              "zh/clients/Lobe-Chat",
+              "zh/clients/Obsidian",
+              "zh/clients/Open-WebUI",
+              "zh/clients/OpenAI-Translator",
+              "zh/clients/Pot-App",
+              "zh/clients/Utools-ChatGPT",
+              "zh/clients/Zotero",
+              "zh/clients/Immersive-Translate",
+              "zh/clients/On-CS",
+              "jp/clients/Oulu"
+            ]
+          },
+          {
+            "tab": "FAQs",
+            "pages": [
+              "zh/FAQs/faq",
+              "zh/FAQs/HTTP-Codes",
+              "zh/FAQs/Human-Customer-Support"
+            ]
+          },
+          {
+            "tab": "Updates",
+            "pages": [
+              "zh/changelog/News"
+            ]
+          },
+          {
+            "tab": "Blogs",
+            "pages": [
+              "zh/blogs/Building"
+            ]
+          }
+        ]
       }
     ]
   },
