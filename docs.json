@@ -408,7 +408,7 @@
       "destination": "/en/index"
     },
     {
-      "source": "/llms",
+      "source": "/llms.txt",
       "destination": "/public/llms.txt",
       "permanent": false
     }
