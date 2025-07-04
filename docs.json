@@ -583,7 +583,7 @@
         "items": [
           {
             "label": "llms.txt",
-            "href": "https://yinchao.oss-cn-hangzhou.aliyuncs.com/docs/llms.txt"
+            "href": "https://docs.aihubmix.com/en/llms"
           },
           {
             "label": "Auth Reference",
@@ -622,6 +622,10 @@
     {
       "source": "/en",
       "destination": "/en/index"
+    },
+    {
+      "source": "/en/llms",
+      "destination": "https://yinchao.oss-cn-hangzhou.aliyuncs.com/docs/llms.txt"
     }
   ],
   "integrations": {
