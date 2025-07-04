@@ -443,7 +443,7 @@
         ]
       },
       {
-        "language": "zh",
+        "language": "zh-Hant",
         "tabs": [
           {
             "tab": "User Guide",
@@ -451,48 +451,48 @@
               {
                 "group": "Basics",
                 "pages": [
-                  "zh/index",
-                  "zh/quick-start",
-                  "zh/api-playground/inferUsages",
-                  "zh/api/Dify-plugin"
+                  "zh-Hant/index",
+                  "zh-Hant/quick-start",
+                  "zh-Hant/api-playground/inferUsages",
+                  "zh-Hant/api/Dify-plugin"
                 ]
               },
               {
                 "group": "API",
                 "pages": [
-                  "zh/api/Model-Information",
-                  "zh/api/Model-List",
-                  "zh/api/OpenAI-library",  
-                  "zh/api/Responses-API",  
-                  "zh/api/GPT-Image-1",
-                  "zh/api/GPT-4o-image",
-                  "zh/api/Image-Gen",
-                  "zh/api/FIM",
-                  "zh/api/Codex-CLI",
-                  "zh/api/Non-OpenAI-Models",
-                  "zh/api/LLM-Search",
-                  "zh/api/General-Model-Forwarding",
-                  "zh/api/Claude-Native",
-                  "zh/api/Claude-Code",
-                  "zh/api/Claude-Text-Edit-Tool",
-                  "zh/api/Claude-Cache",
-                  "zh/api/Gemini-Guides",
-                  "zh/api/Multimodal-Interaction-with-Gemini",
-                  "zh/api/Gemini-Cli",
-                  "zh/api/Qwen",
-                  "zh/api/TTS",
-                  "zh/api/IdeogramAI",
-                  "zh/api/Jina-AI",
-                  "zh/api/Cli",
-                  "zh/api/App-code",
-                  "zh/api/Auth"
+                  "zh-Hant/api/Model-Information",
+                  "zh-Hant/api/Model-List",
+                  "zh-Hant/api/OpenAI-library",  
+                  "zh-Hant/api/Responses-API",  
+                  "zh-Hant/api/GPT-Image-1",
+                  "zh-Hant/api/GPT-4o-image",
+                  "zh-Hant/api/Image-Gen",
+                  "zh-Hant/api/FIM",
+                  "zh-Hant/api/Codex-CLI",
+                  "zh-Hant/api/Non-OpenAI-Models",
+                  "zh-Hant/api/LLM-Search",
+                  "zh-Hant/api/General-Model-Forwarding",
+                  "zh-Hant/api/Claude-Native",
+                  "zh-Hant/api/Claude-Code",
+                  "zh-Hant/api/Claude-Text-Edit-Tool",
+                  "zh-Hant/api/Claude-Cache",
+                  "zh-Hant/api/Gemini-Guides",
+                  "zh-Hant/api/Multimodal-Interaction-with-Gemini",
+                  "zh-Hant/api/Gemini-Cli",
+                  "zh-Hant/api/Qwen",
+                  "zh-Hant/api/TTS",
+                  "zh-Hant/api/IdeogramAI",
+                  "zh-Hant/api/Jina-AI",
+                  "zh-Hant/api/Cli",
+                  "zh-Hant/api/App-code",
+                  "zh-Hant/api/Auth"
                 ]
               },
               {
                 "group": "Terms and Privacy",
                 "pages": [
-                  "zh/terms-and-privacy/Terms",
-                  "zh/terms-and-privacy/Privacy"
+                  "zh-Hant/terms-and-privacy/Terms",
+                  "zh-Hant/terms-and-privacy/Privacy"
                 ]
               }
             ]
@@ -500,52 +500,52 @@
           {
             "tab": "Use Cases",
             "pages": [
-              "zh/clients/Cherry-Studio",
-              "zh/clients/AnythingLLM",
-              "zh/clients/Avante.nvim",
-              "zh/clients/Bob",
-              "zh/clients/ChatAll",
-              "zh/clients/ChatBox",
-              "zh/clients/ChatGPT-Next-Web",
-              "zh/clients/ChatHub",
-              "zh/clients/Chatx",
-              "zh/clients/Cline",
+              "zh-Hant/clients/Cherry-Studio",
+              "zh-Hant/clients/AnythingLLM",
+              "zh-Hant/clients/Avante.nvim",
+              "zh-Hant/clients/Bob",
+              "zh-Hant/clients/ChatAll",
+              "zh-Hant/clients/ChatBox",
+              "zh-Hant/clients/ChatGPT-Next-Web",
+              "zh-Hant/clients/ChatHub",
+              "zh-Hant/clients/Chatx",
+              "zh-Hant/clients/Cline",
               "jp/clients/Cursor",
-              "zh/clients/Dify",
-              "zh/clients/GPT-Academic",
-              "zh/clients/Gptme",
-              "zh/clients/LangChain",
-              "zh/clients/LibreChat",
-              "zh/clients/Lobe-Chat",
-              "zh/clients/Obsidian",
-              "zh/clients/Open-WebUI",
-              "zh/clients/OpenAI-Translator",
-              "zh/clients/Pot-App",
-              "zh/clients/Utools-ChatGPT",
-              "zh/clients/Zotero",
-              "zh/clients/Immersive-Translate",
-              "zh/clients/On-CS",
+              "zh-Hant/clients/Dify",
+              "zh-Hant/clients/GPT-Academic",
+              "zh-Hant/clients/Gptme",
+              "zh-Hant/clients/LangChain",
+              "zh-Hant/clients/LibreChat",
+              "zh-Hant/clients/Lobe-Chat",
+              "zh-Hant/clients/Obsidian",
+              "zh-Hant/clients/Open-WebUI",
+              "zh-Hant/clients/OpenAI-Translator",
+              "zh-Hant/clients/Pot-App",
+              "zh-Hant/clients/Utools-ChatGPT",
+              "zh-Hant/clients/Zotero",
+              "zh-Hant/clients/Immersive-Translate",
+              "zh-Hant/clients/On-CS",
               "jp/clients/Oulu"
             ]
           },
           {
             "tab": "FAQs",
             "pages": [
-              "zh/FAQs/faq",
-              "zh/FAQs/HTTP-Codes",
-              "zh/FAQs/Human-Customer-Support"
+              "zh-Hant/FAQs/faq",
+              "zh-Hant/FAQs/HTTP-Codes",
+              "zh-Hant/FAQs/Human-Customer-Support"
             ]
           },
           {
             "tab": "Updates",
             "pages": [
-              "zh/changelog/News"
+              "zh-Hant/changelog/News"
             ]
           },
           {
             "tab": "Blogs",
             "pages": [
-              "zh/blogs/Building"
+              "zh-Hant/blogs/Building"
             ]
           }
         ]
