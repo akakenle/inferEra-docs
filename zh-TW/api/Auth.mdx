@@ -1,0 +1,1027 @@
+---
+title: "第三方應用接入指南"
+description: " "
+icon: "webhook"
+---
+
+## 重要安全聲明
+
+安全第一原則：在開發和部署第三方應用時，安全性是最重要的考慮因素。必須嚴格遵守以下安全原則，確保用戶資料和授權流程的安全性。
+
+<Warning>
+1. 絕對禁止在前端 JavaScript 程式碼中暴露 `client_secret`
+2. 必須在伺服器端處理 OAuth 授權碼交換 token 的過程
+3. 必須透過後端 API 代理存取受保護的用戶資源
+4. 必須使用 HTTPS 協定保護所有 OAuth 通訊
+</Warning>
+
+違反以上任何一條安全原則都可能導致嚴重的安全漏洞！
+
+## 📋 目錄
+
+1. [概述](#概述)
+2. [接入準備](#接入準備)
+3. [OAuth2 授權流程](#oauth2授權流程)
+4. [API介面文件](#api介面文件)
+5. [SDK和程式碼範例](#sdk和程式碼範例)
+6. [安全最佳實踐](#安全最佳實踐)
+7. [常見問題](#常見問題)
+8. [技術支援](#技術支援)
+
+## 概述
+
+我們提供基於 OAuth2 標準的開放 API，允許第三方應用安全地存取用戶的基本資訊和帳戶餘額。透過我們的 OAuth2 服務，您的應用可以：
+
+- 🚀 一鍵登入：用戶無需重複註冊，登入完成即自動授權，真正的無縫體驗
+- 👤 取得用戶資訊：存取用戶的基本資料（用戶名、電子郵件等）
+- 💰 查看帳戶餘額：即時取得用戶的帳戶餘額資訊
+- 🔄 儲值跳轉：引導用戶到我們的儲值頁面進行帳戶儲值
+- 🔐 自動token刷新：內建 refresh token 機制，無感刷新過期 token，提升用戶體驗
+
+## 接入準備
+
+### 1. 註冊開發者帳戶
+
+首先，您需要在我們的系統中註冊一個開發者帳戶。
+
+### 2. 建立 OAuth 應用
+
+在開發者控制台中建立您的 OAuth 應用：
+
+```shell API 呼叫範例
+curl -X POST https://api.aihubmix.com/api/oauth_apps \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_DEVELOPER_TOKEN" \
+  -d '{
+    "name": "我的第三方應用",
+    "description": "應用描述資訊",
+    "redirect_uri": "https://yourapp.com/oauth/callback"
+  }'
+```
+
+回應範例：
+
+```json
+{
+  "success": true,
+  "message": "應用建立成功",
+  "data": {
+    "id": 1,
+    "name": "我的第三方應用",
+    "client_id": "client_abc123def456...",
+    "client_secret": "secret_xyz789uvw012...",
+    "redirect_uri": "https://yourapp.com/oauth/callback",
+    "created_time": 1640995200
+  }
+}
+```
+
+安全重要提醒：
+<Warning>
+- client_id 可以在前端使用（公開資訊）
+- `client_secret` 只能在伺服器端使用，絕不能暴露給瀏覽器
+- 請將 client_secret 儲存在環境變數中，不要硬編碼在程式碼中
+</Warning>
+
+### 3. 配置回調地址
+
+確保您的回調地址（redirect_uri）滿足以下要求：
+
+- 使用HTTPS協定（生產環境）
+- 指向您的伺服器端點（而非前端頁面）
+- 域名已備案且可正常存取
+- 路徑具體到處理回調的API端點
+
+
+## OAuth2 授權流程
+
+### 安全流程圖
+
+```mermaid
+sequenceDiagram
+    participant Browser  as 用戶瀏覽器
+    participant Backend  as 您的伺服器
+    participant OAuthSrv as 我們的伺服器
+
+    %% 登入入口
+    Browser  ->> Backend : GET /auth<br>(用戶點擊登入)
+
+    %% 生成並保存 state，隨後跳轉
+    Backend  ->> Backend : 生成 state<br>儲存 state
+    Backend  ->> OAuthSrv: 重定向到授權<br>(帶 client_id)
+
+    %% 展示授權頁並完成授權
+    OAuthSrv -->> Browser : 顯示授權頁面
+    Browser  ->> Browser : 用戶完成授權
+
+    %% 授權伺服器透過瀏覽器回調
+    Browser  ->> Backend : GET /callback
+    Backend  ->> Backend : 驗證 state
+    Backend  ->> OAuthSrv: 用授權碼換 token<br>(帶 secret)
+    OAuthSrv -->> Backend : 驗證並返回 token
+
+    %% 保存 token 並回到前端
+    Backend  ->> Backend : 儲存 token
+    Backend  -->> Browser : 重定向到前端
+
+    %% 拉取用戶資訊
+    Browser  ->> Browser : 顯示用戶資訊
+    Browser  ->> Backend : GET /api/user
+    Backend  ->> OAuthSrv: 用 token 請求用戶資訊
+    OAuthSrv -->> Backend : 返回用戶資訊
+    Backend  -->> Browser : 返回用戶資訊
+```
+
+### 詳細步驟
+
+#### 步驟 1：引導用戶授權
+
+在您的前端頁面添加登入按鈕，點擊後重定向到您的伺服器端授權端點：
+
+```js 前端程式碼 - 只負責重定向
+function startLogin() {
+    // 重定向到您的伺服器端授權處理端點
+    window.location.href = '/auth/oauth/start';
+}
+```
+
+#### 步驟 2：伺服器端處理授權請求
+
+在您的伺服器端實現授權處理：
+
+```js 伺服器端程式碼
+app.get('/auth/oauth/start', (req, res) => {
+    // 生成並儲存state參數
+    const state = generateSecureRandomString();
+    req.session.oauth_state = state;
+    
+    // 建構授權URL
+    const authUrl = new URL('https://your-domain.com/api/oauth2/authorize');
+    authUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID);
+    authUrl.searchParams.append('redirect_uri', process.env.OAUTH_REDIRECT_URI);
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('scope', 'profile balance');
+    authUrl.searchParams.append('state', state);
+    authUrl.searchParams.append('auto_authorize', 'true'); // 一鍵登入
+    
+    // 重定向到授權伺服器
+    res.redirect(authUrl.toString());
+});
+```
+
+#### 步驟 3：處理授權回調（伺服器端）
+
+```js 伺服器端處理授權回調
+app.get('/oauth/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    
+    // 錯誤處理
+    if (error) {
+        return res.redirect(`/?error=${encodeURIComponent(error)}`);
+    }
+    
+    // 參數驗證
+    if (!code || !state) {
+        return res.redirect('/?error=missing_parameters');
+    }
+    
+    // 驗證state參數（防CSRF攻擊）
+    if (state !== req.session.oauth_state) {
+        return res.redirect('/?error=invalid_state');
+    }
+    
+    try {
+        // 用授權碼換取存取令牌（在伺服器端完成）
+        const tokenResponse = await fetch('https://your-domain.com/api/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: process.env.OAUTH_REDIRECT_URI,
+                client_id: process.env.OAUTH_CLIENT_ID,
+                client_secret: process.env.OAUTH_CLIENT_SECRET // 只在伺服器端使用
+            })
+        });
+        
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenResponse.ok) {
+            throw new Error(tokenData.error || 'Token exchange failed');
+        }
+        
+        // 安全儲存token（伺服器端session或資料庫）
+        req.session.access_token = tokenData.access_token;
+        req.session.refresh_token = tokenData.refresh_token;
+        req.session.token_expires_at = Date.now() + (tokenData.expires_in * 1000);
+        
+        // 清理臨時狀態
+        delete req.session.oauth_state;
+        
+        // 重定向到前端頁面
+        res.redirect('/?login=success');
+        
+    } catch (error) {
+        console.error('OAuth callback error:', error);
+        res.redirect(`/?error=server_error`);
+    }
+});
+```
+
+#### 步驟 4：前端獲取用戶資訊
+
+```js 前端透過 API 代理獲取用戶資訊
+async function loadUserInfo() {
+    try {
+        const response = await fetch('/api/user/info');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch user info');
+        }
+        
+        const userInfo = await response.json();
+        displayUserInfo(userInfo);
+        
+    } catch (error) {
+        console.error('Failed to load user info:', error);
+        showLoginButton();
+    }
+}
+```
+
+```js 伺服器端API代理
+app.get('/api/user/info', async (req, res) => {
+    const accessToken = req.session.access_token;
+    
+    if (!accessToken) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    try {
+        // 代理請求到OAuth伺服器
+        const response = await fetch('https://your-domain.com/api/oauth2/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('User info request failed');
+        }
+        
+        const userInfo = await response.json();
+        res.json(userInfo);
+        
+    } catch (error) {
+        console.error('User info proxy error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+```
+
+<Tips>
+一鍵登入體驗：設定 `auto_authorize=true` 後，用戶只需要完成登入操作，系統會自動完成授權，無需額外的確認步驟。
+</Tips>
+
+## API 介面文件
+
+### 1. 授權端點
+
+GET `/api/oauth2/authorize`
+
+引導用戶進行 OAuth2 授權。
+
+參數：
+| 參數 | 類型 | 必填 | 說明 |
+| --- | --- | --- | --- |
+| `client_id` | string | 是 | 應用的客戶端ID（可在前端使用） |
+| `redirect_uri` | string | 是 | 授權後的回調地址（必須指向伺服器端點） |
+| `response_type` | string | 是 | 固定值：`code` |
+| `scope` | string | 否 | 權限範圍，多個用空格分隔 |
+| `state` | string | 必填 | 防CSRF攻擊的隨機字串（伺服器端生成） |
+| `auto_authorize` | string | 否 | 設為 `true` 時啟用自動授權 |
+
+安全要求：
+- `redirect_uri` 必須與註冊時的地址完全匹配
+- `state` 參數必須是伺服器端生成的隨機字串
+- 必須使用 HTTPS 協定（生產環境）
+
+Scope 說明：
+- `profile`：獲取用戶基本資訊（用戶名、電子郵件）
+- `balance`：獲取用戶帳戶餘額資訊
+
+### 2. 令牌(Token)獲取端點
+
+POST `/api/oauth2/token`
+
+<Warning>
+安全警告：此端點只能從伺服器端呼叫，絕不能在前端使用！
+</Warning>
+
+用於兩種場景：
+1. 使用授權碼換取存取令牌
+2. 使用刷新令牌獲取新的存取令牌
+
+授權碼模式參數：
+| 參數 | 類型 | 必填 | 說明 |
+| --- | --- | --- | --- |
+| `grant_type` | string | 是 | 固定值：`authorization_code` |
+| `code` | string | 是 | 授權碼 |
+| `redirect_uri` | string | 是 | 必須與授權時的地址一致 |
+| `client_id` | string | 是 | 應用的客戶端 ID |
+| `client_secret` | string | 是 | 應用的客戶端密鑰（只能在伺服器端使用） |
+
+
+刷新令牌參數：
+| 參數 | 類型 | 必填 | 說明 |
+| --- | --- | --- | --- |
+| `grant_type` | string | 是 | 固定值：`refresh_token` |
+| `refresh_token` | string | 是 | 刷新令牌 |
+| `client_id` | string | 是 | 應用的客戶端ID |
+| `client_secret` | string | 是 | 應用的客戶端密鑰（只能在伺服器端使用） |
+
+回應範例：
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "refresh_token": "refresh_abc123def456...",
+  "scope": "profile balance"
+}
+```
+
+### 3. 用戶資訊端點
+
+GET `/api/oauth2/userinfo`
+
+獲取用戶基本資訊和帳戶餘額。
+
+請求頭：
+```json header
+Authorization: Bearer {access_token}
+```
+
+回應範例：
+```json response
+{
+  "id": 12345,
+  "username": "user123",
+  "email": "user@example.com",
+  "quota": 1000000,
+  "used_quota": 250000,
+  "balance_formatted": "750.00",
+  "created_time": 1640995200,
+  "status": 1
+}
+```
+
+## SDK 和程式碼範例
+
+### JavaScript SDK
+
+我們提供了完整的 JavaScript SDK，您可以直接使用：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>第三方應用範例</title>
+    <style>
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .user-info { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .login-section { text-align: center; padding: 40px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>我的第三方應用</h1>
+        
+        <!-- 加載狀態 -->
+        <div id="loading">
+            <p>檢查登入狀態中...</p>
+        </div>
+        
+        <!-- 已登入用戶資訊 -->
+        <div id="user-info" class="user-info hidden">
+            <h2>歡迎回來！</h2>
+            <p><strong>用戶名：</strong><span id="username"></span></p>
+            <p><strong>電子郵件：</strong><span id="email"></span></p>
+            <p><strong>帳戶餘額：</strong><span id="balance"></span></p>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="refreshBalance()">刷新餘額</button>
+                <button class="btn btn-primary" onclick="goToTopup()">帳戶儲值</button>
+                <button class="btn btn-secondary" onclick="logout()">登出</button>
+            </div>
+        </div>
+        
+        <!-- 未登入狀態 -->
+        <div id="login-section" class="login-section hidden">
+            <h2>請登入以查看帳戶資訊</h2>
+            <p>使用一鍵登入快速存取您的帳戶</p>
+            <button class="btn btn-primary" onclick="oneClickLogin()">
+                🚀 一鍵登入
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // OAuth配置
+        const OAUTH_CONFIG = {
+            authServer: 'https://your-domain.com',
+            clientId: 'YOUR_CLIENT_ID',
+            clientSecret: 'YOUR_CLIENT_SECRET', // 生產環境應該在後端處理
+            redirectUri: window.location.origin + '/oauth/callback.html',
+            scope: 'profile balance'
+        };
+
+        class OAuthManager {
+            constructor() {
+                this.accessToken = localStorage.getItem('oauth_access_token');
+                this.refreshToken = localStorage.getItem('oauth_refresh_token');
+                this.tokenExpiresAt = localStorage.getItem('oauth_token_expires_at');
+                this.isRefreshing = false; // 防止並發刷新
+                this.init();
+            }
+
+            async init() {
+                // 檢查URL中是否有授權碼
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const state = urlParams.get('state');
+
+                if (code) {
+                    await this.handleAuthCallback(code, state);
+                    // 清理URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else if (this.accessToken) {
+                    try {
+                        // 檢查token是否過期，如果過期嘗試刷新
+                        if (this.isTokenExpired()) {
+                            await this.refreshTokenIfNeeded();
+                        }
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    } catch (error) {
+                        console.log('Token可能已過期或無效，需要重新登入');
+                        this.clearTokens();
+                        this.showLoginSection();
+                    }
+                } else {
+                    this.showLoginSection();
+                }
+
+                document.getElementById('loading').classList.add('hidden');
+            }
+
+            // 檢查access token是否過期
+            isTokenExpired() {
+                if (!this.tokenExpiresAt) return false;
+                const expiryTime = parseInt(this.tokenExpiresAt);
+                const bufferTime = 5 * 60 * 1000; // 5分鐘緩衝時間
+                return Date.now() > (expiryTime - bufferTime);
+            }
+
+            // 自動刷新token
+            async refreshTokenIfNeeded() {
+                if (!this.refreshToken || this.isRefreshing) {
+                    return false;
+                }
+
+                this.isRefreshing = true;
+                
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'refresh_token',
+                            refresh_token: this.refreshToken,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                        })
+                    });
+
+                    if (response.ok) {
+                        const tokenData = await response.json();
+                        this.updateTokens(tokenData);
+                        return true;
+                    } else {
+                        throw new Error('Token refresh failed');
+                    }
+                } catch (error) {
+                    console.error('刷新token失敗:', error);
+                    this.clearTokens();
+                    return false;
+                } finally {
+                    this.isRefreshing = false;
+                }
+            }
+
+            // 更新token資訊
+            updateTokens(tokenData) {
+                this.accessToken = tokenData.access_token;
+                this.refreshToken = tokenData.refresh_token;
+                this.tokenExpiresAt = Date.now() + (tokenData.expires_in * 1000);
+
+                localStorage.setItem('oauth_access_token', this.accessToken);
+                localStorage.setItem('oauth_refresh_token', this.refreshToken);
+                localStorage.setItem('oauth_token_expires_at', this.tokenExpiresAt.toString());
+            }
+
+            oneClickLogin() {
+                const state = this.generateState();
+                localStorage.setItem('oauth_state', state);
+
+                const authUrl = `${OAUTH_CONFIG.authServer}/api/oauth2/authorize?` +
+                    `client_id=${OAUTH_CONFIG.clientId}&` +
+                    `redirect_uri=${encodeURIComponent(OAUTH_CONFIG.redirectUri)}&` +
+                    `response_type=code&` +
+                    `scope=${encodeURIComponent(OAUTH_CONFIG.scope)}&` +
+                    `state=${state}&` +
+                    `auto_authorize=true`; // 啟用自動授權，實現真正的一鍵登入
+
+                // 在彈窗中打開授權頁面
+                const popup = window.open(authUrl, 'oauth_login', 'width=500,height=600,scrollbars=yes');
+
+                // 監聽彈窗關閉
+                const checkClosed = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(checkClosed);
+                        // 檢查是否獲得了授權
+                        setTimeout(() => this.init(), 1000);
+                    }
+                }, 1000);
+            }
+
+            async handleAuthCallback(code, state) {
+                const savedState = localStorage.getItem('oauth_state');
+                if (state !== savedState) {
+                    console.error('State參數不匹配');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'authorization_code',
+                            code: code,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                            redirect_uri: OAUTH_CONFIG.redirectUri
+                        })
+                    });
+
+                    const tokenData = await response.json();
+                    
+                    if (tokenData.access_token) {
+                        this.updateTokens(tokenData);
+                        localStorage.removeItem('oauth_state');
+                        
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    }
+                } catch (error) {
+                    console.error('獲取訪問令牌失敗:', error);
+                }
+            }
+
+            // 帶自動刷新的API請求方法
+            async apiRequest(url, options = {}) {
+                // 檢查並刷新token
+                if (this.isTokenExpired()) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (!refreshed) {
+                        throw new Error('Unable to refresh token');
+                    }
+                }
+
+                const headers = {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    ...options.headers
+                };
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                // 如果收到401錯誤，嘗試刷新token並重試一次
+                if (response.status === 401 && !options._retry) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (refreshed) {
+                        return this.apiRequest(url, { ...options, _retry: true });
+                    }
+                }
+
+                return response;
+            }
+
+            async fetchUserInfo() {
+                const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`);
+
+                if (!response.ok) {
+                    throw new Error('獲取用戶資訊失敗');
+                }
+
+                this.userInfo = await response.json();
+            }
+
+            showUserInfo() {
+                document.getElementById('username').textContent = this.userInfo.username;
+                document.getElementById('email').textContent = this.userInfo.email;
+                document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('login-section').classList.add('hidden');
+            }
+
+            showLoginSection() {
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('login-section').classList.remove('hidden');
+            }
+
+            async refreshBalance() {
+                try {
+                    await this.fetchUserInfo();
+                    document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+                    alert('餘額已更新');
+                } catch (error) {
+                    alert('刷新失敗，請重新登入');
+                    this.clearTokens();
+                    this.showLoginSection();
+                }
+            }
+
+            async goToTopup() {
+                try {
+                    const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/topup`);
+
+                    const data = await response.json();
+                    if (data.topup_url) {
+                        window.open(data.topup_url, '_blank');
+                    }
+                } catch (error) {
+                    console.error('獲取儲值連結失敗:', error);
+                }
+            }
+
+            logout() {
+                this.clearTokens();
+                this.showLoginSection();
+            }
+
+            clearTokens() {
+                this.accessToken = null;
+                this.refreshToken = null;
+                this.tokenExpiresAt = null;
+                this.userInfo = null;
+                
+                localStorage.removeItem('oauth_access_token');
+                localStorage.removeItem('oauth_refresh_token');
+                localStorage.removeItem('oauth_token_expires_at');
+            }
+
+            generateState() {
+                return Math.random().toString(36).substring(2, 15) + 
+                       Math.random().toString(36).substring(2, 15);
+            }
+        }
+
+        // 全域函數
+        let oauthManager;
+
+        function oneClickLogin() {
+            oauthManager.oneClickLogin();
+        }
+
+        function refreshBalance() {
+            oauthManager.refreshBalance();
+        }
+
+        function goToTopup() {
+            oauthManager.goToTopup();
+        }
+
+        function logout() {
+            oauthManager.logout();
+        }
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            oauthManager = new OAuthManager();
+        });
+    </script>
+</body>
+</html>
+```
+
+### OAuth 回調頁面
+
+建立 `/oauth/callback.html` 文件：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>登入處理中...</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .loading { color: #666; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h2>登入處理中，請稍候...</h2>
+    <div id="status" class="loading">正在驗證授權資訊...</div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+
+        if (error) {
+            document.getElementById('status').innerHTML = 
+                `<div class="error">授權失敗: ${error}</div>`;
+            setTimeout(() => {
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.location.href = '/';
+                }
+            }, 3000);
+        } else if (code) {
+            if (window.opener) {
+                // 如果是彈窗，關閉並讓父視窗處理
+                window.opener.location.href = 
+                    window.opener.location.pathname + `?code=${code}&state=${state}`;
+                window.close();
+            } else {
+                // 如果不是彈窗，重定向到主頁面
+                window.location.href = `/?code=${code}&state=${state}`;
+            }
+        } else {
+            document.getElementById('status').innerHTML = 
+                '<div class="error">未收到有效的授權資訊</div>';
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```
+
+### Node.js 後端範例
+
+為了更好的安全性，建議在後端處理 `client_secret`：
+
+```js
+const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const OAUTH_CONFIG = {
+    authServer: 'https://your-domain.com',
+    clientId: 'YOUR_CLIENT_ID',
+    clientSecret: 'YOUR_CLIENT_SECRET'
+};
+
+// 後端處理token交換
+app.post('/api/oauth/exchange-token', async (req, res) => {
+    const { code, redirectUri, state } = req.body;
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+                redirect_uri: redirectUri
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Token exchange failed' });
+    }
+});
+
+// 刷新token端點
+app.post('/api/oauth/refresh-token', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({ error: 'Missing refresh token' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Token refresh failed' });
+    }
+});
+
+// 代理用戶資訊請求（帶自動刷新）
+app.get('/api/oauth/userinfo', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ error: 'Missing authorization header' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`, {
+            headers: {
+                'Authorization': authHeader
+            }
+        });
+
+        const userData = await response.json();
+        
+        if (response.ok) {
+            res.json(userData);
+        } else {
+            res.status(response.status).json(userData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch user info' });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+```
+
+## 安全最佳實踐
+
+### 1. 客戶端密鑰保護
+
+- ✅ 推薦：將 `client_secret` 儲存在後端伺服器
+- ❌ 避免：在前端JavaScript中暴露 `client_secret`
+
+### 2. State 參數驗證
+
+```js
+// 生成隨機state
+const state = crypto.randomBytes(16).toString('hex');
+localStorage.setItem('oauth_state', state);
+
+// 驗證state
+const savedState = localStorage.getItem('oauth_state');
+if (receivedState !== savedState) {
+    throw new Error('CSRF attack detected');
+}
+```
+
+### 3. HTTPS 使用
+
+- 生產環境必須使用 `HTTPS`
+- 回調地址必須使用 `HTTPS`
+- 所有 API 請求使用 `HTTPS`
+
+### 4. Token 安全儲存
+
+```js
+// 設定 token 過期時間
+const expiryTime = Date.now() + (tokenData.expires_in * 1000);
+localStorage.setItem('oauth_token_expiry', expiryTime);
+
+// 檢查token是否過期
+function isTokenExpired() {
+    const expiry = localStorage.getItem('oauth_token_expiry');
+    return !expiry || Date.now() > parseInt(expiry);
+}
+```
+
+### 5. 錯誤處理
+
+```js
+try {
+    const response = await fetch('/api/oauth2/userinfo', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+        if (response.status === 401) {
+            // Token過期，需要重新登入
+            clearToken();
+            showLoginSection();
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    }
+    
+    const userInfo = await response.json();
+    return userInfo;
+} catch (error) {
+    console.error('API request failed:', error);
+    // 處理網路錯誤等
+}
+```
+
+## 常見問題
+
+### Q1: 如何實現真正的一鍵登入體驗？
+
+A: 在授權URL中添加 `auto_authorize=true` 參數即可。這樣用戶登入完成後會自動完成授權，無需額外的確認步驟：
+
+```js
+const authUrl = 'https://your-domain.com/api/oauth2/authorize?' +
+  'client_id=YOUR_CLIENT_ID&' +
+  'auto_authorize=true&' + // 關鍵參數
+  '...其他參數';
+```
+
+### Q2: Token 會自動刷新嗎？
+
+A: 是的，我們的 SDK 內置了自動 token 刷新機制：
+
+- 存取令牌：2小時有效期，過期前 5 分鐘自動刷新
+- 刷新令牌：30天有效期，用於獲取新的存取令牌
+- 無感刷新：所有 API 呼叫都會自動檢查並刷新過期的 token
+- 失敗重試：如果 API 返回 401 錯誤，會自動嘗試刷新 token 並重試
+
+```js
+// SDK 會自動處理 token 刷新，您無需手動處理
+const userInfo = await oauthManager.fetchUserInfo(); // 自動刷新token
+```
+
+只有在刷新令牌也過期時，才需要用戶重新登入。
+
+### Q3: 可以獲取哪些用戶資訊？
+
+A: 根據授權 scope，您可以獲取：
+- `profile` scope: 用戶名、電子郵件
+- `balance` scope: 帳戶餘額資訊
+
+### Q4: 如何測試 OAuth 整合？
+
+A: 
+1. 在開發環境中使用 `HTTP localhost` 進行測試
+2. 使用我們提供的測試工具驗證授權流程
+3. 檢查瀏覽器開發者工具中的網路請求
+
+### Q5: 支援哪些程式語言？
+
+A: 我們提供標準的OAuth2 API，支援所有主流程式語言：
+- JavaScript/Node.js
+- Python
+- PHP
+- Java
+- C#/.NET
+- Go
+- Ruby
+
+### Q6: 如何撤銷用戶授權？
+
+A: 用戶可以在我們的用戶中心 > 授權管理頁面撤銷對第三方應用的授權。

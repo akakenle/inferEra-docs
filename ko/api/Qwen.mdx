@@ -1,0 +1,260 @@
+---
+title: "Qwen 시리즈"
+icon: "a"
+---
+
+## Qwen 3 시리즈
+
+Qwen3는 동적 사고 모드로 오픈 LLM을 재정의하며, 코드, 수학, 다국어 추론에서 탁월합니다. 희소한 22B 활성 매개변수로 구동되어 번개같은 속도와 깊은 지능의 균형을 맞춥니다 — 경량에서 235B 거대 모델까지 완전 오픈소스입니다.
+
+**1. 기본 사용:** OpenAI 호환 형식으로 전달합니다.  
+**2. 도구 호출:** 일반 도구는 OpenAI 호환 형식을 지원하며, MCP 도구는 qwen-agent에 의존하고 먼저 다음 명령을 사용하여 종속성을 설치해야 합니다:
+`pip install -U qwen-agent mcp`.
+자세한 내용은 [Ali 공식 문서](https://huggingface.co/Qwen/Qwen3-235B-A22B)를 참조하세요
+
+<CodeGroup>
+
+```py 기본 사용
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMix 키로 교체하세요
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",
+    messages=[
+        {
+            "role": "user",
+            "content": "오컴의 면도날 개념을 설명하고 일상생활에서의 예시를 제공해주세요"
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+```py 도구
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMix 키로 교체하세요
+    base_url="https://aihubmix.com/v1",
+)
+
+# 도구 정의
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "지정된 위치의 현재 날씨 가져오기",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "도시 이름, 예: 서울, 부산 등"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "온도 단위"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+# 도구 정의가 포함된 채팅 완성 요청 생성
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",  # 2.5와 3 모두 지원, QwQ는 지원하지 않음
+    messages=[
+        {
+            "role": "user",
+            "content": "오늘 서울 날씨는 어떤가요?"
+        }
+    ],
+    tools=tools,
+    tool_choice="auto",  # 모델이 도구 사용 여부를 결정하도록 함
+    stream=True
+)
+
+# 도구 호출 정보 수집을 위한 딕셔너리
+tool_calls = {}
+
+# 스트리밍 응답 처리
+for chunk in completion:
+    if not hasattr(chunk.choices, '__len__') or len(chunk.choices) == 0:
+        continue
+        
+    delta = chunk.choices[0].delta
+    
+    # 텍스트 내용 처리
+    if hasattr(delta, 'content') and delta.content:
+        print(delta.content, end="")
+    
+    # 도구 호출 처리
+    if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        for tool_call in delta.tool_calls:
+            if not hasattr(tool_call, 'index'):
+                continue
+                
+            idx = tool_call.index
+            if idx not in tool_calls:
+                tool_calls[idx] = {"name": "", "arguments": ""}
+                
+            if hasattr(tool_call, 'function'):
+                if hasattr(tool_call.function, 'name') and tool_call.function.name:
+                    tool_calls[idx]["name"] = tool_call.function.name
+                if hasattr(tool_call.function, 'arguments') and tool_call.function.arguments:
+                    tool_calls[idx]["arguments"] += tool_call.function.arguments
+
+# 완료 후 수집된 도구 호출 정보 출력
+for idx, info in tool_calls.items():
+    if info["name"]:
+        print(f"\n도구 호출: {info['name']}")
+    if info["arguments"]:
+        print(f"인수: {info['arguments']}")
+```
+
+```py MCP 도구
+from qwen_agent.agents import Assistant
+import os
+
+# LLM 정의
+llm_cfg = {
+    'model': 'Qwen/Qwen3-30B-A3B',
+
+    # OpenAI API와 호환되는 사용자 정의 엔드포인트 사용:
+    'model_server': 'https://aihubmix.com/v1',
+    'api_key': os.getenv('AIHUBMIX_API_KEY'),
+
+    # 기타 매개변수:
+    # 'generate_cfg': {
+    #         # 추가: 응답 내용이 `<think>이것이 생각입니다</think>이것이 답변입니다;일 때
+    #         # 추가하지 않음: 응답이 reasoning_content와 content로 분리되었을 때.
+    #         'thought_in_content': True,
+    #     },
+}
+
+# 도구 정의
+tools = [
+    {'mcpServers': {  # MCP 구성 파일을 지정할 수 있습니다
+            'time': {
+                'command': 'uvx',
+                'args': ['mcp-server-time', '--local-timezone=Asia/Seoul']
+            },
+            "fetch": {
+                "command": "uvx",
+                "args": ["mcp-server-fetch"]
+            }
+        }
+    },
+  'code_interpreter',  # 내장 도구
+]
+
+# 에이전트 정의
+bot = Assistant(llm=llm_cfg, function_list=tools)
+
+# 스트리밍 생성
+messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Qwen의 최신 개발 상황을 소개해주세요'}]
+for responses in bot.run(messages=messages):
+    pass
+print(responses)
+```
+
+</CodeGroup>
+
+## Qwen 2.5 및 QwQ/QvQ 시리즈
+
+OpenAI 호환 형식을 사용하여 전달하며, 차이점은 스트리밍 호출에서 `chunk.choices[0].delta.content`를 추출해야 한다는 것입니다. 다음을 참조하세요.
+
+**1. QvQ，Qwen 2.5 VL:** 이미지 인식.  
+**2. QwQ:** 텍스트 작업.  
+
+<CodeGroup>
+
+```py Qwen 2.5 VL
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMix 키로 교체하세요
+    base_url="https://aihubmix.com/v1",
+)
+
+image_path = "yourpath/file.png"
+
+def encode_image(image_path):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"이미지 파일이 존재하지 않습니다: {image_path}")
+    
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 이미지의 base64 인코딩 가져오기
+base64_image = encode_image(image_path)
+
+completion = client.chat.completions.create(
+    model="qwen2.5-vl-72b-instruct", #qwen2.5-vl-72b-instruct OR Qwen/QVQ-72B-Preview
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "이 이미지를 자세히 설명해주세요"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+
+```py QwQ
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 AiHubMix 키로 교체하세요
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/QwQ-32B",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "우주를 지배하는 메타 규칙은 무엇인가요?"}
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+</CodeGroup>

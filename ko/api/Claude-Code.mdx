@@ -1,0 +1,76 @@
+---
+title: "Claude 코드"
+description: " "
+icon: "terminal"
+---
+
+Aihubmix 기반의 Claude 코드는 안정적인 연결을 보장하고 할당량 구매에 대한 걱정을 덜어줍니다.
+
+## 빠른 설정 가이드:
+
+### 1️⃣ npm 패키지 전역 설치
+
+터미널에서 다음 명령을 실행하세요:
+
+```shell
+npm install -g @anthropic-ai/claude-code
+```
+
+예시 이미지:
+
+![install](../../public/en/aihubmix-claude-code-npm.png)
+
+### 2️⃣ 환경 변수 구성
+
+Aihubmix [키 페이지](https://aihubmix.com/token)로 이동하여 API 키를 생성한 다음, 이 키와 전달 URL을 시스템 환경 변수에 추가하세요.
+
+예를 들어, `~/.zshrc` 파일에 다음 줄을 추가하세요:
+
+```shell
+export ANTHROPIC_API_KEY="sk-***"
+export ANTHROPIC_BASE_URL="https://aihubmix.com"
+```
+
+<Tip>
+  Mac 사용자의 경우, 홈 디렉토리에서 `⌘ + ⇧ + .`를 눌러 숨겨진 `.zshrc` 파일을 표시할 수 있습니다. 시스템의 "텍스트 편집기" 앱으로 열고 위의 줄을 추가하세요.
+</Tip>
+
+### 3️⃣ 구성 적용
+
+구성을 추가한 후, 터미널에서 `source ~/.zshrc`를 실행하고 Enter 키를 눌러 변경 사항을 적용하세요.
+
+### 4️⃣ 터미널에서 실행
+
+프로젝트 디렉토리로 이동합니다. 예를 들어 `cd ~/Desktop/my-project`\
+그런 다음 `claude`를 입력하여 Claude 코드를 시작하고 사용을 시작하세요.
+
+## 초기화 구성
+
+### 인증
+
+인증 페이지가 표시되면 클릭하여 확인을 위해 Claude 웹사이트로 이동합니다. 성공적으로 인증한 후 터미널로 돌아가 계속 진행하세요.
+
+![auth](../../public/en/claude-auth.png)
+
+### 실행
+
+실행 후 Claude 코드는 API 키 및 API 기본 URL을 포함한 현재 구성 세부 정보를 표시합니다.\
+Yes를 선택하고 Enter 키를 눌러 프롬프트를 확인하여 설정을 완료하세요.
+
+![initialization](../../public/en/aihubmix-claude-code.png)
+
+예를 들어: Claude가 시스템 환경 변수에서 사용자 지정 KEY를 감지하면 `Yes`를 선택합니다.
+
+```
+Detected a custom API key in your environment
+
+ANTHROPIC_API_KEY: sk-***
+Do you want to use this API key?
+
+> 1. Yes
+2. No(recommended)
+
+Enter to confirm .Esc to cancel
+```
+
+Claude와 함께 코딩을 즐기세요!

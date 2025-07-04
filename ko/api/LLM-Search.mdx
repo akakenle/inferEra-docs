@@ -1,0 +1,205 @@
+---
+title: "LLM 검색"
+description: " "
+icon: 'globe'
+---
+
+## 1️⃣ 실시간 웹 검색: LLM 시간 제한을 깨고 더 정확하고 신뢰할 수 있는 출력 제공
+
+OpenAI 및 Gemini 시리즈 모델에 웹의 최신 정보에 액세스하는 기능을 향상시켜 다음을 지원합니다:  
+- ✅ **최신 정보 액세스**: 현재 이벤트, 최신 연구 또는 실시간 데이터에 대한 실시간 업데이트 받기
+- ✅ **지식 격차 해소**: 훈련 후 정보에 액세스하여 LLM 훈련 데이터의 시간 제한 극복
+- ✅ **환각 감소**: 실시간 웹 검색을 통해 사실 기반 답변을 제공하여 AI의 허위 정보 생성을 크게 줄임
+- ✅ **의사 결정 품질 향상**: 현재 사실에 근거한 분석 및 권장 사항을 기반으로 더 자신감 있는 결정 내리기
+
+**지원되는 모델:**
+현재 두 가지 통합 방법을 통해 OpenAI 및 Gemini 모델 시리즈를 지원합니다:
+
+**1. 기본 검색 기능이 있는 모델**
+**Gemini 시리즈** (Google 검색 기반):
+- gemini-2.0-pro-exp-02-05-search
+- gemini-2.0-flash-exp-search
+- gemini-2.0-flash-search
+
+**OpenAI 시리즈** (Bing 검색):
+- gpt-4o-search-preview
+- gpt-4o-mini-search-preview
+
+**2. 매개변수 기반 지원**
+`web_search_options={}` 매개변수를 추가하기만 하면 모든 Gemini 및 OpenAI 모델에 대해 웹 연결을 활성화할 수 있습니다. 
+Gemini 모델의 검색 요금은 1,000회 검색당 3.5달러입니다.
+
+## 사용 가이드
+
+사용하기 전에 `pip install -U openai`를 실행하여 openai 패키지를 업그레이드하십시오.
+
+**예시:**
+<CodeGroup>
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    model="gemini-2.0-flash-exp",
+    # 🌐 검색 활성화
+    web_search_options={},
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "AIhubmix LLM API 플랫폼에 대한 정보를 검색하고 간략한 소개와 관련 링크를 제공하세요."
+                }
+            ]
+        }
+    ]
+)
+
+print(chat_completion.choices[0].message.content)
+```
+
+```ts Typescript 
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+    apiKey: 'sk-***',
+    baseURL: 'https://aihubmix.com/v1'
+});
+
+async function main() {
+    const chatCompletion = await client.chat.completions.create({
+        model: 'gemini-2.0-flash-exp',
+        // 🌐 검색 활성화
+        web_search_options: {},
+        messages: [
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: 'AIhubmix LLM API 플랫폼에 대한 정보를 검색하고 간략한 소개와 관련 링크를 제공하세요.'
+                    }
+                ]
+            }
+        ]
+    });
+
+    console.log(chatCompletion.choices[0].message.content);
+}
+
+main().catch(console.error);
+```
+
+```shell Curl
+curl "https://aihubmix.com/v1/chat/completions" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer xxx" \
+    -d '{
+    "model": "gemini-2.0-flash-exp",
+    "web_search_options": {},
+    "messages": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Google Arts & Culture 웹사이트에서 반 고흐에 대한 정보를 간략한 소개와 관련 링크와 함께 제공하세요."
+                }
+            ]
+        }
+    ],
+    "stream": false
+}'
+```
+
+</CodeGroup>
+
+## 2️⃣ 스마트 서핑: AI가 인터넷을 자유롭게 탐색하도록 허용
+
+모델 ID에 `:surfing`을 추가하면 모든 대규모 언어 모델에 검색 기능이 탑재될 수 있습니다.
+- 복잡한 통합 없이 접미사를 추가하기만 하면 됩니다.
+- 이 방법은 기본적으로 사용자의 요청을 **Tavily 검색 서비스**로 전달하며, LLM은 응답을 위해 검색 결과를 참조합니다.
+- 검색 요금: **검색당 0.006달러**
+- 요금은 현재 "크레딧 변경"에서 직접 차감되며, "로그 세부 정보"에는 아직 검색 요금이 표시되지 않지만 향후 표시될 예정입니다.
+
+<Tip>
+모델 ID는 [모델 갤러리](https://aihubmix.com/models)에서 복사할 수 있습니다.
+</Tip>
+
+**예시:**
+<CodeGroup>
+```py Python
+import requests
+import json
+import os
+
+try:
+    response = requests.post(
+        url="https://aihubmix.com/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {os.environ.get('AIHUBMIX_API_KEY')}",
+            "Content-Type": "application/json",
+        },
+        data=json.dumps({
+            "model": "gpt-4o-mini:surfing", # 검색을 지원하려면 모델 ID에 :surfing을 추가합니다.
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "ChatGPT 메모리 기능에 대한 마지막 사실을 검색하고 URL과 함께 반환하세요."
+                }
+            ]
+        })
+    )
+
+    result = response.json()
+    print("API 응답:", json.dumps(result, ensure_ascii=False, indent=2))
+
+except requests.exceptions.RequestException as e:
+    print(f"요청 오류: {e}")
+except json.JSONDecodeError as e:
+    print(f"JSON 디코딩 오류: {e}")
+except Exception as e:
+    print(f"기타 오류: {e}")
+```
+</CodeGroup>
+
+**API 응답 예시:**
+```json
+{
+  "id": "chatcmpl-BLN21dGcrv8MrbeHfForjY4bYZHBF",
+  "model": "gpt-4o-mini-2024-07-18",
+  "object": "chat.completion",
+  "created": 1744433121,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "ChatGPT의 메모리 기능에 대한 최신 업데이트에 따르면 이제 사용자가 수동으로 기억하도록 요청하는 “저장된 메모리”와 향후 상호 작용을 개선하기 위한 “참조 채팅 기록”의 두 가지 방식으로 정보를 회상할 수 있는 확장된 메모리 기능이 있습니다. 자세한 내용은 URL: [The Verge 기사](https://www.theverge.com/news/646968/openai-chatgpt-long-term-memory-upgrade)를 방문하십시오."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_ded0d14823",
+  "usage": {
+    "prompt_tokens": 604,
+    "completion_tokens": 89,
+    "total_tokens": 693,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  }
+}
+```

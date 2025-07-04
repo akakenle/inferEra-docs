@@ -1,0 +1,181 @@
+---
+title: "텍스트 음성 변환"
+description: "AI 모델을 사용하여 텍스트를 자연스러운 음성으로 변환, 다양한 음성 스타일과 출력 형식 지원"
+icon: 'monitor-waveform'
+---
+
+## 소개
+
+텍스트 음성 변환(TTS) API는 고급 생성 AI 모델을 기반으로 입력 텍스트를 사실적인 음성 오디오로 변환할 수 있습니다. 다양한 용도를 지원합니다:
+
+- 블로그 글 음성 변환
+- 다국어 음성 오디오 생성
+- 실시간 오디오 출력 스트림 제공
+
+**사용 가능한 모델 목록:**
+- **gpt-4o-audio-preview** - OpenAI의 최신 오디오 생성 모델, 대화형 오디오 생성 지원
+- **gpt-4o-mini-tts** - 스마트 실시간 애플리케이션에 선호되는 모델, 고급 음성 제어를 지원하며 프롬프트를 통해 다양한 음성 특성을 제어할 수 있습니다:
+  - 악센트
+  - 감정 범위
+  - 억양
+  - 인상
+  - 말하기 속도
+  - 톤
+  - 속삭임
+- **tts-1-hd** - 고품질 TTS 모델
+- **tts-1** - 표준 TTS 모델, 품질과 속도의 균형
+
+<Tip>
+**성능 제안:** 가장 빠른 응답 시간을 위해서는 `wav` 또는 `pcm`을 응답 형식으로 사용하는 것을 권장합니다. 고품질 오디오의 경우 `tts-1-hd`를 권장하고, 더 빠른 생성 속도를 위해서는 `tts-1`을 사용하며, 스마트 음성 애플리케이션에는 `gpt-4o-mini-tts`를 권장합니다.
+
+**음성 미리보기:** [OpenAI.fm](https://www.openai.fm/)에서 다양한 음성 효과를 들어볼 수 있습니다.
+</Tip>
+
+## 모델 호출 방법
+
+### 표준 TTS 모델 (tts-1, tts-1-hd)
+`/v1/audio/speech` 엔드포인트를 사용하고, `client.audio.speech.create()` 메서드를 호출합니다.
+
+### gpt-4o-mini-tts
+`/v1/audio/speech` 엔드포인트를 사용하고, 고급 음성 제어를 위한 `instructions` 매개변수를 지원합니다.
+
+### gpt-4o-audio-preview
+`/v1/chat/completions` 엔드포인트를 사용하고, `modalities: ["text", "audio"]` 및 `audio` 구성을 설정합니다.
+
+### 요청 매개변수
+
+#### 표준 TTS 매개변수 
+
+tts-1, tts-1-hd, gpt-4o-mini-tts에 적용
+
+<ParamField body="model" type="string" required>
+  사용할 모델 ID. 선택 가능한 값: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  오디오를 생성할 텍스트, 최대 길이 4096자
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  합성에 사용할 음성. 선택 가능한 값: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
+</ParamField>
+
+<ParamField body="response_format" type="string" optional>
+  오디오 출력 형식. 지원되는 형식: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`. 기본값은 `mp3`
+</ParamField>
+
+<ParamField body="speed" type="number" optional>
+  오디오 생성 속도. 범위는 0.25에서 4.0까지. 기본값은 1.0. **참고: `gpt-4o-mini-tts`는 이 매개변수를 지원하지 않지만, 자연어 설명을 통해 속도를 제어할 수 있습니다**
+</ParamField>
+
+<ParamField body="instructions" type="string" optional>
+  음성 생성 지침(`gpt-4o-mini-tts` 모델에만 적용), 음성 스타일, 톤, 감정 등을 지정할 수 있습니다.
+</ParamField>
+
+#### gpt-4o-audio-preview 매개변수
+
+<ParamField body="model" type="string" required>
+  `gpt-4o-audio-preview`로 설정
+</ParamField>
+
+<ParamField body="modalities" type="array" required>
+  오디오 출력을 활성화하려면 `["text", "audio"]`로 설정
+</ParamField>
+
+<ParamField body="audio" type="object" required>
+  `voice` 및 `format` 필드를 포함하는 오디오 구성 객체
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  채팅 메시지 배열, 표준 채팅 형식과 동일
+</ParamField>
+
+## 사용법
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tts-1",
+    "input": "빠른 갈색 🦊이 게으른 개를 뛰어넘었습니다.",
+    "voice": "alloy"
+  }' \
+  --output speech.mp3
+```
+
+```py gpt-4o-audio-preview
+import base64
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key=os.getenv("AIHUBMIX_API_KEY"),
+  base_url="https://aihubmix.com/v1"
+)
+
+completion = client.chat.completions.create(
+    model="gpt-4o-audio-preview",
+    modalities=["text", "audio"],
+    audio={"voice": "alloy", "format": "wav"},
+    messages=[
+        {
+            "role": "user",
+            "content": "빠른 갈색 🦊이 게으른 개를 뛰어넘었습니다."
+        }
+    ]
+)
+
+print(completion.choices[0])
+
+wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
+with open("output.wav", "wb") as f:
+    f.write(wav_bytes)
+```
+
+```py gpt-4o-mini-tts
+from pathlib import Path
+from openai import OpenAI
+import os
+
+# aihubmix 전달
+client = OpenAI(
+  api_key="sk-***", # AiHubMix API 키로 교체하세요
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+with client.audio.speech.with_streaming_response.create(
+  model="gpt-4o-mini-tts",
+  voice="alloy", # 가장 균형 잡힌 음성, 명확한 발음
+  instructions="""참을성 있는 선생님으로 연기하세요""",
+  input="빠른 갈색 🦊이 게으른 개를 뛰어넘었습니다."
+) as response:
+  response.stream_to_file(speech_file_path)
+```
+
+```py 표준 TTS 모델
+from pathlib import Path
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key="sk-***", # AiHubMix API 키로 교체하세요
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+response = client.audio.speech.create(
+  model="tts-1-hd",
+  voice="alloy",
+  input="빠른 갈색 🦊이 게으른 개를 뛰어넘었습니다.",
+  response_format="mp3",
+  speed=1.0
+)
+
+response.stream_to_file(speech_file_path)
+```
+
+</CodeGroup>

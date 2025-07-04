@@ -1,0 +1,206 @@
+---
+title: "GPT Image"
+description: " "
+icon: "palette"
+---
+
+## 接口說明
+
+OpenAI 的繪圖接口 `gpt-image-1`，支持文生圖（generate）、圖文生圖（edit）。  
+使用前請運行 `pip install -U openai` 升級到最新的 openai 包。
+
+## 注意事項
+
+<Warning>
+- 生成過程中，無論任何情況導致的中斷或失敗，**接口調用一旦發出，都會被扣取費用**
+- 還在世的藝術家名稱（如「宮崎駿」、「新海誠」等）會觸發 `moderation_blocked` 報錯，**導致生成失敗**。你可以通過「吉卜力」、「明亮的現代日式動漫風格」等非敏感詞來規避。衣著暴露或含有暗示的圖片同理。
+- 總的來說,「風格」比「藝術家」安全，像是「皮克斯」也是支持的。
+- 更穩妥的做法是採用已故藝術家或對應的風格，如「梵高」、「蒙娜麗莎」等。
+</Warning>
+
+## 模型和費率
+
+| 模型 | 質量 | 1024x1024 | 1024x1536 | 1536x1024 |
+| ------------------ | ------------ | ------------ | ------------ | ------------ |
+| gpt-image-1 | low | $0.011 | $0.016 | $0.016 |
+| gpt-image-1 | medium | $0.042 | $0.063 | $0.063 |
+| gpt-image-1 | high | $0.167 | $0.25 | $0.25 |
+
+<Info>
+注意：輸入文本 Token 部分的費率是 $5/百萬 Tokens，額外計算。
+</Info>
+  
+## 調用方法
+
+**端點 (Endpoints)**
+1. 繪圖：`https://aihubmix.com/v1/images/generations`
+2. 編輯：`https://aihubmix.com/v1/images/edits`
+
+**Python 調用示例如下：**  
+<CodeGroup>
+```py 生成 (文生圖)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """redesign poster of the movie [Black Swan], 3D cartoon, smooth render, bright tone, 2:3 portrait."""
+
+result = client.images.generate(
+    model="gpt-image-1",
+    prompt=prompt,
+    n=1, # 單次出圖數量，最多 10 張
+    size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default) 
+    quality="high", # high, medium, low, auto (default)
+    moderation="low", # low, auto (default) 需要升級 openai 包 📍
+    background="auto", # transparent, opaque, auto (default)
+)
+
+print(result.usage)
+
+# 定義文件名前綴和保存目錄
+output_dir = "." # 可以指定其他目錄
+file_prefix = "image_gen"
+
+# 確保輸出目錄存在
+os.makedirs(output_dir, exist_ok=True)
+
+# 遍歷所有返回的圖片數據
+for i, image_data in enumerate(result.data):
+    image_base64 = image_data.b64_json
+    if image_base64: # 確保 b64_json 不為空
+        image_bytes = base64.b64decode(image_base64)
+
+        # --- 文件名衝突處理邏輯開始 ---
+        current_index = i
+        while True:
+            # 構建帶自增序號的文件名
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name) # 構建完整文件路徑
+
+            # 檢查文件是否存在
+            if not os.path.exists(file_path):
+                break # 文件名不衝突，跳出循環
+
+            # 文件名衝突，增加序號
+            current_index += 1
+
+        # 使用找到的唯一 file_path 保存圖片到文件
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"圖片已保存至：{file_path}")
+    else:
+        print(f"第 {i} 張圖片數據為空，跳過保存。")
+
+```
+
+```py 編輯 (多圖+文生圖)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """redesign poster of the movie [Black Swan], 3D cartoon, smooth render, bright tone, 2:3 portrait."""
+
+result = client.images.edit(
+    model="gpt-image-1",
+    image=open("yourpath/edit.jpg", "rb"), #多參考圖應使用 [列表，]
+    n=2, # 單次數量
+    prompt=prompt,
+    size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    # moderation="low", # edit 不支持 moderation
+    quality="high" # high, medium, low, auto (default)
+)
+
+print(result.usage)
+
+# 定義文件名前綴和保存目錄
+output_dir = "." # 可以指定其他目錄
+file_prefix = "image_edit" # 修改文件名前綴
+
+# 確保輸出目錄存在
+os.makedirs(output_dir, exist_ok=True)
+
+# --- 遍歷 API 返回的每張圖片數據 ---
+for i, image_item in enumerate(result.data):
+    image_base64 = image_item.b64_json
+    if image_base64 is None:
+        print(f"警告：第 {i+1} 張圖片沒有返回 base64 數據，跳過保存。")
+        continue # 如果没有 b64_json 數據，跳到下張圖片
+
+    image_bytes = base64.b64decode(image_base64)
+
+    # --- 為當前圖片尋找不衝突的文件名 ---
+    current_index = 0 # 每次都從 0 開始檢查，或者維護一個全局遞增的索引
+    while True:
+        # 構建帶自增序號的文件名
+        file_name = f"{file_prefix}_{current_index}.png"
+        file_path = os.path.join(output_dir, file_name) # 構建完整文件路徑
+
+        # 檢查文件是否存在
+        if not os.path.exists(file_path):
+            break # 文件名不衝突，跳出內部循環
+
+        # 文件名衝突，增加序號
+        current_index += 1
+
+    # 使用找到的唯一 file_path 保存當前圖片到文件
+    try:
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"第 {i+1} 張編輯後的圖片已保存至：{file_path}")
+    except Exception as e:
+        print(f"保存第 {i+1} 張圖片時出錯 ({file_path}): {e}")
+```
+</CodeGroup>
+更多的參數細節可以參考 [OpenAI 官方文件](https://platform.openai.com/docs/api-reference/images/create)
+
+## 輸出示例
+<CodeGroup>
+```json 生成
+Usage(input_tokens=150, input_tokens_details=UsageInputTokensDetails(image_tokens=0, text_tokens=150), output_tokens=6240, total_tokens=6390)
+圖片已保存至：./image_gen_14.png
+```
+
+```json 編輯
+Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_tokens=646, text_tokens=346), output_tokens=12480, total_tokens=13472)
+第 1 張編輯後的圖片已保存至：./image_edit_1.png
+第 2 張編輯後的圖片已保存至：./image_edit_2.png
+```
+</CodeGroup>
+
+## 被拒的情況
+
+請求被拒的錯誤信息如下：
+```json
+Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
+```
+
+對於單次請求生成 2-10 張圖片的情况，如果系統檢測到請求涉嫌違反平台政策，該請求中的違規部分將不會被生成。這可能導致實際生成圖片數量少於用戶請求數量，然而多圖的情况下，不會拋出 `moderation_blocked`。 
+因此，請在創作中主動規避潛在的知識產權（IP）或版權問題，以減少生成被系統攔截的风险，確保創作順利完成。
+
+**✍️ 關鍵提示：**
+- 避免直接使用已知的受版權保護角色、品牌標誌、名人肖像等
+- 可以採用「風格借鑒」「創意改編」「泛指描述」等方式表達
+- 若需引用特定元素，請提前確認該元素是否處於公有領域
+
+## 實用提示
+
+<Tip>
+- 支持任何語言，中文繪制也很穩定，但我們也不建議繪制大量的文本
+- size 參數不支持顯示傳入 size="auto"，默認即 auto
+- 畫幅比例可以在 prompt 中指定，支持 2:3、3:2、1:1，也可以在 size 參數中設置。
+- 支持控制敏感度的 `moderation` 參數，但這個參數設為 low 也可能被拒，比如說維納斯過於暴露
+- edits 端口不支持 `moderation` 參數
+- 文本描述和參考圖搭配，融圖效果更準確
+- 上傳的圖片可以做壓縮預處理，提升速度
+- 支持透明背景，免抠圖。——只需要在 Prompt 中補充要求
+</Tip>

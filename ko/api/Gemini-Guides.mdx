@@ -1,0 +1,747 @@
+---
+title: "Gemini 가이드"
+description: "우리 플랫폼에서 Gemini API 호출에 대한 포괄적인 가이드입니다."
+icon: "google"
+---
+
+## Gemini 모델 전달
+
+Gemini 시리즈의 경우 **두 가지** 호출 방법, 즉 네이티브 API 호출과 OpenAI 호환 호출을 제공합니다.\
+시작하기 전에 `pip install google-genai` 또는 `pip install -U google-genai`를 실행하여 네이티브 종속성을 설치하거나 업데이트해야 합니다.
+
+1️⃣ 네이티브 전달의 경우 주로 내부 클라이언트 설정에 **AiHubMix API 키**와 **요청 URL**을 주입해야 합니다.\
+⚡️ 참고: URL 형식은 기존의 `base_url` 사용법과 다릅니다. 아래 예를 참조하십시오:
+
+```python
+client = genai.Client(
+    api_key="sk-***",  # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com"},
+)
+```
+
+2️⃣ OpenAI 호환 형식의 경우 범용 `v1` 엔드포인트를 유지합니다.
+
+```py
+client = OpenAI(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1",
+)
+```
+
+3️⃣ 2.5 시리즈의 경우 추론 과정을 표시해야 하는 경우 두 가지 방법이 있습니다:
+
+1. **네이티브 호출:** `include_thoughts=True` 전달
+2. **OpenAI 호환 방법:** `reasoning_effort` 전달
+
+자세한 사용법은 아래 코드 예제를 참조할 수 있습니다.
+
+### Gemini 2.5 추론 모델 정보
+
+1. 전체 2.5 시리즈는 **추론 모델**로 구성됩니다.
+2. **2.5 Flash**는 Claude Sonnet 3.7과 유사한 하이브리드 모델입니다. 최적의 제어를 위해 `thinking_budget` 매개변수를 조정하여 추론 동작을 미세 조정할 수 있습니다.
+3. **2.5 Pro**는 순수 추론 모델입니다. 사고를 비활성화할 수 없으며 `thinking_budget`을 명시적으로 설정해서는 안 됩니다.
+
+**Python 사용 예제:**
+
+<CodeGroup>
+
+```py StreamFalse
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMix 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""시간을 낭비하고 있지 않다는 것을 어떻게 알 수 있습니까?"""),
+            ],
+        ),
+    ]
+
+    print(client.models.generate_content(
+        model=model,
+        contents=contents,
+    ))
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.0 시리즈-스트림
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMix 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""시간을 낭비하고 있지 않다는 것을 어떻게 알 수 있습니까?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 Flash-스트림
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMix 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-flash-preview-04-17" #gemini-2.5-pro-preview-03-25、gemini-2.5-flash-preview-04-17
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""시간을 낭비하고 있지 않다는 것을 어떻게 알 수 있습니까?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        thinking_config = types.ThinkingConfig(
+            thinking_budget=2048, #범위: 0-16K. 기본값 1024, 최상의 성능을 위해 16000
+        ),
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 Pro-스트림
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMix 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""시간을 낭비하고 있지 않다는 것을 어떻게 알 수 있습니까?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py 2.5 사고 표시
+from google import genai
+from google.genai import types
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # 🔑 AiHubMix 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-05-06"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""금융에서 \"72의 법칙\"은 어떻게 파생되었습니까?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+        thinking_config=types.ThinkingConfig(
+            include_thoughts=True  # 사고 내용 표시
+        ),
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        if chunk.candidates and len(chunk.candidates) > 0:
+            for part in chunk.candidates[0].content.parts:
+                if part.text:
+                    if part.thought:
+                        print(part.text, end="")
+                    else:
+                        print(part.text, end="")
+
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    if final_usage_metadata:
+        print(f"\n\n📊 토큰 사용량:")
+        print(f"사고 토큰: {getattr(final_usage_metadata, 'thoughts_token_count', '사용 불가')}")
+        print(f"출력 토큰: {getattr(final_usage_metadata, 'candidates_token_count', '사용 불가')}")
+        print(f"총계: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+```
+
+</CodeGroup>
+
+## Gemini 2.5 Flash: 빠른 작업 지원
+
+OpenAI 호환 호출 예제:
+
+<CodeGroup>
+
+```py Python 빠른 작업을 위해 사고 비활성화
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17-nothink",
+    messages=[
+        {
+            "role": "user",
+            "content": "오컴의 면도날 개념을 설명하고 일상적인 예를 들어주세요"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+```
+
+
+```py Python 추론 노력
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", #"low", "medium", "high"는 1K, 8K, 16K 사고 토큰 예산에 매핑됩니다.
+    messages=[
+        {
+            "role": "user",
+            "content": "오컴의 면도날 개념을 설명하고 일상적인 예를 들어주세요"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+```
+
+
+```shell Curl-기본
+curl -X POST https://aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "gemini-2.5-flash-preview-04-17-nothink",
+    "messages": [
+      {
+        "role": "user",
+        "content": "오컴의 면도날 개념을 설명하고 일상적인 예를 들어주세요."
+      }
+    ]
+  }'
+```
+
+
+```shell Curl-사고 표시
+curl https://aihubmix.com/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer sk-***" \
+-d '{
+  "model": "gemini-2.5-pro-preview-05-06",
+  "messages": [
+    {
+      "role": "user",
+      "content": "오컴의 면도날 개념을 설명하고 일상적인 예를 들어주세요."
+    }
+  ],
+  "reasoning_effort": "low"
+}'
+```
+
+</CodeGroup>
+
+<Tip>
+  1. 복잡한 작업의 경우 모델 ID를 기본 `gemini-2.5-flash-preview-04-17`로 설정하여 사고를 활성화하기만 하면 됩니다.
+  2. Gemini 2.5 Flash는 `budget` 매개변수를 사용하여 사고의 깊이를 제어하며, 범위는 0에서 16K입니다. 기본 예산은 1024이며 최적의 한계 효과는 16K입니다.
+</Tip>
+
+## 미디어 이해
+
+Aihubmix는 현재 `inline_data`를 통해 **최대 20MB**의 멀티미디어 파일(이미지, 오디오 및 비디오) 업로드를 지원합니다.
+20MB를 초과하는 파일의 경우 파일 API가 필요합니다. 이 기능은 아직 사용할 수 없습니다. 진행 상황 추적 및 upload_url 검색은 개발 중입니다.
+
+<CodeGroup>
+
+```py 이미지
+from google import genai
+from google.genai import types
+
+file_path = "yourpath/file.jpeg"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="image/jpeg"
+                )
+            ),
+            types.Part(
+                text="이미지를 설명하세요."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py 오디오
+from google import genai
+from google.genai import types
+
+file_path = "yourpath/file.m4a"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="audio/m4a"
+                )
+            ),
+            types.Part(
+                text="오디오를 텍스트로 변환하세요."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py 비디오
+from google import genai
+from google.genai import types
+
+file_path = "yourpath/file.mp4"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="video/mp4"
+                )
+            ),
+            types.Part(
+                text="이 비디오를 요약하세요. 그런 다음 이 비디오의 정보를 기반으로 답안지가 있는 퀴즈를 만드세요."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+
+```py 유튜브 URL
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                file_data=types.FileData(
+                    file_uri="https://www.youtube.com/watch?v=OoU7PwNyYUw"
+                )
+            ),
+            types.Part(
+                text="비디오를 3문장으로 요약해 주세요."
+            )
+        ]
+    )
+)
+
+print(response.text)
+```
+
+</CodeGroup>
+
+## 코드 실행
+
+코드 실행 기능을 사용하면 모델이 Python 코드를 생성 및 실행하고 최종 출력에 도달할 때까지 결과로부터 반복적으로 학습할 수 있습니다. 이 코드 실행 기능을 사용하여 코드 기반 추론의 이점을 활용하고 텍스트 출력을 생성하는 애플리케이션을 빌드할 수 있습니다. 예를 들어 방정식을 풀거나 텍스트를 처리하는 애플리케이션에서 코드 실행을 사용할 수 있습니다.
+
+```py Python
+from google import genai
+from google.genai import types
+
+file_path = "yourpath/file.csv"
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+
+client = genai.Client(
+    api_key="sk-***", # AiHubMix에서 생성한 키로 교체
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=types.Content(
+        parts=[
+            types.Part(
+                inline_data=types.Blob(
+                    data=file_bytes,
+                    mime_type="text/csv"
+                )
+            ),
+            types.Part(
+                text="이 CSV를 분석하고 주요 통계를 요약해 주세요. 필요한 경우 코드 실행을 사용하세요."
+            )
+        ]
+    ),
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(
+            code_execution=types.ToolCodeExecution
+        )]
+    )
+)
+
+for part in response.candidates[0].content.parts:
+    if part.text is not None:
+        print(part.text)
+    if getattr(part, "executable_code", None) is not None:
+        print("생성된 코드:\n", part.executable_code.code)
+    if getattr(part, "code_execution_result", None) is not None:
+        print("실행 결과:\n", part.code_execution_result.output)
+```
+
+## 컨텍스트 캐싱
+
+Gemini의 네이티브 API는 **기본적으로 암시적 컨텍스트 캐싱을 활성화**하므로 설정이 필요하지 않습니다. 모든 `generate_content` 요청에 대해 시스템은 자동으로 입력 콘텐츠를 캐시합니다. 후속 요청이 정확히 동일한 콘텐츠, 모델 및 매개변수를 사용하는 경우 시스템은 즉시 이전 결과를 반환하여 응답 시간을 크게 단축하고 잠재적으로 입력 토큰 비용을 절감합니다.
+
+- **캐싱은 자동이며 수동 구성이 필요하지 않습니다.**
+- 캐시는 콘텐츠, 모델 및 모든 매개변수가 정확히 동일할 때만 적중됩니다. 어떤 차이라도 캐시 미스를 초래합니다.
+- 캐시 TTL(Time-To-Live)은 개발자가 설정하거나 설정하지 않은 상태로 둘 수 있습니다(기본값 1시간). Google에서 적용하는 최소 또는 최대 TTL은 없습니다. 비용은 캐시된 토큰 수와 캐시 기간에 따라 다릅니다.
+  - Google은 TTL에 제한을 두지 않지만 전달 플랫폼으로서 **제한된 TTL 범위만 지원합니다**. 플랫폼의 한계를 넘어서는 요구 사항에 대해서는 문의해 주십시오.
+
+### 참고
+
+- **비용 절감 보장 없음:** 캐시 토큰은 표준 입력 가격의 25%로 청구되므로 이론적으로 캐싱은 입력 토큰 비용을 최대 75%까지 절약할 수 있습니다. 그러나 [Google의 공식 문서](https://ai.google.dev/gemini-api/docs/caching?lang=python)는 비용 절감을 보장하지 않습니다. 실제 효과는 캐시 적중률, 토큰 유형 및 저장 기간에 따라 다릅니다.
+- **캐시 적중 조건:** 캐시 효율성을 극대화하려면 입력 시작 부분에 반복 가능한 컨텍스트를 배치하고 끝 부분에 동적 콘텐츠(예: 사용자 입력)를 배치하십시오.
+- **캐시 적중 감지 방법:** 응답이 캐시에서 온 경우 `response.usage_metadata`에 `cache_tokens_details` 필드와 `cached_content_token_count`가 포함됩니다. 이를 사용하여 캐시 사용량을 확인할 수 있습니다.\
+  캐시 적중 시 예제 필드:
+
+  ```
+  cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+  cached_content_token_count=2003
+  ```
+
+**코드 예제:**
+
+```python
+from google import genai
+
+client = genai.Client(
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+    api_key="sk-***",  # AiHubMix API 키로 교체
+)
+
+prompt = """
+        <오만과 편견의 전체 내용>
+"""
+
+def generate_content_sync():
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-preview-05-20",
+        contents=prompt + "'오만과 편견'의 주요 주제를 분석하세요.",
+    )
+    print(response.usage_metadata)  # 캐시가 적중되면 cache_tokens_details와 cached_content_token_count가 나타납니다.
+    return response
+
+generate_content_sync()
+```
+
+> 캐시가 적중되면 `response.usage_metadata`에 다음이 포함됩니다:
+>
+> ```
+> cache_tokens_details=[ModalityTokenCount(modality=<MediaModality.TEXT: 'TEXT'>, token_count=2003)]
+> cached_content_token_count=2003
+> ```
+
+**핵심 결론:** 암시적 캐싱은 자동이며 명확한 캐시 적중 피드백을 제공합니다. 개발자는 usage_metadata에서 캐시 상태를 확인할 수 있습니다. **비용 절감은 보장되지 않으며** 실제 이점은 요청 구조와 캐시 적중률에 따라 다릅니다.
+
+## 함수 호출
+
+openai 호환 방식을 사용하여 Gemini의 함수 호출을 호출하려면 요청 본문에 `tool_choice="auto"`를 전달해야 합니다. 그렇지 않으면 오류가 발생합니다.
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+# 모델에 대한 함수 선언 정의
+schedule_meeting_function = {
+    "name": "schedule_meeting",
+    "description": "지정된 시간에 지정된 참석자와 회의를 예약합니다.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "attendees": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "회의에 참석하는 사람들의 목록입니다.",
+            },
+            "date": {
+                "type": "string",
+                "description": "회의 날짜 (예: '2024-07-29')",
+            },
+            "time": {
+                "type": "string",
+                "description": "회의 시간 (예: '15:00')",
+            },
+            "topic": {
+                "type": "string",
+                "description": "회의의 주제 또는 주제입니다.",
+            },
+        },
+        "required": ["attendees", "date", "time", "topic"],
+    },
+}
+
+# 클라이언트 구성
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1",
+)
+
+# OpenAI 호환 형식을 사용하여 함수 선언으로 요청 보내기
+response = client.chat.completions.create(
+    model="gemini-2.0-flash",
+    messages=[
+        {"role": "user", "content": "밥과 앨리스와 2025년 3월 14일 오전 10시에 3분기 계획에 대해 회의를 예약하세요."}
+    ],
+    tools=[{"type": "function", "function": schedule_meeting_function}],
+    tool_choice="auto" ## 📍 Aihubmix 호환성 추가, 더 안정적인 요청 방법
+)
+
+# 함수 호출 확인
+if response.choices[0].message.tool_calls:
+    tool_call = response.choices[0].message.tool_calls[0]
+    function_call = tool_call.function
+    print(f"호출할 함수: {function_call.name}")
+    print(f"인수: {function_call.arguments}")
+    print(response.usage)
+    #  실제 앱에서는 여기에서 함수를 호출합니다:
+    #  result = schedule_meeting(**json.loads(function_call.arguments))
+else:
+    print("응답에서 함수 호출을 찾을 수 없습니다.")
+    print(response.choices[0].message.content)
+```
+
+</CodeGroup>
+
+**출력 예:**
+
+```bash
+호출할 함수: schedule_meeting
+인수: {"attendees":["Bob","Alice"],"date":"2025-03-14","time":"10:00","topic":"Q3 planning"}
+CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, completion_tokens_details=None, prompt_tokens_details=None)
+```
+
+## 토큰 사용량 추적 간소화
+
+1. **Gemini**는 `usage_metadata`를 사용하여 토큰 사용량을 추적합니다. 각 필드의 의미는 다음과 같습니다:
+   - `prompt_token_count`: 입력 토큰 수
+   - `candidates_token_count`: 출력 토큰 수
+   - `thoughts_token_count`: 추론 중에 사용된 토큰 (출력으로도 계산됨)
+   - `total_token_count`: 총 사용된 토큰 (입력 + 출력)
+
+   자세한 내용은 [공식 문서](https://ai.google.dev/gemini-api/docs/tokens?lang=python)를 확인하십시오.
+2. **OpenAI 호환 형식**을 사용하는 API의 경우 토큰 사용량은 다음 필드와 함께 `.usage` 아래에서 추적됩니다:
+   - `usage.completion_tokens`: 입력 토큰 수
+   - `usage.prompt_tokens`: 출력 토큰 수 (추론 포함)
+   - `usage.total_tokens`: 총 토큰 사용량
+
+---
+
+**코드에서 사용하는 방법은 다음과 같습니다:**
+
+<CodeGroup>
+
+```py Gemini 네이티브
+from google import genai
+from google.genai import types
+import time
+
+def generate():
+    client = genai.Client(
+        api_key="sk-***", # AiHubMix의 키로 교체
+        http_options={"base_url": "https://aihubmix.com/gemini"},
+    )
+
+    model = "gemini-2.5-pro-preview-03-25"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text="""금융계에서 \"72의 법칙\"은 어떻게 파생되었습니까?"""),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="text/plain",
+    )
+
+    final_usage_metadata = None
+    
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        print(chunk.text, end="")
+        if chunk.usage_metadata:
+            final_usage_metadata = chunk.usage_metadata
+    
+    # 모든 청크가 처리되면 전체 토큰 사용량을 인쇄합니다.
+    if final_usage_metadata:
+        print(f"\n사용량: {final_usage_metadata}")
+
+if __name__ == "__main__":
+    generate()
+```
+
+
+```py OpenAI 호환
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMix의 키로 교체
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="gemini-2.5-flash-preview-04-17",
+    reasoning_effort="low", #"low", "medium", "high"는 내부적으로 1K, 8K, 24K 사고 토큰 예산에 매핑됩니다. 사고를 비활성화하려면 추론 노력을 "none"으로 설정할 수 있습니다.
+    messages=[
+        {
+            "role": "user",
+            "content": "금융계에서 \"72의 법칙\"은 어떻게 파생되었습니까?"
+        }
+    ],
+    stream=True
+)
+
+#print(completion.choices[0].message.content)
+
+for chunk in completion:
+    print(chunk.choices[0].delta)
+    # 마지막 청크에만 토큰 사용량 정보를 인쇄합니다 (전체 사용량 데이터 포함)
+    if chunk.usage and chunk.usage.completion_tokens > 0:
+        print(f"출력 토큰: {chunk.usage.completion_tokens}")
+        print(f"입력 토큰: {chunk.usage.prompt_tokens}")
+        print(f"총 토큰: {chunk.usage.total_tokens}")
+```
+
+</CodeGroup>

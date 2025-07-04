@@ -1,0 +1,76 @@
+---
+title: "Claude Code"
+description: " "
+icon: "terminal"
+---
+
+用 Aihubmix 為 Claude Code 提供強勁動力，再也不怕連線不穩定或者無法購買額度。
+
+## 快速配置指引：
+
+### 1️⃣ 全域安裝 npm 套件
+
+終端機執行
+
+```shell
+npm install -g @anthropic-ai/claude-code
+```
+
+示意圖：
+
+![install](../../public/cn/aihubmix-claude-code-npm.png)
+
+### 2️⃣ 環境變數配置
+
+到 Aihubmix[「Keys」頁面](https://aihubmix.com/token) 生成密鑰，在系統環境變數中填入這個密鑰和轉發位址。
+
+比如在 ~/.zshrc 中新增：
+
+```shell
+export ANTHROPIC_API_KEY="sk-***"
+export ANTHROPIC_BASE_URL="https://aihubmix.com"
+```
+
+<Tip>
+  對於 Mac 使用者，你可以在`使用者名稱`目錄透過快捷鍵 `⌘ + ⇧ + .` 顯示隱藏的 .zshrc 檔案，用系統的「文字編輯」APP 開啟並新增上述內容。
+</Tip>
+
+### 3️⃣ 使配置生效
+
+新增配置之後，終端機執行 `source ~/.zshrc`，按下 Enter 即可。
+
+### 4️⃣ 終端機啟動
+
+定位到目標專案目錄，比如 `cd ~/Desktop/my-project`\
+輸入 `claude` 啟動，即可使用。
+
+## 初始化配置
+
+### 授權
+
+如彈出授權頁面，點擊跳轉到 Claude 官網進行確認，授權成功後，返回終端機繼續。認證不需要付費帳號，隨便註冊有一個免費的 claude 帳號就行；
+
+![auth](../../public/cn/claude-auth.png)
+
+### 啟動
+
+啟動後，Claude Code 會顯示當前配置信息，包括 API Key 和 API Base URL。
+需要確認的地方，選擇 Yes 按下 Enter 確認，即可完成所有設定。
+
+![initialization](../../public/cn/aihubmix-claude-code.png)
+
+比如：Claude 偵測到系統環境變數有自訂 KEY，選 `Yes`
+
+```
+Detected a custom API key in your environment
+
+ANTHROPIC_API_KEY: sk-***
+Do you want to use this API key?
+
+> 1. Yes
+2. No(recommended)
+
+Enter to confirm .Esc to cancel
+```
+
+祝你使用愉快！

@@ -1,0 +1,151 @@
+---
+title: "빠른 시작"
+description: ""
+"icon": "rocket-launch"
+---
+
+## 1️⃣ AiHubMix에 직접 API 호출하기
+
+<Tip>
+`<AIHUBMIX_API_KEY>`를 [Aihubmix 키](https://aihubmix.com/token)로 바꾸세요. 키의 유효 기간과 사용 한도를 확인해 주세요.
+</Tip>
+
+사용 가능한 `model` 옵션은 [모델 갤러리](https://aihubmix.com/models)에서 확인하세요. 모델 이름을 복사하여 붙여넣기만 하면 사용할 수 있습니다.
+
+<CodeGroup>
+```py Python
+import requests
+import json
+
+response = requests.post(
+  url="https://aihubmix.com/v1/chat/completions",
+  headers={
+    "Authorization": "Bearer <AIHUBMIX_API_KEY>",
+    "Content-Type": "application/json",
+  },
+  data=json.dumps({
+    "model": "gpt-4o-mini", # 모델 ID를 바꾸세요
+    "messages": [
+      {
+        "role": "user",
+        "content": "삶의 의미는 무엇인가요?"
+      }
+    ]
+  })
+)
+```
+
+```typescript Javascript
+// 브라우저 CORS 문제를 피하려면 https://aihubmix.com 도메인에서 시도하세요
+fetch('https://aihubmix.com/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer <AIHUBMIX_API_KEY>',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: "gpt-4o-mini", // 모델 ID를 바꾸세요
+    messages: [
+      {
+         "role": "user",
+         "content": "삶의 의미는 무엇인가요?"
+      }
+    ]
+  }),
+})
+```
+
+```Shell Curl
+curl 'https://aihubmix.com/v1/chat/completions' \
+-H 'Authorization: Bearer <AIHUBMIX_API_KEY>' \
+-H 'Content-Type: application/json' \
+-d '{
+   "model": "gpt-4o-mini",
+   "messages": [
+      {
+         "role": "user",
+         "content": "삶의 의미는 무엇인가요?"
+      }
+   ]
+}'
+```
+</CodeGroup>
+
+스트리밍 응답을 원하시면 `stream: true` 매개변수를 추가하기만 하면 됩니다.
+
+## 2️⃣ OpenAI SDK 사용하기
+
+`<AIHUBMIX_API_KEY>`를 [Aihubmix 키](https://aihubmix.com/token)로 바꾸세요. 키의 유효 기간과 사용 한도를 확인해 주세요.
+사용 가능한 `model` 옵션은 [모델 갤러리](https://aihubmix.com/models)에서 확인하세요. 모델 이름을 복사하여 붙여넣기만 하면 사용할 수 있습니다.
+
+<CodeGroup>
+```py Python
+from openai import OpenAI
+import random
+
+client = OpenAI(
+  base_url="https://aihubmix.com/v1",
+  api_key="<AIHUBMIX_API_KEY>",
+)
+
+completion = client.chat.completions.create(
+  model="gpt-4o-mini", # 모델 ID를 바꾸세요
+  messages=[
+    {
+      "role": "developer",
+      "content": "항상 한국어로 답하세요"
+    },    
+    {
+      "role": "user",
+      "content": "삶의 의미는 무엇인가요?"
+    }
+  ],
+  temperature=0.8,
+  max_tokens=1024,
+  top_p=1,
+  frequency_penalty=0,
+  presence_penalty=0,
+  seed=random.randint(1, 1000000000),
+)
+
+print(completion.choices[0].message.content)
+```
+
+```js Javascript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://aihubmix.com/v1',
+  apiKey: '<AIHUBMIX_API_KEY>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini", # 모델 ID를 바꾸세요
+    messages: [
+      {
+         "role": "user",
+         "content": "삶의 의미는 무엇인가요?"
+      }
+    ]
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+```
+</CodeGroup>
+
+웹 검색을 지원하는 모델의 경우 다음 매개변수를 추가할 수 있습니다:
+```Python
+  web_search_options={}, # 검색 매개변수
+```
+사용 가능한 모델: `gpt-4o-search-preview`, `gpt-4o-mini-search-preview`.
+<Info>
+검색 모델은 현재 `temperature`와 같은 매개변수를 지원하지 않습니다.
+</Info>
+
+## 3️⃣ 타사 클라이언트를 통해 요청하기
+
+[사용 사례](/en/clients/AnythingLLM)를 참조하세요.

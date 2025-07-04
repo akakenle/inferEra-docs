@@ -1,0 +1,113 @@
+---
+title: "중간 채우기"
+icon: "message-code"
+---
+
+### 1. 사용법
+
+FIM(Fill In the Middle) 완성 작업에서 사용자는 유지하려는 접두사 및 접미사 내용을 입력하고 모델은 이러한 프롬프트를 기반으로 누락된 부분을 생성합니다. 이 완성 방법은 코드 자동 완성 및 텍스트 중간 생성과 같은 애플리케이션에서 일반적입니다.
+
+### 2. 데이터 형식
+
+chat/completions 인터페이스에서 `model id`를 [모델 갤러리](https://aihubmix.com/models)의 모델 ID로 설정하기만 하면 되며, 이는 모듈 카드 오른쪽 상단에서 확인할 수 있습니다.
+
+```json
+{ 
+    "model": "모델 ID",
+    "messages": "프롬프트",
+    "params": "매개변수",
+    "extra_body": {"prefix":"접두사 내용", "suffix":"선택적 접미사 내용"}
+}
+```
+
+completions 인터페이스에서
+
+```json
+{
+    "model": "모델 정보",
+    "prompt": "프롬프트",
+    "suffix": "프롬프트"
+}
+```
+
+### 3. 예시
+
+#### 3.1 OpenAI의 chat.completions 인터페이스를 기반으로 한 FIM 완성 사용:
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+messages = [
+    {"role": "user", "content": "합계 함수 코드를 작성해 주세요"},
+]
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    extra_body={
+            "prefix": f"""
+def sum_numbers(numbers):
+    # 목록이 비어 있으면 0을 반환합니다
+    if not numbers:
+        return 0
+""",
+            "suffix": f"""
+# 테스트 실행
+numbers = [1, 2, 3, 4, 5]
+result = sum_numbers(numbers)
+print("숫자의 합:", result)
+"""
+    },
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end='')
+```
+
+</CodeGroup>
+
+
+#### 3.2 OpenAI의 Completions API를 기반으로 한 FIM을 사용한 완성:
+<CodeGroup>
+
+```py Python
+
+client = OpenAI(
+    api_key="Aihubmix APIKEY", 
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.completions.create(
+    model="deepseek-ai/DeepSeek-V2.5",
+    prompt=f"""
+def quick_sort(arr):
+   # 기본 상황: 배열 길이가 1 이하이면 배열을 반환합니다
+    if len(arr) <= 1:
+        return arr
+    else:
+""",
+    suffix=f"""
+# quick_sort 함수 테스트
+arr = [3, 6, 8, 10, 1, 2, 1]
+sorted_arr = quick_sort(arr)
+print("정렬된 배열:", sorted_arr)
+""",
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    print(chunk.choices[0].text, end='')
+```
+
+</CodeGroup>

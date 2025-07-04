@@ -1,0 +1,216 @@
+---
+title: "GPT 이미지"
+description: " "
+icon: "palette"
+---
+
+## API 개요
+
+OpenAI의 `gpt-image-1` 이미지 생성 API는 텍스트-이미지 생성과 텍스트 안내를 통한 이미지-이미지 편집 기능을 모두 제공합니다.\
+이 API를 사용하기 전에 `pip install -U openai`를 실행하여 최신 OpenAI 패키지가 설치되어 있는지 확인하십시오.
+
+## 중요 참고 사항
+
+<Warning>
+  - API 호출이 전송되면 생성 과정에서 중단이나 실패에 관계없이 **요금이 부과됩니다**
+  - 살아있는 예술가(예: "미야자키 하야오", "신카이 마코토" 등)의 이름은 `moderation_blocked` 오류를 유발하여 **생성 실패**를 초래합니다. 대신 "지브리" 또는 "밝은 현대 일본 애니메이션 스타일"과 같은 민감하지 않은 용어를 사용하여 이 문제를 해결할 수 있습니다. 노출이 심한 의상이나 선정적인 내용의 이미지에도 동일하게 적용됩니다.
+  - 일반적으로 "아티스트"를 지명하는 것보다 "스타일"을 참조하는 것이 더 안전합니다. 예를 들어 "픽사"는 지원됩니다.
+  - 더 신뢰할 수 있는 접근 방식은 "반 고흐" 또는 "모나리자"와 같이 사망한 예술가 또는 해당 스타일을 사용하는 것입니다.
+</Warning>
+
+## 모델 및 가격
+
+| 모델       | 품질 | 1024x1024 | 1024x1536 | 1536x1024 |
+| ----------- | ------- | --------- | --------- | --------- |
+| gpt-image-1 | 낮음     | \$0.011   | \$0.016   | \$0.016   |
+| gpt-image-1 | 중간  | \$0.042   | \$0.063   | \$0.063   |
+| gpt-image-1 | 높음    | \$0.167   | \$0.25    | \$0.25    |
+
+<Info>
+  참고: 입력 텍스트 토큰은 백만 토큰당 \$5로 별도로 청구됩니다.
+</Info>
+
+## API 사용법
+
+**엔드포인트**
+
+1. 이미지 생성: `https://aihubmix.com/v1/images/generations`
+2. 이미지 편집: `https://aihubmix.com/v1/images/edits`
+
+**Python 예제:**
+
+<CodeGroup>
+
+```py 생성 (텍스트-이미지)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AIHUBMIX 키 "sk-***"로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """영화 [블랙 스완]의 포스터를 재디자인하세요, 3D 만화, 부드러운 렌더링, 밝은 톤, 2:3 세로."""
+
+result = client.images.generate(
+    model="gpt-image-1",
+    prompt=prompt,
+    n=1, # 생성할 이미지 수, 최대 10개
+    size="1024x1536", # 1024x1024 (정사각형), 1536x1024 (3:2 가로), 1024x1536 (2:3 세로), auto (기본값) 
+    quality="high", # high, medium, low, auto (기본값)
+    moderation="low", # low, auto (기본값) - 업데이트된 openai 패키지 필요 📍
+    background="auto", # transparent, opaque, auto (기본값)
+)
+
+print(result.usage)
+
+# 파일 이름 접두사 및 저장 디렉토리 정의
+output_dir = "." # 다른 디렉토리를 지정할 수 있습니다
+file_prefix = "image_gen"
+
+# 출력 디렉토리가 있는지 확인
+os.makedirs(output_dir, exist_ok=True)
+
+# 반환된 모든 이미지 데이터 반복
+for i, image_data in enumerate(result.data):
+    image_base64 = image_data.b64_json
+    if image_base64: # b64_json이 비어 있지 않은지 확인
+        image_bytes = base64.b64decode(image_base64)
+
+        # --- 파일 이름 충돌 로직 처리 ---
+        current_index = i
+        while True:
+            # 증분 카운터로 파일 이름 생성
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name) # 전체 파일 경로 빌드
+
+            # 파일이 있는지 확인
+            if not os.path.exists(file_path):
+                break # 파일 이름 충돌 없음, 루프 종료
+
+            # 파일 이름 충돌, 카운터 증가
+            current_index += 1
+
+        # 고유한 file_path를 사용하여 파일에 이미지 저장
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"이미지가 다음 위치에 저장되었습니다: {file_path}")
+    else:
+        print(f"인덱스 {i}의 이미지 데이터가 비어 있어 저장을 건너뜁니다.")
+```
+
+
+```py 편집 (이미지+텍스트에서 이미지로)
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AIHUBMIX 키 "sk-***"로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """영화 [블랙 스완]의 포스터를 재디자인하세요, 3D 만화, 부드러운 렌더링, 밝은 톤, 2:3 세로."""
+
+result = client.images.edit(
+    model="gpt-image-1",
+    image=open("yourpath/edit.jpg", "rb"), # 여러 참조 이미지의 경우 [list,] 사용
+    n=2, # 생성할 이미지 수
+    prompt=prompt,
+    size="1024x1536", # 1024x1024 (정사각형), 1536x1024 (3:2 가로), 1024x1536 (2:3 세로), auto (기본값)
+    # moderation="low", # 편집은 조정 지원 안 함
+    quality="high" # high, medium, low, auto (기본값)
+)
+
+print(result.usage)
+
+# 파일 이름 접두사 및 저장 디렉토리 정의
+output_dir = "." # 다른 디렉토리를 지정할 수 있습니다
+file_prefix = "image_edit" # 파일 이름 접두사 수정
+
+# 출력 디렉토리가 있는지 확인
+os.makedirs(output_dir, exist_ok=True)
+
+# --- API에서 반환된 각 이미지 반복 ---
+for i, image_item in enumerate(result.data):
+    image_base64 = image_item.b64_json
+    if image_base64 is None:
+        print(f"경고: 이미지 {i+1}에 base64 데이터가 없어 저장을 건너뜁니다.")
+        continue # b64_json 데이터가 없으면 다음 이미지로 건너뛰기
+
+    image_bytes = base64.b64decode(image_base64)
+
+    # --- 현재 이미지에 대해 충돌하지 않는 파일 이름 찾기 ---
+    current_index = 0 # 0부터 확인 시작 또는 전역적으로 증가하는 인덱스 유지
+    while True:
+        # 증분 카운터로 파일 이름 생성
+        file_name = f"{file_prefix}_{current_index}.png"
+        file_path = os.path.join(output_dir, file_name) # 전체 파일 경로 빌드
+
+        # 파일이 있는지 확인
+        if not os.path.exists(file_path):
+            break # 파일 이름 충돌 없음, 내부 루프 종료
+
+        # 파일 이름 충돌, 카운터 증가
+        current_index += 1
+
+    # 고유한 file_path를 사용하여 현재 이미지를 파일에 저장
+    try:
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"편집된 이미지 {i+1}이 다음 위치에 저장되었습니다: {file_path}")
+    except Exception as e:
+        print(f"이미지 {i+1} 저장 오류 ({file_path}): {e}")
+```
+
+</CodeGroup>
+
+더 많은 매개변수 세부 정보는 [OpenAI 공식 문서](https://platform.openai.com/docs/api-reference/images/create)를 참조하십시오.
+
+## 출력 예시
+
+<CodeGroup>
+
+```json 생성
+Usage(input_tokens=150, input_tokens_details=UsageInputTokensDetails(image_tokens=0, text_tokens=150), output_tokens=6240, total_tokens=6390)
+이미지가 다음 위치에 저장되었습니다: ./image_gen_14.png
+```
+
+
+```json 편집
+Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_tokens=646, text_tokens=346), output_tokens=12480, total_tokens=13472)
+편집된 이미지 1이 다음 위치에 저장되었습니다: ./image_edit_1.png
+편집된 이미지 2가 다음 위치에 저장되었습니다: ./image_edit_2.png
+```
+
+</CodeGroup>
+
+## 거부 시나리오
+
+요청이 거부될 때의 오류 메시지:
+
+```json
+오류 코드: 400 - {'error': {'message': '안전 시스템의 결과로 요청이 거부되었습니다. 요청에 안전 시스템에서 허용하지 않는 콘텐츠가 포함될 수 있습니다.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
+```
+
+단일 생성에서 2-10개의 이미지를 요청할 때 시스템이 요청이 플랫폼 정책을 위반한다고 감지하면 플래그가 지정된 콘텐츠는 생성되지 않습니다. 이로 인해 원래 요청한 수보다 적은 수의 이미지가 생성될 수 있습니다. 그러나 다중 이미지 생성에서는 `moderation_blocked` 오류가 발생하지 않습니다. 
+따라서 시스템 거부 위험을 최소화하고 원활한 생성을 보장하기 위해 잠재적인 지적 재산권(IP) 또는 저작권 문제를 사전에 피하는 것이 좋습니다.
+
+**✍️ 주요 권장 사항:**  
+- 저작권이 있는 캐릭터, 로고, 유명인 초상화 등을 직접 사용하지 마십시오.
+- 대신 "스타일 영감", "창의적인 재해석" 또는 "일반화된 설명"을 사용하는 것을 고려하십시오.
+- 특정 요소를 참조하는 경우 공개 도메인에 속하는지 확인하십시오.
+
+## 실용적인 팁
+
+<Tip>
+  - 모든 언어를 지원합니다. 중국어 텍스트는 안정적으로 작동하지만 어떤 언어로든 많은 양의 텍스트를 생성하는 것은 권장하지 않습니다.
+  - size 매개변수는 명시적으로 size="auto"를 전달하는 것을 지원하지 않습니다. auto가 기본값입니다.
+  - 가로 세로 비율은 프롬프트에서 지정하거나(2:3, 3:2, 1:1 지원) size 매개변수를 통해 설정할 수 있습니다.
+  - `moderation` 매개변수는 민감도를 제어하지만 "low"로 설정하더라도 요청이 여전히 거부될 수 있습니다(예: 비너스가 너무 노출이 심한 경우).
+  - edits 엔드포인트는 `moderation` 매개변수를 지원하지 않습니다.
+  - 텍스트 설명과 참조 이미지를 결합하면 더 정확한 결과를 얻을 수 있습니다.
+  - 업로드된 이미지를 사전 처리로 압축하면 속도를 향상시킬 수 있습니다.
+  - 투명한 배경이 지원됩니다(수동으로 잘라낼 필요 없음). 프롬프트에 이 요구 사항을 추가하기만 하면 됩니다.
+</Tip>

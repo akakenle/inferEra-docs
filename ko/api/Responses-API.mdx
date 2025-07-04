@@ -1,0 +1,273 @@
+---
+title: "Openai Responses API 지원"
+icon: "o"
+---
+
+Openai Responses API 다기능 인터페이스를 지원하며, 다음 기능들이 출시되었습니다:
+
+- Text input: 텍스트 입력
+- Image input: 이미지 입력
+- Streaming: 스트리밍
+- Web search: 웹 검색
+- Reasoning: 추론
+- Functions: 함수
+- image_generation tool usage: 이미지 그리기 및 생성은 `gpt-image-1`로 청구됩니다.
+- Code Interpreter: 모델이 Python을 작성하고 실행하여 문제를 해결할 수 있도록 합니다
+- Remote MCP: 원격 MCP 서버 호출
+- Computer Use: 컴퓨터 사용
+
+## 사용법 (Python 호출):
+
+공식 OpenAI 호출 방법과 동일하며, 전달을 위해 `api_key`와 `base_url`만 교체하면 됩니다.
+중국 본토에서 직접 접근할 수 있습니다.
+
+```py
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체하세요
+    base_url="https://aihubmix.com/v1"
+)
+```
+
+추론 모델의 경우, 다음 매개변수를 사용하여 출력 추론 요약을 제어할 수 있으며, 요약의 상세도는 detailed \> auto \> None 순으로, auto가 최상의 균형을 제공합니다.
+
+```py
+"summary": "auto"
+```
+
+<CodeGroup>
+
+```py 텍스트 입력
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 사용 가능
+  input="유니콘에 대한 세 문장 잠자리 이야기를 들려주세요."
+)
+
+print(response)
+```
+
+
+```py 이미지 입력
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4o-mini", # codex-mini-latest 사용 가능
+    input=[
+        {
+            "role": "user",
+            "content": [
+                { "type": "input_text", "text": "이 이미지에 무엇이 있나요?" },
+                {
+                    "type": "input_image",
+                    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+                }
+            ]
+        }
+    ]
+)
+
+print(response)
+```
+
+
+```py 스트리밍
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 사용 가능
+  instructions="당신은 도움이 되는 어시스턴트입니다.",
+  input="안녕하세요!",
+  stream=True
+)
+
+for event in response:
+  print(event)
+```
+
+
+```py 웹 검색
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini",
+  tools=[{ "type": "web_search_preview" }],
+  input="오늘의 긍정적인 뉴스는 무엇이었나요?",
+)
+
+print(response)
+```
+
+
+```py 추론
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1/"
+)
+
+response = client.responses.create(
+    model="o4-mini", # codex-mini-latest, o4-mini, o3-mini, o3, o1
+    input="딱따구리가 얼마나 많은 나무를 쪼을 수 있을까요?",
+    reasoning={
+        "effort": "medium", # low, medium, high
+        "summary": "auto", # 추론 요약
+    }
+)
+
+print(response)
+```
+
+
+```py 함수
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+tools = [
+    {
+        "type": "function",
+        "name": "get_current_weather",
+        "description": "주어진 위치의 현재 날씨 가져오기",
+        "parameters": {
+          "type": "object",
+          "properties": {
+              "location": {
+                  "type": "string",
+                  "description": "도시와 주, 예: 서울, 부산",
+              },
+              "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+          },
+          "required": ["location", "unit"],
+        }
+    }
+]
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 사용 가능
+  tools=tools,
+  input="오늘 보스턴 날씨는 어떤가요?",
+  tool_choice="auto"
+)
+
+print(response)
+```
+
+
+```py 이미지 생성 도구
+from openai import OpenAI
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="주황색 스카프를 한 수달을 안고 있는 회색 줄무늬 고양이 이미지를 생성해주세요",
+    tools=[{"type": "image_generation"}],
+)
+
+# 이미지를 파일로 저장
+image_data = [
+    output.result
+    for output in response.output
+    if output.type == "image_generation_call"
+]
+
+if image_data:
+    image_base64 = image_data[0]
+    with open("cat_and_otter.png", "wb") as f:
+        f.write(base64.b64decode(image_base64))
+```
+
+
+```py 코드 인터프리터
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+instructions = """
+당신은 개인 수학 튜터입니다. 수학 문제를 받으면, 
+python 도구를 사용해서 코드를 작성하고 실행하여 문제를 답하세요.
+"""
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[
+        {
+            "type": "code_interpreter",
+            "container": {"type": "auto"}
+        }
+    ],
+    instructions=instructions,
+    input="3x + 11 = 14 방정식을 풀어야 합니다. 도와주실 수 있나요?",
+)
+
+print(resp.output)
+```
+
+
+```py 원격 MCP
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 당신의 키 "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "never",
+        "allowed_tools": ["ask_question"],
+    }],
+    input="MCP 사양의 2025-03-26 버전(modelcontextprotocol/modelcontextprotocol)은 어떤 전송 프로토콜을 지원하나요?",
+)
+
+print(resp.output_text)
+```
+
+</CodeGroup>
+
+**참고:**
+
+1. 최신 `codex-mini-latest`는 검색을 **지원하지 않습니다**.
+2. **Computer use** 기능은 **Playwright**와의 통합이 필요합니다. [공식 저장소](https://github.com/openai/openai-cua-sample-app)를 참조하는 것을 권장합니다.
+
+알려진 문제:
+
+- 사용 사례가 복잡하여 호출이 어려움
+- 많은 스크린샷을 찍어 시간이 오래 걸리고 종종 불안정함
+- CAPTCHA나 Cloudflare 인간 검증을 유발하여 무한 루프에 빠질 가능성

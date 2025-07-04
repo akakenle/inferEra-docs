@@ -1,0 +1,37 @@
+---
+title: "OpenAI 라이브러리 사용하기"
+description: ""
+icon: 'o'
+---
+
+다음은 최신 OpenAI 패키지 사용 가이드입니다.
+
+<Tip>
+클라이언트 내에서 전달 base_url과 AiHubMix [토큰](https://aihubmix.com/token)을 구성하기만 하면 됩니다.
+이 구성은 AiHubMix 플랫폼의 모든 모델과 호환됩니다.
+</Tip>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체하세요
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "테스트라고 말해주세요",
+        }
+    ],
+    model="gpt-4o-mini",
+)
+
+print(chat_completion)
+```
+
+<Info>
+OpenAI 공식 현재 서비스 상태 [확인](https://status.openai.com/)
+</Info>

@@ -1,0 +1,321 @@
+---
+title: "GPT 이미지 (리버스)"
+description: " "
+icon: "paintbrush"
+---
+
+## 인터페이스 설명
+
+사용자들의 강한 기대에 부응하기 위해 특별히 두 가지 리버스 엔지니어링 인터페이스인 `gpt-4o-image`와 `gpt-4o-image-vip`를 출시했습니다. VIP 모델은 우수한 성능과 안정성을 제공합니다.\
+리버스 엔지니어링 인터페이스는 완전한 안정성을 보장할 수 없으며 `🕐 대기 중...` 상태 또는 생성 실패가 발생할 수 있습니다. 체험 및 기능 테스트용으로만 권장됩니다.\
+OpenAI의 공식 인터페이스 `gpt-image-1`이 출시되었습니다. 사용 비용을 고려하여 현재 리버스 엔지니어링 인터페이스는 일시적으로 유지되며 모든 사람에게 호환되는 호출 방법이 제공됩니다.
+
+## 참고
+
+<Warning>
+  - **특별 참고**: 원인에 관계없이 API 호출이 시작되면 생성에 실패하더라도 요금이 부과됩니다.
+  - 살아있는 예술가(예: "지브리", "신카이 마코토")의 이름은 `input_moderation` 오류를 유발하여 **생성 실패**를 초래합니다. "지브리" 및 "밝은 현대 일본 애니메이션 스타일"과 같은 민감하지 않은 단어를 사용하여 이를 피할 수 있습니다.
+  - 일반적으로 "스타일"은 "아티스트"보다 안전하며 "픽사"와 같은 것도 지원됩니다.
+  - 더 안전한 접근 방식은 "반 고흐" 및 "모나리자"와 같이 사망한 예술가 또는 해당 스타일의 이름을 사용하는 것입니다.
+</Warning>
+
+## 모델 및 가격
+
+| 모델              | 가격 ($/이미지) |
+| ------------------ | -------------- |
+| `gpt-4o-image-vip` | $0.009        |
+| `gpt-4o-image`     | $0.005        |
+
+<Info>
+  리버스 엔지니어링 인터페이스의 유지 관리 비용이 증가함에 따라 통화당 가격이 인상되었습니다.
+  <sub>(업데이트 날짜: 2025-06-04)</sub>.
+</Info>
+
+## Python 예제
+
+익숙한 `v1/completions` 엔드포인트를 사용하여 완벽하게 호환되는 지원을 제공합니다. 특정 사용법은 다음을 참조하십시오:
+
+<CodeGroup>
+
+```py 텍스트를 이미지로
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 여기에 키 입력
+    base_url="https://aihubmix.com/v1"
+)
+
+# 채팅 완료 요청 생성
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #list: gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """[진주 귀걸이를 한 소녀]를 애니메이션 스타일의 일러스트 표지로 재디자인하세요. 원본의 본질과 구성을 보존하세요. 세련된 교토 애니메이션 스타일(부드러운 붓놀림, 영화 같은 조명, 점진적인 깊이)로 렌더링하세요. 
+AV 표지 레이아웃 형식: 
+일본어-영어 혼합 타이포그래피, 시각적 계층 구조가 중요한 세리프 제목 - 디자인 감각이 핵심입니다.
+심오한 의미를 전달하는 단어를 제목으로 추출한 다음 창의적인 슬로건을 만드세요. 필요한 경우에만 원본 이름을 더 작은 정보로 사용할 수 있습니다.
+의류나 배경에 "jerlin" 워터마크를 미묘하게 삽입하세요. 감정적인 톤과 자세를 유지하고 필요할 때만 부드럽게 처리하세요. 2:3 세로"""
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# 스트리밍 응답 처리
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n응답 처리 중 오류 발생: {str(e)}")
+```
+
+
+```py 이미지가 있는 텍스트를 이미지로
+from openai import OpenAI
+import base64
+
+# 이미지를 인코딩하는 함수
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 이미지 경로 가져오기
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# 이미지 인코딩
+base64_image = encode_image(image_path)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """이미지를 지브리 스타일로 변환하고 밝은 톤으로 만드세요. 3:2"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n응답 처리 중 오류 발생: {str(e)}")
+```
+
+
+```py 텍스트가 있는 다중 이미지
+from openai import OpenAI
+import base64
+
+# 이미지를 인코딩하는 함수
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 이미지 경로 가져오기
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# 첫 번째 이미지 인코딩
+base64_image1 = encode_image(image_path)
+
+# 두 번째 이미지 경로 가져오기
+image_path2 = "ref.jpeg"
+
+# 두 번째 이미지 인코딩
+base64_image2 = encode_image(image_path2)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 여기에 키 입력
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """이미지 1을 이미지 2 스타일로 변환하고 밝은 톤으로 만드세요. 2:3"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image1}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image2}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n응답 처리 중 오류 발생: {str(e)}")
+```
+
+</CodeGroup>
+
+## 출력 예시
+
+```
+{
+  "prompt": "'진주 귀걸이를 한 소녀'를 애니메이션 스타일의 일러스트 표지로 재디자인하세요. 상징적인 옆모습 포즈, 고요한 표정, 친밀한 프레임 등 원본의 본질과 구성을 보존하세요. 부드러운 붓놀림, 영화 같은 조명, 점진적인 깊이를 갖춘 세련된 교토 애니메이션 스타일로 렌더링하세요. 일본어-영어 혼합 타이포그래피를 사용하여 AV 표지 레이아웃을 만들고, 강한 시각적 계층 구조를 가진 눈에 띄는 세리프 제목을 사용하세요. 제목에 심오한 단어를 추출하고 창의적인 슬로건을 포함하세요. 원본 이름 '진주 귀걸이를 한 소녀'는 필요한 경우 더 작은 텍스트로 표시되어야 합니다. 의류나 배경에 'jerlin' 워터마크를 미묘하게 삽입하세요. 겸손을 위해 잠재적인 노출을 흐르는 천, 머리카락 또는 베일로 대체하면서 감정적인 톤과 자세를 유지하세요. 필요한 경우에만 세부 사항을 부드럽게 처리하세요.",
+  "ratio": "2:3"
+}
+
+>🕐 대기 중.
+
+>⚡ 생성 중.....
+
+>🏃‍ 진행률 11....19....27...34....42....50....57...64....[100](https://videos.openai.com/vg-assets/assets%2Ftask_01jsccq77nfcsab7dn8bx7z230%2Fsrc_1.png?st=2025-04-21T13%3A08%3A48Z&se=2025-04-27T14%3A08%3A48Z&sks=b&skt=2025-04-21T13%3A08%3A48Z&ske=2025-04-27T14%3A08%3A48Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=xm6K6M7au3F3Vd9qcYxR3mYWrqAHsgbagbUV5GQo39w%3D&az=oaivgprodscus)
+
+> ✅ 생성 완료
+
+
+![gen_01jsccq83pfg6ssfqf3pzfaytj](https://filesystem.site/cdn/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+[다운로드하려면 클릭](https://filesystem.site/cdn/download/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+![gen_01jsccq83nf6ftmtx8y48h383y](https://filesystem.site/cdn/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)
+
+[다운로드하려면 클릭](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%
+```
+
+## 공식 OpenAI API와의 호환성
+
+OpenAI에서 출시한 최신 이미지 생성 방법을 선호하는 경우 다음 구현을 참조할 수 있습니다. 다음 3가지만 기억하면 됩니다:
+
+1. `quality` 매개변수를 포함하지 마십시오. `gpt-4o-image-vip` 및 `gpt-4o-image`와 같은 모델에는 내부적으로 번들로 제공됩니다.
+2. `usage` 필드(토큰 추적)는 지원되지 않습니다.
+3. 최신 출력은 Base64로 인코딩된 이미지 데이터를 반환하며 현재 스크립트는 이미 자동 저장을 처리합니다.
+
+```py Python
+from openai import OpenAI
+import os
+import requests
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix API 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+영화 [블랙 스완]의 포스터를 재디자인하세요, 3D 만화, 부드러운 렌더링, 밝은 톤, 2:3
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # 생성할 이미지 수
+    size="1024x1536", # 1024x1024 (정사각형), 1536x1024 (3:2 가로), 1024x1536 (2:3 세로), auto (기본값)
+    #quality="high" # 리버스 모델에 대해 품질을 전달하지 마십시오. 내부적으로 바인딩됩니다 📍
+)
+
+print(result) # 전체 API 응답 인쇄, 리버스 API에 대해 사용량은 지원되지 않음 📍
+
+# 출력 파일 이름 접두사 및 디렉토리 정의
+output_dir = "." # 다른 디렉토리를 지정할 수 있습니다
+file_prefix = "image_gen-reverse"
+
+# 출력 디렉토리가 있는지 확인
+os.makedirs(output_dir, exist_ok=True)
+
+# 반환된 모든 이미지 데이터 반복
+for i, image_data in enumerate(result.data):
+    # 먼저 base64 문자열 처리
+    if hasattr(image_data, "b64_json") and image_data.b64_json:
+        image_bytes = base64.b64decode(image_data.b64_json)
+        current_index = i
+        while True:
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name)
+            if not os.path.exists(file_path):
+                break
+            current_index += 1
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"이미지가 다음 위치에 저장되었습니다: {file_path} (base64)")
+    # 그런 다음 url 필드 처리 (인터페이스 변경 시 강력한 대체)
+    elif hasattr(image_data, "url") and image_data.url:
+        try:
+            response = requests.get(image_data.url, stream=True)
+            response.raise_for_status()
+            image_bytes = response.content
+            current_index = i
+            while True:
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name)
+                if not os.path.exists(file_path):
+                    break
+                current_index += 1
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"이미지가 다음 위치에 저장되었습니다: {file_path} (url)")
+        except requests.exceptions.RequestException as e:
+            print(f"이미지 #{i} 다운로드 실패: {e}")
+        except Exception as e:
+            print(f"이미지 #{i} 처리 중 오류 발생: {e}")
+    else:
+        print(f"이미지 #{i}에서 b64_json 또는 url을 찾을 수 없어 저장을 건너뜁니다.")
+```
+
+## 효과 시연
+
+<Card title="진주 귀걸이를 한 소녀" img="../../public/en/Girl-with-a-Pearl-Earring.PNG">
+  1. 유명한 그림이 재해석되었으며 텍스트와 워터마크가 직접 출력됩니다.
+</Card>
+
+<Card title="픽사" img="../../public/en/pixar.png">
+  1. 픽사 3D 만화 스타일, 여전히 안정적입니다.
+</Card>
+
+<Card title="지브리" img="../../public/en/ghibli.png">
+  1. 가장 인기 있는 지브리
+</Card>
+
+## 실용적인 팁
+
+<Tip>
+  - 모든 언어를 지원하며 중국어 그림도 안정적이지만 많은 양의 텍스트를 그리는 것은 권장하지 않습니다.
+  - 프롬프트에 가로 세로 비율을 지정하지 않으면 4o가 자동으로 결정합니다. 2:3, 3:2, 1:1을 지원합니다.
+  - 영감이 없으면 참조 이미지를 제공하고 단일 이미지 및 다중 이미지를 지원합니다.
+  - 업로드 이미지는 사전 처리를 위해 압축하여 속도를 향상시킬 수 있습니다.
+  - 투명한 배경을 지원하며 배경을 제거할 필요가 없습니다. 프롬프트에 요구 사항을 추가하기만 하면 됩니다.
+</Tip>

@@ -1,0 +1,76 @@
+---
+title: "모델 목록"
+description: "사용 가능한 모델 조회"
+icon: 'list-ul'
+---
+
+엔드포인트: `GET /v1/models`
+
+- 사용자 로그인 시, 사용자 그룹에서 사용 가능한 모델을 조회합니다. 로그인하지 않은 경우, 기본 그룹에서 사용 가능한 모델을 조회합니다.
+- 헤더에 Authorization 필드가 있는 경우, 시스템은 해당 토큰에 구성된 모델 목록을 쿼리합니다.
+
+**응답 예시:**
+
+```json
+{
+  "data": [
+    {
+      "id": "gpt-4o-mini",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "OpenAI",
+      "permission": [
+        {
+          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
+          "object": "model_permission",
+          "created": 1626777600,
+          "allow_create_engine": true,
+          "allow_sampling": true,
+          "allow_logprobs": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "allow_fine_tuning": false,
+          "organization": "*",
+          "group": null,
+          "is_blocking": false
+        }
+      ],
+      "root": "gpt-4o-mini",
+      "parent": null
+    }
+  ]
+}
+```
+
+### 응답
+
+|상태 코드 | 설명 | 세부사항 | 데이터 모델|
+|---|---|---|---|
+|200|OK|없음|인라인|
+
+### 응답 데이터 구조
+
+상태 코드 **200**
+
+|이름 | 유형 | 필수 | 제약 | 한국어 이름 | 설명|
+|---|---|---|---|---|---|
+|» data|[object]|true|없음||없음|
+|»» id|string|true|없음|모델 ID|없음|
+|»» object|string|true|없음|model|없음|
+|»» created|integer|true|없음|생성 시간|없음|
+|»» owned_by|string|true|없음|개발자|없음|
+|»» permission|[object]¦null|true|없음||없음|
+|»»» id|string|true|없음||없음|
+|»»» object|string|true|없음||없음|
+|»»» created|integer|true|없음||없음|
+|»»» allow_create_engine|boolean|true|없음||없음|
+|»»» allow_sampling|boolean|true|없음||없음|
+|»»» allow_logprobs|boolean|true|없음||없음|
+|»»» allow_search_indices|boolean|true|없음||없음|
+|»»» allow_view|boolean|true|없음||없음|
+|»»» allow_fine_tuning|boolean|true|없음||없음|
+|»»» organization|string|true|없음||없음|
+|»»» group|null|true|없음||없음|
+|»»» is_blocking|boolean|true|없음||없음|
+|»» root|string|true|없음|모델 이름|없음|
+|»» parent|null|true|없음|부모 노드|없음|

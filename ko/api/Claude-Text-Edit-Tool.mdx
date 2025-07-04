@@ -1,0 +1,218 @@
+---
+title: "Claude 텍스트 편집기 도구"
+description: "Claude의 텍스트 편집기 도구를 사용하면 파일을 직접 보고 수정할 수 있어 코드 디버깅, 문서 개선, 보다 효율적인 인간-기계 협업을 달성하는 데 도움이 됩니다."
+icon: 'pen'
+---
+
+Claude는 Anthropic의 텍스트 편집기 도구를 사용하여 텍스트 파일을 보고 수정하여 코드나 기타 텍스트 문서의 디버깅, 수정 및 개선을 도울 수 있습니다. 이를 통해 Claude는 제안만 하는 것이 아니라 파일과 직접 상호 작용하여 실질적인 지원을 제공할 수 있습니다.
+
+## 텍스트 편집기 도구 사용 전 준비 사항
+
+호환되는 모델 선택
+Anthropic의 텍스트 편집기 도구는 다음 Claude 모델을 지원합니다:
+
+- **Claude 4 모델** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
+
+<Warning>
+Claude 4 모델은 이전 버전과 호환되지 않는 완전히 새로운 텍스트 편집기 도구를 사용합니다. 올바른 도구 유형과 이름을 사용해야 합니다.
+</Warning>
+
+## 모델별 도구 구성
+
+| 모델 버전 | 도구 유형 | 도구 이름 | 지원되는 기능 |
+|---------------|-----------|-----------|-------------------|
+| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
+| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+
+<Tip>
+**중요 변경 사항:** Claude 4 모델은 더 이상 `undo_edit` 명령을 지원하지 않습니다. 코드에서 이 기능에 대한 모든 종속성을 제거하십시오.
+</Tip>
+
+## 사용 사례 평가
+다음은 텍스트 편집기 도구를 사용하는 몇 가지 일반적인 시나리오입니다:
+
+- 코드 디버깅: 구문 오류에서 논리적 문제에 이르기까지 코드의 문제를 식별하고 수정하는 데 도움을 줍니다.
+- 코드 리팩토링: 대상 편집을 통해 코드 구조, 가독성 및 성능을 개선합니다.
+- 문서 생성: 코드베이스에 docstring, 주석 또는 README 파일을 추가합니다.
+- 테스트 생성: 구현 이해를 기반으로 단위 테스트를 생성합니다.
+
+## 텍스트 편집기 도구 사용
+메시지 API를 통해 Claude에 텍스트 편집기 도구를 제공합니다:
+`anthropic` 패키지를 설치해야 합니다:
+```shell
+pip install anthropic
+```
+
+**사용 예:**
+<CodeGroup>
+  
+```py python-Claude 4
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 또는 claude-opus-4-20250514
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250429",
+            "name": "str_replace_based_edit_tool"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "primes.py 파일에 구문 오류가 있습니다. 수정하는 데 도움을 주시겠습니까?"
+        }
+    ]
+)
+
+print("응답 내용:")
+for message in response.content:
+    print(message.text)
+```
+
+```py python-Claude 3.7
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="AIHUBMIX_API_KEY", # AiHubMix에서 생성한 키로 교체
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250124",
+            "name": "str_replace_editor"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "primes.py 파일에 구문 오류가 있습니다. 수정하는 데 도움을 주시겠습니까?"
+        }
+    ]
+)
+
+print("응답 내용:")
+for message in response.content:
+    print(message.text)
+```
+
+```shell Curl-Claude 4
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "primes.py 파일에 구문 오류가 있습니다. 수정하는 데 도움을 주시겠습니까?"
+      }
+    ]
+  }'
+```
+
+```shell Curl-Claude 3.7
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-3-7-sonnet-20250219",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "primes.py 파일에 구문 오류가 있습니다. 수정하는 데 도움을 주시겠습니까?"
+      }
+    ]
+  }'
+```
+
+</CodeGroup>
+
+## Claude 4로 마이그레이션
+
+Claude 3.7 Sonnet에서 Claude 4 모델로 마이그레이션하는 경우 다음 변경 사항에 유의하십시오:
+
+### 도구 구성 업데이트
+
+```py python
+# Claude 3.7 Sonnet
+tools=[
+    {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+    }
+]
+
+# Claude 4 (Opus/Sonnet)
+tools=[
+    {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+    }
+]
+```
+
+### 지원되지 않는 기능 제거
+
+- **`undo_edit` 명령**: Claude 4 모델은 더 이상 실행 취소 편집 기능을 지원하지 않습니다.
+- 코드에서 `undo_edit`에 의존하는 모든 논리를 제거하십시오.
+
+응답 예:
+```json
+{
+  "id": "msg_bdrk_012xyNaFCQg4zsVcTk5VkDAe",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "`primes.py` 파일의 구문 오류를 수정하는 데 기꺼이 도움을 드리겠습니다. 먼저 문제를 식별하기 위해 파일을 살펴보겠습니다."
+    },
+    {
+      "type": "tool_use",
+      "text": "",
+      "id": "toolu_bdrk_01P6jQG6suDSsDjzugqGVHWC",
+      "name": "str_replace_based_edit_tool",
+      "input": {
+        "command": "view",
+        "path": "/repo/primes.py"
+      }
+    }
+  ],
+  "model": "claude-sonnet-4-20250514",
+  "stop_reason": "tool_use",
+  "usage": {
+    "input_tokens": 1042,
+    "output_tokens": 115
+  }
+}
+```

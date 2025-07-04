@@ -1,0 +1,292 @@
+---
+title: "Claude 네이티브 API 통합"
+description: " "
+icon: "c"
+---
+
+## 지침
+
+Claude 시리즈 모델은 공식 네이티브 API를 통해 액세스할 수 있습니다. 사용하기 전에 anthropic 종속성을 설치하거나 업그레이드해야 합니다:
+
+```bash
+pip install -U anthropic
+```
+
+<Info>
+  Claude가 아닌 모델의 경우 OpenAI API 형식을 대신 사용하십시오.
+</Info>
+
+## 모델 정보
+
+| 모델             | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
+| ----------------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
+| 확장된 사고 | 예           | 예             | 예               | 아니요                | 아니요               | 아니요            | 아니요             |
+| 컨텍스트 창    | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
+| 최대 출력        | 32000 토큰  | 64000 토큰    | 64000 토큰      | 8192 토큰       | 8192 토큰      | 4096 토큰   | 4096 토큰    |
+| 훈련 컷오프  | 2025년 3월      | 2025년 3월        | 2024년 11월          | 2024년 4월          | 2024년 7월        | 2023년 8월      | 2023년 8월       |
+
+<Tip>
+  1. 버전 3.5 이상 모델의 경우 4096 토큰보다 긴 출력이 필요한 경우 위 표의 `최대 출력` 열을 참조하여 `"max_tokens"` 매개변수를 명시적으로 지정해야 합니다.
+  2. Sonnet 3.7의 경우 `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}`를 전달하여 최대 출력을 64K에서 128K로 늘릴 수 있습니다. 아래 "스트리밍 128K" 예제를 참조하십시오.
+</Tip>
+
+## Claude 4 새로운 기능
+
+### 새로운 거부 중지 사유
+
+Claude 4 모델은 모델이 안전상의 이유로 생성을 거부하는 콘텐츠에 대해 새로운 `refusal` 중지 사유를 도입합니다:
+
+```json
+{
+  "id": "msg_014XEDjypDjFzgKVWdFUXxZP",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-20250514",
+  "content": [{"type": "text", "text": "기꺼이 도와드리겠습니다. 당신은 할 수 있습니다 "}],
+  "stop_reason": "refusal",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 564,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 22
+  }
+}
+```
+
+Claude 4로 마이그레이션할 때 `refusal` 중지 사유를 처리하도록 애플리케이션을 업데이트해야 합니다.
+
+### 확장된 사고
+
+확장된 사고가 활성화되면 Claude 4 모델용 메시지 API는 Claude의 전체 사고 과정 요약을 반환합니다. 요약된 사고는 확장된 사고의 전체 지능 이점을 제공하면서 오용을 방지합니다.
+
+API는 Claude 3.7 및 4 모델에서 일관되지만 확장된 사고에 대한 스트리밍 응답은 스트리밍 이벤트 간에 지연이 발생할 수 있는 "덩어리" 전달 패턴으로 반환될 수 있습니다.
+
+요약은 요청에서 대상으로 하는 모델과 다른 모델에 의해 처리됩니다. 사고 모델은 요약된 출력을 보지 않습니다.
+
+### 인터리브된 사고
+
+Claude 4 모델은 도구 사용과 확장된 사고를 인터리브하는 것을 지원하여 도구 사용과 응답이 일반 메시지와 혼합될 수 있는 보다 자연스러운 대화를 가능하게 합니다.
+
+인터리브된 사고는 베타 버전입니다. 인터리브된 사고를 활성화하려면 API 요청에 베타 헤더 `interleaved-thinking-2025-05-14`를 추가하십시오:
+
+```python
+extra_headers={
+    "anthropic-beta": "interleaved-thinking-2025-05-14"
+}
+```
+
+**엔드포인트:** `POST` /v1/messages
+
+## 사용법
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/messages \ # 공식 엔드포인트를 AiHubMix의 API 엔드포인트로 교체
+     --header "x-api-key: $AIHUBMIX_API_KEY" \ # AiHubMix에서 생성한 키로 교체
+     --header "anthropic-version: 2023-06-01" \
+     --header "content-type: application/json" \
+     --data \
+'{
+    "model": "claude-3-5-sonnet-20241022",
+    "max_tokens": 1024,
+    "messages": [
+        {"role": "user", "content": "안녕하세요, 세상"}
+    ]
+}'
+```
+
+
+```py Python
+import anthropic
+
+# Anthropics 클라이언트 초기화
+client = anthropic.Anthropic(
+    api_key="sk-***", # AiHubMix 키로 교체
+    base_url="https://aihubmix.com"
+)
+
+# 메시지 구성
+message = client.messages.create(
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "안녕하세요, Claude"}
+    ]
+)
+
+# 응답 내용 인쇄
+print(message.content)
+```
+
+```py Python 스트리밍 128K
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # AiHubMix 키로 교체
+    base_url="https://aihubmix.com"
+)
+
+with client.messages.stream(
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=128000,
+    messages=[
+        {"role": "user", "content": "100,000 토큰에 달하는 소설의 시작 부분을 생성해 주세요."}
+    ],
+    extra_headers={
+        "anthropic-beta": "output-128k-2025-02-19"
+    }
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+```
+
+```py Python 인터리브된 사고
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # AiHubMix 키로 교체
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 또는 claude-opus-4-20250514
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "이 데이터를 분석하고 차트를 생성하는 데 도움을 주세요"}
+    ],
+    tools=[
+        {
+            "type": "computer_20241022",
+            "name": "computer"
+        }
+    ],
+    extra_headers={
+        "anthropic-beta": "interleaved-thinking-2025-05-14"
+    }
+)
+print(response.content)
+```
+
+</CodeGroup>
+
+### 요청 본문
+
+```json
+{
+  "model": "claude-3-5-sonnet-20241022",
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "role": "user",
+      "content": "삶의 의미는 무엇입니까?"
+    }
+  ]
+}
+```
+
+### 요청 매개변수
+
+| 이름         | 위치 | 유형     | 필수 | 설명             |
+| ------------ | -------- | -------- | -------- | ----------------------- |
+| x-api-key    | 헤더   | 문자열   | 아니요       | Bearer AIHUBMIX_API_KEY |
+| Content-Type | 헤더   | 문자열   | 아니요       | 없음                    |
+| body         | 본문     | 객체   | 아니요       | 없음                    |
+| » model      | 본문     | 문자열   | 예      | 없음                    |
+| » messages   | 본문     | [객체] | 예      | 없음                    |
+| »» role      | 본문     | 문자열   | 아니요       | 없음                    |
+| »» content   | 본문     | 문자열   | 예      | 없음                    |
+| » max_tokens | 본문     | 숫자   | 예      | 없음                    |
+
+### 응답 예제
+
+```json
+200 응답
+```
+
+```json
+{
+  "id": "msg_013Uf6CwwyjSe35n3yVaPbLM",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-3-5-sonnet-20241022",
+  "content": [
+    {
+      "type": "text",
+      "text": "그것은 인류의 가장 오래 지속되고 복잡한 철학적 질문 중 하나입니다! 보편적인 답은 없지만, 저는 복잡성을 인정하면서 그러한 질문을 신중하게 탐구하는 것을 목표로 합니다. 저는 의미 있는 대화를 나누고 제가 할 수 있는 곳에서 돕는 데 집중하려고 노력합니다. 당신에게 삶의 의미는 무엇입니까?"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 61
+  }
+}
+```
+
+### 응답 결과
+
+| 상태 코드 | 상태 설명 | 설명 | 데이터 모델 |
+| ----------- | ------------------ | ----------- | ---------- |
+| 200         | OK                 | 없음        | 인라인     |
+
+## Claude 4로 마이그레이션
+
+Claude 3.7에서 Claude 4 모델로 마이그레이션하는 경우 다음 변경 사항에 유의하십시오:
+
+### 모델 이름 업데이트
+
+```python
+# Claude 3.7에서
+model="claude-3-7-sonnet-20250219"
+
+# Claude 4로 마이그레이션
+model="claude-sonnet-4-20250514"  # 또는 "claude-opus-4-20250514"
+```
+
+### 새로운 중지 사유 처리
+
+새로운 `refusal` 중지 사유를 처리하도록 애플리케이션을 업데이트하십시오:
+
+```python
+if response.stop_reason == "refusal":
+    print("Claude가 이 콘텐츠 생성을 거부했습니다")
+elif response.stop_reason == "end_turn":
+    print("정상적으로 완료됨")
+```
+
+### 지원되지 않는 기능 제거
+
+- **토큰 효율적인 도구 사용**: Claude Sonnet 3.7에서만 사용 가능하며 Claude 4에서는 더 이상 지원되지 않음
+- **확장된 출력**: `output-128k-2025-02-19` 베타 헤더는 Claude Sonnet 3.7에서만 사용 가능
+
+Claude Sonnet 3.7에서 마이그레이션하는 경우 요청에서 이러한 베타 헤더를 제거하는 것이 좋습니다:
+
+```python
+# 이러한 헤더 제거 (있는 경우)
+# "token-efficient-tools-2025-02-19"
+# "output-128k-2025-02-19"
+```
+
+## 애플리케이션에서 Claude 사용 (예: Lobe-Chat)
+
+Lobe-Chat과 같은 타사 애플리케이션에서 Claude 모델을 구성하는 방법은 다음과 같습니다:
+
+1. 설정 페이지로 이동하여 모델 제공자로 **Claude**를 선택합니다.
+2. AiHubMix에서 [API 키](https://aihubmix.com/token)를 입력합니다.
+3. API 프록시 엔드포인트를 다음으로 설정합니다:
+
+   ```
+   https://aihubmix.com
+   ```
+4. (권장) "클라이언트 요청 모드" 옵션을 활성화합니다.
+5. 선택한 모델을 모델 목록에 추가합니다.
+   - AiHubMix의 설정 페이지에서 모델 이름을 복사하여 애플리케이션에 붙여넣는 것이 좋습니다.
+
+![이미지](../../public/en/cla1.png)
+
+![이미지](../../public/en/cla2.png)

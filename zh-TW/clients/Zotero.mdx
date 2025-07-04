@@ -1,0 +1,48 @@
+---
+title: "在 Zotero 中使用"
+description: ""
+icon: ''
+---
+
+## PDF 閱讀插件 zotero-gpt
+下載連結：https://github.com/MuiseDestiny/zotero-gpt/releases
+
+安裝好插件後在編輯中找到設定（舊版本在編輯中偏好設定）。找到 GPT 的設定介面
+![圖片](../../public/cn/zotero9.png)
+按照如圖所示配置 Base API，並輸入[API key](https://aihubmix.com/token)
+
+或者使用以下命令設定
+
+首選使用「ctrl＋/」打開使用視窗  
+![圖片](../../public/cn/zotero1.png)  
+輸入
+```
+/api https://aihubmix.com
+```
+並回車  
+![圖片](../../public/cn/zotero2.png) 
+![圖片](../../public/cn/zotero3.png)  
+輸入
+```
+/secretKey ＋ 密鑰 sk-***
+```
+![圖片](../../public/cn/zotero4.png) 
+![圖片](../../public/cn/zotero8.png)  
+切換模型命令  
+```
+/model gpt-3.5-turbo-0125 
+```
+![圖片](../../public/cn/zotero6.png)  
+選擇自己要用的模型之後就可以使用了。  
+![圖片](../../public/cn/zotero7.png)  
+
+## 翻譯插件 zotero-pdf-translate
+下載連結：https://github.com/windingwind/zotero-pdf-translate/releases
+
+編輯中找到設定（舊版本在編輯中偏好設定）。找到翻譯的設定介面  
+接口地址填寫: 
+```
+https://aihubmix.com/v1/chat/completions
+```  
+不用管狀態是否顯示可用 填上之後就可以了。  
+![圖片](../../public/cn/zotero5.png) 

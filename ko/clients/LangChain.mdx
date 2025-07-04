@@ -1,0 +1,64 @@
+---
+title: "LangChain 사용법"
+description: ""
+icon: ''
+---
+
+### 가장 간단한 방법은 아래와 같이 환경 변수를 직접 설정하는 것입니다.
+다운로드 주소: https://www.langchain.com/  
+```
+API_SECRET_KEY = "sk-pvMtoVO******66249058b93C766F2D70167"
+BASE_URL = "https://aihubmix.com/v1"; # aihubmix의 기본 URL
+
+os.environ["OPENAI_API_KEY"] = API_SECRET_KEY
+os.environ["OPENAI_BASE_URL"] = BASE_URL
+```
+참고: openai_api_base 끝에 /v1을 추가해야 합니다.
+
+```py Python
+from langchain.chat_models import ChatOpenAI
+
+llm = ChatOpenAI(
+    openai_api_base="https://aihubmix.com/v1", # 참고, 끝에 /v1 추가
+    openai_api_key="sk-3133f******fee269b71d",
+)
+
+res = llm.predict("hello")
+
+print(res)
+```
+
+LLM을 사용하여 예측하는 예시 코드  
+핵심은 실제로 키와 URL을 설정하는 것입니다.  
+방법은 다음과 같습니다:  
+1. 환경 변수를 사용하여 설정  
+2. 변수 전달  
+3. 환경 변수 수동 설정  
+
+```py Python
+import os
+import requests
+import time
+import json
+import time
+from langchain.llms import OpenAI
+
+API_SECRET_KEY = "your key from aihubmix";
+BASE_URL = "https://aihubmix.com/v1"; # aihubmix의 기본 URL
+
+os.environ["OPENAI_API_KEY"] = API_SECRET_KEY
+os.environ["OPENAI_API_BASE"] = BASE_URL
+
+def text():
+    llm = OpenAI(temperature=0.9)
+    text = "What would be a good company name for a company that makes colorful socks?"
+    print(llm(text))
+
+if __name__ == '__main__':
+    text();
+    
+```
+실행 후 다음을 확인할 수 있습니다:    
+```
+Lively Socks.
+```

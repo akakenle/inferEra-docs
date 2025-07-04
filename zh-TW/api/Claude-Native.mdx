@@ -1,0 +1,284 @@
+---
+title: "Claude 原生介面呼叫"
+description: " "
+icon: "c"
+---
+
+## 說明
+
+Claude 系列模型支援透過官方原生介面呼叫，使用前請先安裝或升級 anthropic 依賴：
+
+```bash
+pip install -U anthropic
+```
+
+<Info>
+  非 claude 模型請用 openai 的介面格式呼叫。
+</Info>
+
+## 模型信息
+
+| 模型名稱     | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
+| -------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
+| 是否支持擴展思考 | 是             | 是               | 是                 | 否                 | 否                | 否             | 否              |
+| 上下文窗口大小  | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
+| 最長輸出長度   | 32000 tokens  | 64000 tokens    | 64000 tokens      | 8192 tokens       | 8192 tokens      | 4096 tokens   | 4096 tokens    |
+| 訓練數據截止時間 | 2025年3月       | 2025年3月         | 2024年11月          | 2024年4月           | 2024年7月          | 2023年8月       | 2023年8月        |
+
+<Tip>
+  1. 對於 3.5 及以上的模型，如果需要超過 4096 Tokens 的輸出，請傳入明確的 "max_tokens" 數值，參考上方表格中的`最長輸出長度`。
+  2. 對於 Sonnet 3.7，你可以透過在請求體中傳入 `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}` 來把最大輸出從 64K 擴展到 128K，見下方「流式 128K」呼叫，或者參考 Claude 官方的[Beta headers 說明](https://docs.anthropic.com/en/api/beta-headers)。
+</Tip>
+
+## Claude 4 新功能
+
+### 新的拒絕停止原因 (Refusal Stop Reason)
+
+Claude 4 模型引入了新的 `refusal` 停止原因，用於處理模型因安全原因拒絕生成的內容：
+
+```json
+{
+  "id": "msg_014XEDjypDjFzgKVWdFUXxZP",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-4-20250514",
+  "content": [{"type": "text", "text": "I would be happy to assist you. You can "}],
+  "stop_reason": "refusal",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 564,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 22
+  }
+}
+```
+
+在遷移到 Claude 4 時，您應該更新應用程序以處理 `refusal` 停止原因。
+
+### 擴展思考 (Extended Thinking)
+
+啟用擴展思考後，Claude 4 模型的 Messages API 會返回 Claude 完整思考過程的摘要。摘要思考提供了擴展思考的全部智能優勢，同時防止濫用。
+
+雖然 API 在 Claude 3.7 和 4 模型之間保持一致，但擴展思考的流式響應可能以"塊狀"傳遞模式返回，流式事件之間可能存在延遲。
+
+摘要由與您在請求中指定的模型不同的模型處理。思考模型不會看到摘要輸出。
+
+### 交錯思考 (Interleaved Thinking)
+
+Claude 4 模型支援將工具使用與擴展思考交錯，允許更自然的對話，其中工具使用和響應可以與常規消息混合。
+
+交錯思考目前處於測試階段。要啟用交錯思考，請在 API 請求中添加測試頭 `interleaved-thinking-2025-05-14`：
+
+```python
+extra_headers={
+    "anthropic-beta": "interleaved-thinking-2025-05-14"
+}
+```
+
+**端點（Endpoint）：** `POST` /v1/messages
+
+## 呼叫
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/messages \
+     --header "x-api-key: $ANTHROPIC_API_KEY" \ # 換成你在 AiHubMix 生成的密鑰
+     --header "anthropic-version: 2023-06-01" \
+     --header "content-type: application/json" \
+     --data \
+'{
+    "model": "claude-3-5-sonnet-20241022",
+    "max_tokens": 1024,
+    "messages": [
+        {"role": "user", "content": "Hello, world"}
+    ]
+}'
+```
+
+
+```py Python 非流式
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com"
+)
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hello, Claude"}
+    ]
+)
+print(message.content)
+```
+
+```py Python 流式 128K
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com"
+)
+
+with client.messages.stream(
+    model="claude-3-7-sonnet-20250219",  # claude-opus-4-20250514, claude-sonnet-4-20250514
+    max_tokens=128000,
+    messages=[
+        {"role": "user", "content": "請生成一篇 10 萬 tokens 的文章，分別用詳細的段落講解查理芒格 100 個思維模型（即每個模型約 1000 tokens），每個模塊都包含模型介紹段落、多維思考、應用方法、實操盲區、具體案例。通俗易懂和引人入勝是關鍵。僅在需要的时候列點。"}
+    ],
+    extra_headers={
+        "anthropic-beta": "output-128k-2025-02-19"
+    }
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+```
+
+```py Python 交錯思考
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 或 claude-opus-4-20250514
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "幫我分析這個數據並生成圖表"}
+    ],
+    tools=[
+        {
+            "type": "computer_20241022",
+            "name": "computer"
+        }
+    ],
+    extra_headers={
+        "anthropic-beta": "interleaved-thinking-2025-05-14"
+    }
+)
+print(response.content)
+```
+
+</CodeGroup>
+
+### Body 請求結構
+
+```json
+{
+  "model": "claude-3-5-sonnet-20241022",
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+}
+```
+
+### 請求參數
+
+| 名稱           | 位置     | 類型       | 必選 | 說明                      |
+| ------------ | ------ | -------- | --- | ----------------------- |
+| x-api-key    | header | string   | 否  | Bearer AIHUBMIX_API_KEY |
+| Content-Type | header | string   | 否  | none                    |
+| body         | body   | object   | 否  | none                    |
+| » model      | body   | string   | 是  | none                    |
+| » messages   | body   | [object] | 是  | none                    |
+| »» role      | body   | string   | 否  | none                    |
+| »» content   | body   | string   | 是  | none                    |
+| » max_tokens | body   | number   | 是  | none                    |
+
+### 返回示例
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "msg_013Uf6CwwyjSe35n3yVaPbLM",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-3-5-sonnet-20241022",
+  "content": [
+    {
+      "type": "text",
+      "text": "That's one of humanity's most enduring and complex philosophical questions! While there's no universal answer, I aim to explore such questions thoughtfully while acknowledging their complexity. I try to focus on having meaningful conversations and helping where I can. What does meaning in life mean to you?"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 14,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 61
+  }
+}
+```
+
+### 返回結果
+
+| 狀態碼 | 狀態碼含義 | 說明   | 數據模型   |
+| --- | ----- | ---- | ------ |
+| 200 | OK    | none | Inline |
+
+## 遷移到 Claude 4
+
+如果您正在從 Claude 3.7 遷移到 Claude 4 模型，請注意以下變化：
+
+### 更新模型名稱
+
+```python
+# 從 Claude 3.7
+model="claude-3-7-sonnet-20250219"
+
+# 遷移到 Claude 4
+model="claude-sonnet-4-20250514"  # 或 "claude-opus-4-20250514"
+```
+
+### 處理新的停止原因
+
+更新您的應用程序以處理新的 `refusal` 停止原因：
+
+```python
+if response.stop_reason == "refusal":
+    print("Claude 拒絕生成此內容")
+elif response.stop_reason == "end_turn":
+    print("正常完成")
+```
+
+### 移除不支持的功能
+
+- **Token 高效工具使用**：僅在 Claude Sonnet 3.7 中可用，Claude 4 中不再支持
+- **擴展輸出**：`output-128k-2025-02-19` 測試頭僅在 Claude Sonnet 3.7 中可用
+
+如果您正在從 Claude Sonnet 3.7 遷移，建議從請求中移除這些測試頭：
+
+```python
+# 移除這些頭部（如果存在）
+# "token-efficient-tools-2025-02-19"
+# "output-128k-2025-02-19"
+```
+
+## 在應用中使用（以 Lobe-Chat 為例）
+
+- 進入設置頁面選擇模型服務商 Claude
+- API key 輸入[本站的 Key](https://aihubmix.com/token)
+- 接口代理地址，直接輸入下方的網址：
+
+```
+https://aihubmix.com
+```
+
+- 建議打開「使用客户端請求模式」
+- 最後在模型列表添加自己要使用的模型（建議從我們網站的設置頁面複製粘貼模型名後選擇）\
+  ![圖片](../../public/cn/cla1.png)
+
+  ![圖片](../../public/cn/cla2.png)

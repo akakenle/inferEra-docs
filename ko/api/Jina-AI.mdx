@@ -1,0 +1,925 @@
+---
+title: "Jina AI 통합"
+description: ""
+icon: "j"
+---
+
+## 설명
+Jina AI의 세 가지 핵심 인터페이스를 통합하여 강력한 지능형 에이전트를 쉽게 구축할 수 있도록 지원합니다. 이러한 인터페이스는 주로 다음과 같은 시나리오에 적합합니다:
+- **벡터 임베딩 (Embeddings)**: 스마트 고객 서비스, 스마트 채용, 지식 기반 질의응답과 같은 다중 모드 RAG 질의응답 시나리오에 적용 가능합니다.
+- **재순위 (Rerank)**: 임베딩 후보 결과를 최적화하고 주제 관련성을 기반으로 정렬하여 대규모 언어 모델의 답변 품질을 크게 향상시킵니다.
+- **딥 서치 (DeepSearch)**: 최적의 답변을 찾을 때까지 심층 검색 및 추론을 수행하며, 특히 연구 프로젝트 및 제품 솔루션 개발과 같은 복잡한 작업에 적합합니다.
+
+<Tip>
+Jina AI API를 향후 확장을 지원하도록 개선했으므로 사용법이 공식 네이티브 구현과 약간 다를 수 있습니다.
+</Tip>
+
+## 빠른 시작
+`API_KEY`를 [AIHUBMIX_API_KEY](https://aihubmix.com/token)와 모델 엔드포인트 링크로 교체하면 다른 매개변수와 사용법은 [Jina AI 공식](https://jina.ai/)과 완전히 일치합니다.
+
+**엔드포인트 교체:**  
+- **벡터 임베딩 (Embeddings)**: `https://jina.ai/embeddings` -> `https://aihubmix.com/v1/embeddings`
+- **재순위 (Rerank)**: `https://api.jina.ai/v1/rerank` -> `https://aihubmix.com/v1/rerank`
+- **딥 서치 (DeepSearch)**: `https://deepsearch.jina.ai/v1/chat/completions` -> `https://aihubmix.com/v1/chat/completions`
+
+## 임베딩
+Jina AI의 임베딩은 일반 텍스트와 다중 모드 이미지를 모두 지원하며 다국어 작업 처리에서 뛰어난 성능을 발휘합니다.
+
+### 요청 매개변수
+<ParamField body="model" type="string" required>
+  모델 이름, 사용 가능한 모델 목록:
+  - `jina-clip-v2`: 다중 모드, 다국어, 1024차원, 8K 컨텍스트 창, 8억 6,500만 매개변수
+  - `jina-embeddings-v3`: 텍스트 모델, 다국어, 1024차원, 8K 컨텍스트 창, 5억 7,000만 매개변수
+  - `jina-colbert-v2`: 다국어 ColBERT 모델, 8K 토큰 컨텍스트, 5억 6,000만 매개변수, 임베딩 및 재순위에 사용
+  - `jina-embeddings-v2-base-code`: 코드 및 문서 검색에 최적화된 모델, 768차원, 8K 컨텍스트 창, 1억 3,700만 매개변수
+</ParamField>
+
+<ParamField body="input" type="array" required>
+  입력 텍스트 또는 이미지, 다른 모델은 다른 입력 형식을 지원합니다. 텍스트의 경우 문자열 배열을 제공하고, 다중 모드 모델의 경우 텍스트 또는 이미지 필드가 포함된 객체 배열을 제공합니다.
+</ParamField>
+
+<ParamField body="embedding_format" type="string" default="float">
+  반환되는 데이터 유형, 선택적 값:
+  - `float`: 기본값, float 배열을 반환합니다. 가장 일반적이고 사용하기 쉬운 형식으로 float 목록을 반환합니다.
+  - `binary_int8`: int8 압축 이진 형식으로 반환합니다. 더 효율적인 저장, 검색 및 전송
+  - `binary_uint8`: uint8 압축 이진 형식으로 반환합니다. 더 효율적인 저장, 검색 및 전송
+  - `base64`: base64 인코딩된 문자열로 반환합니다. 더 효율적인 전송
+</ParamField>
+
+<ParamField body="dimensions" default="1024" type="integer">
+  계산에 사용되는 차원 수. 지원되는 값:
+  - 1024  
+  - 768
+</ParamField>
+
+### 1. 다중 모드 사용법
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+}
+
+data = {
+    "model": "jina-clip-v2",
+    "input": [
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "text": "해변의 아름다운 일몰"
+        },
+        {
+            "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+        },
+        {
+            "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+        },
+        {
+            "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        }
+    ]
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+print(response.json())
+```
+
+```ts TypeScript
+import fetch from 'node-fetch';
+
+const url = 'https://aihubmix.com/v1/embeddings';
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer sk-***' // AiHubMix 키로 교체
+};
+const data = {
+  "model": "jina-clip-v2",
+  "input": [
+    {
+      "text": "해변의 아름다운 일몰"
+    },
+    {
+      "text": "해변의 아름다운 일몰"
+    },
+    {
+      "text": "해변의 아름다운 일몰"
+    },
+    {
+      "text": "해변의 아름다운 일몰"
+    },
+    {
+      "image": "https://i.ibb.co/nQNGqL0/beach1.jpg"
+    },
+    {
+      "image": "https://i.ibb.co/r5w8hG8/beach2.jpg"
+    },
+    {
+      "image": "R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+    }
+  ]
+};
+
+fetch(url, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify(data)
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+
+```
+</CodeGroup>
+
+### 2. 순수 텍스트 사용법
+텍스트 문자열 배열만 제공하고 `image` 필드는 제공하지 마십시오.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-embeddings-v3",
+    "input": [
+        "해변의 아름다운 일몰",
+        "해변의 아름다운 일몰",
+        "해변의 아름다운 일몰",
+        "해변의 아름다운 일몰"
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/embeddings'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+}
+data = {
+    'model': 'jina-embeddings-v3',
+    'input': [
+        '해변의 아름다운 일몰',
+        '해변의 아름다운 일몰',
+        '해변의 아름다운 일몰',
+        '해변의 아름다운 일몰'
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+```ts TypeScript
+import * as https from 'https';
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/embeddings',   
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+  }
+};
+
+const data = JSON.stringify({
+  "model": "jina-embeddings-v3",
+  "input": [
+    "해변의 아름다운 일몰",
+    "해변의 아름다운 일몰",
+    "해변의 아름다운 일몰",
+    "해변의 아름다운 일몰"
+  ]
+});
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(data);
+req.end();
+
+```
+</CodeGroup>
+
+## 재순위
+재순위기는 검색 관련성 및 RAG 정확도를 향상시키는 것을 목표로 합니다. 초기 검색 결과를 심층 분석하고 쿼리와 문서 내용 간의 미묘한 상호 작용을 고려하여 검색 결과를 재정렬하여 가장 관련성 높은 결과를 맨 위에 배치합니다.
+
+### 요청 매개변수
+<ParamField body="model" type="string" required>
+  모델 이름, 사용 가능한 모델 목록:
+  - `jina-reranker-m0`: 다중 모드 다국어 문서 재순위기, 10K 컨텍스트, 24억 매개변수, 시각적 문서 정렬용
+</ParamField>
+
+<ParamField body="query" type="string" required>
+  검색 쿼리 텍스트, 후보 문서와 비교하는 데 사용됩니다.
+</ParamField>
+
+<ParamField body="top_n" type="integer">
+  반환할 가장 관련성 높은 문서의 수. 기본값은 모든 문서를 반환합니다.
+</ParamField>
+
+<ParamField body="documents" type="array" required>
+  후보 문서 배열, 쿼리와의 관련성을 기반으로 재정렬됩니다.
+</ParamField>
+
+<ParamField body="max_chunk_per_doc" default="4096" type="integer">
+  문서당 최대 청크 길이, Cohere에만 적용됩니다(Jina에서는 지원되지 않음). 기본값은 4096입니다.  
+  긴 문서는 지정된 토큰 수로 자동 잘립니다.
+</ParamField>
+
+### 1. 다중 모드 사용법
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-m0",
+    "query": "소형 언어 모델 데이터 추출",
+    "documents": [
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png"
+        },
+        {
+            "text": "효율적인 웹 콘텐츠 추출을 위해 설계된 15억 매개변수의 소형 언어 모델인 ReaderLM-v2를 소개합니다. 우리 모델은 최대 512K 토큰의 문서를 처리하여 지저분한 HTML을 깨끗한 마크다운 또는 JSON 형식으로 높은 정확도로 변환하여 대규모 언어 모델을 기반으로 하는 이상적인 도구입니다. 모델의 효율성은 두 가지 주요 혁신에서 비롯됩니다. (1) 반복적으로 웹 콘텐츠 추출을 초안, 수정 및 비평하여 고품질의 다양한 학습 데이터를 생성하는 3단계 데이터 합성 파이프라인, (2) 연속 사전 학습과 다중 목표 최적화를 결합한 통합 학습 프레임워크. 집중적인 평가는 ReaderLM-v2가 신중하게 선별된 벤치마크에서 GPT-4o-2024-08-06 및 기타 대형 모델보다 15-20% 우수하며, 특히 100K 토큰을 초과하는 문서에서 탁월한 성능을 발휘하면서 훨씬 낮은 계산 요구 사항을 유지함을 보여줍니다."
+        },
+        {
+            "image": "https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp"
+        },
+        {
+            "text": "데이터 추출? 왜 정규식을 사용하지 않습니까? 정규식을 사용하면 모든 것이 해결됩니다."
+        },
+        {
+            "text": "캘리포니아 골드러시 동안 일부 상인들은 광부들이 금을 찾는 것보다 광부들에게 물품을 팔아 더 많은 돈을 벌었습니다."
+        },
+        {
+            "text": "우리 작업의 가장 중요한 기여는 두 가지입니다. 첫째, 반복적인 수정을 통해 고품질 학습 데이터를 생성하는 Draft-Refine-Critique라는 새로운 3단계 데이터 합성 파이프라인을 도입합니다. 둘째, 길이 확장을 위한 연속 사전 학습, 특수 제어점을 사용한 감독 미세 조정, 직접 선호도 최적화(DPO) 및 반복적인 자체 플레이 튜닝을 결합한 포괄적인 학습 전략을 제안합니다. 구조화된 콘텐츠 추출에 대한 추가 연구 및 적용을 용이하게 하기 위해 모델은 Hugging Face에서 공개적으로 사용할 수 있습니다."
+        },
+        {
+            "image": "iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWoBoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns83rC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGresuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYIABJjmY... [truncated]"
+        }
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/rerank'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+}
+data = {
+    "model": "jina-reranker-m0",
+    "query": "소형 언어 모델 데이터 추출",
+    "documents": [
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png"
+        },
+        {
+            "image": "https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png"
+        },
+        {
+            "text": "효율적인 웹 콘텐츠 추출을 위해 설계된 15억 매개변수의 소형 언어 모델인 ReaderLM-v2를 소개합니다. 우리 모델은 최대 512K 토큰의 문서를 처리하여 지저분한 HTML을 깨끗한 마크다운 또는 JSON 형식으로 높은 정확도로 변환하여 대규모 언어 모델을 기반으로 하는 이상적인 도구입니다. 모델의 효율성은 두 가지 주요 혁신에서 비롯됩니다. (1) 반복적으로 웹 콘텐츠 추출을 초안, 수정 및 비평하여 고품질의 다양한 학습 데이터를 생성하는 3단계 데이터 합성 파이프라인, (2) 연속 사전 학습과 다중 목표 최적화를 결합한 통합 학습 프레임워크. 집중적인 평가는 ReaderLM-v2가 신중하게 선별된 벤치마크에서 GPT-4o-2024-08-06 및 기타 대형 모델보다 15-20% 우수하며, 특히 100K 토큰을 초과하는 문서에서 탁월한 성능을 발휘하면서 훨씬 낮은 계산 요구 사항을 유지함을 보여줍니다."
+        },
+        {
+            "image": "https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp"
+        },
+        {
+            "text": "데이터 추출? 왜 정규식을 사용하지 않습니까? 정규식을 사용하면 모든 것이 해결됩니다."
+        },
+        {
+            "text": "캘리포니아 골드러시 동안 일부 상인들은 광부들이 금을 찾는 것보다 광부들에게 물품을 팔아 더 많은 돈을 벌었습니다."
+        },
+        {
+            "text": "우리 작업의 가장 중요한 기여는 두 가지입니다. 첫째, 반복적인 수정을 통해 고품질 학습 데이터를 생성하는 Draft-Refine-Critique라는 새로운 3단계 데이터 합성 파이프라인을 도입합니다. 둘째, 길이 확장을 위한 연속 사전 학습, 특수 제어점을 사용한 감독 미세 조정, 직접 선호도 최적화(DPO) 및 반복적인 자체 플레이 튜닝을 결합한 포괄적인 학습 전략을 제안합니다. 구조화된 콘텐츠 추출에 대한 추가 연구 및 적용을 용이하게 하기 위해 모델은 Hugging Face에서 공개적으로 사용할 수 있습니다."
+        },
+        {
+            "image": "iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWoBoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns8nC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGresuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYIABJjmY... [truncated]"
+        }
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+
+```
+
+```ts TypeScript
+import fetch from 'node-fetch';
+
+const url = 'https://aihubmix.com/v1/rerank';
+
+const options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' // AiHubMix 키로 교체
+  },
+  body: JSON.stringify({
+    model: 'jina-reranker-m0',
+    query: '소형 언어 모델 데이터 추출',
+    documents: [
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/handelsblatt-preview.png'
+      },
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/paper-11.png'
+      },
+      {
+        image: 'https://raw.githubusercontent.com/jina-ai/multimodal-reranker-test/main/wired-preview.png'
+      },
+      {
+        text: '효율적인 웹 콘텐츠 추출을 위해 설계된 15억 매개변수의 소형 언어 모델인 ReaderLM-v2를 소개합니다. 우리 모델은 최대 512K 토큰의 문서를 처리하여 지저분한 HTML을 깨끗한 마크다운 또는 JSON 형식으로 높은 정확도로 변환하여 대규모 언어 모델을 기반으로 하는 이상적인 도구입니다. 모델의 효율성은 두 가지 주요 혁신에서 비롯됩니다. (1) 반복적으로 웹 콘텐츠 추출을 초안, 수정 및 비평하여 고품질의 다양한 학습 데이터를 생성하는 3단계 데이터 합성 파이프라인, (2) 연속 사전 학습과 다중 목표 최적화를 결합한 통합 학습 프레임워크. 집중적인 평가는 ReaderLM-v2가 신중하게 선별된 벤치마크에서 GPT-4o-2024-08-06 및 기타 대형 모델보다 15-20% 우수하며, 특히 100K 토큰을 초과하는 문서에서 탁월한 성능을 발휘하면서 훨씬 낮은 계산 요구 사항을 유지함을 보여줍니다.'
+      },
+      {
+        image: 'https://jina.ai/blog-banner/using-deepseek-r1-reasoning-model-in-deepsearch.webp'
+      },
+      {
+        text: '데이터 추출? 왜 정규식을 사용하지 않습니까? 정규식을 사용하면 모든 것이 해결됩니다.'
+      },
+      {
+        text: '캘리포니아 골드러시 동안 일부 상인들은 광부들이 금을 찾는 것보다 광부들에게 물품을 팔아 더 많은 돈을 벌었습니다.'
+      },
+      {
+        text: '우리 작업의 가장 중요한 기여는 두 가지입니다. 첫째, 반복적인 수정을 통해 고품질 학습 데이터를 생성하는 Draft-Refine-Critique라는 새로운 3단계 데이터 합성 파이프라인을 도입합니다. 둘째, 길이 확장을 위한 연속 사전 학습, 특수 제어점을 사용한 감독 미세 조정, 직접 선호도 최적화(DPO) 및 반복적인 자체 플레이 튜닝을 결합한 포괄적인 학습 전략을 제안합니다. 구조화된 콘텐츠 추출에 대한 추가 연구 및 적용을 용이하게 하기 위해 모델은 Hugging Face에서 공개적으로 사용할 수 있습니다.'
+      },
+      {
+        image: 'iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAA7VBMVEX///8AAABONC780K49Wv5gfYu8vLwiIiIAvNRHLypceJ5hfoc4Vf//1bL8/PxSbsCCgoLk5OQpKSlOQDXctpgZEA9AXv8SG0sGCRorHRocKnY4U+sKDQ7rwqISGBssOkE+Pj5fX19MY29ZdIF1YFGHcF68m4EjLTKSkpInOqIcJSndzbU9UFlcv87DyrvrzrF1wcpOTk6jo6OixsE7MCg4JSHLy8skNZLNqo4EBQ9kU0VZSj0uJh93d3cyMjKihnBvamZca3KoqbI8R5YaLI41R3omM1lNZ7EAAEEbIy46TGcwPk8jEQyIw8eZjobFTeMIAAAFHUlEQVR4nO3da0PaOhwG8CGOHqYwKqBjFKQ6sJt63Biy6Siw+/18/48zSP7FhqU5XNr04vP4igRCfmsX2jSFBw+2TTm0bN2V7ePkQooTt2SWvhGOxejHLZml3w4H0wYm5ACTWExIA0A8GNN+5c/YYn2pF7dNh7dX0YvpyP5hG8WdLdPgDdnAAANM6jD1dGMa10K2tXiYTp9HzxmBh9l6U8gxlI4JDDDAABNRyibLsFNnCRtzzZutc8x4yN8tqhG6cGDNQ4qwLV6KtGnYe1kHhagwRkif9StheAxggAEGmJRidmiyhj5vDjosoc+qa8JQ6sIWCn0CSiumCAwwwNxfzA5N+tQzgaE0gAEGGGBCU5hDFmfUYNFpCR/jjFkGWjdJVJgKb1DvJgEGGGCAiQXjzeEXpaVi6GJuUVrppRgrRnZ4cJ2TpeFhpLU5oaFYMEU5xgIGGGDuDybXEMMLB5Meyy11VKgcUSVlwkstek7oszPrYKS5bZVYurLKwduSPzVpCwnCvKuV8vMEYfJ3AQaYLGBc3uCvjTHVBGEKlXmcqWoBoxxT7bJMWry/va4kk5qIoeJRRBi6japg5IJXAMkx3RbLoqstWfJieGGtGhGGopwEDMDkS/mNUmolEbNpgAEmuxi+OoTmAKxB1Z8Jde2KR97vK1ktYSy6RUjTchNxaeWoV/OHht3z35fzvPxXannNKi/FSsIYfb5UM/Tlp3KMuOh1UBOO52lgPr/8h0WOeckrX0sxelc1/YWR9BcYYO43ZkeBGaUM482biHNB72hypZUujBcR86wlDMapx8h6CgwwwGQTQ3M12cCIVytSjskBAwww/4ORXqBMKWZo80hNSszVb9mchbIyaox3B+14bUz+6pxFPtd0LquMGkORf+2EGrN+gAEGmIRijANf2qnGlIcFf1wrVIx3gfbZSAtmKfRlbeFhhL1XN6YNDDDRY7L0f8ZZDM3B07MB/ZZmae2MXszQYStr/lNNnMstrZ4stKzRqPAMtWI8Ez8ukF/SCNihxLU+YjR9vZESI7/YFIAZAAMMMMuLGlRRYsZxYkyXzdxMxeUmyvSmdnCmcWJo6sZ0qyvHNVVJwJfRl23FrrMUOwH9Vcacro6JdU9aJcAkNaa9OsZOOqbssrvtO3T1oz4a+DKi5YJGhz3JTfoAQFM3Q9rbbsXDe7qzaUpPSjrGC52ydcXPfLqxIQk/AbJOPIx4OAZM/AEmqcniACAfmlOKkQeYGANMUgNMjFFORzjts8C0HeVLY8HYwkVnMcbJQ0VOVK/U+ysnC4xqT7pQYS5UrwQGGGASjaHfJbVz7XlokaPV9sdSj2ZLT/a3MMPo/N1Ts+KyS6fvT1iOeV/OToScqjCn4nPPuOWYP3rPGncrmn6yhdZoUn8vOOZY2X0l7ZhjaM885a1ruj7jrTeLFqP5x3SAASaS8CFzhrmZJToMa32GiXSENvk6xg8fP72Z5dNjns83rC9fvj7eMF+/sAZuPtNj3vrHD/zdotpABb4DfGresuzuz7P7/Akrfdrkj9fObvMpa+DJc2qQt978xt8t4ltOjpq7vhzeYTbMAnMolB6x0qjvnwEGGGCAAQYYYIABJjmY... [truncated]"
+      }
+    ]
+  })
+};
+
+fetch(url, options)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+</CodeGroup>
+
+### 응답 설명
+```json
+{
+  "model": "jina-reranker-m0",
+  "results": [
+    {
+      "index": 1,
+      "relevance_score": 0.8814517277012487
+    },
+    {
+      "index": 3,
+      "relevance_score": 0.7756727858283531
+    },
+    {
+      "index": 7,
+      "relevance_score": 0.6128658982982312
+    }
+  ],
+  "usage": {
+    "total_tokens": 2894
+  }
+}
+```
+
+**응답 성공:**
+- `model`: 사용된 모델의 이름
+- `results`: 관련성 점수를 기준으로 내림차순으로 정렬된 재순위 결과 배열, 각 요소에는 다음이 포함됩니다:
+  - `index`: 원본 문서 배열의 인덱스 위치
+  - `relevance_score`: 0-1 사이의 관련성 점수, 점수가 높을수록 쿼리와의 관련성이 높음을 나타냅니다.
+- `usage`: 사용 통계
+  - `total_tokens`: 이 요청에서 처리된 총 토큰 수
+
+### 2. 텍스트 사용법
+텍스트 재순위는 임베딩 사용법과 유사하게 배열을 전달하여 다국어 및 일반 작업을 모두 지원합니다.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/rerank \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "민감성 피부를 위한 유기농 스킨케어 제품",
+    "top_n": 3,
+    "documents": [
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 제작된 유기농 스킨케어 제품군으로 자연의 부드러운 포옹을 상상해 보세요. 알로에 베라와 카모마일의 진정 효과가 함유된 각 제품은 부드러운 영양과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 안색을 맞이하세요.",
+        "새로운 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드로 최첨단 뷰티의 세계로 들어가 보세요. 대담하고 생생한 색상과 획기적인 기술이 메이크업 예술을 재정의하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩으로 개성을 표현하세요.",
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 바이오 스킨케어: 민감성 피부를 위해 특별히 개발된 바이오 스킨케어의 진정 효과를 경험해 보세요. 알로에 베라와 카모마일의 진정 효과로 우리 제품은 자연스러운 방식으로 피부를 관리하고 보호합니다. 피부 자극에 작별을 고하고 빛나는 안색을 즐기세요.",
+        "새로운 메이크업 트렌드는 강렬한 색상과 혁신적인 기술에 중점을 둡니다. 최신 메이크업 트렌드로 현대적인 아름다움의 세계에 빠져보세요. 강렬하고 생생한 색상과 혁신적인 기술이 새로운 기준을 제시합니다. 눈에 띄는 아이라이너부터 홀로그램 하이라이터까지 창의력을 마음껏 발휘하고 매번 개성을 표현하세요.",
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 설계된 유기농 스킨케어 라인으로 자연의 힘을 발견하세요. 알로에 베라와 카모마일이 풍부하게 함유된 이 제품들은 부드러운 수분 공급과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+        "새로운 메이크업 트렌드는 생생한 색상과 혁신적인 기술에 중점을 둡니다. 최신 트렌드로 매혹적인 메이크업의 세계로 들어가 보세요. 생생한 색상과 혁신적인 기술이 메이크업 예술을 혁신하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩에서 돋보이세요.",
+        "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일 추출물이 선사하는 자연의 케어를 경험해 보세요. 저희 스킨케어 제품은 민감성 피부를 위해 특별히 설계되어 부드럽게 수분을 공급하고 자극으로부터 피부를 보호합니다. 피부가 불편함에서 벗어나 건강한 광채를 되찾도록 하세요.",
+        "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술을 중심으로 메이크업 예술의 새로운 시대를 열었습니다. 네온 아이라이너든 홀로그램 하이라이터든 모든 메이크업 룩은 당신을 돋보이게 하고 독특한 매력을 보여줄 수 있습니다.",
+        "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일의 부드러운 힘으로 자연의 포옹을 느껴보세요. 민감성 피부를 위해 특별히 설계된 저희 스킨케어 제품은 피부에 부드럽게 영양을 공급하고 보호합니다. 피부 트러블에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+        "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 주목하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 매번 독특한 룩을 연출하세요."
+    ]
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+
+url = 'https://aihubmix.com/v1/rerank'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+}
+data = {
+    "model": "jina-reranker-v2-base-multilingual",
+    "query": "민감성 피부를 위한 유기농 스킨케어 제품",
+    "top_n": 3,
+    "documents": [
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 제작된 유기농 스킨케어 제품군으로 자연의 부드러운 포옹을 상상해 보세요. 알로에 베라와 카모마일의 진정 효과가 함유된 각 제품은 부드러운 영양과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 안색을 맞이하세요.",
+        "새로운 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드로 최첨단 뷰티의 세계로 들어가 보세요. 대담하고 생생한 색상과 획기적인 기술이 메이크업 예술을 재정의하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩으로 개성을 표현하세요.",
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 바이오 스킨케어: 민감성 피부를 위해 특별히 개발된 바이오 스킨케어의 진정 효과를 경험해 보세요. 알로에 베라와 카모마일의 진정 효과로 우리 제품은 자연스러운 방식으로 피부를 관리하고 보호합니다. 피부 자극에 작별을 고하고 빛나는 안색을 즐기세요.",
+        "새로운 메이크업 트렌드는 강렬한 색상과 혁신적인 기술에 중점을 둡니다. 최신 메이크업 트렌드로 현대적인 아름다움의 세계에 빠져보세요. 강렬하고 생생한 색상과 혁신적인 기술이 새로운 기준을 제시합니다. 눈에 띄는 아이라이너부터 홀로그램 하이라이터까지 창의력을 마음껏 발휘하고 매번 개성을 표현하세요.",
+        "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 설계된 유기농 스킨케어 라인으로 자연의 힘을 발견하세요. 알로에 베라와 카모마일이 풍부하게 함유된 이 제품들은 부드러운 수분 공급과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+        "새로운 메이크업 트렌드는 생생한 색상과 혁신적인 기술에 중점을 둡니다. 최신 트렌드로 매혹적인 메이크업의 세계로 들어가 보세요. 생생한 색상과 혁신적인 기술이 메이크업 예술을 혁신하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩에서 돋보이세요.",
+        "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일 추출물이 선사하는 자연의 케어를 경험해 보세요. 저희 스킨케어 제품은 민감성 피부를 위해 특별히 설계되어 부드럽게 수분을 공급하고 자극으로부터 피부를 보호합니다. 피부가 불편함에서 벗어나 건강한 광채를 되찾도록 하세요.",
+        "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술을 중심으로 메이크업 예술의 새로운 시대를 열었습니다. 네온 아이라이너든 홀로그램 하이라이터든 모든 메이크업 룩은 당신을 돋보이게 하고 독특한 매력을 보여줄 수 있습니다.",
+        "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일의 부드러운 힘으로 자연의 포옹을 느껴보세요. 민감성 피부를 위해 특별히 설계된 저희 스킨케어 제품은 피부에 부드럽게 영양을 공급하고 보호합니다. 피부 트러블에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+        "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 주목하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 매번 독특한 룩을 연출하세요."
+    ]
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.json())
+```
+
+```ts TypeScript
+const https = require('https');
+
+const requestData = {
+  model: "jina-reranker-v2-base-multilingual",
+  query: "민감성 피부를 위한 유기농 스킨케어 제품",
+  top_n: 3,
+  documents: [
+    "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 제작된 유기농 스킨케어 제품군으로 자연의 부드러운 포옹을 상상해 보세요. 알로에 베라와 카모마일의 진정 효과가 함유된 각 제품은 부드러운 영양과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 안색을 맞이하세요.",
+    "새로운 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드로 최첨단 뷰티의 세계로 들어가 보세요. 대담하고 생생한 색상과 획기적인 기술이 메이크업 예술을 재정의하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩으로 개성을 표현하세요.",
+    "알로에 베라와 카모마일이 함유된 민감성 피부용 바이오 스킨케어: 민감성 피부를 위해 특별히 개발된 바이오 스킨케어의 진정 효과를 경험해 보세요. 알로에 베라와 카모마일의 진정 효과로 우리 제품은 자연스러운 방식으로 피부를 관리하고 보호합니다. 피부 자극에 작별을 고하고 빛나는 안색을 즐기세요.",
+    "새로운 메이크업 트렌드는 강렬한 색상과 혁신적인 기술에 중점을 둡니다. 최신 메이크업 트렌드로 현대적인 아름다움의 세계에 빠져보세요. 강렬하고 생생한 색상과 혁신적인 기술이 새로운 기준을 제시합니다. 눈에 띄는 아이라이너부터 홀로그램 하이라이터까지 창의력을 마음껏 발휘하고 매번 개성을 표현하세요.",
+    "알로에 베라와 카모마일이 함유된 민감성 피부용 유기농 스킨케어: 민감성 피부를 위해 특별히 설계된 유기농 스킨케어 라인으로 자연의 힘을 발견하세요. 알로에 베라와 카모마일이 풍부하게 함유된 이 제품들은 부드러운 수분 공급과 보호를 제공합니다. 자극에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+    "새로운 메이크업 트렌드는 생생한 색상과 혁신적인 기술에 중점을 둡니다. 최신 트렌드로 매혹적인 메이크업의 세계로 들어가 보세요. 생생한 색상과 혁신적인 기술이 메이크업 예술을 혁신하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 모든 룩에서 돋보이세요.",
+    "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일 추출물이 선사하는 자연의 케어를 경험해 보세요. 저희 스킨케어 제품은 민감성 피부를 위해 특별히 설계되어 부드럽게 수분을 공급하고 자극으로부터 피부를 보호합니다. 피부가 불편함에서 벗어나 건강한 광채를 되찾도록 하세요.",
+    "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술을 중심으로 메이크업 예술의 새로운 시대를 열었습니다. 네온 아이라이너든 홀로그램 하이라이터든 모든 메이크업 룩은 당신을 돋보이게 하고 독특한 매력을 보여줄 수 있습니다.",
+    "민감성 피부를 위해 특별히 설계된 천연 유기농 스킨케어 제품: 알로에 베라와 카모마일의 부드러운 힘으로 자연의 포옹을 느껴보세요. 민감성 피부를 위해 특별히 설계된 저희 스킨케어 제품은 피부에 부드럽게 영양을 공급하고 보호합니다. 피부 트러블에 작별을 고하고 빛나는 건강한 피부를 맞이하세요.",
+    "새로운 메이크업 트렌드는 선명한 색상과 혁신적인 기술에 중점을 둡니다. 이번 시즌 메이크업 트렌드는 대담한 색상과 혁신적인 기술에 주목하고 있습니다. 네온 아이라이너부터 홀로그램 하이라이터까지 창의력을 발휘하고 매번 독특한 룩을 연출하세요."
+  ]
+};
+
+const options = {
+  hostname: 'aihubmix.com',
+  port: 443,
+  path: '/v1/rerank',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+  }
+};
+
+const req = https.request(options, res => {
+  let responseData = '';
+  res.on('data', chunk => {
+    responseData += chunk;
+  });
+  res.on('end', () => {
+    console.log(responseData);
+  });
+});
+
+req.write(JSON.stringify(requestData));
+req.end();
+```
+</CodeGroup>
+
+## 딥서치
+딥서치는 검색, 읽기, 추론 기능을 결합하여 최상의 답변을 추구합니다. OpenAI의 채팅 API 형식과 완벽하게 호환되므로 api.openai.com을 aihubmix.com으로 교체하기만 하면 시작할 수 있습니다.  
+스트림은 사고 과정을 반환합니다.
+
+### 요청 매개변수
+<ParamField body="model" type="string" required>
+  모델 이름, 사용 가능한 모델:
+  - `jina-deepsearch-v1`: 기본 모델, 최상의 답변을 찾을 때까지 검색, 읽기 및 추론
+</ParamField>
+
+<ParamField body="stream" type="boolean" default="true">
+  스트리밍 응답을 활성화할지 여부. 이 옵션을 활성화하는 것이 좋습니다. 딥서치 요청은 완료하는 데 시간이 오래 걸릴 수 있으며 스트리밍을 비활성화하면 '524 시간 초과' 오류가 발생할 수 있습니다.
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  사용자와 어시스턴트 간의 대화 메시지 목록. 텍스트(.txt, .pdf), 이미지(.png, .webp, .jpeg) 등 여러 유형(모달) 메시지를 지원합니다. 최대 파일 크기는 10MB입니다.
+</ParamField>
+
+### 다중 모드 메시지 형식
+
+딥서치는 순수 텍스트(메시지), 파일(파일), 이미지(이미지) 등 여러 유형의 메시지 형식을 지원합니다. 다음은 다양한 형식의 예입니다:
+
+#### 1. 순수 텍스트 메시지
+```json
+{
+  "role": "user",
+  "content": "안녕하세요"
+}
+```
+
+#### 2. 파일 첨부가 있는 메시지
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "이 파일에 무엇이 있습니까?"
+    },
+    {
+      "type": "file",
+      "data": "data:application/pdf;base64,JVBERi0xLjQKJfbk...", // PDF 파일의 base64 인코딩
+      "mimeType": "application/pdf"
+    }
+  ]
+}
+```
+
+#### 3. 이미지가 있는 메시지
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "이미지에 무엇이 있습니까?"
+    },
+    {
+      "type": "image",
+      "image": "data:image/webp;base64,UklGRoDOAAB...", // 이미지의 base64 인코딩
+      "mimeType": "image/webp"
+    }
+  ]
+}
+```
+
+모든 파일과 이미지는 사전에 데이터 URI 형식(data URI)으로 인코딩해야 하며 최대 파일 크기는 10MB입니다.
+
+### 호출 예제
+공식 웹사이트의 **Jina AI의 Python 스트리밍 호출에는 응답이 없습니다**. 예제를 참조하십시오.
+
+<CodeGroup>
+```shell Curl
+curl https://aihubmix.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d @- <<EOFEOF
+  {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "안녕하세요!"
+        },
+        {
+            "role": "assistant",
+            "content": "안녕하세요, 무엇을 도와드릴까요?"
+        },
+        {
+            "role": "user",
+            "content": "jina ai의 최신 블로그 게시물은 무엇입니까?"
+        }
+    ],
+    "stream": true
+  }
+EOFEOF
+```
+
+```py Python
+import requests
+import json
+
+url = 'https://aihubmix.com/v1/chat/completions'
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer sk-***' # AiHubMix 키로 교체
+}
+
+data = {
+    "model": "jina-deepsearch-v1",
+    "messages": [
+        {
+            "role": "user",
+            "content": "안녕하세요!"
+        },
+        {
+            "role": "assistant",
+            "content": "안녕하세요, 무엇을 도와드릴까요?"
+        },
+        {
+            "role": "user",
+            "content": "jina ai의 최신 블로그 게시물은 무엇입니까?"
+        }
+    ],
+    "stream": True
+}
+
+# 스트리밍 응답을 처리하기 위해 요청에 stream=True 사용
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+# 요청이 성공했는지 확인
+if response.status_code == 200:
+    # 응답 내용을 한 줄씩 반복
+    for line in response.iter_lines():
+        if line:
+            # 줄을 디코딩하고 인쇄 (SSE 형식 가정: "data: {...}")
+            decoded_line = line.decode('utf-8')
+            if decoded_line.startswith('data: '):
+                # "data: [DONE]"과 같은 종료 신호 처리
+                if decoded_line[len('data: '):].strip() == '[DONE]':
+                    print("\n스트림이 완료되었습니다.")
+                    break
+                try:
+                    # JSON 부분 추출
+                    json_data = json.loads(decoded_line[len('data: '):])
+                    # JSON 데이터 처리
+                    if 'choices' in json_data and len(json_data['choices']) > 0:
+                        delta = json_data['choices'][0].get('delta', {})
+                        content_to_print = delta.get('content') or delta.get('reasoning_content') # 두 필드 모두 확인
+
+                        if content_to_print:
+                            print(content_to_print, end='', flush=True)
+                except json.JSONDecodeError:
+                    # "data: " 뒤에 유효한 JSON이 아닌 줄은 무시
+                    # print(f"\n줄에서 JSON을 디코딩할 수 없습니다: {decoded_line}")
+                    pass # 필요한 경우 비 JSON 데이터 줄을 선택적으로 기록하거나 처리
+            # 필요한 경우 "data: "로 시작하지 않는 줄 처리
+            # else:
+            #    print(f"데이터가 아닌 줄 수신: {decoded_line}")
+
+    print() # 끝에 줄 바꿈 추가
+elif response.status_code == 401:
+     print(f"오류: {response.status_code} - 권한 없음. API 키를 확인하십시오.")
+     try:
+         print(response.json())
+     except json.JSONDecodeError:
+         print(response.text)
+else:
+    print(f"오류: {response.status_code}")
+    try:
+        print(response.json()) # 가능한 경우 오류 세부 정보 인쇄
+    except json.JSONDecodeError:
+        print(response.text) # JSON이 아닌 경우 원시 텍스트 인쇄
+```
+
+```ts TypeScript
+const https = require('https');
+
+const data = JSON.stringify({
+  model: "jina-deepsearch-v1",
+  messages: [
+    {
+      role: "user",
+      content: "안녕하세요!"
+    },
+    {
+      role: "assistant",
+      content: "안녕하세요, 무엇을 도와드릴까요?"
+    },
+    {
+      role: "user",
+      content: "jina ai의 최신 블로그 게시물은 무엇입니까?"
+    }
+  ],
+  stream: true
+});
+
+const options = {
+  hostname: 'aihubmix.com',
+  path: '/v1/chat/completions',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Length': data.length,
+    'Authorization': 'Bearer sk-***' // AiHubMix 키로 교체
+  }
+};
+
+const req = https.request(options, res => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on('data', d => {
+    process.stdout.write(d);
+  });
+});
+
+req.on('error', error => {
+  console.error(error);
+});
+
+req.write(data);
+req.end();
+```
+</CodeGroup>
+
+### 응답 설명
+딥서치의 응답은 기본적으로 스트리밍되며 중간 추론 단계와 최종 답변을 모두 포함합니다.
+스트림의 마지막 블록에는 최종 응답, 방문한 URL 목록 및 토큰 사용 세부 정보가 포함됩니다.
+스트리밍이 비활성화되면 최종 답변만 반환되고 중간 "사고" 단계는 생략됩니다.
+**참고:** 이 JSON 객체는 Jina AI에서 사용하는 형식과 다릅니다.
+
+```json
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "reasoning_content": "<think>"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// 스트리밍 이유
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "사고 부분"
+      }
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// 추론 완료
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "reasoning_content": "</think>\n\n"
+      },
+      "finish_reason": "thinking_end"
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379"
+}
+
+// URL이 포함된 최종 응답
+{
+  "id": "1745506101379",
+  "object": "chat.completion.chunk",
+  "created": 1745506101,
+  "model": "jina-deepsearch-v1",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "응답 내용",
+        "type": "text",
+        "annotations": [
+          {
+            "type": "url_citation",
+            "url_citation": {
+              "url": "https://example.com",
+              "title": "페이지 제목",
+              "start_index": 0,
+              "end_index": 0
+            }
+          }
+        ]
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_1745506101379",
+  "usage": {
+    "prompt_tokens": 673423,
+    "completion_tokens": 109286,
+    "total_tokens": 583555
+  }
+}
+
+data: [DONE]
+```
+
+**Python 반환 예제:**
+```py Python
+<think>최신 정보를 필요로 하는 Jina AI 블로그에서 가장 최근 게시물을 확인해야 합니다. Jina AI에서 최신 블로그 게시물을 찾아야 합니다. 검색 엔진을 사용하여 Jina AI 블로그를 찾은 다음 가장 최근 게시물을 식별하겠습니다. 더 많은 정보를 수집하기 위해 Jina AI의 최신 블로그 게시물을 검색해 보겠습니다. 좋습니다, 최신 Jina AI 블로그 게시물을 찾기 위해 몇 가지 쿼리를 만들었습니다. 먼저 지난 주에 업데이트된 Jina AI 블로그에 대한 일반적인 검색입니다. 그런 다음 DeepSearch 및 신경망 검색과 같은 특정 Jina AI 제품에 대한 집중적인 쿼리를 통해 지난 한 달 동안의 업데이트를 확인합니다. 또한 지난 한 달 동안의 임베딩 모델 및 API 업데이트에 대한 쿼리를 추가했습니다. 그리고 작년부터 Elasticsearch 통합에 대한 쿼리를 추가했습니다. 마지막으로 균형 잡힌 관점을 얻기 위해 Jina AI의 비판이나 한계에 대한 쿼리를 추가했습니다. 더 많은 정보를 수집하기 위해 https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch, https://jina.ai/news/auto-gpt-unmasked-hype-hard-truths-production-pitfalls, https://jinaai.cn/news/a-practical-guide-to-implementing-deepsearch-deepresearch, https://businesswire.com/news/home/20250220781575/en/Elasticsearch-Open-Inference-API-now-Supports-Jina-AI-Embeddings-and-Rerank-Model, https://gurufocus.com/news/2709507/elastic-nv-estc-enhances-elasticsearch-with-jina-ai-integration을 읽어보겠습니다. https://jina.ai/news/a-practical-guide-to-implementing-deepsearch-deepresearch의 내용은... [잘림]
+
+더 나은 검색을 향한 끊임없는 추구는 우리가 혹독한 현실에 직면해야 함을 요구합니다. 크기는 중요하며 항상 좋은 방향으로만 작용하는 것은 아닙니다. 2025년 4월 16일에 발표된 Jina AI의 최신 블로그 게시물 "텍스트 임베딩의 크기 편향과 검색에 미치는 영향"은 이 문제를 정면으로 다룹니다. 이것은 단순한 콘텐츠가 아니라 텍스트 입력의 길이가 유사성 메트릭을 어떻게 왜곡하여 검색 시스템이 간결하고 정확한 일치 항목보다 장황하고 종종 관련 없는 문서를 선호하게 만드는지에 대한 비판적인 검토입니다.
+
+왜 신경 써야 할까요? 정보 과부하 시대에 관련성이 왕이기 때문입니다. 우리는 데이터에 빠져 있고 검색 엔진은 우리의 구명 뗏목입니다. 그러나 그 뗏목이 순전히 양에 속기 쉬운 알고리즘에 의해 조종된다면 우리 모두는 배와 함께 가라앉을 것입니다.
+
+이 게시물은 기계가 의미를 이해하고 비교할 수 있도록 하는 텍스트의 숫자 표현인 텍스트 임베딩의 메커니즘을 탐구할 가능성이 높습니다. 핵심 문제, Jina AI가 지적했듯이, 이러한 임베딩이 입력 텍스트의 길이에 영향을 받을 수 있다는 것이며, 이를 "크기 편향"이라고 합니다. 이는 더 긴 문서가 의미적으로 관련성이 거의 없더라도 더 짧고 집중된 문서보다 쿼리와 더 유사하게 보일 수 있음을 의미합니다.[^1]
+
+그 의미를 진정으로 파악하려면 다음을 고려하십시오.
+
+*   **크기 편향이란 무엇입니까?** 크기 편향은 텍스트 입력의 길이가 의미적 관련성과 관계없이 유사성에 어떻게 영향을 미치는지 나타냅니다. 검색 시스템이 쿼리에 대해 더 짧고 정확한 일치 항목 대신 길고 거의 관련 없는 문서를 반환하는 이유를 설명합니다. [^2]
+*   **누가 영향을 받습니까?** 학술 논문을 샅샅이 뒤지는 연구원부터 고객에게 가장 관련성 높은 정보를 제공하려는 기업에 이르기까지 의미 검색에 의존하는 모든 사람은 크기 편향으로 인한 왜곡에 취약합니다.
+*   **이 문제는 어디에서 나타납니까?** 이 문제는 특정 검색 엔진이나 플랫폼에 국한되지 않습니다. 많은 텍스트 임베딩 모델이 설계되고 구현되는 방식에 내재된 시스템적 문제입니다.
+*   **이것이 언제 시급한 문제가 되었습니까?** 컨텍스트 창이 커지고 모델이 점점 더 큰 문서를 수집함에 따라 크기 편향 문제가 증폭됩니다.
+*   **왜 이런 일이 발생합니까?** 이유는 복잡하지만 고차원 공간의 수학적 속성과 유사성이 계산되는 방식에 귀결됩니다. 더 긴 벡터는 의미적 정렬이 약하더라도 쿼리 벡터와 겹치는 "표면적"이 더 많습니다.
+*   **어떻게 해결할 수 있습니까?** Jina AI의 블로그 게시물은 잠재적인 완화 전략을 탐구할 가능성이 높습니다. 여기에는 정규화 기술, 임베딩 모델의 아키텍처 수정 또는 길이 관련 왜곡에 덜 민감한 새로운 유사성 메트릭이 포함될 수 있습니다.
+
+여기서 Jina AI의 작업은 학문적인 것만이 아닙니다. 실용적인 개입입니다. 크기 편향을 식별하고 분석함으로써 더 정확하고 신뢰할 수 있는 검색 기술의 길을 열고 있습니다. 이것은 정보 검색에서 콘텐츠 추천에 이르기까지 모든 것에 영향을 미치는 실제적인 의미를 갖습니다.
+
+최신 블로그 게시물은 여기에서 찾을 수 있습니다: https://jina.ai/news
+
+궁극적으로 텍스트 임베딩에 대한 불편한 진실에 맞서려는 Jina AI의 의지는 해당 분야를 발전시키려는 그들의 헌신에 대한 증거입니다. 진보는 더 크고 복잡한 모델을 구축하는 것뿐만 아니라 해당 모델의 뉘앙스와 한계를 이해하고 무엇보다 정확성과 관련성을 우선시하는 솔루션을 위해 노력하는 것임을 상기시켜 줍니다. 그리고 그것은 받아들일 가치가 있는 크기와 무관한 진실입니다.
+
+
+
+[^1]: 크기 편향은 텍스트 입력의 길이가 의미적 관련성과 관계없이 유사성에 어떻게 영향을 미치는지 나타냅니다. 검색 시스템이 쿼리에 대해 더 짧고 정확한 일치 항목 대신 길고 거의 관련 없는 문서를 반환하는 이유를 설명합니다. [뉴스룸 - Jina AI](https://jina.ai/news)
+
+[^2]: 크기 편향은 텍스트 입력의 길이가 의미적 관련성과 관계없이 유사성에 어떻게 영향을 미치는지 나타냅니다. 검색 시스템이 쿼리에 대해 더 짧고 정확한 일치 항목 대신 길고 거의 관련 없는 문서를 반환하는 이유를 설명합니다. [뉴스룸 - Jina AI](https://jina.ai/news?tag=tech-blog)
+스트림이 완료되었습니다.
+```

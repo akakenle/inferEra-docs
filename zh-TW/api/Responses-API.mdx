@@ -1,0 +1,274 @@
+---
+title: "Openai Responses API 支援"
+icon: "o"
+---
+
+支援 Openai 的 Responses API 多功能介面，已經上線的功能介面如下：
+
+- Text input：文字輸入
+- Image input：圖文輸入
+- Streaming：串流調用
+- Web search：搜尋
+- Reasoning：推理深度，支援 3 檔
+- Functions：函數調用
+- image_generation：繪圖工具調用，圖片生成部分按 `gpt-image-1` 計價
+- Code Interpreter：程式碼解析器
+- Remote MCP：MCP 調用
+- Computer Use：自動操作
+
+## 使用（Python 調用）：
+
+與官方的 OpenAI 調用方式一致，只需替換 `api_key` 和 `base_url` 進行轉發。
+中國大陸可直接連線訪問。
+
+```py
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+```
+
+對於推理模型，支援通過以下參數來輸出推理總結，總結細節的豐富程度為 detailed > auto > None，其中 auto 為最佳平衡。
+
+```py
+"summary": "auto" 
+```
+
+<CodeGroup>
+
+```py 文字
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 可用
+  input="Tell me a three sentence bedtime story about a unicorn."
+)
+
+print(response)
+```
+
+
+```py 圖文
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4o-mini", # codex-mini-latest 可用
+    input=[
+        {
+            "role": "user",
+            "content": [
+                { "type": "input_text", "text": "what is in this image?" },
+                {
+                    "type": "input_image",
+                    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+                }
+            ]
+        }
+    ]
+)
+
+print(response)
+```
+
+
+```py 串流
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 可用
+  instructions="You are a helpful assistant.",
+  input="Hello!",
+  stream=True
+)
+
+for event in response:
+  print(event)
+```
+
+
+```py 搜尋
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 不支援搜尋📍
+  tools=[{ "type": "web_search_preview" }],
+  input="What was a positive news story from today?",
+)
+
+print(response)
+```
+
+
+```py 推理
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1/"
+)
+
+response = client.responses.create(
+    model="o4-mini", # 支援 codex-mini-latest, o4-mini, o3-mini, o3, o1
+    input="How much wood would a woodchuck chuck?",
+    reasoning={
+        "effort": "medium", # 支援 low, medium, high
+        "summary": "auto" # 推理總結
+    }
+)
+
+print(response)
+```
+
+
+```py 函數調用
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+tools = [
+    {
+        "type": "function",
+        "name": "get_current_weather",
+        "description": "Get the current weather in a given location",
+        "parameters": {
+          "type": "object",
+          "properties": {
+              "location": {
+                  "type": "string",
+                  "description": "The city and state, e.g. San Francisco, CA",
+              },
+              "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+          },
+          "required": ["location", "unit"],
+        }
+    }
+]
+
+response = client.responses.create(
+  model="gpt-4o-mini", # codex-mini-latest 可用
+  tools=tools,
+  input="What is the weather like in Boston today?",
+  tool_choice="auto"
+)
+
+print(response)
+```
+
+
+```py 圖片生成工具
+from openai import OpenAI
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Generate an image of gray tabby cat hugging an otter with an orange scarf",
+    tools=[{"type": "image_generation"}],
+)
+
+# 儲存為圖片檔案
+image_data = [
+    output.result
+    for output in response.output
+    if output.type == "image_generation_call"
+]
+
+if image_data:
+    image_base64 = image_data[0]
+    with open("cat_and_otter.png", "wb") as f:
+        f.write(base64.b64decode(image_base64))
+```
+
+
+```py 程式碼解析器
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+instructions = """
+You are a personal math tutor. When asked a math question, 
+write and run code using the python tool to answer the question.
+"""
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[
+        {
+            "type": "code_interpreter",
+            "container": {"type": "auto"}
+        }
+    ],
+    instructions=instructions,
+    input="I need to solve the equation 3x + 11 = 14. Can you help me?",
+)
+
+print(resp.output)
+```
+
+
+```py Remote MCP
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+resp = client.responses.create(
+    model="gpt-4.1",
+    tools=[{
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "never",
+        "allowed_tools": ["ask_question"],
+    }],
+    input="What transport protocols does the 2025-03-26 version of the MCP spec (modelcontextprotocol/modelcontextprotocol) support?",
+)
+
+print(resp.output_text)
+```
+
+</CodeGroup>
+
+**注意：**
+
+1. 最新的 `codex-mini-latest` 不支援搜尋
+2. Computer use 需要配合 Praywright 使用，建議參考[官方倉庫](https://github.com/openai/openai-cua-sample-app)
+
+已知細節問題：
+
+- 調用用例複雜
+- 截圖大量，耗時久，任務成功率低
+- 或觸發 CAPTCHA 驗證或 Cloudflare 真人驗證，可能遇到無限循環

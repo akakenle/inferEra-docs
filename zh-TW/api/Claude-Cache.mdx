@@ -1,0 +1,394 @@
+---
+title: "Claude 提示詞快取"
+description: "提示快取顯著減少了重複任務或包含一致元素的提示的處理時間，有效減低了 Token 成本。"
+icon: "badge-percent"
+---
+
+以下是如何使用 Messages API 實現提示快取的範例：
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/messages \
+  -H "content-type: application/json" \
+  -H "x-api-key: AIHUBMIX_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "stream": true,
+    "model": "claude-opus-4-20250514",
+    "max_tokens": 20000,
+    "system": [
+      {
+        "type": "text",
+        "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style."
+      },
+      {
+        "type": "text",
+        "text": "Pride and Prejudice by Jane Austen... [此处放置完整文本内容]",
+        "cache_control": {"type": "ephemeral"}
+      }
+    ],
+    "thinking": {
+      "type": "enabled",
+      "budget_tokens": 16000
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze the major themes in Pride and Prejudice."
+      }
+    ]
+  }'
+```
+
+
+```py Python (Anthropic SDK - 推荐)
+import os
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+# 使用缓存的流式响应
+with client.messages.stream(
+    model="claude-opus-4-20250514",
+    max_tokens=20000,
+    system=[
+        {
+            "type": "text",
+            "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n"
+        },
+        {
+            "type": "text",
+            "text": "<the entire contents of 'Pride and Prejudice'>",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ],
+    thinking={
+        "type": "enabled",
+        "budget_tokens": 16000
+    },
+    messages=[
+        {"role": "user", "content": "Analyze the major themes in 'Pride and Prejudice'."}
+    ]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+
+# 非流式响应
+message = client.messages.create(
+    model="claude-opus-4-20250514",
+    max_tokens=20000,
+    system=[
+        {
+            "type": "text",
+            "text": "You are an AI assistant tasked with analyzing literary works."
+        },
+        {
+            "type": "text",
+            "text": "<the entire contents of 'Pride and Prejudice'>",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ],
+    messages=[
+        {"role": "user", "content": "Analyze the major themes in 'Pride and Prejudice'."}
+    ]
+)
+print(message.content)
+```
+
+
+```py Python (Requests - 备选)
+import requests
+
+url = "https://aihubmix.com/v1/messages"
+headers = {
+    "content-type": "application/json",
+    "x-api-key": "sk-***", # 换成你在 AiHubMix 生成的密钥
+    "anthropic-version": "2023-06-01"
+}
+data = {
+    "stream": True,
+    "model": "claude-opus-4-20250514",
+    "max_tokens": 20000,
+    "system": [
+        {
+            "type": "text",
+            "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n"
+        },
+        {
+            "type": "text",
+            "text": "<the entire contents of 'Pride and Prejudice'>",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ],
+    "thinking": {
+        "type": "enabled",
+        "budget_tokens": 16000
+    },
+    "messages": [{"role": "user", "content": "Analyze the major themes in 'Pride and Prejudice'."}]
+}
+
+response = requests.post(url, headers=headers, json=data, stream=True)
+
+# 检查响应状态
+if response.status_code == 200:
+    # Process the streaming response
+    for line in response.iter_lines():
+        if line:
+            print(line.decode('utf-8'))
+else:
+    print(f"Error: {response.status_code}, {response.text}")
+```
+
+</CodeGroup>
+
+**Response:**
+
+```json
+{"cache_creation_input_tokens":188086,"cache_read_input_tokens":0,"input_tokens":21,"output_tokens":393}
+{"cache_creation_input_tokens":0,"cache_read_input_tokens":188086,"input_tokens":21,"output_tokens":393}
+```
+
+在这个例子中，《傲慢与偏见》的全文通过 cache_control 参数进行了缓存。这样就可以在多次 API 调用中重复使用这段长文本，而无需每次都重新处理。只需改变用户消息，就能针对这本书提出各种问题，同时利用缓存内容，从而获得更快的响应速度和更高的效率。
+
+## 提示词缓存的工作原理
+
+当你发送启用了提示词缓存的请求时：
+
+1. 系统会检查是否已经缓存了最近查询中指定缓存断点之前的提示词前缀
+2. 如果找到，就使用缓存版本，减少处理时间和成本
+3. 否则，系统会处理完整提示词，并在开始响应时缓存前缀部分
+
+这在以下场景特别有用：
+
+- 包含大量示例的提示词
+- 大量的上下文或背景信息
+- 具有一致指令的重复任务
+- 长时间的多轮对话
+
+**缓存默认有效期為 5 分钟**，每次使用緩存內容時都會刷新。我们还支持 **1 小時緩存版本（Beta）**，适用于需要更長緩存時間的場景。
+
+<Tip>
+  ## 提示詞緩存會緩存完整前綴
+
+  提示詞緩存會引用整個提示詞 - 按順序包括 `tools`、`system` 和 `messages`,直到並包含使用 `cache_control` 標記的內容塊。
+</Tip>
+
+## 緩存定價
+
+提示詞緩存采用新的定價結構。下表顯示了每個支持模型的百萬 Token 價格：
+
+| 模型                | 基礎輸入 Token | 5 分鐘緩存寫入   | 1 小時緩存寫入 | 緩存命中和刷新   | 輸出 Token |
+| ----------------- | ---------- | ---------- | -------- | --------- | -------- |
+| Claude Opus 4     | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Sonnet 4   | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Sonnet 3.7 | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Sonnet 3.5 | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Haiku 3.5  | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Opus 3     | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+| Claude Haiku 3    | 按平台定價      | 1.25x 基礎價格 | 2x 基礎價格  | 0.1x 基礎價格 | 按平台定價    |
+
+注意：
+
+- 5 分鐘緩存寫入 Token 價格為基礎輸入 Token 價格的 1.25 倍
+- 1 小時緩存寫入 Token 價格為基礎輸入 Token 價格的 2 倍
+- 緩存讀取 Token 價格為基礎輸入 Token 價格的 0.1 倍
+- 常規輸入和輸出 Token 按平台標準費率計價
+
+## 如何實現提示詞緩存
+
+### 支持的模型
+
+目前支持提示詞緩存的模型包括：
+
+- Claude Opus 4
+- Claude Sonnet 4
+- Claude Sonnet 3.7
+- Claude Sonnet 3.5
+- Claude Haiku 3.5
+- Claude Haiku 3
+- Claude Opus 3
+
+### 構建提示詞結構
+
+將靜態內容 (工具定義、系統指令、上下文、示例) 放在提示詞的前面。使用 `cache_control` 參數標記要緩存的可用內容的結束位置。
+
+緩存前綴按以下順序創建：`tools`、`system`，然後是 `messages`。
+
+使用 `cache_control` 參數，你可以定義最多 4 個緩存斷點，允許分別緩存不同的可用部分。對於每個斷點，系統會自動檢查之前位置的緩存命中情況，如果找到就使用最長的匹配前綴。
+
+### 緩存限制
+
+最小可緩存提示詞長度為：
+
+- Claude Opus 4、Claude Sonnet 4、Claude Sonnet 3.7、Claude Sonnet 3.5 和 Claude Opus 3 為 1024 個 Token
+- Claude Haiku 3.5 和 Claude Haiku 3 為 2048 個 Token
+
+即使標記了 `cache_control`，更短的提示詞也無法緩存。任何請求緩存少於這個數量的 Token 都會在不使用緩存的情況下處理。要查看提示詞是否被緩存，請查看響應使用情況[字段](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#tracking-cache-performance)。
+
+對於並發請求，注意緩存條目只有在第一個響應開始後才可用。如果需要並行請求的緩存命中，請等待第一個響應後再發送後續請求。
+
+目前支持兩種緩存類型：
+
+- **"ephemeral"**：默認 5 分鐘生存期
+- **1 小時緩存（Beta）**：適用於需要更長緩存時間的場景
+
+### 1 小時緩存持續時間（Beta）
+
+對於需要更長緩存時間的場景，我們提供 1 小時緩存選項。
+
+要使用擴展緩存，需要在請求中添加 `extended-cache-ttl-2025-04-11` 作為 beta header，然後在 cache_control 定義中包含 ttl：
+
+```shell
+curl https://aihubmix.com/v1/messages \
+  -H "content-type: application/json" \
+  -H "x-api-key: AIHUBMIX_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "anthropic-beta: extended-cache-ttl-2025-04-11" \
+  -d '{
+    "model": "claude-opus-4-20250514",
+    "system": [
+      {
+        "type": "text",
+        "text": "Long-term instructions...",
+        "cache_control": {
+          "type": "ephemeral",
+          "ttl": "1h"
+        }
+      }
+    ],
+    "messages": [...]
+  }'
+```
+
+```json
+{
+  "cache_control": {
+    "type": "ephemeral",
+    "ttl": "5m" | "1h"
+  }
+}
+```
+
+#### 何時使用 1 小時緩存
+
+1 小時緩存特別適用於：
+
+- **批處理作業**：處理大量具有共同前綴的請求
+- **長時間會話**：需要在較長時間內保持上下文的對話
+- **大型文件分析**：對同一文件進行多次不同類型的分析
+- **代碼庫問答**：在較長時間內對同一代碼庫進行多次查詢
+
+#### 混合不同的 TTL
+
+你可以在同一個請求中混合使用不同的緩存持續時間：
+
+```json
+{
+  "system": [
+    {
+      "type": "text", 
+      "text": "Long-term instructions...",
+      "cache_control": {
+        "type": "ephemeral",
+        "ttl": "1h"
+      }
+    },
+    {
+      "type": "text",
+      "text": "Short-term context...", 
+      "cache_control": {
+        "type": "ephemeral",
+        "ttl": "5m"
+      }
+    }
+  ]
+}
+```
+
+### 可以緩存的内容
+
+請求中的每個塊都可以用 cache_control 指定緩存。這包括：
+
+- 工具：tools 數組中的工具定義
+- 系統消息：system 數組中的內容塊
+- 消息：messages.content 數組中的內容塊，包括用戶和助手的對話輪次
+- 圖片和文件：用戶對話輪次中 messages.content 數組的內容塊
+- 工具使用和工具結果：用戶和助手對話輪次中 messages.content 數組的內容塊
+
+這些元素都可以用 `cache_control` 標記來啟用該部分請求的緩存。
+
+### 無法緩存的内容
+
+雖然大多數請求塊都可以緩存，但有一些例外：
+
+- **思考塊**無法直接使用 `cache_control` 緩存。但是，當思考塊出現在之前的助手回合中時，可以與其他內容一起緩存。以這種方式緩存時，從緩存讀取時它們確實計為輸入 Token。
+- **子內容塊**（如引用）本身無法直接緩存。相反，緩存頂級塊。
+- **空文本塊**無法緩存。
+
+### 跟踪緩存性能
+
+通過響應中的這些 API 響應字段 (或流式傳輸時的 message_start 事件) 監控緩存性能：
+
+- `cache_creation_input_tokens`: 創建新緩存條目時寫入緩存的 Token 數
+- `cache_read_input_tokens`: 從緩存中檢索的 Token 數
+- `input_tokens`: 未從緩存讀取或用於創建緩存的輸入 Token 數
+
+### 有效緩存的最佳實踐
+
+要優化提示詞緩存性能：
+
+- 緩存穩定的、可用重用的內容，如系統指令、背景信息、大型上下文或常用工具定義
+- 將緩存內容放在提示詞前面以獲得最佳性能
+- 策略性地使用緩存斷點來分隔不同的可用前綴部分
+- 定期分析緩存命中率並根據需要調整策略
+- 對於長期使用的内容，考慮使用 1 小時緩存以獲得更好的成本效益
+
+### 針對不同用例的優化
+
+根據你的場景調整提示詞緩存策略：
+
+- 對話代理：減少長時間對話的成本和延遲，特別是那些有長指令或上傳文件的對話
+- 編程助手：通過在提示詞中保留相關部分或代碼庫的摘要版本，改善自動完成和代碼庫問答
+- 大文件處理：在提示詞中包含完整長篇材料 (包括圖片)，而不增加響應延遲
+- 詳細指令集：共享廣泛的指令、程序和示例列表來微調 Claude 的響應。開發者通常在提示詞中包含一兩個示例，但使用提示詞緩存，你可以通過包含 20\+ 個高質量答案的多元化示例獲得更好的性能
+- 代理工具使用：提升涉及多個工具調用和迭代代碼更改的場景性能，每個步驟通常需要新的 API 調用
+- 與書籍、論文、文件、播客記錄和其他長篇內容對話：通過在提示詞中嵌入整個文件，讓用戶能夠提問
+
+### 常見問題解決
+
+- 確保緩存部分在不同調用之間完全相同，並在相同位置標記了 `cache_control`
+- 檢查調用是否在緩存生存期內（5 分鐘或 1 小時）
+- 驗證 `tool_choice` 和圖片使用在調用之間保持一致
+- 確認你緩存的 Token 數至少達到最小要求
+- 雖然系統會嘗試使用緩存斷點之前位置的已緩存內容，但你可以使用額外的 `cache_control` 參數來保證查找提示詞前面部分的緩存，這對於包含很長內容塊列表的查詢可能很有用
+
+<Warning>
+  注意，更改 `tool_choice` 或提示詞中任何位置的圖片存在/缺失都會使緩存失效，需要創建新的緩存條目。
+</Warning>
+
+### 緩存儲存和共享
+
+- **組織隔離：** 緩存在組織之間是隔離的。不同組織永遠不會共享緩存，即使它們使用相同的提示詞。
+- **精確匹配：** 緩存命中需要 100% 相同的提示詞段，包括標記有 cache control 的塊之前及其本身的所有文本和圖片。在緩存讀取和創建期間必須用 cache_control 標記相同的塊。
+- **輸出 Token 生成：** 提示詞緩存不會影響輸出 Token 生成。你收到的響應將與不使用提示詞緩存時完全相同。
+
+---
+
+## 不同模型的支持情況
+
+- 是否支持 Prompt Caching 賴於模型本身。
+- 如果模型本身支持，並且不需要顯式聲明的參數，則通過 opanai 兼容格式轉發可以支持。
+- Openai 默認支持 Prompt Caching，緩存不計費，緩存 Tokens 讀取費用減半，處於未復用狀態 5-10 分鐘之後會自動清除。[文件](https://openai.com/index/api-prompt-caching/)
+- Claude 需要原生的 `cache_control: { type: "ephemeral" }` 聲明，緩存費率為常規輸入的 1.25 倍（5 分鐘）或 2 倍（1 小時），緩存 Tokens 讀取費用為 0.1 倍，生命周期 5 分鐘或 1 小時。[文件](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#how-to-implement-prompt-caching)
+- Deepseek V3 和 R1 原生支持，緩存費率為常規輸入的 1 倍，緩存 Tokens 讀取費用為 0.1 倍。[文件](https://api-docs.deepseek.com/zh-cn/)
+- Gemini 模型支持[隱式緩存](https://ai.google.dev/gemini-api/docs/caching?lang=python)：
+  - **隱式緩存**：默認情況下為所有 Gemini 2.5 模型啟用。如果你的請求命中緩存，會自動傳遞成本節省。此功能自 2025 年 5 月 8 日起生效。上下文緩存的最低輸入 Token 數：Gemini 2.5 Flash 為 1,024，Gemini 2.5 Pro 為 2,048。
+    - 提高隱式緩存命中率的技巧：
+      - 將大塊的常見內容放在提示的前面。
+      - 嘗試在短時間內發送前綴相似的請求。
+    - 你可以在響應對象的 `usage_metadata` 字段中查看緩存命中的 Token 數量。
+    - 成本節省是根據預填充緩存命中次數衡量的。只有預填充緩存和 YouTube 視頻預處理緩存支持隱式緩存。

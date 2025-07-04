@@ -1,0 +1,66 @@
+---
+title: "일반 모델 전달"
+description: " "
+icon: 'person-from-portal'
+---
+
+엔드포인트: `POST` /v1/chat/completions
+
+**요청 본문 매개변수:**
+
+```json
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "삶의 의미는 무엇입니까?"
+    }
+  ]
+}
+```
+
+### 요청 매개변수
+
+|이름 | 위치 | 유형 | 필수 | 설명|
+|---|---|---|---|---|
+|Authorization|header|string| 아니요 |Bearer AIHUBMIX_API_KEY|
+|Content-Type|header|string| 아니요 |없음|
+|body|body|object| 아니요 |없음|
+
+**응답 예시:**
+
+```json
+200 응답
+```
+
+```json
+{
+  "id": "chatcmpl-AzJqsyf2h02BKjrqHMA1HVUQpiDfL",
+  "model": "gpt-4o-mini",
+  "object": "chat.completion",
+  "created": 1739177682,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "삶의 의미는 수세기 동안 논의되어 온 철학적 질문입니다. 다른 사람들과 문화는 삶의 목적과 중요성에 대해 다른 믿음을 가질 수 있습니다. 어떤 사람들은 삶의 의미가 행복과 성취를 추구하는 것이라고 믿는 반면, 다른 사람들은 더 높은 힘을 섬기거나 운명을 완수하는 것과 같은 영적 또는 종교적 의미를 믿습니다. 궁극적으로 삶의 의미는 각자가 스스로 답해야 하는 매우 개인적이고 개별적인 질문일 수 있습니다."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_0165350fbb",
+  "usage": {
+    "prompt_tokens": 14,
+    "completion_tokens": 86,
+    "total_tokens": 100
+  }
+}
+```
+
+### 응답 결과
+
+|상태 코드 | 상태 설명 | 설명 | 데이터 모델|
+|---|---|---|---|
+|200|OK|없음|인라인|

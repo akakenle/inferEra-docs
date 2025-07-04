@@ -1,0 +1,204 @@
+---
+title: "LLM 模型聯網搜索"
+description: " "
+icon: 'globe'
+---
+
+## 1️⃣ 實時聯網支持：突破 LLM 時效限制，讓輸出更準確、更可靠
+
+我們為 OpenAI 和 Gemini 系列大模型接口帶來了獲取最新網絡信息的能力，幫助你：  
+✅ **獲取最新資訊**：無論是今日熱點、最新研究還是實時數據，都能即時獲取  
+✅ **消除知識盲區**：突破大模型訓練數據的時間限制，獲取訓練後的新信息   
+✅ **降低幻覺風險**：基於實時網絡搜索的事實回答，大幅減少 AI 已讀亂回的可能性  
+✅ **提升決策質量**：基於最新事實的分析和建議，讓你的決策更有把握  
+
+**支持的模型：**
+目前支持 OpenAI 和 Gemini 大模型系列，包含兩種接入方式：
+
+**1. 原生搜索能力模型：**
+**Gemini 系列** (Ground with Google search)：
+- gemini-2.0-pro-exp-02-05-search
+- gemini-2.0-flash-exp-search
+- gemini-2.0-flash-search
+
+**OpenAI 系列** (Bing search)：
+- gpt-4o-search-preview
+- gpt-4o-mini-search-preview
+
+**2. 參數支持方式：**
+只需增加參數`web_search_options={}`，即可為所有 gemini、OpenAI 大模型開啟聯網能力。Gemini 系列的搜索費率為 3.5 美元/千次；
+
+
+### 使用方法
+
+使用前需要運行`pip install -U openai`升級 openai 包。
+
+**示例：**
+<CodeGroup>
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    model="gemini-2.0-flash-exp",
+    # 🌐 啟用搜索
+    web_search_options={},
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "搜索大模型 API 平台 AIhubmix 的相關資訊，簡短介紹，並提供相關連結。"
+                }
+            ]
+        }
+    ]
+)
+
+print(chat_completion.choices[0].message.content)
+```
+
+```ts Typescript 
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+    apiKey: 'sk-***',
+    baseURL: 'https://aihubmix.com/v1'
+});
+
+async function main() {
+    const chatCompletion = await client.chat.completions.create({
+        model: 'gemini-2.0-flash-exp',
+        # 🌐 啟用搜索
+        web_search_options: {},
+        messages: [
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: '搜索大模型 API 平台 AIhubmix 的相關資訊，簡短介紹，並提供相關連結。'
+                    }
+                ]
+            }
+        ]
+    });
+
+    console.log(chatCompletion.choices[0].message.content);
+}
+
+main().catch(console.error);
+```
+
+```shell Curl
+curl "https://aihubmix.com/v1/chat/completions" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer xxx" \
+    -d '{
+    "model": "gemini-2.0-flash-exp",
+    "web_search_options": {},
+    "messages": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "提供梵高在 Google Arts & Culture 網站的相關信息，簡短介紹，並提供相關連結。"
+                }
+            ]
+        }
+    ],
+    "stream": false
+}'
+```
+</CodeGroup>
+
+## 2️⃣ 智能衝浪：讓 AI 自由馳騁互聯網
+
+通過在模型 id 後方追加 `:surfing`，讓任何大語言模型具備搜索能力。
+- 追加後綴即可，不需要複雜的整合
+- 這種方式會默認將用戶請求轉發給 **Tavily 搜索服務**，LLM 根據返回的搜索結果參考作答
+- 搜索費用 **0.006 美元/次**
+- 目前「日志明細」裡未列出每次搜索的費用，費用直接在「額度變動」扣取，後續會列出
+
+<Tip>
+模型 id 在[模型廣場](https://aihubmix.com/models)中複製即可。
+</Tip>
+
+**示例：**
+<CodeGroup>
+```py Python
+import requests
+import json
+import os
+
+try:
+    response = requests.post(
+        url="https://aihubmix.com/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {os.environ.get('AIHUBMIX_API_KEY')}",
+            "Content-Type": "application/json",
+        },
+        data=json.dumps({
+            "model": "gpt-4o-mini:surfing", # 模型 id 後面追加 :surfing 即可支持搜索
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Search the last fact about ChatGPT memory feature, return with the URL, answer in Chinese"
+                }
+            ]
+        })
+    )
+
+    result = response.json()
+    print("API 響應：", json.dumps(result, ensure_ascii=False, indent=2))
+
+except requests.exceptions.RequestException as e:
+    print(f"請求錯誤：{e}")
+except json.JSONDecodeError as e:
+    print(f"JSON 解析錯誤：{e}")
+except Exception as e:
+    print(f"其他錯誤：{e}")
+```
+</CodeGroup>
+
+**API 響應示例：**
+```json
+{
+  "id": "chatcmpl-BLMY8YIKvcjNpiFmyvIfEGQMvPAAh",
+  "model": "gpt-4o-mini-2024-07-18",
+  "object": "chat.completion",
+  "created": 1744431268,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "ChatGPT 最近获得了重大的记忆功能升级，现在能够参考用户的所有过去对话，以提供更个性化的回应。用户可以选择不让 ChatGPT 记住这些信息，或完全退出记忆功能。有关此更新的更多信息可以在以下网址找到：[https://www.digitaltrends.com/computing/openai-chatgpt-memory-update/](https://www.digitaltrends.com/computing/openai-chatgpt-memory-update/)"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_b705f0c291",
+  "usage": {
+    "prompt_tokens": 584,
+    "completion_tokens": 99,
+    "total_tokens": 683,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  }
+}
+```

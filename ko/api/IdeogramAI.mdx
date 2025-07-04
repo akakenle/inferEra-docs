@@ -1,0 +1,1279 @@
+---
+title: "Ideogram AI 드로잉"
+icon: "paintbrush"
+---
+
+## Ideogram V3 인터페이스
+
+Ideogram V3 모델은 고급 이미지 생성 및 처리 기능을 제공합니다. V3 인터페이스는 이전 버전과 매개변수 및 사용법이 다르며, 이 섹션에서는 V3 인터페이스 및 사용 예제를 자세히 설명합니다.
+
+### V3 생성
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/generate](https://aihubmix.com/ideogram/v1/ideogram-v3/generate)
+
+주어진 프롬프트를 기반으로 이미지를 생성합니다. V3 모델은 더 높은 품질의 이미지 생성 기능을 제공하며 더 다양한 스타일과 매개변수 제어를 지원합니다.
+
+<ParamField body="prompt" type="string" required>
+  이미지 생성을 위한 프롬프트
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  렌더링 속도 옵션, 사용 가능 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8  
+  더 많은 이미지를 생성해도 생성 시간이 크게 늘어나지 않습니다.
+</ParamField>
+
+<ParamField body="aspect_ratio" default="1x1" type="string">
+  이미지 생성을 위한 가로 세로 비율, 다양한 사양 지원  
+  사용 가능 ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']  
+  다른 모델에서 사용되는 가로 세로 비율은 다릅니다.
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  프롬프트 향상. 사용 가능한 매개변수: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  이미지 생성을 위한 스타일 유형, 사용 가능 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`  
+  참고: V2 버전에 비해 유형이 더 집중되었습니다.
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  이미지에 나타나지 않기를 바라는 내용 설명
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647  
+  여러 이미지를 생성할 때 시드를 사용하지 마십시오. 그렇지 않으면 동일한 이미지가 생성됩니다.
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  스타일 참조 이미지, 스타일 안내에 사용할 수 있습니다.
+</ParamField>
+
+### 사용 예제
+
+<CodeGroup>
+
+```shell Curl 텍스트를 이미지로
+curl -X POST https://aihubmix.com/ideogram/v1/ideogram-v3/generate \
+  -H "Api-Key: sk-***" \
+  -H "Content-Type: multipart/form-data" \
+  -F prompt="포털에서 날아오는 다양한 전투 기계가 있는 섬세한 3D 커버 디자인. 기계는 모양, 크기, 색상이 다릅니다. 포털은 소용돌이치는 에너지를 방출하고 있습니다. 배경에는 높은 건물이 있는 미래 도시가 있습니다. \"하나의 게이트웨이, 무한한 모델\"이라는 텍스트가 네온 불빛, 넓은 시야, 영화 같은 조명, 생생한 색상, 밝은 톤으로 중앙에 배치되어 있습니다. 깨끗한 텍스트, 사이버 펑크, 부드러운 렌더링" \
+  -F rendering_speed="QUALITY" \
+  -F num_images="2" \
+  -F aspect_ratio="2x1"
+```
+
+```py Python 텍스트를 이미지로
+import requests
+import os
+
+# 요청 데이터 준비 - JSON 대신 사전 사용
+data = {
+  "prompt": "포털에서 날아오는 다양한 전투 기계가 있는 섬세한 3D 커버 디자인. 기계는 모양, 크기, 색상이 다릅니다. 포털은 소용돌이치는 에너지를 방출하고 있습니다. 배경에는 높은 건물이 있는 미래 도시가 있습니다. \"하나의 게이트웨이, 무한한 모델\"이라는 텍스트가 네온 불빛, 넓은 시야, 영화 같은 조명, 생생한 색상, 밝은 톤으로 중앙에 배치되어 있습니다. 깨끗한 텍스트, 사이버 펑크, 부드러운 렌더링",
+  "rendering_speed": "QUALITY",
+  "num_images": "2",
+  "aspect_ratio": "2x1",
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "흐릿함, 워터마크"
+}
+
+# Content-Type은 multipart/form-data입니다.
+files = {}
+for key, value in data.items():
+    files[key] = (None, str(value))  # 각 데이터 필드를 양식 필드로 보냅니다.
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # AiHubMix API 키로 교체
+  },
+  files=files
+)
+print(response.json())
+
+# 출력 이미지를 파일에 저장
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("이미지가 output.png에 저장되었습니다.")
+    else:
+        print(f"이미지를 가져오는 데 실패했습니다: {image_response.status_code}")
+else:
+    print("API 요청이 실패했거나 반환된 이미지가 없습니다.")
+```
+
+```py Python 참조 이미지 + 텍스트를 이미지로
+import requests
+import os
+
+data = {
+  "prompt": "포털에서 날아오는 다양한 전투 기계가 있는 섬세한 3D 커버 디자인. 기계는 모양, 크기, 색상이 다릅니다. 포털은 소용돌이치는 에너지를 방출하고 있습니다. 배경에는 높은 건물이 있는 미래 도시가 있습니다. \"하나의 게이트웨이, 무한한 모델\"이라는 텍스트가 네온 불빛, 넓은 시야, 영화 같은 조명, 생생한 색상, 밝은 톤으로 중앙에 배치되어 있습니다. 깨끗한 텍스트, 사이버 펑크, 부드러운 렌더링",
+  "rendering_speed": "QUALITY",
+  "num_images": 2,
+  # "seed": "998", # 여러 이미지를 생성할 때 시드를 사용하지 마십시오.
+  "aspect_ratio": "2x1", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "흐릿함, 워터마크",
+}
+
+# 파일 매개변수 초기화
+files = None
+
+# 스타일 참조 이미지 경로
+style_reference_path = "yourpath/reference-image.jpeg"
+use_reference_image = True
+
+if use_reference_image and os.path.exists(style_reference_path):
+    # 참조 이미지를 사용하고 파일이 있는 경우 파일 매개변수 설정
+    files = [
+        ("style_reference_images", open(style_reference_path, "rb")),
+        # 여러 스타일 참조 이미지를 추가해야 하는 경우 다음과 같이 추가할 수 있습니다.
+        # ("style_reference_images", open("두 번째 참조 이미지 경로", "rb")),
+    ]
+elif use_reference_image:
+    print(f"경고: 스타일 참조 이미지를 찾을 수 없습니다: {style_reference_path}")
+
+response = requests.post(
+  "https://aihubmix.com/ideogram/v1/ideogram-v3/generate",
+  headers={
+    "Api-Key": "sk-***" # AiHubMix API 키로 교체
+  },
+  data=data,
+  files=files
+)
+print(response.json())
+
+# 출력 이미지를 파일에 저장
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("이미지가 output.png에 저장되었습니다.")
+    else:
+        print(f"이미지를 가져오는 데 실패했습니다: {image_response.status_code}")
+else:
+    print("API 요청이 실패했거나 반환된 이미지가 없습니다.")
+```
+
+</CodeGroup>
+
+### V3 리믹스
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/remix](https://aihubmix.com/ideogram/v1/ideogram-v3/remix)
+
+참조 이미지와 프롬프트를 기반으로 이미지를 리믹스합니다. V3의 리믹스 기능은 원본 이미지의 스타일과 내용을 더 잘 유지합니다.
+
+<ParamField body="prompt" type="string" required>
+  이미지 리믹스를 위한 프롬프트
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  원본 이미지 파일
+</ParamField>
+
+<ParamField body="image_weight" default="50" type="integer">
+  원본 이미지의 가중치, 범위 1-100, 값이 클수록 원본 이미지와 결과가 더 유사합니다.
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  렌더링 속도 옵션, 사용 가능 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8
+  더 많은 이미지를 생성해도 생성 시간이 크게 늘어나지 않습니다.
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  출력 이미지의 가로 세로 비율, 사용 가능 ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  스타일 참조 이미지, 스타일 안내에 사용할 수 있습니다.
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  프롬프트 향상. 사용 가능한 매개변수: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  이미지 생성을 위한 스타일 유형, 사용 가능 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  이미지에 나타나지 않기를 바라는 내용 설명
+</ParamField>
+
+### 사용 예제
+
+<CodeGroup>
+
+```py Python 리믹스
+import requests
+import os
+
+data = {
+  "prompt": "눈 속에서 고양이와 노는 새, 픽셀 아트 스타일",
+  "image_weight": "60",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  "aspect_ratio": "16x9", 
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  "negative_prompt": "흐릿함, 잘못된 해부학, 워터마크",
+}
+
+# 원본 이미지 - 필수
+source_image_path = "yourpath/image.jpeg"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"원본 이미지를 찾을 수 없습니다: {source_image_path}")
+
+# 파일 매개변수 초기화
+files = None
+
+# 스타일 참조 이미지 경로
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# 업로드할 파일 준비
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 참조 이미지를 사용하고 파일이 있는 경우 파일 매개변수 설정
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"경고: 스타일 참조 이미지를 찾을 수 없습니다: {style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/remix",
+      headers={
+        "Api-Key": "sk-***" # AiHubMix API 키로 교체
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# 출력 이미지를 파일에 저장
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("이미지가 output.png에 저장되었습니다.")
+    else:
+        print(f"이미지를 가져오는 데 실패했습니다: {image_response.status_code}")
+else:
+    print("API 요청이 실패했거나 반환된 이미지가 없습니다.")
+    print(f"오류 세부 정보: {response_json}")
+```
+
+</CodeGroup>
+
+### V3 편집
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/edit](https://aihubmix.com/ideogram/v1/ideogram-v3/edit)
+
+V3의 로컬 편집 기능을 사용하면 원본 이미지와 마스크를 제공하여 이미지의 특정 영역을 정밀하게 편집하고 다른 영역은 변경하지 않은 상태로 유지할 수 있습니다.
+
+<ParamField body="prompt" type="string" required>
+  이미지 편집을 위한 프롬프트
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  원본 이미지 파일
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  마스크 이미지, 검은색 영역은 편집할 부분을 나타내고 흰색 영역은 변경하지 않을 부분을 나타냅니다.
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  렌더링 속도 옵션, 사용 가능 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8
+  더 많은 이미지를 생성해도 생성 시간이 크게 늘어나지 않습니다.
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string">
+  출력 이미지의 가로 세로 비율, 사용 가능 ['1x3', '3x1', '1x2', '2x1', '9x16', '16x9', '10x16', '16x10', '2x3', '3x2', '3x4', '4x3', '4x5', '5x4', '1x1']
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  프롬프트 향상. 사용 가능한 매개변수: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  이미지 생성을 위한 스타일 유형, 사용 가능 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+<ParamField body="negative_prompt" type="string">
+  이미지에 나타나지 않기를 바라는 내용 설명
+</ParamField>
+
+### 사용 예제
+
+<CodeGroup>
+
+```py Python 편집
+import requests
+import os
+
+# 원본 이미지 - 필수
+source_image_path = "yourpath/image.jpeg"
+# 마스크 - 필수
+mask_image_path = "yourpath/mask.jpg"
+
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"원본 이미지를 찾을 수 없습니다: {source_image_path}")
+
+with open(source_image_path, "rb") as image_file, open(mask_image_path, "rb") as mask_file:
+    response = requests.post(
+        "https://aihubmix.com/ideogram/v1/ideogram-v3/edit",
+        headers={
+            "Api-Key": "sk-***" # AiHubMix API 키로 교체
+        },
+        data={
+            "prompt": "텍스트 제거",
+            "rendering_speed": "DEFAULT",
+            "num_images": 1,
+            "seed": 1,
+            "aspect_ratio": "16x9",
+            "magic_prompt": "AUTO",
+            "style_type": "AUTO",
+            "negative_prompt": "흐릿함, 잘못된 해부학, 워터마크",
+        },
+        files={
+            "image": image_file,
+            "mask": mask_file,
+        }
+    )
+
+print(response.json())
+
+# 출력 이미지를 파일에 저장
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("이미지가 output.png에 저장되었습니다.")
+    else:
+        print(f"이미지를 가져오는 데 실패했습니다: {image_response.status_code}")
+else:
+    print("API 요청이 실패했거나 반환된 이미지가 없습니다.")
+    print(f"오류 세부 정보: {response_json}")
+```
+
+</CodeGroup>
+
+### V3 배경 교체
+
+`POST` [https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background](https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background)
+
+V3의 배경 교체 기능은 이미지의 전경과 배경을 지능적으로 식별하고 프롬프트에 따라 배경을 교체하면서 전경 개체는 그대로 유지합니다.
+
+<ParamField body="prompt" type="string" required>
+  배경 교체를 위한 프롬프트
+</ParamField>
+
+<ParamField body="image" type="file" required>
+  원본 이미지 파일
+</ParamField>
+
+<ParamField body="rendering_speed" default="DEFAULT" type="string">
+  렌더링 속도 옵션, 사용 가능 `TURBO`, `DEFAULT`, `QUALITY`
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8
+  더 많은 이미지를 생성해도 생성 시간이 크게 늘어나지 않습니다.
+</ParamField>
+
+<ParamField body="style_reference_images" type="file">
+  스타일 참조 이미지, 스타일 안내에 사용할 수 있습니다.
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="magic_prompt" default="AUTO" type="string">
+  프롬프트 향상. 사용 가능한 매개변수: `AUTO`, `ON`, `OFF`
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  이미지 생성을 위한 스타일 유형, 사용 가능 `AUTO`, `GENERAL`, `REALISTIC`, `DESIGN`
+</ParamField>
+
+### 사용 예제
+
+<CodeGroup>
+
+```py Python 배경 교체
+import requests
+import os
+
+data = {
+  "prompt": "눈 속에서 고양이와 노는 새, 픽셀 아트 스타일",
+  "rendering_speed": "QUALITY",
+  "num_images": 1,
+  "seed": 1,
+  # "aspect_ratio" 없음
+  "magic_prompt": "AUTO",
+  "style_type": "AUTO",
+  # "negative_prompt" 없음
+}
+
+# 원본 이미지 - 필수
+source_image_path = "yourpath/image.png"
+if not os.path.exists(source_image_path):
+    raise FileNotFoundError(f"원본 이미지를 찾을 수 없습니다: {source_image_path}")
+
+# 파일 매개변수 초기화
+files = None
+
+# 스타일 참조 이미지 경로
+style_reference_path = "yourpath/reference-image.png"
+use_reference_image = True
+
+# 파일 준비
+with open(source_image_path, "rb") as image_file:
+    if use_reference_image and os.path.exists(style_reference_path):
+        # 참조 이미지를 사용하고 파일이 있는 경우 파일 매개변수 설정
+        files = {
+            "image": image_file,
+            "style_reference_images": open(style_reference_path, "rb"),
+        }
+    else:
+        if use_reference_image:
+            print(f"경고: 스타일 참조 이미지를 찾을 수 없습니다: {style_reference_path}")
+        files = {
+            "image": image_file,
+        }
+
+    response = requests.post(
+      "https://aihubmix.com/ideogram/v1/ideogram-v3/replace-background",
+      headers={
+        "Api-Key": "sk-***" # AiHubMix API 키로 교체
+      },
+      data=data,
+      files=files
+    )
+print(response.json())
+
+# 출력 이미지를 파일에 저장
+response_json = response.json()
+if response.ok and 'data' in response_json and len(response_json['data']) > 0:
+    image_data = response_json['data'][0]['url']
+    image_response = requests.get(image_data)
+    if image_response.ok:
+        with open('output.png', 'wb') as f:
+            f.write(image_response.content)
+        print("이미지가 output.png에 저장되었습니다.")
+    else:
+        print(f"이미지를 가져오는 데 실패했습니다: {image_response.status_code}")
+else:
+    print("API 요청이 실패했거나 반환된 이미지가 없습니다.")
+    print(f"오류 세부 정보: {response_json}")
+```
+
+</CodeGroup>
+
+더 많은 선택적 매개변수는 [Ideogram AI](https://developer.ideogram.ai/api-reference/api-reference/generate-v3)를 참조하십시오.
+
+### 💰 V3 가격
+
+| Ideogram v3 | 생성 | 리믹스 | 편집 | 리프레임 | 배경 교체 |
+|-------------|---------|-------|------|---------|-----------|
+| 3.0 터보 | US $0.03 | US $0.03 | US $0.03 | US $0.03 | US $0.03 |
+| 3.0 기본 | US $0.06 | US $0.06 | US $0.06 | US $0.06 | US $0.06 |
+| 3.0 품질 | US $0.09 | US $0.09 | US $0.09 | US $0.09 | US $0.09 |
+
+---
+
+## V2 & V1 인터페이스 설명
+Ideogram AI V2 & V1 드로잉 인터페이스는 생성, 리믹스, 편집, 업스케일 및 설명 기능을 포함한 강력한 텍스트-이미지 기능을 제공합니다.
+
+- **리믹스:** 참조 이미지와 프롬프트를 기반으로 새 이미지를 만듭니다.
+- **편집:** 프롬프트와 마스크를 사용하여 참조 이미지의 특정 영역을 로컬로 편집합니다.
+- **업스케일:** 유사성 및 세부 수준을 제어하여 저해상도 이미지를 고해상도로 향상시킵니다.
+- **설명:** 이미지를 설명하기 위해 프롬프트를 리버스 엔지니어링합니다.
+
+**지원되는 스타일:**
+
+- AUTO: 기본 자동 선택
+- GENERAL: 일반 목적
+- REALISTIC: 사실적
+- DESIGN: 디자인 지향
+- RENDER_3D: 3D 렌더링
+- ANIME: 애니메이션 스타일
+
+<Warning>
+  1. 공식 AiHubMix API 또는 [Cherry Studio 앱](https://cherry-ai.com/)을 통해 사용할 수 있습니다. 현재 이미지 생성을 위해 프록시가 필요합니다. 중국 내 직접 연결은 향후 지원될 예정입니다.
+  2. Cherry Studio는 현재 Ideogram 드로잉(생성) 인터페이스만 제공합니다.
+</Warning>
+
+### 생성
+
+`POST` [https://aihubmix.com/ideogram/generate](https://api.aihubmix.com/ideogram/generate)
+주어진 프롬프트와 선택적 매개변수를 기반으로 이미지를 동기적으로 생성합니다. 이미지 링크는 유효 기간이 제한되어 있습니다. 이미지를 보관하려면 다운로드하여 저장해야 합니다.
+
+**요청 매개변수**
+
+<ParamField body="image_request" type="object" required>
+  이미지 생성을 위한 요청 객체
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string" required>
+  이미지 생성을 위한 프롬프트
+</ParamField>
+
+<ParamField body="image_request.aspect_ratio" default="ASPECT_1_1" type="string">
+  이미지 생성을 위한 가로 세로 비율, 해상도를 결정합니다. 해상도 매개변수와 함께 사용할 수 없습니다.
+
+  사용 가능한 비율:
+
+  - ASPECT_1_1
+  - ASPECT_3_1
+  - ASPECT_1_3
+  - ASPECT_3_2
+  - ASPECT_2_3
+  - ASPECT_4_3
+  - ASPECT_3_4
+  - ASPECT_16_9
+  - ASPECT_9_16
+  - SPECT_16_10
+  - ASPECT_10_16
+</ParamField>
+
+<ParamField body="image_request.model" default="V_2" type="string">
+  이미지 생성 또는 편집을 위한 모델. /generate 및 /remix는 모든 모델 유형을 지원하지만 /edit는 V_2 및 V_2_TURBO만 지원합니다.
+
+  사용 가능한 모델 버전:
+
+  - V_1
+  - V_1_TURBO
+  - V_2
+  - V_2_TURBO
+  - V_2A
+  - V_2A_TURBO
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  프롬프트 향상 옵션. 사용 가능한 매개변수: AUTO, ON, OFF
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="image_request.style_type" default="AUTO" type="string">
+  이미지 생성에 사용되는 스타일 유형, 이 매개변수는 V_2 이상 버전의 모델에만 적용되며 V_1 버전에서는 지정해서는 안 됩니다.
+
+  사용 가능한 스타일:
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+<ParamField body="image_request.negative_prompt" type="string">
+  이미지에 나타나지 않기를 바라는 내용을 설명합니다. 모델 버전 V_1, V_1_TURBO, V_2 및 V_2_TURBO에만 적용됩니다. 프롬프트의 설명이 부정적인 프롬프트의 설명보다 우선합니다.
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8
+</ParamField>
+
+<ParamField body="image_request.resolution" type="string">
+  이미지 생성을 위한 해상도(모델 버전 2.0에만 적용, aspect_ratio와 함께 사용할 수 없음), 너비 x 높이로 표현됩니다. 지정하지 않으면 기본적으로 aspect_ratio가 사용됩니다.
+</ParamField>
+
+### 예제 호출
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/generate"
+
+payload = { "image_request": {
+        "prompt": "3D 만화, 머리를 기울인 사랑스러운 흰 올빼미 아기, 하이라이트가 있는 반짝이는 호박색 눈, 푹신한 몸, 이끼와 빛나는 버섯이 많은 나무 줄기에 서 있음, 클로즈업, 영화 같은 조명, 낮은 각도, 깊은 깊이감. 배경은 마법 같은 봄 풍경, 귀엽고 미적인, 거대한 제목 디자인 \"항상 궁금해\"", #string optional
+        "negative_prompt": "흐릿함, 잘못된 해부학, 워터마크",
+        "aspect_ratio": "ASPECT_3_2",  # optional include ASPECT_1_1(Default), ASPECT_3_2, ASPECT_2_3, ASPECT_4_3, ASPECT_3_4, ASPECT_16_9, ASPECT_9_16, SPECT_16_10, ASPECT_10_16
+        "model": "V_2",
+        "num_images": 2, #integer optional >=1 <=8 Defaults to 1
+        "magic_prompt_option": "AUTO", #string optional AUTO, ON, OFF
+        #"seed": "2" #integer optional >=0 <=2147483647
+        "style_type": "RENDER_3D" #string optional AUTO/GENERAL/REALISTIC/DESIGN/RENDER_3D/ANIME, only applicable to V_2 and above
+    } }
+headers = {
+    "Api-Key": os.getenv("AIHUBMIX_API_KEY"),
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.json())
+```
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/describe';
+const form = new FormData();
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/generate \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "image_request": {
+    "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+    "aspect_ratio": "ASPECT_10_16",
+    "model": "V_2",
+    "magic_prompt_option": "AUTO"
+  }
+}'
+```
+
+</CodeGroup>
+
+### 응답
+
+이미지가 성공적으로 생성되었습니다.
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### 오류 코드
+
+- `400` : 이미지 생성 요청 게시 잘못된 요청 오류
+- `401` : 이미지 생성 요청 게시 무단 오류
+- `422` : 이미지 생성 요청 게시 처리할 수 없는 엔터티 오류
+- `429` : 이미지 생성 요청 게시 너무 많은 요청 오류
+
+### 편집
+
+`POST` [https://aihubmix.com/ideogram/edit](https://api.aihubmix.com/ideogram/edit)
+
+제공된 마스크를 사용하여 지정된 이미지를 동기적으로 편집합니다. 마스크는 이미지의 어떤 부분을 편집해야 하는지 나타내고, 프롬프트와 선택한 스타일 유형은 편집 방향을 추가로 안내할 수 있습니다. 지원되는 이미지 형식에는 JPEG, PNG 및 WebP가 포함됩니다. 이미지 링크는 유효 기간이 제한되어 있습니다. 이미지를 보관하려면 다운로드하여 저장해야 합니다.
+
+**요청 매개변수**
+
+<ParamField body="image_file" type="file" required>
+  원본 이미지 파일, JPEG, PNG 및 WebP 형식 지원
+</ParamField>
+
+<ParamField body="mask" type="file" required>
+  마스크 이미지, 다음 요구 사항을 충족해야 합니다:
+
+  - 검은색과 흰색 픽셀만 포함하며 RGB, RGBA 또는 회색조 이미지 형식 지원
+  - 원본 이미지와 정확히 동일한 크기
+  - 검은색 영역은 수정해야 할 부분을 나타내고 흰색 영역은 변경하지 않아야 할 부분을 나타냅니다.
+  - 순수한 흰색일 수 없음
+  - 수정된 영역(검은색 부분)은 이미지 영역의 10% 이상을 차지해야 합니다.
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  로컬 편집을 위한 프롬프트
+</ParamField>
+
+<ParamField body="model" type="string" required>
+  이미지 생성 또는 편집을 위한 모델. /generate 및 /remix는 모든 모델 유형을 지원하지만 /edit는 V_2 및 V_2_TURBO만 지원합니다.
+
+  사용 가능한 모델 버전:
+
+  - V_2
+  - V_2_TURBO
+</ParamField>
+
+<ParamField body="magic_prompt_option" default="AUTO" type="string">
+  프롬프트 향상 옵션. 사용 가능한 매개변수: AUTO, ON, OFF
+</ParamField>
+
+<ParamField body="num_images" default="1" type="integer">
+  생성할 이미지 수, 범위 1-8
+</ParamField>
+
+<ParamField body="seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="style_type" default="AUTO" type="string">
+  이미지 생성에 사용되는 스타일 유형, 이 매개변수는 V_2 이상 버전의 모델에만 적용됩니다.
+
+  사용 가능한 스타일:
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+### 예제 호출
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/eidt"
+
+files = {
+    "image_file": open('<file1>', 'rb'), #required
+    "mask": "open('<file1>', 'rb')" #required
+}
+
+payload = {
+    "prompt": "\"prompt\"", #required
+    "model": "V_2",  #required, only supported for V_2 and V_2_TURBO.
+    "magic_prompt_option": ,
+    "num_images":1, #integer optional >=1 <=8 Defaults to 1
+    "seed": ,
+    "style_type":
+16}
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json()
+
+# close file
+files["image_file"].close()
+files["mask"].close()
+```
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/edit';
+const form = new FormData();
+form.append('image_file', '<file1>');
+form.append('mask', '<file1>');
+form.append('prompt', '"prompt"');
+form.append('model', '"V_1"');
+form.append('magic_prompt_option', '');
+form.append('num_images', '');
+form.append('seed', '');
+form.append('style_type', '');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/edit \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_file=@<file1> \
+     -F mask=@<file1> \
+     -F prompt="prompt" \
+     -F model="V_1"
+```
+
+</CodeGroup>
+
+### 응답
+
+이미지 편집이 성공적으로 생성되었습니다.
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### 오류 코드
+
+- `400` : 이미지 편집 요청 게시 잘못된 요청 오류
+- `401` : 이미지 편집 요청 게시 무단 오류
+- `422` : 이미지 편집 요청 게시 처리할 수 없는 엔터티 오류
+- `429` : 이미지 편집 요청 게시 너무 많은 요청 오류
+
+### 리믹스
+
+`POST` [https://aihubmix.com/ideogram/remix](https://api.aihubmix.com/ideogram/remix)
+
+제공된 이미지와 주어진 프롬프트 및 선택적 매개변수를 융합합니다. 입력 이미지는 리믹스하기 전에 선택한 가로 세로 비율로 잘립니다. 지원되는 이미지 형식에는 JPEG, PNG 및 WebP가 포함됩니다. 이미지 링크는 유효 기간이 제한되어 있습니다. 이미지를 보관하려면 다운로드하여 저장해야 합니다.
+
+**요청 매개변수**
+
+<ParamField body="image_request" type="object" required>
+  제공된 이미지와 프롬프트를 사용하여 새 이미지를 생성하는 요청. 제공된 이미지는 선택한 출력 가로 세로 비율과 일치하도록 잘립니다.
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string" required>
+  이미지 생성을 위한 프롬프트
+</ParamField>
+
+<ParamField body="image_request.aspect_ratio" default="ASPECT_1_1" type="string">
+  이미지 생성을 위한 가로 세로 비율, 해상도를 결정합니다. 해상도 매개변수와 함께 사용할 수 없습니다.
+
+  사용 가능한 비율:
+
+  - ASPECT_1_1
+  - ASPECT_3_1
+  - ASPECT_1_3
+  - ASPECT_3_2
+  - ASPECT_2_3
+  - ASPECT_4_3
+  - ASPECT_3_4
+  - ASPECT_16_9
+  - ASPECT_9_16
+  - SPECT_16_10
+  - ASPECT_10_16
+</ParamField>
+
+<ParamField body="image_request.image_weight" default="50" type="integer">
+  참조 이미지 가중치, 범위: 1-100
+</ParamField>
+
+<ParamField body="image_request.model" default="V_2" type="string">
+  이미지 생성 또는 편집을 위한 모델. /generate 및 /remix는 모든 모델 유형을 지원하지만 /edit는 V_2 및 V_2_TURBO만 지원합니다.
+</ParamField>
+
+<ParamField body="image_request.negative_prompt" type="string">
+  이미지에 나타나지 않기를 바라는 내용을 설명합니다. 모델 버전 V_1, V_1_TURBO, V_2 및 V_2_TURBO에만 적용됩니다. 프롬프트의 설명이 부정적인 프롬프트의 설명보다 우선합니다.
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  프롬프트 향상 옵션. 사용 가능한 매개변수: AUTO, ON, OFF
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  생성할 이미지 수, 범위: 1-8
+</ParamField>
+
+<ParamField body="image_request.resolution" type="string">
+  이미지 생성을 위한 해상도(모델 버전 2.0에만 적용, aspect_ratio와 함께 사용할 수 없음), 너비 x 높이로 표현됩니다. 지정하지 않으면 기본적으로 aspect_ratio가 사용됩니다.
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="image_request.style_type" default="AUTO" type="string">
+  생성된 이미지의 스타일 유형, V_2 이상 버전의 모델에만 적용되며 V_1 버전에서는 지정해서는 안 됩니다.
+
+  사용 가능한 스타일:
+
+  - AUTO
+  - GENERAL
+  - REALISTIC
+  - DESIGN
+  - RENDER_3D
+  - ANIME
+</ParamField>
+
+<ParamField body="image_file" type="file" required>
+  원본 이미지 파일, JPEG, PNG 및 WebP 형식 지원
+</ParamField>
+
+### 예제 호출
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/remix"
+
+files = { "image_file": open('<file1>', 'rb') }
+payload = { "image_request": '''{
+    "prompt": "수채화",
+    "aspect_ratio": "ASPECT_10_16",
+    "image_weight": 50,
+    "magic_prompt_option": "ON",
+    "model": "V_2"
+}'''}
+
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json())
+```
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/remix';
+const form = new FormData();
+form.append('image_request', '{
+  "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+  "aspect_ratio": "ASPECT_10_16",
+  "image_weight": 50,
+  "magic_prompt_option": "ON",
+  "model": "V_2"
+}');
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/remix \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_request='{
+  "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+  "aspect_ratio": "ASPECT_10_16",
+  "image_weight": 50,
+  "magic_prompt_option": "ON",
+  "model": "V_2"
+}' \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### 응답
+
+이미지가 성공적으로 생성되었습니다.
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### 오류 코드
+
+- `400` : 이미지 리믹스 요청 게시 잘못된 요청 오류
+- `401` : 이미지 리믹스 요청 게시 무단 오류
+- `422` : 이미지 리믹스 요청 게시 처리할 수 없는 엔터티 오류
+- `429` : 이미지 리믹스 요청 게시 너무 많은 요청 오류
+
+### 업스케일
+
+`POST` [https://aihubmix.com/ideogram/upscale](https://api.aihubmix.com/ideogram/upscale)
+
+제공된 이미지를 선택적 프롬프트와 함께 동기적으로 업스케일합니다. 지원되는 이미지 형식에는 JPEG, PNG 및 WebP가 포함됩니다. 이미지 링크는 유효 기간이 제한되어 있습니다. 이미지를 보관하려면 다운로드하여 저장해야 합니다.
+
+**요청 매개변수**
+
+<ParamField body="image_request" type="object" required>
+  선택적 프롬프트와 함께 제공된 이미지를 업스케일하기 위한 요청 객체
+</ParamField>
+
+<ParamField body="image_request.prompt" type="string">
+  업스케일링 프로세스를 안내하는 선택적 프롬프트
+</ParamField>
+
+<ParamField body="image_request.resemblance" default="50" type="integer">
+  유사성, 범위: 1-100
+</ParamField>
+
+<ParamField body="image_request.detail" default="50" type="integer">
+  세부 정보, 범위: 1-100
+</ParamField>
+
+<ParamField body="image_request.magic_prompt_option" default="AUTO" type="string">
+  프롬프트 향상 옵션. 사용 가능한 매개변수: AUTO, ON, OFF
+</ParamField>
+
+<ParamField body="image_request.num_images" default="1" type="integer">
+  생성할 이미지 수, 범위: 1-8
+</ParamField>
+
+<ParamField body="image_request.seed" type="integer">
+  랜덤 시드, 범위: 0-2147483647
+</ParamField>
+
+<ParamField body="image_file" type="file" required>
+  원본 이미지 파일, JPEG, PNG 및 WebP 형식 지원
+</ParamField>
+
+### 예제 호출
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/upscale"
+
+files = { "image_file": open('<file1>', 'rb') }
+payload = { "image_request": "{}" }
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, data=payload, files=files, headers=headers)
+
+print(response.json())
+```
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/upscale';
+const form = new FormData();
+form.append('image_request', '{}');
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/upscale \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_request='{}' \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### 응답
+
+이미지가 성공적으로 생성되었습니다.
+
+```json
+{
+  "created": "2000-01-23T04:56:07Z",
+  "data": [
+    {
+      "prompt": "고요한 열대 해변 풍경. 전경을 지배하는 것은 무성한 녹색 잎이 있는 키 큰 야자수이며, 모래 해변을 배경으로 우뚝 서 있습니다. 해변은 해안선에 부드럽게 키스하는 푸른 바다로 이어집니다. 멀리에는 등대나 탑으로 보이는 실루엣이 있는 섬이나 육지가 있습니다. 위의 하늘은 푹신한 흰 구름으로 칠해져 있으며, 그중 일부는 일출이나 일몰을 암시하는 분홍색과 주황색 색조로 물들어 있습니다.",
+      "resolution": "1024x1024",
+      "is_image_safe": true,
+      "seed": 12345,
+      "url": "https://ideogram.ai/api/images/direct/8YEpFzHuS-S6xXEGmCsf7g",
+      "style_type": "REALISTIC"
+    }
+  ]
+}
+```
+
+### 오류 코드
+
+- `400` : 이미지 업스케일 요청 게시 잘못된 요청 오류
+- `401` : 이미지 업스케일 요청 게시 무단 오류
+- `422` : 이미지 업스케일 요청 게시 처리할 수 없는 엔터티 오류
+- `429` : 이미지 업스케일 요청 게시 너무 많은 요청 오류
+
+### 설명
+
+`POST` [https://aihubmix.com/ideogram/describe](https://api.aihubmix.com/ideogram/describe)
+
+업로드된 이미지를 분석하고 설명합니다. 지원되는 이미지 형식에는 JPEG, PNG 및 WebP가 포함됩니다.
+
+**요청 매개변수**
+
+<ParamField body="image_file" type="file" required>
+  설명할 이미지 파일, JPEG, PNG 및 WebP 형식 지원
+</ParamField>
+
+### 예제 호출
+
+<CodeGroup>
+
+```py Python
+import requests
+import os
+
+url = "https://aihubmix.com/ideogram/describe"
+
+files = { "image_file": open('<file1>', 'rb') }
+headers = {"Api-Key": os.getenv("AIHUBMIX_API_KEY")}
+
+response = requests.post(url, files=files, headers=headers)
+
+print(response.json())
+
+# close file
+files["image_file"].close()
+```
+
+```js Javascript
+const url = 'https://aihubmix.com/ideogram/describe';
+const form = new FormData();
+form.append('image_file', '<file1>');
+
+const options = {method: 'POST', headers: {'Api-Key': '<apiKey>'}};
+
+options.body = form;
+
+try {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}
+```
+
+```shell Curl
+curl -X POST https://aihubmix.com/ideogram/describe \
+     -H "Api-Key: <apiKey>" \
+     -H "Content-Type: multipart/form-data" \
+     -F image_file=@<file1>
+```
+
+</CodeGroup>
+
+### 응답
+
+설명이 성공적으로 생성되었습니다.
+
+```json
+{
+  "descriptions": [
+    {
+      "text": "줄무늬 패턴이 있는 꼼꼼하게 그려진 고양이가 똑바로 앉아 있습니다. 고양이의 눈은 매혹적인 노란색이며 무언가를 열심히 응시하는 것처럼 보입니다. 배경은 검은색, 흰색, 베이지색의 추상적이고 소용돌이치는 패턴으로 구성되어 거의 유동적이거나 물결 모양의 모양을 만듭니다. 고양이는 전경에 위치하며 배경 요소는 멀리 사라져 이미지에 깊이감을 줍니다."
+    },
+    {
+      "text": "줄무늬 패턴이 있는 꼼꼼하게 그려진 고양이가 똑바로 앉아 있습니다. 고양이의 눈은 매혹적인 노란색이며 무언가를 열심히 응시하는 것처럼 보입니다. 배경은 검은색, 흰색, 베이지색의 추상적이고 소용돌이치는 패턴으로 구성되어 거의 유동적이거나 물결 모양의 모양을 만듭니다. 고양이는 전경에 위치하며 배경 요소는 멀리 사라져 이미지에 깊이감을 줍니다."
+    }
+  ]
+}
+```
+
+### 오류 코드
+
+- `400` : 설명 요청 게시 잘못된 요청 오류
+- `422` : 설명 요청 게시 처리할 수 없는 엔터티 오류
+- `429` : 설명 요청 게시 너무 많은 요청 오류
+
+---
+
+### 💰 V2 & V1 가격
+
+#### 이미지 생성
+
+| 모델     | 기능                                                                                | 이미지당 비용 |
+| --------- | -------------------------------------------------------------------------------------- | -------------- |
+| 2a        | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로                                     | US $0.04       |
+| 2a 터보  | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로 (더 빠르지만 약간 낮은 품질) | US $0.025      |
+| 2.0       | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로                                     | US $0.08       |
+| 2.0 터보 | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로 (더 빠르지만 약간 낮은 품질) | US $0.05       |
+| 1.0       | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로                                     | US $0.06       |
+| 1.0 터보 | 텍스트를 이미지로, 또는 텍스트 + 참조 이미지를 이미지로 (더 빠르지만 약간 낮은 품질) | US $0.02       |
+
+#### 이미지 편집
+
+| 모델          | 기능                                                                                                      | 이미지당 비용 |
+| -------------- | ------------------------------------------------------------------------------------------------------------ | -------------- |
+| 2.0 편집       | 텍스트 프롬프트, 참조 이미지 및 이진 마스크를 사용하여 이미지 다시 생성                                     | US $0.08       |
+| 2.0 터보 편집 | 텍스트 프롬프트, 참조 이미지 및 이진 마스크를 사용하여 이미지 다시 생성 (더 빠르지만 약간 낮은 품질) | US $0.05       |
+
+#### 이미지 향상
+
+| 모델   | 기능                                                                     | 이미지당 비용 |
+| ------- | --------------------------------------------------------------------------- | -------------- |
+| 업스케일 | 참조 이미지 해상도를 2배로 높이고 이미지 품질을 향상시킬 수 있음 | US $0.06       |
+
+자세한 내용은 [공식 문서](https://developer.ideogram.ai/api-reference/api-reference/generate)를 참조하십시오.

@@ -1,0 +1,175 @@
+---
+title: "범용 이미지 생성 API"
+description: "여러 이미지 생성 모델을 위한 통합 API"
+icon: "palette"
+---
+
+## API 개요
+
+다양한 이미지 생성 모델의 통합을 단순화하기 위해 Aihubmix는 다음과 같은 주류 모델을 지원하는 통합 이미지 API를 제공합니다:
+
+- [OpenAI 시리즈](#openai)
+- [Ideogram V3](#ideogram-v3)
+- [Stability SD 3.5 Large](#stability)
+- [Google Imagen 시리즈](#google-imagen)
+
+**API 사양:**
+
+```shell Curl
+curl https://aihubmix.com/v1/models/<model_path>/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "당신의 프롬프트"
+  }
+}'
+```
+
+**여기서:**
+
+- `https://aihubmix.com/v1/models/`는 고정된 접두사입니다.
+- `<model_path>`는 모델 경로이며, 사용 가능한 모델은 다음과 같습니다:
+  - `opanai/gpt-image-1`
+  - `opanai/dall-e-3`
+  - `ideogram/V3`
+  - `stability/Stable-Diffusion-3-5-Large`
+  - `imagen-4.0-generate-preview-05-20`
+  - `imagen-4.0-ultra-generate-exp-05-20`
+  - `imagen-3.0-generate-002`
+- `sk-***`는 Aihubmix에서 생성한 API 키입니다.
+
+---
+
+아래는 각 모델의 호출 방법입니다.
+
+## OpenAI
+
+### 지원되는 모델:
+
+- gpt-image-1
+- dall-e-3
+
+<Note>
+  2개의 리버스 엔지니어링 모델 `gpt-4o-image-vip` 및 `gpt-4o-image`는 지원되지 않습니다.
+</Note>
+
+### 사용법:
+
+<CodeGroup>
+
+```shell Curl gpt-image-1
+curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "호수에서 물을 마시는 사슴, 벚꽃 잎이 떨어지고, 푸르고 깨끗한 물, 일본 사원, 얼룩덜룩한 햇빛, 영화 같은 조명, 넓은 시야, 평화",
+    "size": "1024x1024", 
+    "n": 1,
+    "quality": "high",
+    "moderation": "low",
+    "background": "auto"
+  }
+}'
+```
+
+
+```shell Curl dall-e-3
+curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "호수에서 물을 마시는 사슴, 벚꽃 잎이 떨어지고, 푸르고 깨끗한 물, 일본 사원, 얼룩덜룩한 햇빛, 영화 같은 조명, 넓은 시야, 평화",
+    "size": "1024x1024", 
+    "n": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+## Ideogram V3
+
+### 지원되는 모델:
+
+- V3
+
+<Note>
+  1. V3 미만 버전(V_2, V_1 등)은 레거시 API를 사용하며 현재 지원되지 않습니다.
+  2. 반환된 링크는 액세스하려면 프록시 네트워크가 필요합니다.
+</Note>
+
+### 사용법:
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "호수에서 물을 마시는 사슴, 벚꽃 잎이 떨어지고, 푸르고 깨끗한 물, 일본 사원, 얼룩덜룩한 햇빛, 영화 같은 조명, 넓은 시야, 평화, 픽사 3D 스타일",
+    "rendering_speed": "QUALITY",
+    "aspect_ratio": "2x1"
+  }
+}'
+```
+
+</CodeGroup>
+
+## Stability
+
+### 지원되는 모델:
+
+- Stable-Diffusion-3-5-Large
+
+### 사용법:
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "호수에서 물을 마시는 사슴, 벚꽃 잎이 떨어지고, 푸르고 깨끗한 물, 일본 사원, 얼룩덜룩한 햇빛, 영화 같은 조명, 넓은 시야, 평화",
+    "n": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+## Google Imagen
+
+### 지원되는 모델:
+
+- imagen-3.0-generate-002
+- imagen-4.0-generate-preview-05-20
+- imagen-4.0-ultra-generate-exp-05-20
+
+<Note>
+  Gemini 시리즈 모델은 지원되지 않습니다.
+</Note>
+
+### 사용법:
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "numberOfImages": 1
+  }
+}'
+```
+
+</CodeGroup>

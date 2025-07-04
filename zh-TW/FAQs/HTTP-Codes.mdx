@@ -1,0 +1,36 @@
+---
+title: "HTTP 狀態碼總覽"
+description: "關鍵錯誤代碼映射表"
+icon: 'comment-code'
+---
+
+<Note>
+- 400 狀態碼通常是傳參錯誤，請查看介面文件。大部分 400 錯誤是上游透傳的報錯。
+- 錯誤回應中的 response ID 已更改為 tid (traceId)，用於錯誤追蹤和問題定位。
+</Note>
+
+
+| HTTP 狀態碼 | 錯誤標識符 | 錯誤訊息 | 常見原因 | 英文錯誤訊息 |
+|------------|------------|----------|----------|--------------|
+| 503 | - | 模型名字錯誤請求進入模型廣場查看或當前分組下對於模型無使用權限 | 沒有可用的管道處理請求 | Incorrect model ID. Please request to view the model page or you do not have permission to use this model |
+| 503 | - | 該模型遇到官方限速，聯絡客服增加並發或請稍後重試 | 模型遇到官方限速 | Rate limited by provider – contact support to request higher concurrency or try again later. |
+| 429 | - | 請求頻率超過限制 | 請求頻率超過限制 | The xx（xx: model id） model Too many requests; please try again later. |
+| 403 | insufficient_user_quota | 使用者餘額不足，需要充值 | 使用者餘額不足，需要充值 | Your account balance is insufficient. Please recharge your account to continue using the API. |
+| 403 | - | 使用者已被封禁 | 使用者狀態被禁用或在黑名單 | Account suspended. |
+| 403 | - | 無權進行此操作，權限不足 | 使用者角色權限不夠 | Forbidden – insufficient permissions. |
+| 403 | - | 該令牌只能在指定網段使用 | IP 不在令牌允許的網段內 | Forbidden – key(請求的 key 後六位) allowed only from approved IP ranges. |
+| 403 | - | 該令牌無權使用模型 | 令牌不支援請求的模型 | Forbidden – key(請求的 key 後六位) not authorized to access the requested model. |
+| 403 | - | 普通使用者不支援指定管道 | 非管理員使用者嘗試指定管道 | Key error；(請求的 key 後六位) |
+| 403 | - | 該管道已被禁用 | 管道狀態為禁用 | Forbidden – channel has been disabled. |
+| 401 | - | 無權進行此操作，未登入且未提供 access token | 未提供 Authorization 頭 | Unauthorized – no access token supplied; please log in and include a valid token. |
+| 401 | - | 無權進行此操作，access token 無效 | access token 驗證失敗 | Unauthorized – access token is invalid or expired. |
+| 400 | - | 無效的管道 Id | 管道 ID 格式錯誤或不存在 | Bad Request – invalid channel ID. |
+| 400 | prompt_missing | prompt is required | 圖片產生缺少提示詞 | prompt is required |
+| 400 | prompt_too_long | prompt is too long | 提示詞超過長度限制 | prompt is too long |
+| 400 | text_too_long | input is too long | 音訊輸入文字過長 | input is too long |
+| 400 | size_not_supported | size not supported | 圖片尺寸不被模型支援 | size not supported |
+| 400 | n_not_within_range | invalid value of n | n 參數值不在有效範圍 | invalid value of n |
+
+## 新增客服微信
+客服微信見[充值頁面](https://aihubmix.com/topup) 
+充值後任何問題都可以留言，客服會在 24 小時內回覆

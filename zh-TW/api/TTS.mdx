@@ -1,0 +1,186 @@
+---
+title: "TTS 文字轉語音"
+description: "使用 AI 模型將文字轉換為自然語音，支援多種語音風格和輸出格式"
+icon: "monitor-waveform"
+---
+
+## 介紹
+
+文字轉語音（TTS）API 基於先進的生成 AI 模型，可以將輸入的文字轉換為逼真的語音音頻。支援多種用途：
+
+- 為書面部落格文章配音
+- 生成多種語言的語音音頻
+- 提供即時音頻輸出串流
+
+**可用模型列表：**
+
+- **gpt-4o-audio-preview** —— OpenAI 最新的音頻生成模型，支援對話式音頻生成
+- **gpt-4o-mini-tts** —— 智慧即時應用的首選模型，支援進階語音控制，可以透過提示詞控制多種語音特性：
+  - 口音 (Accent)
+  - 情感範圍 (Emotional range)
+  - 語調 (Intonation)
+  - 印象/風格 (Impressions)
+  - 語速 (Speed of speech)
+  - 語調 (Tone)
+  - 輕聲說話 (Whispering)
+- **tts-1-hd** —— 高清音質的上一代 TTS 模型
+- **tts-1** —— 標準 TTS 模型，平衡品質和速度
+
+<Tip>
+  **效能建議：** 為獲得最快的響應時間，建議使用 `wav` 或 `pcm` 作為響應格式。對於高品質音頻，建議使用 `tts-1-hd`；對於更快的生成速度，使用 `tts-1`；對於智慧語音應用，推薦使用 `gpt-4o-mini-tts`。
+
+  **音色預覽：** 你可以在 [OpenAI.fm](https://www.openai.fm/) 試聽不同音色效果。
+</Tip>
+
+## 模型調用方式
+
+### 標準 TTS 模型（tts-1, tts-1-hd）
+
+使用 `/v1/audio/speech` 端點，透過 `client.audio.speech.create()` 方法調用。
+
+### gpt-4o-mini-tts 模型
+
+使用 `/v1/audio/speech` 端點，支援 `instructions` 參數進行進階語音控制。
+
+### gpt-4o-audio-preview 模型
+
+使用 `/v1/chat/completions` 端點，需要設定 `modalities: ["text", "audio"]` 和 `audio` 配置。
+
+### 請求參數
+
+#### 標準 TTS 參數（適用於 tts-1, tts-1-hd, gpt-4o-mini-tts）
+
+<ParamField body="model" type="string" required>
+  要使用的模型 ID。可選值：`tts-1`、`tts-1-hd`、`gpt-4o-mini-tts`
+</ParamField>
+
+<ParamField body="input" type="string" required>
+  要生成音頻的文字，最大長度為 4096 個字元
+</ParamField>
+
+<ParamField body="voice" type="string" required>
+  用於合成的語音。可選值：`alloy`、`echo`、`fable`、`onyx`、`nova`、`shimmer`
+</ParamField>
+
+<ParamField body="response_format" type="string">
+  音頻輸出格式。支援格式：`mp3`、`opus`、`aac`、`flac`、`wav`、`pcm`。預設為 `mp3`
+</ParamField>
+
+<ParamField body="speed" type="number">
+  生成音頻的語速。取值範圍 0.25 到 4.0。預設為 1.0。**`注意：gpt-4o-mini-tts 不支援此參數，但你可以透過自然語言描述來控制語速`**
+</ParamField>
+
+<ParamField body="instructions" type="string">
+  語音生成指令（僅適用於 `gpt-4o-mini-tts` 模型），可以詳細指定語音風格、語調、情感等特性
+</ParamField>
+
+#### gpt-4o-audio-preview 參數
+
+<ParamField body="model" type="string" required>
+  設定為 `gpt-4o-audio-preview`
+</ParamField>
+
+<ParamField body="modalities" type="array" required>
+  設定為 `["text", "audio"]` 啟用音頻輸出
+</ParamField>
+
+<ParamField body="audio" type="object" required>
+  音頻配置物件，包含 `voice` 和 `format` 欄位
+</ParamField>
+
+<ParamField body="messages" type="array" required>
+  聊天訊息陣列，與標準聊天格式相同
+</ParamField>
+
+## 使用方法
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tts-1",
+    "input": "The quick brown 🦊 jumped over the lazy dog.",
+    "voice": "alloy"
+  }' \
+  --output speech.mp3
+```
+
+
+```py gpt-4o-audio-preview
+import base64
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key=os.getenv("AIHUBMIX_API_KEY"),
+  base_url="https://aihubmix.com/v1"
+)
+
+completion = client.chat.completions.create(
+    model="gpt-4o-audio-preview",
+    modalities=["text", "audio"],
+    audio={"voice": "alloy", "format": "wav"},
+    messages=[
+        {
+            "role": "user",
+            "content": "The quick brown 🦊 jumped over the lazy dog."
+        }
+    ]
+)
+
+print(completion.choices[0])
+
+wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
+with open("output.wav", "wb") as f:
+    f.write(wav_bytes)
+```
+
+
+```py gpt-4o-mini-tts
+from pathlib import Path
+from openai import OpenAI
+import os
+
+# aihubmix 轉發
+client = OpenAI(
+  api_key="sk-***", # 替換為你的 AiHubMix API 密鑰
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+with client.audio.speech.with_streaming_response.create(
+  model="gpt-4o-mini-tts",
+  voice="alloy", # 最佳平衡音色，發音清晰
+  instructions="""Play as a Patient Teacher""",
+  input="The quick brown 🦊 jumped over the lazy dog."
+) as response:
+  response.stream_to_file(speech_file_path)
+```
+
+
+```py 標準 TTS 模型
+from pathlib import Path
+from openai import OpenAI
+import os
+
+client = OpenAI(
+  api_key="sk-***", # 替換為你的 AiHubMix API 密鑰
+  base_url="https://aihubmix.com/v1"
+)
+
+speech_file_path = Path(__file__).parent / "speech.mp3"
+response = client.audio.speech.create(
+  model="tts-1-hd",
+  voice="alloy",
+  input="The quick brown 🦊 jumped over the lazy dog.",
+  response_format="mp3",
+  speed=1.0
+)
+
+response.stream_to_file(speech_file_path)
+```
+
+</CodeGroup>

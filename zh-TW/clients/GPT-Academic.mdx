@@ -1,0 +1,17 @@
+---
+title: "在 GPT 學術優化中使用"
+description: ""
+icon: ''
+---
+
+1. 開啟 gpt_academic/config.py 檔案：  
+![圖片](../../public/cn/image16.png) 
+1. 找到 config.py 中的 API_KEY 變數，將[本站的Key](https://aihubmix.com/token)填入，即可：  
+![圖片](../../public/cn/image17.png) 
+2. 往下滾動，找到 config.py 中的 API_URL_REDIRECT 變數，修改為（直接複製下面的程式碼區塊進去就行）：  
+```
+API_URL_REDIRECT = {"https://api.openai.com/v1/chat/completions": "https://aihubmix.com/v1/chat/completions"}
+```
+![圖片](../../public/cn/image18.png) 
+3. 然後就能用了  
+![圖片](../../public/cn/image19.png) 

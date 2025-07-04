@@ -1,0 +1,1026 @@
+---
+title: "타사 애플리케이션 통합 가이드"
+description: " "
+icon: "webhook"
+---
+
+## 중요한 보안 선언문
+
+보안 우선 원칙: 타사 애플리케이션을 개발하고 배포할 때 보안이 가장 중요한 고려 사항입니다. 사용자 데이터와 인증 프로세스의 안전을 보장하려면 아래 보안 원칙을 엄격히 따라야 합니다.
+
+<Warning>
+1. 프론트엔드 JavaScript 코드에 `client_secret`을 절대 노출하지 마십시오.
+2. OAuth 인증 코드를 토큰으로 교환하는 과정은 반드시 서버 측에서 처리해야 합니다.
+3. 보호된 사용자 리소스에 대한 모든 접근은 백엔드 API 프록시를 통해 이루어져야 합니다.
+4. 모든 OAuth 통신은 HTTPS를 사용하여 보호해야 합니다.
+</Warning>
+
+위 보안 원칙 중 하나라도 위반하면 심각한 보안 취약점이 발생할 수 있습니다!
+
+## 📋 목차
+
+1. [개요](#개요)
+2. [시작하기](#시작하기)
+3. [OAuth2 인증 흐름](#oauth2-인증-흐름)
+4. [API 참조](#api-참조)
+5. [SDK 및 코드 예제](#sdk-및-코드-예제)
+6. [보안 모범 사례](#보안-모범-사례)
+7. [자주 묻는 질문](#자주-묻는-질문)
+8. [기술 지원](#기술-지원)
+
+## 개요
+
+저희는 OAuth2 표준을 기반으로 한 개방형 API를 제공하여 타사 애플리케이션이 사용자의 기본 정보 및 계정 잔액에 안전하게 접근할 수 있도록 합니다. 저희 OAuth2 서비스를 통해 귀하의 애플리케이션은 다음을 수행할 수 있습니다:
+
+- 🚀 원클릭 로그인: 사용자는 다시 등록할 필요 없이 자동으로 로그인하여 진정한 원활한 경험을 제공합니다.
+- 👤 사용자 정보 얻기: 사용자의 기본 프로필(사용자 이름, 이메일 등)에 접근합니다.
+- 💰 계정 잔액 보기: 사용자의 계정 잔액을 실시간으로 확인합니다.
+- 🔄 충전 리디렉션: 사용자를 저희 충전 페이지로 안내하여 계정을 충전하도록 합니다.
+- 🔐 자동 토큰 갱신: 내장된 리프레시 토큰 메커니즘으로 원활한 토큰 갱신을 통해 사용자 경험을 향상시킵니다.
+
+## 시작하기
+
+### 1. 개발자 계정 등록
+
+먼저 저희 시스템에 개발자 계정을 등록해야 합니다.
+
+### 2. OAuth 애플리케이션 생성
+
+개발자 콘솔에서 OAuth 애플리케이션을 생성합니다:
+
+```shell API 호출 예제
+curl -X POST https://api.aihubmix.com/api/oauth_apps \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_DEVELOPER_TOKEN" \
+  -d '{
+    "name": "My Third-party App",
+    "description": "앱 설명",
+    "redirect_uri": "https://yourapp.com/oauth/callback"
+  }'
+```
+
+예제 응답:
+
+```json
+{
+  "success": true,
+  "message": "애플리케이션이 성공적으로 생성되었습니다",
+  "data": {
+    "id": 1,
+    "name": "My Third-party App",
+    "client_id": "client_abc123def456...",
+    "client_secret": "secret_xyz789uvw012...",
+    "redirect_uri": "https://yourapp.com/oauth/callback",
+    "created_time": 1640995200
+  }
+}
+```
+
+중요한 보안 알림:
+
+<Warning>
+- client_id는 프론트엔드에서 사용할 수 있습니다 (공개 정보)
+- `client_secret`은 서버 측에서만 사용해야 하며 브라우저에 절대 노출되어서는 안 됩니다.
+- client_secret을 환경 변수에 저장하고 코드에 하드코딩하지 마십시오.
+</Warning>
+
+### 3. 리디렉션 URI 구성
+
+리디렉션 URI가 다음 요구 사항을 충족하는지 확인하십시오:
+
+- HTTPS 프로토콜 사용 (프로덕션 환경)
+- 서버 엔드포인트를 가리킴 (프론트엔드 페이지가 아님)
+- 도메인이 등록되어 있고 접근 가능함
+- 경로는 콜백을 처리하는 API 엔드포인트에 특정됨
+
+## OAuth2 인증 흐름
+
+### 보안 흐름 다이어그램
+
+```mermaid
+sequenceDiagram
+    participant Browser as 사용자 브라우저
+    participant Backend as 귀하의 서버
+    participant OAuthSrv as 저희 서버
+
+    %% 로그인 진입점
+    Browser  ->> Backend : GET /auth<br>(사용자가 로그인 클릭)
+
+    %% state 생성/저장 후 리디렉션
+    Backend  ->> Backend : state 생성<br>state 저장
+    Backend  ->> OAuthSrv: 인증으로 리디렉션<br>(client_id 포함)
+
+    %% 인증 페이지 표시 및 완료
+    OAuthSrv -->> Browser : 인증 페이지 표시
+    Browser  ->> Browser : 사용자가 인증 완료
+
+    %% 인증 서버가 브라우저를 통해 콜백 호출
+    Browser  ->> Backend : GET /callback
+    Backend  ->> Backend : state 유효성 검사
+    Backend  ->> OAuthSrv: 코드를 토큰으로 교환<br>(secret 포함)
+    OAuthSrv -->> Backend : 유효성 검사 및 토큰 반환
+
+    %% 토큰 저장 및 프론트엔드로 반환
+    Backend  ->> Backend : 토큰 저장
+    Backend  -->> Browser : 프론트엔드로 리디렉션
+
+    %% 사용자 정보 가져오기
+    Browser  ->> Browser : 사용자 정보 표시
+    Browser  ->> Backend : GET /api/user
+    Backend  ->> OAuthSrv: 토큰으로 사용자 정보 요청
+    OAuthSrv -->> Backend : 사용자 정보 반환
+    Backend  -->> Browser : 사용자 정보 반환
+```
+
+### 단계별 지침
+
+#### 1단계: 사용자를 인증으로 안내
+
+프론트엔드 페이지에 로그인 버튼을 추가합니다. 클릭 시 서버 측 인증 엔드포인트로 리디렉션합니다:
+
+```js // 프론트엔드 코드 - 리디렉션만 담당
+function startLogin() {
+    // 서버 측 인증 핸들러로 리디렉션
+    window.location.href = '/auth/oauth/start';
+}
+```
+
+#### 2단계: 서버 측 인증 핸들러
+
+서버에 인증 핸들러를 구현합니다:
+
+```js // 서버 측 코드
+app.get('/auth/oauth/start', (req, res) => {
+    // state 매개변수 생성 및 저장
+    const state = generateSecureRandomString();
+    req.session.oauth_state = state;
+    
+    // 인증 URL 빌드
+    const authUrl = new URL('https://your-domain.com/api/oauth2/authorize');
+    authUrl.searchParams.append('client_id', process.env.OAUTH_CLIENT_ID);
+    authUrl.searchParams.append('redirect_uri', process.env.OAUTH_REDIRECT_URI);
+    authUrl.searchParams.append('response_type', 'code');
+    authUrl.searchParams.append('scope', 'profile balance');
+    authUrl.searchParams.append('state', state);
+    authUrl.searchParams.append('auto_authorize', 'true'); // 원클릭 로그인
+    
+    // 인증 서버로 리디렉션
+    res.redirect(authUrl.toString());
+});
+```
+
+#### 3단계: 인증 콜백 처리 (서버 측)
+
+```js // 서버 측 인증 콜백 핸들러
+app.get('/oauth/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    
+    // 오류 처리
+    if (error) {
+        return res.redirect(`/?error=${encodeURIComponent(error)}`);
+    }
+    
+    // 매개변수 유효성 검사
+    if (!code || !state) {
+        return res.redirect('/?error=missing_parameters');
+    }
+    
+    // state 매개변수 유효성 검사 (CSRF 공격 방지)
+    if (state !== req.session.oauth_state) {
+        return res.redirect('/?error=invalid_state');
+    }
+    
+    try {
+        // 인증 코드를 액세스 토큰으로 교환 (서버 측)
+        const tokenResponse = await fetch('https://your-domain.com/api/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: process.env.OAUTH_REDIRECT_URI,
+                client_id: process.env.OAUTH_CLIENT_ID,
+                client_secret: process.env.OAUTH_CLIENT_SECRET // 서버 측에서만 사용
+            })
+        });
+        
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenResponse.ok) {
+            throw new Error(tokenData.error || '토큰 교환 실패');
+        }
+        
+        // 토큰을 안전하게 저장 (서버 세션 또는 데이터베이스)
+        req.session.access_token = tokenData.access_token;
+        req.session.refresh_token = tokenData.refresh_token;
+        req.session.token_expires_at = Date.now() + (tokenData.expires_in * 1000);
+        
+        // 임시 state 정리
+        delete req.session.oauth_state;
+        
+        // 프론트엔드 페이지로 리디렉션
+        res.redirect('/?login=success');
+        
+    } catch (error) {
+        console.error('OAuth 콜백 오류:', error);
+        res.redirect(`/?error=server_error`);
+    }
+});
+```
+
+#### 4단계: 프론트엔드에서 사용자 정보 가져오기
+
+```js // 프론트엔드에서 API 프록시를 통해 사용자 정보 가져오기
+async function loadUserInfo() {
+    try {
+        const response = await fetch('/api/user/info');
+        
+        if (!response.ok) {
+            throw new Error('사용자 정보를 가져오는 데 실패했습니다');
+        }
+        
+        const userInfo = await response.json();
+        displayUserInfo(userInfo);
+        
+    } catch (error) {
+        console.error('사용자 정보를 로드하는 데 실패했습니다:', error);
+        showLoginButton();
+    }
+}
+```
+
+```js // 서버 측 API 프록시
+app.get('/api/user/info', async (req, res) => {
+    const accessToken = req.session.access_token;
+    
+    if (!accessToken) {
+        return res.status(401).json({ error: '인증되지 않았습니다' });
+    }
+    
+    try {
+        // OAuth 서버로 요청 프록시
+        const response = await fetch('https://your-domain.com/api/oauth2/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('사용자 정보 요청 실패');
+        }
+        
+        const userInfo = await response.json();
+        res.json(userInfo);
+        
+    } catch (error) {
+        console.error('사용자 정보 프록시 오류:', error);
+        res.status(500).json({ error: '서버 오류' });
+    }
+});
+```
+
+<Tips>
+원클릭 로그인 경험: `auto_authorize=true`로 설정하면 사용자가 로그인한 후 추가 확인 단계 없이 시스템이 자동으로 인증을 부여합니다.
+</Tips>
+
+## API 참조
+
+### 1. 인증 엔드포인트
+
+GET `/api/oauth2/authorize`
+
+사용자를 OAuth2 인증으로 안내합니다.
+
+매개변수:
+| 매개변수 | 타입   | 필수 | 설명 |
+|-----------|--------|----------|-------------|
+| `client_id` | string | 예      | 애플리케이션 클라이언트 ID (프론트엔드에서 사용 가능) |
+| `redirect_uri` | string | 예      | 인증 후 콜백 URI (서버 엔드포인트를 가리켜야 함) |
+| `response_type` | string | 예      | 고정: `code` |
+| `scope` | string | 아니요       | 범위, 공백으로 구분 |
+| `state` | string | 예      | CSRF 공격을 방지하기 위한 임의의 문자열 (서버 측에서 생성) |
+| `auto_authorize` | string | 아니요       | 자동 인증을 활성화하려면 `true`로 설정 |
+
+보안 요구 사항:
+- `redirect_uri`는 등록된 주소와 정확히 일치해야 합니다.
+- `state`는 서버 측에서 생성된 임의의 문자열이어야 합니다.
+- HTTPS를 사용해야 합니다 (프로덕션 환경).
+
+범위 설명:
+- `profile`: 사용자의 기본 정보(사용자 이름, 이메일)에 접근
+- `balance`: 사용자의 계정 잔액에 접근
+
+### 2. 토큰 엔드포인트
+
+POST `/api/oauth2/token`
+
+<Warning>
+보안 경고: 이 엔드포인트는 반드시 서버 측에서만 호출해야 하며, 프론트엔드에서는 절대 호출해서는 안 됩니다!
+</Warning>
+
+두 가지 시나리오에 사용됩니다:
+1. 인증 코드를 액세스 토큰으로 교환
+2. 리프레시 토큰을 사용하여 새 액세스 토큰 얻기
+
+인증 코드 부여 매개변수:
+| 매개변수 | 타입   | 필수 | 설명 |
+|-----------|--------|----------|-------------|
+| `grant_type` | string | 예      | 고정: `authorization_code` |
+| `code` | string | 예      | 인증 코드 |
+| `redirect_uri` | string | 예      | 인증에 사용된 URI와 일치해야 함 |
+| `client_id` | string | 예      | 애플리케이션 클라이언트 ID |
+| `client_secret` | string | 예      | 애플리케이션 클라이언트 시크릿 (서버 측에서만 사용) |
+
+리프레시 토큰 부여 매개변수:
+| 매개변수 | 타입   | 필수 | 설명 |
+|-----------|--------|----------|-------------|
+| `grant_type` | string | 예      | 고정: `refresh_token` |
+| `refresh_token` | string | 예      | 리프레시 토큰 |
+| `client_id` | string | 예      | 애플리케이션 클라이언트 ID |
+| `client_secret` | string | 예      | 애플리케이션 클라이언트 시크릿 (서버 측에서만 사용) |
+
+예제 응답:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "refresh_token": "refresh_abc123def456...",
+  "scope": "profile balance"
+}
+```
+
+### 3. 사용자 정보 엔드포인트
+
+GET `/api/oauth2/userinfo`
+
+사용자의 기본 정보 및 계정 잔액을 가져옵니다.
+
+요청 헤더:
+```json header
+Authorization: Bearer {access_token}
+```
+
+예제 응답:
+```json response
+{
+  "id": 12345,
+  "username": "user123",
+  "email": "user@example.com",
+  "quota": 1000000,
+  "used_quota": 250000,
+  "balance_formatted": "750.00",
+  "created_time": 1640995200,
+  "status": 1
+}
+```
+
+## SDK 및 코드 예제
+
+### JavaScript SDK
+
+직접 사용할 수 있는 완전한 JavaScript SDK를 제공합니다:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>타사 앱 예제</title>
+    <style>
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .user-info { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .login-section { text-align: center; padding: 40px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>나의 타사 애플리케이션</h1>
+        
+        <!-- 로딩 상태 -->
+        <div id="loading">
+            <p>로그인 상태 확인 중...</p>
+        </div>
+        
+        <!-- 로그인된 사용자 정보 -->
+        <div id="user-info" class="user-info hidden">
+            <h2>다시 오신 것을 환영합니다!</h2>
+            <p><strong>사용자 이름:</strong> <span id="username"></span></p>
+            <p><strong>이메일:</strong> <span id="email"></span></p>
+            <p><strong>계정 잔액:</strong> <span id="balance"></span></p>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="refreshBalance()">잔액 새로고침</button>
+                <button class="btn btn-primary" onclick="goToTopup()">계정 충전</button>
+                <button class="btn btn-secondary" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+        
+        <!-- 로그인되지 않은 상태 -->
+        <div id="login-section" class="login-section hidden">
+            <h2>계정 정보를 보려면 로그인하세요</h2>
+            <p>원클릭 로그인을 사용하여 계정에 빠르게 접근하세요</p>
+            <button class="btn btn-primary" onclick="oneClickLogin()">
+                🚀 원클릭 로그인
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // OAuth 구성
+        const OAUTH_CONFIG = {
+            authServer: 'https://your-domain.com',
+            clientId: 'YOUR_CLIENT_ID',
+            clientSecret: 'YOUR_CLIENT_SECRET', // 프로덕션 환경에서는 백엔드에서 처리해야 합니다
+            redirectUri: window.location.origin + '/oauth/callback.html',
+            scope: 'profile balance'
+        };
+
+        class OAuthManager {
+            constructor() {
+                this.accessToken = localStorage.getItem('oauth_access_token');
+                this.refreshToken = localStorage.getItem('oauth_refresh_token');
+                this.tokenExpiresAt = localStorage.getItem('oauth_token_expires_at');
+                this.isRefreshing = false; // 동시 갱신 방지
+                this.init();
+            }
+
+            async init() {
+                // URL에 인증 코드가 있는지 확인
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const state = urlParams.get('state');
+
+                if (code) {
+                    await this.handleAuthCallback(code, state);
+                    // URL 정리
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else if (this.accessToken) {
+                    try {
+                        // 토큰이 만료되었는지 확인하고, 만료되었다면 갱신 시도
+                        if (this.isTokenExpired()) {
+                            await this.refreshTokenIfNeeded();
+                        }
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    } catch (error) {
+                        console.log('토큰이 만료되었거나 유효하지 않을 수 있으므로 다시 로그인해야 합니다');
+                        this.clearTokens();
+                        this.showLoginSection();
+                    }
+                } else {
+                    this.showLoginSection();
+                }
+
+                document.getElementById('loading').classList.add('hidden');
+            }
+
+            // 액세스 토큰이 만료되었는지 확인
+            isTokenExpired() {
+                if (!this.tokenExpiresAt) return false;
+                const expiryTime = parseInt(this.tokenExpiresAt);
+                const bufferTime = 5 * 60 * 1000; // 5분 버퍼
+                return Date.now() > (expiryTime - bufferTime);
+            }
+
+            // 자동으로 토큰 갱신
+            async refreshTokenIfNeeded() {
+                if (!this.refreshToken || this.isRefreshing) {
+                    return false;
+                }
+
+                this.isRefreshing = true;
+                
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'refresh_token',
+                            refresh_token: this.refreshToken,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                        })
+                    });
+
+                    if (response.ok) {
+                        const tokenData = await response.json();
+                        this.updateTokens(tokenData);
+                        return true;
+                    } else {
+                        throw new Error('토큰 갱신 실패');
+                    }
+                } catch (error) {
+                    console.error('토큰 갱신 실패:', error);
+                    this.clearTokens();
+                    return false;
+                } finally {
+                    this.isRefreshing = false;
+                }
+            }
+
+            // 토큰 정보 업데이트
+            updateTokens(tokenData) {
+                this.accessToken = tokenData.access_token;
+                this.refreshToken = tokenData.refresh_token;
+                this.tokenExpiresAt = Date.now() + (tokenData.expires_in * 1000);
+
+                localStorage.setItem('oauth_access_token', this.accessToken);
+                localStorage.setItem('oauth_refresh_token', this.refreshToken);
+                localStorage.setItem('oauth_token_expires_at', this.tokenExpiresAt.toString());
+            }
+
+            oneClickLogin() {
+                const state = this.generateState();
+                localStorage.setItem('oauth_state', state);
+
+                const authUrl = `${OAUTH_CONFIG.authServer}/api/oauth2/authorize?` +
+                    `client_id=${OAUTH_CONFIG.clientId}&` +
+                    `redirect_uri=${encodeURIComponent(OAUTH_CONFIG.redirectUri)}&` +
+                    `response_type=code&` +
+                    `scope=${encodeURIComponent(OAUTH_CONFIG.scope)}&` +
+                    `state=${state}&` +
+                    `auto_authorize=true`; // 진정한 원클릭 로그인을 위해 자동 인증 활성화
+
+                // 팝업에서 인증 페이지 열기
+                const popup = window.open(authUrl, 'oauth_login', 'width=500,height=600,scrollbars=yes');
+
+                // 팝업 닫힘 감지
+                const checkClosed = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(checkClosed);
+                        // 인증을 받았는지 확인
+                        setTimeout(() => this.init(), 1000);
+                    }
+                }, 1000);
+            }
+
+            async handleAuthCallback(code, state) {
+                const savedState = localStorage.getItem('oauth_state');
+                if (state !== savedState) {
+                    console.error('State 매개변수 불일치');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'authorization_code',
+                            code: code,
+                            client_id: OAUTH_CONFIG.clientId,
+                            client_secret: OAUTH_CONFIG.clientSecret,
+                            redirect_uri: OAUTH_CONFIG.redirectUri
+                        })
+                    });
+
+                    const tokenData = await response.json();
+                    
+                    if (tokenData.access_token) {
+                        this.updateTokens(tokenData);
+                        localStorage.removeItem('oauth_state');
+                        
+                        await this.fetchUserInfo();
+                        this.showUserInfo();
+                    }
+                } catch (error) {
+                    console.error('액세스 토큰 가져오기 실패:', error);
+                }
+            }
+
+            // 자동 갱신 기능이 있는 API 요청 메서드
+            async apiRequest(url, options = {}) {
+                // 필요한 경우 토큰 확인 및 갱신
+                if (this.isTokenExpired()) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (!refreshed) {
+                        throw new Error('토큰을 갱신할 수 없습니다');
+                    }
+                }
+
+                const headers = {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    ...options.headers
+                };
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                // 401 오류를 받으면 토큰을 갱신하고 한 번 재시도
+                if (response.status === 401 && !options._retry) {
+                    const refreshed = await this.refreshTokenIfNeeded();
+                    if (refreshed) {
+                        return this.apiRequest(url, { ...options, _retry: true });
+                    }
+                }
+
+                return response;
+            }
+
+            async fetchUserInfo() {
+                const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`);
+
+                if (!response.ok) {
+                    throw new Error('사용자 정보를 가져오는 데 실패했습니다');
+                }
+
+                this.userInfo = await response.json();
+            }
+
+            showUserInfo() {
+                document.getElementById('username').textContent = this.userInfo.username;
+                document.getElementById('email').textContent = this.userInfo.email;
+                document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('login-section').classList.add('hidden');
+            }
+
+            showLoginSection() {
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('login-section').classList.remove('hidden');
+            }
+
+            async refreshBalance() {
+                try {
+                    await this.fetchUserInfo();
+                    document.getElementById('balance').textContent = this.userInfo.balance_formatted;
+                    alert('잔액이 업데이트되었습니다');
+                } catch (error) {
+                    alert('새로고침 실패, 다시 로그인하세요');
+                    this.clearTokens();
+                    this.showLoginSection();
+                }
+            }
+
+            async goToTopup() {
+                try {
+                    const response = await this.apiRequest(`${OAUTH_CONFIG.authServer}/api/oauth2/topup`);
+
+                    const data = await response.json();
+                    if (data.topup_url) {
+                        window.open(data.topup_url, '_blank');
+                    }
+                } catch (error) {
+                    console.error('충전 링크를 가져오는 데 실패했습니다:', error);
+                }
+            }
+
+            logout() {
+                this.clearTokens();
+                this.showLoginSection();
+            }
+
+            clearTokens() {
+                this.accessToken = null;
+                this.refreshToken = null;
+                this.tokenExpiresAt = null;
+                this.userInfo = null;
+                
+                localStorage.removeItem('oauth_access_token');
+                localStorage.removeItem('oauth_refresh_token');
+                localStorage.removeItem('oauth_token_expires_at');
+            }
+
+            generateState() {
+                return Math.random().toString(36).substring(2, 15) +
+                       Math.random().toString(36).substring(2, 15);
+            }
+        }
+
+        // 전역 함수
+        let oauthManager;
+
+        function oneClickLogin() {
+            oauthManager.oneClickLogin();
+        }
+
+        function refreshBalance() {
+            oauthManager.refreshBalance();
+        }
+
+        function goToTopup() {
+            oauthManager.goToTopup();
+        }
+
+        function logout() {
+            oauthManager.logout();
+        }
+
+        // 페이지 로드 완료 후 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            oauthManager = new OAuthManager();
+        });
+    </script>
+</body>
+</html>
+```
+
+### OAuth 콜백 페이지
+
+`/oauth/callback.html` 파일을 생성합니다:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로그인 중...</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .loading { color: #666; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+        <h2>로그인 중입니다, 잠시만 기다려 주세요...</h2>
+        <div id="status" class="loading">인증 정보 확인 중...</div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+
+        if (error) {
+            document.getElementById('status').innerHTML =
+                `<div class="error">인증 실패: ${error}</div>`;
+            setTimeout(() => {
+                if (window.opener) {
+                    window.close();
+                } else {
+                    window.location.href = '/';
+                }
+            }, 3000);
+        } else if (code) {
+            if (window.opener) {
+                // 팝업인 경우, 닫고 부모 창에서 처리하도록 함
+                window.opener.location.href =
+                    window.opener.location.pathname + `?code=${code}&state=${state}`;
+                window.close();
+            } else {
+                // 팝업이 아닌 경우, 메인 페이지로 리디렉션
+                window.location.href = `/?code=${code}&state=${state}`;
+            }
+        } else {
+            document.getElementById('status').innerHTML =
+                '<div class="error">유효한 인증 정보를 받지 못했습니다</div>';
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```
+
+### Node.js 백엔드 예제
+
+보안을 강화하기 위해 백엔드에서 `client_secret`을 처리하는 것이 좋습니다:
+
+```js
+const express = require('express');
+const cors = require('cors');
+const fetch = require('node-fetch');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const OAUTH_CONFIG = {
+    authServer: 'https://your-domain.com',
+    clientId: 'YOUR_CLIENT_ID',
+    clientSecret: 'YOUR_CLIENT_SECRET'
+};
+
+// 백엔드에서 토큰 교환 처리
+app.post('/api/oauth/exchange-token', async (req, res) => {
+    const { code, redirectUri, state } = req.body;
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+                redirect_uri: redirectUri
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: '토큰 교환 실패' });
+    }
+});
+
+// 리프레시 토큰 엔드포인트
+app.post('/api/oauth/refresh-token', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({ error: '리프레시 토큰이 없습니다' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+                client_id: OAUTH_CONFIG.clientId,
+                client_secret: OAUTH_CONFIG.clientSecret,
+            })
+        });
+
+        const tokenData = await response.json();
+        
+        if (response.ok) {
+            res.json(tokenData);
+        } else {
+            res.status(400).json(tokenData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: '토큰 갱신 실패' });
+    }
+});
+
+// 사용자 정보 요청 프록시 (자동 갱신 포함)
+app.get('/api/oauth/userinfo', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ error: '인증 헤더가 없습니다' });
+    }
+
+    try {
+        const response = await fetch(`${OAUTH_CONFIG.authServer}/api/oauth2/userinfo`, {
+            headers: {
+                'Authorization': authHeader
+            }
+        });
+
+        const userData = await response.json();
+        
+        if (response.ok) {
+            res.json(userData);
+        } else {
+            res.status(response.status).json(userData);
+        }
+    } catch (error) {
+        res.status(500).json({ error: '사용자 정보를 가져오는 데 실패했습니다' });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('서버가 3000번 포트에서 실행 중입니다');
+});
+```
+
+## 보안 모범 사례
+
+### 1. 클라이언트 시크릿 보호
+
+- ✅ 권장: 백엔드 서버에 `client_secret` 저장
+- ❌ 피해야 할 사항: 프론트엔드 JavaScript에 `client_secret` 노출
+
+### 2. State 매개변수 유효성 검사
+
+```js
+// 임의의 state 생성
+const state = crypto.randomBytes(16).toString('hex');
+localStorage.setItem('oauth_state', state);
+
+// state 유효성 검사
+const savedState = localStorage.getItem('oauth_state');
+if (receivedState !== savedState) {
+    throw new Error('CSRF 공격이 감지되었습니다');
+}
+```
+
+### 3. HTTPS 사용
+
+- 프로덕션 환경에서는 반드시 `HTTPS`를 사용해야 합니다.
+- 콜백 URI는 `HTTPS`를 사용해야 합니다.
+- 모든 API 요청은 `HTTPS`를 사용합니다.
+
+### 4. 토큰 보안 저장
+
+```js
+// 토큰 만료 시간 설정
+const expiryTime = Date.now() + (tokenData.expires_in * 1000);
+localStorage.setItem('oauth_token_expiry', expiryTime);
+
+// 토큰 만료 여부 확인
+function isTokenExpired() {
+    const expiry = localStorage.getItem('oauth_token_expiry');
+    return !expiry || Date.now() > parseInt(expiry);
+}
+```
+
+### 5. 오류 처리
+
+```js
+try {
+    const response = await fetch('/api/oauth2/userinfo', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+        if (response.status === 401) {
+            // 토큰 만료, 다시 로그인해야 함
+            clearToken();
+            showLoginSection();
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    }
+    
+    const userInfo = await response.json();
+    return userInfo;
+} catch (error) {
+    console.error('API 요청 실패:', error);
+    // 네트워크 오류 등 처리
+}
+```
+
+## 자주 묻는 질문
+
+### Q1: 진정한 원클릭 로그인 경험을 어떻게 구현하나요?
+
+A: 인증 URL에 `auto_authorize=true` 매개변수를 추가하기만 하면 됩니다. 사용자가 로그인하면 추가 확인 단계 없이 자동으로 인증이 부여됩니다:
+
+```js
+const authUrl = 'https://your-domain.com/api/oauth2/authorize?' +
+  'client_id=YOUR_CLIENT_ID&' +
+  'auto_authorize=true&' + // 핵심 매개변수
+  '...다른 매개변수들';
+```
+
+### Q2: 토큰이 자동으로 갱신되나요?
+
+A: 예, 저희 SDK에는 자동 토큰 갱신 기능이 내장되어 있습니다:
+
+- 액세스 토큰: 2시간 유효, 만료 5분 전에 자동 갱신
+- 리프레시 토큰: 30일 유효, 새 액세스 토큰을 얻는 데 사용
+- 원활한 갱신: 모든 API 호출은 만료된 토큰을 자동으로 확인하고 갱신합니다.
+- 실패 시 재시도: API가 401 오류를 반환하면 자동으로 토큰 갱신을 시도하고 재시도합니다.
+
+```js
+// SDK가 토큰 갱신을 자동으로 처리하므로 수동으로 처리할 필요가 없습니다.
+const userInfo = await oauthManager.fetchUserInfo(); // 토큰 자동 갱신
+```
+
+리프레시 토큰도 만료된 경우에만 사용자가 다시 로그인해야 합니다.
+
+### Q3: 어떤 사용자 정보를 얻을 수 있나요?
+
+A: 인증된 범위에 따라 다음을 얻을 수 있습니다:
+- `profile` 범위: 사용자 이름, 이메일
+- `balance` 범위: 계정 잔액 정보
+
+### Q4: OAuth 통합을 어떻게 테스트하나요?
+
+A: 
+1. 개발 중에는 `HTTP localhost`를 사용하여 테스트합니다.
+2. 저희가 제공하는 테스트 도구를 사용하여 인증 흐름을 확인합니다.
+3. 브라우저의 개발 도구에서 네트워크 요청을 확인합니다.
+
+### Q5: 어떤 프로그래밍 언어가 지원되나요?
+
+A: 저희 OAuth2 API는 표준이며 모든 주요 프로그래밍 언어를 지원합니다:
+- JavaScript/Node.js
+- Python
+- PHP
+- Java
+- C#/.NET
+- Go
+- Ruby
+
+### Q6: 사용자가 인증을 어떻게 철회할 수 있나요?
+
+A: 사용자는 저희 사용자 센터 > 인증 관리 페이지에서 타사 앱 인증을 철회할 수 있습니다.

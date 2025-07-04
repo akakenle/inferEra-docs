@@ -1,0 +1,69 @@
+---
+title: "產品介紹"
+description: "歡迎使用 **AiHubMix** 提供的 AI 模型 API 路由服務！我們基於統一的 OpenAI API 標準，支援 OpenAI 官方所有模型及市面上其他主流大模型（如 Claude、Gemini、DeepSeek、阿里 Qwen 等）。只需在參數中修改`模型名稱`，即可輕鬆切換接入的大模型。"
+icon: 'face-smile-wink'
+---
+
+## 公司與合作背景
+
+- **主體營運公司**：AiHubMix, LLC（美國）  
+- **官方授權代理**：微軟 Azure、AWS、GCP 官方代理（額度來源正規，放心使用）  
+- **服務保障**：  
+  - **穩定**：提供 OpenAI、Claude、Google Gemini 等主流模型的高並發和穩定服務  
+  - **可信**：已有眾多知名應用在生產環境中穩定接入
+
+## 多端點支援說明
+
+- **OpenAI + Azure 雙端點**  
+  - AiHubMix 會同時連接 OpenAI 官方和微軟 Azure OpenAI 兩個端點，並隨機路由請求至 Azure 進行內容審核  
+  - 相比 OpenAI 官方端，Azure OpenAI 自帶自動內容過濾，所以響應速度可能略慢  
+<Warning>
+**請注意合規**：不要請求暴力、政治、色情等敏感內容。若帳號頻繁觸發內容過濾，我們將進行統計並與您聯繫核實
+</Warning>
+
+import { ClaudeGuide } from 'api/Claude 原生接口調用.mdx';
+
+<ClaudeGuide title={'Claude 原生接口調用'} />
+
+## 快速上手
+
+1. **儲值**  
+   - 進入[「儲值」頁面](https://aihubmix.com/topup)完成儲值，確保帳戶餘額 > 0  
+2. **創建 API Key**  
+   - 打開[「Keys」頁面](https://aihubmix.com/token)，創建並複製自己的 Key，新手建議只填 `Key 名稱`
+3. **獲取中轉資訊**  
+   - 穩定中轉接口地址：`https://aihubmix.com`  
+   - 中轉 API Key（不要硬編碼在專案中）：`sk-***` 
+   - 備用伺服器地址（新功能測試專用）：`https://api.aihubmix.com`  
+4. **替換 API 地址**  
+   - 如果您是開發者，請參考 [OpenAI 官方文件](https://platform.openai.com)  
+   - 開發時，將文件中的 `https://api.openai.com` 替換為 `https://aihubmix.com` 即可  
+   - Claude 模型也支援原生 `v1/messages` 接口，詳情請參考 [Claude 原生接口調用](/cn/api/Claude-Native)
+
+<Tip>
+**提示**：
+在一些第三方軟體或平台輸入自定義 URL 時，可能需要追加 `/v1` 或 `/v1/chat/completions` 
+</Tip>
+如：
+- `https://aihubmix.com`
+- `https://aihubmix.com/v1`（目前最常見）
+- `https://aihubmix.com/v1/chat/completions`
+
+## 常用功能與場景
+
+- **基於模型 API 的應用軟體**  
+  - 例如 Lobe-chat、OpenAI Translator、Cursor、ChatX、Cherry Studio、ChatBox、Sider、ChatGPT Next Web、歐陸翻譯、沉浸式翻譯等  
+- **產品開發**  
+  - 完整支援 Langchain、LlamaIndex 等庫的調用  
+  - 安裝配置與 OpenAI 官方一致，僅需替換 API 地址和 Key  
+- **服務特點**  
+  - **穩定**：用於強大的技術服務團隊不斷迭代優化系統 
+  - **方便**：和 OpenAI 官方 API 完全相容，無縫切換  
+  - **快速**：持續優化線路，保障存取與響應速度  
+  - **省心**：無包月、無會員，用多少買多少
+
+
+## 聯繫我們
+
+- **商務合作**：business@aihubmix.com  
+- **意見回饋**：feedback@aihubmix.com  

@@ -1,0 +1,114 @@
+---
+title: "FIM 補全"
+icon: "message-code"
+---
+
+### 1. 使用場景
+
+在 FIM (Fill In the Middle) 補全任務中，用戶輸入希望保留的前綴和後綴內容，模型根據這些提示生成中間缺失的部分。這種補全方式常見於程式碼自動補全、文字中段生成等應用場景。
+
+### 2. 使用方式
+
+在 chat/completions 接口中使用，只需要將 `model id` 設定為[模型廣場](https://aihubmix.com/models)上的模型 id 即可，在模組卡片的右上角複製。
+
+```json
+{ 
+    "model": "model id",
+    "messages": "prompt",
+    "params": "params",
+    "extra_body": {"prefix":"前綴內容", "suffix":"可選的後綴內容"}
+}
+```
+
+在 completions 接口中使用
+
+```json
+{
+    "model": "model info",
+    "prompt": "前綴內容",
+    "suffix": "後綴內容"
+}
+```
+
+### 3. 使用示例
+
+#### 3.1 基於 OpenAI 的 chat.completions 接口使用FIM補全：
+
+<CodeGroup>
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1"
+)
+
+messages = [
+    {"role": "user", "content": "Please write a sum function code"},
+]
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    extra_body={
+            "prefix": f"""
+def sum_numbers(numbers):
+    # 如果列表為空，返回 0
+    if not numbers:
+        return 0
+""",
+            "suffix": f"""
+# 測試
+numbers = [1, 2, 3, 4, 5]
+result = sum_numbers(numbers)
+print("Sum of numbers:", result)
+"""
+    },
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end='')
+```
+
+</CodeGroup>
+
+
+
+#### 3.2 基於 OpenAI 的 completions 接口使用 FIM 補全：
+<CodeGroup>
+
+```py Python
+
+client = OpenAI(
+    api_key="Aihubmix APIKEY", 
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.completions.create(
+    model="deepseek-ai/DeepSeek-V2.5",
+    prompt=f"""
+def quick_sort(arr):
+    # 基本情況，如果陣列長度小於等於 1，則返回陣列
+    if len(arr) <= 1:
+        return arr
+    else:
+""",
+    suffix=f"""
+# 測試 quick_sort 函數
+arr = [3, 6, 8, 10, 1, 2, 1]
+sorted_arr = quick_sort(arr)
+print("Sorted array:", sorted_arr)
+""",
+    stream=True,
+    max_tokens=4096
+)
+
+for chunk in response:
+    print(chunk.choices[0].text, end='')
+```
+
+</CodeGroup>

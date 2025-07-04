@@ -1,0 +1,268 @@
+---
+title: "阿里通義系列"
+icon: "a"
+---
+
+## Qwen 3 系列
+
+Qwen3 系列是阿里推出的新一代開源大模型，能力大幅躍升：在代碼理解、數學推理、多語言表達、複雜推斷任務上，比肩甚至超越了目前市面上的頂級模型（如 o1、DeepSeek-R1）。**它的核心突破在于引入了「思考模式」與「非思考模式」切換機制，讓模型在面對不同難度任務時，自主調節推理深度，實現了速度與精度的雙優平衡。** 旗艦版 Qwen3-235B 採用稀疏激活，僅用 22B 參數推理，兼顧成本和卓越能力。全系模型全面開源，涵蓋從輕量到超大規模需求。
+
+**1. 基礎用法：** 用 OpenAI 兼容格式轉發。  
+**2. 工具調用：** 常規 Tools 調用支持 OpenAI 兼容格式（適用於 V2.5、V3），而 MCP Tools 依賴 `qwen-agent`，需要先運行指令安裝依賴：`pip install -U qwen-agent mcp`。
+更多細節可以參考[阿里官方文件](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+
+<CodeGroup>
+
+```py 基礎用法
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B",
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the Occam's Razor concept and provide everyday examples of it"
+        }
+    ],
+    stream=True
+)
+
+# 某些 chunk 物件可能沒有 choices 屬性或 choices 是一個空列表，處理方法：
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+```py Tools
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1",
+)
+
+# 定義工具
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "獲取指定位置的當前天氣",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "城市名稱，如北京、上海等"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "溫度單位"
+                    }
+                },
+                "required": ["location"]
+            }
+        }
+    }
+]
+
+# 創建聊天完成請求，包含工具定義
+completion = client.chat.completions.create(
+    model="Qwen/Qwen3-30B-A3B", #2.5 和 3 都支持，QwQ 不支持
+    messages=[
+        {
+            "role": "user",
+            "content": "北京今天的天氣怎麼樣？"
+        }
+    ],
+    tools=tools,
+    tool_choice="auto",  # 讓模型自行決定是否使用工具
+    stream=True
+)
+
+# 用於收集工具調用信息的字典
+tool_calls = {}
+
+# 處理流式響應
+for chunk in completion:
+    if not hasattr(chunk.choices, '__len__') or len(chunk.choices) == 0:
+        continue
+        
+    delta = chunk.choices[0].delta
+    
+    # 處理文本內容
+    if hasattr(delta, 'content') and delta.content:
+        print(delta.content, end="")
+    
+    # 處理工具調用
+    if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        for tool_call in delta.tool_calls:
+            if not hasattr(tool_call, 'index'):
+                continue
+                
+            idx = tool_call.index
+            if idx not in tool_calls:
+                tool_calls[idx] = {"name": "", "arguments": ""}
+                
+            if hasattr(tool_call, 'function'):
+                if hasattr(tool_call.function, 'name') and tool_call.function.name:
+                    tool_calls[idx]["name"] = tool_call.function.name
+                if hasattr(tool_call.function, 'arguments') and tool_call.function.arguments:
+                    tool_calls[idx]["arguments"] += tool_call.function.arguments
+
+# 完成後，打印收集到的工具調用信息
+for idx, info in tool_calls.items():
+    if info["name"]:
+        print(f"\n工具調用：{info['name']}")
+    if info["arguments"]:
+        print(f"參數：{info['arguments']}")
+
+```
+
+```py MCP Tools
+from qwen_agent.agents import Assistant
+import os
+
+# Define LLM
+llm_cfg = {
+    'model': 'Qwen/Qwen3-30B-A3B',
+
+    # Use a custom endpoint compatible with OpenAI API:
+    'model_server': 'https://aihubmix.com/v1',
+    'api_key': os.getenv('AIHUBMIX_API_KEY'),
+
+    # Other parameters:
+    # 'generate_cfg': {
+    #         # Add: When the response content is `<think>this is the thought</think>this is the answer;
+    #         # Do not add: When the response has been separated by reasoning_content and content.
+    #         'thought_in_content': True,
+    #     },
+}
+
+# Define Tools
+tools = [
+    {'mcpServers': {  # You can specify the MCP configuration file
+            'time': {
+                'command': 'uvx',
+                'args': ['mcp-server-time', '--local-timezone=Asia/Shanghai']
+            },
+            "fetch": {
+                "command": "uvx",
+                "args": ["mcp-server-fetch"]
+            }
+        }
+    },
+  'code_interpreter',  # Built-in tools
+]
+
+# Define Agent
+bot = Assistant(llm=llm_cfg, function_list=tools)
+
+# Streaming generation
+messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Introduce the latest developments of Qwen'}]
+for responses in bot.run(messages=messages):
+    pass
+print(responses)
+```
+
+</CodeGroup>
+
+## QvQ、Qwen 2.5 和 QwQ 系列
+
+用 OpenAI 的兼容格式轉發即可，區別在於流式調用的提取，需要剔除為空的 `chunk.choices[0].delta.content`，參考如下。
+
+**1. QvQ、Qwen 2.5 VL：** 圖片認識  
+**2. QwQ：** 文本任務  
+
+<Info>
+  `Qwen/QVQ-72B-Preview` 是基于 `Qwen2-VL-72B` 構建的开源多模態推理模型，专注于视觉推理和跨模態任务。
+</Info>
+
+<CodeGroup>
+
+```py Qwen 2.5 VL
+from openai import OpenAI
+import base64
+import os
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1",
+)
+
+image_path = "yourpath/file.png"
+
+# 讀取並編碼圖片
+def encode_image(image_path):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"圖片文件不存在：{image_path}")
+    
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 獲取圖片的 base64 編碼
+base64_image = encode_image(image_path)
+
+# 創建包含文本和圖像的消息
+completion = client.chat.completions.create(
+    model="qwen2.5-vl-72b-instruct", #qwen2.5-vl-72b-instruct 或 Qwen/QVQ-72B-Preview
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "請詳細描述這張圖片，包括圖片中的內容、風格和可能的含義。"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    # 安全地檢查是否有內容
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+
+```py QwQ
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 🔑 換成你在 AiHubMix 生成的密鑰
+    base_url="https://aihubmix.com/v1",
+)
+
+completion = client.chat.completions.create(
+    model="Qwen/QwQ-32B",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "支配宇宙的元規則是什么？"}
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    if hasattr(chunk.choices, '__len__') and len(chunk.choices) > 0:
+        if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+```
+
+</CodeGroup>

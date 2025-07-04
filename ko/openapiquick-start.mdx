@@ -1,0 +1,170 @@
+---
+title: "AIHubMix OpenAPI 사양"
+description: "AIHubMix API에 대한 OpenAPI 사양 문서"
+icon: "code"
+---
+
+```yaml
+openapi: 3.0.0
+info:
+  title: AIHubMix API
+  version: '1.0'
+  description: AIHubMix API 스키마 – OpenAPI 3.0 호환
+servers:
+  - url: https://aihubmix.com/v1
+    description: AIHubMix API 서버
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authorization 헤더에 Bearer 토큰을 사용하세요
+
+  schemas:
+    Message:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system, developer]
+          description: 메시지의 역할
+        content:
+          type: string
+          description: 메시지 내용
+
+    ChatCompletionRequest:
+      type: object
+      required:
+        - model
+        - messages
+      properties:
+        model:
+          type: string
+          description: 사용할 모델의 ID
+          example: gpt-4o
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        temperature:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 2
+          default: 0.8
+          description: 샘플링 온도
+        max_tokens:
+          type: integer
+          default: 1024
+          description: 생성할 최대 토큰 수
+        top_p:
+          type: number
+          format: float
+          default: 1
+          description: 핵 샘플링 임계값
+        frequency_penalty:
+          type: number
+          format: float
+          default: 0
+          description: 빈도 패널티 계수
+        presence_penalty:
+          type: number
+          format: float
+          default: 0
+          description: 존재 패널티 계수
+        stream:
+          type: boolean
+          default: false
+          description: 스트리밍 응답 활성화
+        web_search_options:
+          type: object
+          description: 검색 옵션 (검색 활성화 모델만 해당)
+
+paths:
+  /chat/completions:
+    post:
+      summary: 채팅 완료 생성
+      description: |
+        gpt-4o-mini와 같은 다양한 모델을 사용하여 채팅 완료를 생성합니다.
+        검색 지원 모델(예: gpt-4o-search-preview, gpt-4o-mini-search-preview)의 경우,
+        `web_search_options` 매개변수를 통해 웹 검색을 활성화할 수 있습니다.
+      operationId: createChatCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: 성공적인 응답
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 응답 ID
+                  model:
+                    type: string
+                    description: 사용된 모델
+                  object:
+                    type: string
+                    description: 객체 유형
+                  created:
+                    type: integer
+                    description: 생성 타임스탬프
+                  choices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        index:
+                          type: integer
+                          description: 선택 인덱스
+                        message:
+                          $ref: '#/components/schemas/Message'
+                        finish_reason:
+                          type: string
+                          description: 완료 이유
+                  usage:
+                    type: object
+                    properties:
+                      prompt_tokens:
+                        type: integer
+                        description: 프롬프트 토큰 수
+                      completion_tokens:
+                        type: integer
+                        description: 완료 토큰 수
+                      total_tokens:
+                        type: integer
+                        description: 총 토큰 수
+```
+
+이 OpenAPI 사양은 **AIHubMix API**의 주요 기능을 정의합니다:
+
+1. 기본 정보:
+   • 서버 URL
+   • API 버전
+   • 인증 방법
+2. 구성 요소 정의:
+   • 메시지 스키마
+   • ChatCompletionRequest 스키마
+3. API 엔드포인트:
+   • **POST /chat/completions** – 자세한 요청 매개변수 및 응답 형식으로 채팅 완료를 생성합니다.
+4. 인증:
+   • Bearer 토큰
+   • `Authorization` 헤더에 API 키를 제공하세요
+5. 특수 기능:
+   • 스트리밍 응답 (`stream` 매개변수)
+   • 웹 검색 지원 (특정 모델)
+   • 광범위한 모델 매개변수 (temperature, max_tokens 등)

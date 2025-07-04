@@ -1,0 +1,500 @@
+---
+title: "AiHubMix CLI"
+description: "AiHubMix CLI 유틸리티 스크립트를 통해 API 키를 관리하고, 계정 정보를 보고, 사용 가능한 모델에 액세스합니다."
+icon: "terminal"
+---
+
+AiHubMix CLI는 웹 인터페이스에 액세스할 필요 없이 AiHubMix API 키를 관리하고, 계정 정보를 쿼리하고, AI 서비스를 사용할 수 있게 해주는 유틸리티 관리 스크립트 모음입니다. 기본적으로 명령줄에서 더 쉽게 사용할 수 있도록 API 호출(curl 또는 Python 요청)을 래핑합니다.
+
+## 전제 조건
+
+AiHubMix CLI를 사용하기 전에 다음이 필요합니다:
+
+1. [AiHubMix 계정](https://aihubmix.com)
+2. [AiHubMix 설정 페이지](https://aihubmix.com/setting)에서 "시스템 액세스 토큰 생성"을 클릭하여 생성된 액세스 토큰
+3. 필요한 Python 종속성:
+
+```bash
+pip install -U requests openai
+```
+
+<Info>
+  aihubmix_cli.py 스크립트는 [여기에서 다운로드](https://github.com/jerlinn/inferHub)할 수 있습니다.
+</Info>
+
+## 모델
+
+## 기능 목록
+
+AiHubMix CLI는 다음과 같은 주요 기능을 제공합니다:
+
+### API 엔드포인트 개요
+
+| 엔드포인트                     | HTTP 메서드 | 설명                                        |
+| ---------------------------- | ----------- | -------------------------------------------------- |
+| `/api/user/self`             | GET         | 현재 사용자 정보 및 계정 잔액 가져오기   |
+| `/api/token/`                | GET         | 모든 API 키 목록 가져오기                           |
+| `/api/token/`                | POST        | 새 API 키 만들기                               |
+| `/api/token/`                | PUT         | 기존 API 키 업데이트                         |
+| `/api/token/{token_id}`      | GET         | 특정 API 키의 세부 정보 가져오기                  |
+| `/api/token/{token_id}`      | DELETE      | 특정 API 키 삭제                          |
+| `/api/token/search`          | GET         | API 키 검색 ( `?keyword=search_term` 사용) |
+| `/api/user/token`            | GET         | 사용자 API 키 가져오기                                   |
+| `/api/models`                | GET         | 사용 가능한 모든 모델 목록 가져오기                   |
+| `/api/user/available_models` | GET         | 현재 사용자가 사용할 수 있는 모델 목록 가져오기   |
+
+### 계정 관리
+
+<CodeGroup>
+
+```shell Curl 계정 잔액 가져오기
+curl -X GET "https://aihubmix.com/api/user/self" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python 계정 잔액 가져오기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 계정 잔액 가져오기
+response = requests.get(f"{api_url}/api/user/self", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        user_data = data.get("data", {})
+        quota = user_data.get('quota', 0)
+        usd_balance = quota / 500000  # $1는 500,000 크레딧과 같습니다.
+        print(f"사용자 이름: {user_data.get('username', '알 수 없음')}")
+        print(f"표시 이름: {user_data.get('display_name', '알 수 없음')}")
+        print(f"현재 할당량: {quota}")
+        print(f"사용 가능한 USD: ${usd_balance:.2f}")
+    else:
+        print(f"요청 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+
+```shell CLI 계정 잔액 가져오기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+```
+
+</CodeGroup>
+
+### API 키 관리
+
+<CodeGroup>
+
+```shell Curl 새 API 키 만들기
+curl -X POST "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "새 키 이름",
+    "expired_time": -1,
+    "remain_quota": 500000,
+    "unlimited_quota": false,
+    "subnet": ""
+  }'
+```
+
+
+```py Python 새 API 키 만들기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 새 API 키 만들기
+payload = {
+    "name": "새 키 이름",
+    "expired_time": -1,  # 만료되지 않음
+    "remain_quota": 500000,
+    "unlimited_quota": False,
+    "subnet": ""
+}
+
+response = requests.post(f"{api_url}/api/token/", headers=headers, json=payload)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        token_data = data.get("data", {})
+        print(f"새 API 키: {token_data.get('key', '알 수 없음')}")
+        print(f"키 ID: {token_data.get('id', '알 수 없음')}")
+    else:
+        print(f"키 생성 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+
+```shell CLI 새 API 키 만들기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "새 키 이름" --expires -1 --quota 500000
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl API 키 목록 가져오기
+curl -X GET "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+
+```py Python API 키 목록 가져오기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# API 키 목록 가져오기
+response = requests.get(f"{api_url}/api/token/", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        tokens_data = data.get("data", [])
+        print(f"API 키 목록 (총: {len(tokens_data)}):")
+        for token in tokens_data:
+            print(f"키 ID: {token.get('id', '알 수 없음')}")
+            print(f"키 이름: {token.get('name', '알 수 없음')}")
+            print(f"키: {token.get('key', '알 수 없음')}")
+            print("---")
+    else:
+        print(f"키 목록 가져오기 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+
+```shell CLI API 키 목록 가져오기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl API 키 검색
+curl -X GET "https://aihubmix.com/api/token/search?keyword=search_term" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```py Python API 키 검색
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 검색어
+query = "search_term"
+
+# API 키 검색
+response = requests.get(f"{api_url}/api/token/search?keyword={query}", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        tokens_data = data.get("data", [])
+        print(f"검색 결과 (총: {len(tokens_data)}):")
+        for token in tokens_data:
+            print(f"키 ID: {token.get('id', '알 수 없음')}")
+            print(f"키 이름: {token.get('name', '알 수 없음')}")
+            print(f"키: {token.get('key', '알 수 없음')}")
+            print("---")
+    else:
+        print(f"키 검색 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI API 키 검색
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "search_term"
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl API 키 업데이트
+curl -X PUT "https://aihubmix.com/api/token/" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "KEY_ID",
+    "name": "새 이름",
+    "expired_time": 86400,
+    "remain_quota": 100000,
+    "status": 1
+  }'
+```
+
+```py Python API 키 업데이트
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# API 키 업데이트
+key_id = "KEY_ID"  # 실제 KEY ID로 교체
+payload = {
+    "id": key_id,
+    "name": "새 이름",
+    "expired_time": 86400,  # 24시간 후 만료
+    "remain_quota": 100000,
+    "status": 1  # 1-활성화, 0-비활성화
+}
+
+response = requests.put(f"{api_url}/api/token/", headers=headers, json=payload)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        print(f"API 키가 성공적으로 업데이트되었습니다")
+        if "data" in data:
+            token_data = data.get("data", {})
+            print(f"이름: {token_data.get('name', '알 수 없음')}")
+            print(f"만료 시간: {token_data.get('expired_time', '알 수 없음')}")
+    else:
+        print(f"키 업데이트 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI API 키 업데이트
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "새 이름" --expires 86400 --quota 100000 --status 1
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl API 키 삭제
+curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```py Python API 키 삭제
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# API 키 삭제
+key_id = "KEY_ID"  # 실제 KEY ID로 교체
+
+response = requests.delete(f"{api_url}/api/token/{key_id}", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        print(f"API 키가 성공적으로 삭제되었습니다")
+    else:
+        print(f"키 삭제 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI API 키 삭제
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl 사용자 API 키 가져오기
+curl -X GET "https://aihubmix.com/api/user/token" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```py Python 사용자 API 키 가져오기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 사용자 API 키 가져오기
+response = requests.get(f"{api_url}/api/user/token", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        user_token = data.get("data", {}).get("token")
+        print(f"사용자 API 키: {user_token}")
+    else:
+        print(f"사용자 API 키 가져오기 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI 사용자 API 키 가져오기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
+```
+
+</CodeGroup>
+
+### 모델 관리
+
+<CodeGroup>
+
+```shell Curl 사용 가능한 모든 모델 가져오기
+curl -X GET "https://aihubmix.com/api/models" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```py Python 사용 가능한 모든 모델 가져오기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 사용 가능한 모든 모델 가져오기
+response = requests.get(f"{api_url}/api/models", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        models_data = data.get("data", {})
+        
+        # 모든 고유 모델 이름 수집
+        total_models = set()
+        for channel_id, channel_models in models_data.items():
+            if channel_models and isinstance(channel_models, list):
+                for model in channel_models:
+                    total_models.add(model)
+        
+        # 모델 목록 출력
+        print(f"사용 가능한 모델 목록 (총: {len(total_models)}):")
+        for i, model in enumerate(sorted(list(total_models)), 1):
+            print(f"  {i}. {model}")
+    else:
+        print(f"모델 목록 가져오기 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI 사용 가능한 모든 모델 가져오기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```shell Curl 사용자가 사용할 수 있는 모델 가져오기
+curl -X GET "https://aihubmix.com/api/user/available_models" \
+  -H "Authorization: YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```py Python 사용자가 사용할 수 있는 모델 가져오기
+import requests
+import json
+
+# API 구성
+api_url = "https://aihubmix.com"
+access_token = "YOUR_ACCESS_TOKEN"
+headers = {
+    "Authorization": access_token,
+    "Content-Type": "application/json"
+}
+
+# 사용자가 사용할 수 있는 모델 가져오기
+response = requests.get(f"{api_url}/api/user/available_models", headers=headers)
+if response.status_code == 200:
+    data = response.json()
+    if data.get("success", False):
+        models_data = data.get("data", [])
+        print(f"사용자가 사용할 수 있는 모델 목록 (총: {len(models_data)}):")
+        for i, model in enumerate(models_data, 1):
+            print(f"  {i}. {model}")
+    else:
+        print(f"사용자가 사용할 수 있는 모델 가져오기 실패: {data.get('message', '알 수 없는 오류')}")
+else:
+    print(f"요청 실패, 상태 코드: {response.status_code}")
+```
+
+```shell CLI 사용자가 사용할 수 있는 모델 가져오기
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
+```
+
+</CodeGroup>
+
+## JSON 형식 출력
+
+모든 CLI 명령은 프로그래밍 방식으로 처리할 수 있도록 결과를 JSON 형식으로 출력하는 것을 지원합니다:
+
+```bash
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance --json
+```
+
+## 문제 해결
+
+문제가 발생하면 다음 해결 방법을 시도해 보십시오:
+
+1. **연결 문제**: 주 도메인 연결이 실패하면 백업 도메인을 사용해 보십시오:
+
+   ```bash
+   python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+   ```
+2. **잘못된 액세스 토큰**: 제공된 액세스 토큰이 AiHubMix 웹사이트에서 얻은 유효한 키인지 확인하십시오. 액세스 토큰은 일반적으로 `fd***`와 같은 형식을 가집니다.
+3. **권한 부족**: 일부 작업에는 특정 권한이 필요할 수 있습니다. 계정에 충분한 권한이 있는지 확인하십시오.
+4. **요청 실패**: 네트워크 연결을 확인하거나 나중에 다시 시도하십시오.
+
+## 참고
+
+- 액세스 토큰은 AI 모델에 액세스하는 데 사용되는 일반 API 키와 다릅니다.
+- 각 사용자는 고유한 시스템 액세스 토큰을 가지고 있으며, 액세스 수준은 사용자 역할(일반 사용자, 관리자 또는 루트 사용자)에 따라 결정됩니다.

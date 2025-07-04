@@ -1,0 +1,152 @@
+---
+title: "快速開始"
+description: ""
+"icon": "rocket-launch"
+---
+
+## 1️⃣ 直接調用 AiHubMix API
+
+<Tip>
+其中 `<AIHUBMIX_API_KEY>` 替換為 [Aihubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和額度限制。
+</Tip>
+
+可使用的 `model` 列表，可查閱 [模型廣場](https://aihubmix.com/models) ，複製模型名稱替換即可。
+
+<CodeGroup>
+```py Python
+import requests
+import json
+
+response = requests.post(
+  url="https://aihubmix.com/v1/chat/completions",
+  headers={
+    "Authorization": "Bearer <AIHUBMIX_API_KEY>",
+    "Content-Type": "application/json",
+  },
+  data=json.dumps({
+    "model": "gpt-4o-mini", # 替換模型 id
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the meaning of life?"
+      }
+    ]
+  })
+)
+
+```
+
+```typescript Javascript
+// 請在 https://aihubmix.com 域名下嘗試，否則有瀏覽器跨域問題
+fetch('https://aihubmix.com/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer <AIHUBMIX_API_KEY>',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: "gpt-4o-mini", // 替換模型 id
+    messages: [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+    ]
+  }),
+})
+```
+
+```Shell Curl
+curl 'https://aihubmix.com/v1/chat/completions'
+-H 'Authorization: Bearer <AIHUBMIX_API_KEY>'
+-H 'Content-Type: application/json'
+-d '{
+   "model": "gpt-4o-mini",
+   "messages": [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+   ]
+}'
+```
+</CodeGroup>
+
+支援串流調用，只需要增加參數 `stream: true`
+
+## 2️⃣ 使用 OpenAI SDK
+
+其中 `<AIHUBMIX_API_KEY>` 替換為 [Aihubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和額度限制。
+可使用的 `model` 列表，可查閱 [模型廣場](https://aihubmix.com/models) ，複製模型名稱替換即可。
+
+<CodeGroup>
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+  base_url="https://aihubmix.com/v1",
+  api_key="<AIHUBMIX_API_KEY>",
+)
+
+completion = client.chat.completions.create(
+  model="gpt-4o-mini", # 替換模型 id
+  messages=[
+    {
+      "role": "developer",
+      "content": "總是用中文回覆"
+    },    
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ],
+  temperature=0.8,
+  max_tokens=1024,
+  top_p=1,
+  frequency_penalty=0,
+  presence_penalty=0,
+  seed=random.randint(1, 1000000000),
+)
+
+print(completion.choices[0].message.content)
+```
+
+```js Javascript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://aihubmix.com/v1',
+  apiKey: '<AIHUBMIX_API_KEY>',
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini", // 替換模型 id
+    messages: [
+      {
+         "role": "user",
+         "content": "What is the meaning of life?"
+      }
+    ]
+  });
+
+  console.log(completion.choices[0].message);
+}
+
+main();
+
+```
+</CodeGroup>
+
+對於支援搜尋的模型，可以追加下方參數來支援：
+```Python
+  web_search_options={}, # 搜尋參數
+```
+可用模型：`gpt-4o-search-preview`、`gpt-4o-mini-search-preview`。  
+<Info>
+注意搜尋模型暫不支援 ```temperature``` 等細節參數。
+</Info>
+
+## 3️⃣ 透過第三方客戶端發起請求
+
+參考 [場景示例](/cn/clients/AnythingLLM)

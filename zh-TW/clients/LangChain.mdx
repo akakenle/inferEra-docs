@@ -1,0 +1,63 @@
+---
+title: "在 LangChain 中使用"
+description: ""
+icon: ''
+---
+
+下載地址：https://www.langchain.com/  
+### 最簡單的就是：直接設定環境變數程式碼如下
+
+```
+API_SECRET_KEY = "sk-pvMtoVO******66249058b93C766F2D70167"
+BASE_URL = "https://aihubmix.com/v1"; #aihubmix的base-url
+
+os.environ["OPENAI_API_KEY"] = API_SECRET_KEY
+os.environ["OPENAI_BASE_URL"] = BASE_URL
+```
+注意：openai_api_base 的末尾要加上 /v1，  
+```from langchain.chat_models import ChatOpenAI
+
+llm = ChatOpenAI(
+    openai_api_base="https://aihubmix.com/v1", # 注意，末尾要加 /v1
+    openai_api_key="sk-3133f******fee269b71d",
+)
+
+res = llm.predict("hello")
+
+print(res)
+```
+範例程式碼，使用LLM進行預測  
+核心其實在於key和url的設定  
+方法有：  
+1. 使用環境變數來設定  
+2. 使用變數來傳入  
+3. 使用手動設定環境變數     
+
+```py Python
+import os
+import requests
+import time
+import json
+import time
+
+from langchain.llms import OpenAI
+
+API_SECRET_KEY = "你在aihubmix的key";
+BASE_URL = "https://aihubmix.com/v1"; #aihubmix的base-url
+
+os.environ["OPENAI_API_KEY"] = API_SECRET_KEY
+os.environ["OPENAI_API_BASE"] = BASE_URL
+
+def text():
+    llm = OpenAI(temperature=0.9)
+    text = "What would be a good company name for a company that makes colorful socks?"
+    print(llm(text))
+
+if __name__ == '__main__':
+    text();
+    
+```
+執行後可以看到返回：  
+```
+Lively Socks.
+```

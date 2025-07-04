@@ -1,0 +1,74 @@
+---
+title: "소개"
+description: ""
+icon: 'face-smile-wink'
+---
+
+신뢰할 수 있는 AI 모델 API 라우팅 서비스인 AiHubMix에 오신 것을 환영합니다. 저희는 OpenAI API를 표준화된 인터페이스로 사용하여 **OpenAI가 공식적으로 지원하는 모든 모델**을 처리할 수 있습니다. 또한 AiHubMix는 시장의 다른 주요 대규모 언어 모델을 통합했습니다. 현재 **Claude**, **Gemini**, **Deepseek** 및 Qwen과 같은 모델을 지원합니다. 요청에서 `모델 이름`을 수정하기만 하면 이러한 모델 간에 전환할 수 있습니다.
+
+- AiHubMix는 미국에 등록된 회사인 AiHubMix, LLC에서 운영합니다.
+  - OpenAI 및 Claude와 같은 주류 모델에 대해 안정적인 서비스와 높은 동시성을 보장합니다. 많은 유명 애플리케이션이 이미 프로덕션 환경에서 저희 서비스를 활용하여 원활하게 실행되고 있습니다.
+- 저희 OpenAI 엔드포인트는 OpenAI의 공식 엔드포인트와 Microsoft Azure OpenAI와 모두 상호 작용합니다. 요청은 둘 중 하나로 무작위로 라우팅됩니다.
+- Azure OpenAI에는 입력과 출력을 모두 처리하는 자동 콘텐츠 필터링 시스템이 있습니다. 결과적으로 응답이 약간 느려질 수 있습니다.
+- AiHubMix는 모델 요청 및 출력의 간단한 라우팅 및 전달만 수행합니다. 안전을 보장하기 위해 OpenAI를 통해 라우팅된 요청은 무작위로 Azure OpenAI의 콘텐츠 조정을 거칠 수 있습니다. **폭력적이거나 정치적이거나 노골적인 콘텐츠와 관련된 요청은 삼가해 주십시오.** Azure의 콘텐츠 필터를 자주 트리거하는 계정은 검토되며 확인을 위해 연락을 드릴 수 있습니다.
+
+## 시작하기
+
+1. **[충전](https://aihubmix.com/topup)** 페이지로 이동하여 계정 잔액이 $0보다 크도록 자금을 추가하십시오.
+
+2. **[API 키](https://aihubmix.com/token)** 페이지로 이동하여 API 키를 생성하십시오. 애플리케이션에서 사용할 키를 복사하십시오.
+
+API를 사용하기 전에 다음 정보가 있어야 합니다.
+
+```bash
+api_key="sk-***",
+base_url="https://aihubmix.com/v1"
+```
+
+- 대체 서버 API 주소: https://api.aihubmix.com
+
+이 두 주소는 다른 서버에서 호스팅됩니다. 기본 서버가 공격을 받는 경우 대안으로 전환할 수 있도록 둘 다 저장하십시오. 둘 다 테스트하여 해당 지역에서 더 빠른 옵션을 찾을 수 있습니다.
+
+- 개발자인 경우 OpenAI 공식 API 설명서를 참조하십시오.
+  **[https://platform.openai.com](https://platform.openai.com)**
+개발 과정에서 `https://api.openai.com`의 모든 인스턴스를 프록시 API 주소 `https://aihubmix.com`으로 바꾸십시오.
+
+- ChatGPT 기반의 타사 채팅 또는 번역 도구의 경우 **[사용 지침](https://docs.aihubmix.com/en/api/Non-OpenAI-Models)**을 참조하십시오.
+
+- Claude 모델의 경우 기본 `v1/messages` 인터페이스를 지원합니다. 자세한 내용은 [기본 Claude API 사용 방법](/en/api/Claude-Native)에서 확인할 수 있습니다.
+
+- 애플리케이션에 사용자 지정 URL을 입력할 때 일부는 URL에 `/v1/chat/completions`와 같은 매개변수를 추가해야 할 수 있습니다. 가장 일반적인 세 가지 형식은 다음과 같습니다.
+  1. `https://aihubmix.com`
+  2. `https://aihubmix.com/v1`
+  3. `https://aihubmix.com/v1/chat/completions`
+
+- 자세한 튜토리얼은 왼쪽 메뉴에서 사용 가능한 가이드를 확인하십시오.
+
+## 인기 있는 ChatGPT 기반 서비스
+
+AiHubMix API를 사용하면 다음과 같은 수많은 ChatGPT 기반 도구를 탐색할 수 있습니다.
+- [Lobe Chat](https://chat-preview.lobehub.com/?utm_source=aihubmix&utm_medium=website&utm_campaign=references)
+- [OpenAI Translator](https://chromewebstore.google.com/detail/openai-translator/ogjibjphoadhljaoicdnjnmgokohngcc?hl=zh-TW)
+- [ChatX](https://apps.apple.com/app/id6446304087)
+- [Cherry Studio](https://cherry-ai.com/)
+- ChatBox
+- Sider
+- ChatGPT Next Web
+- Cursor
+- Youdao Translation
+- AMA
+- Immersive Translation
+- Virtual Desktop Pet Simulator
+- 다양한 브라우저 확장 프로그램
+
+또한 **langchain** 및 **llamaindex**와 같은 대규모 언어 모델용 개발 도구도 지원합니다. 저희 서비스의 장점은 다음과 같습니다.
+
+- **안정성**: 오픈 소스 소프트웨어 업데이트 및 유지 관리를 위한 원활한 운영을 보장합니다.
+- **편의성**: OpenAI API가 사용되는 모든 곳에 손쉽게 통합됩니다.
+- **속도**: 가능한 가장 빠른 경험을 위해 라우팅 서비스를 지속적으로 최적화합니다.
+- **유연성**: 구독이나 멤버십 플랜 없이 사용한 만큼만 지불하는 단순함.
+
+## 문의하기
+
+- **비즈니스 문의**: business@aihubmix.com
+- **피드백**: feedback@aihubmix.com

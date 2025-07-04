@@ -1,0 +1,413 @@
+---
+title: "更新日誌"
+icon: "map"
+mode: "center"
+---
+
+<Update label="6 月 29 日">
+  - 新增 [Gemini Cli](/cn/api/Gemini-Cli) 轉發支援，多種使用方式，由你靈活掌控。
+  - OpenAI Responses API 介面新增程式碼解析器和 Remote MCP 呼叫。
+</Update>
+
+<Update label="6 月 26 日">
+  - 新增 [通用圖形介面](/cn/api/Image-Gen)，支援多種主流模型，包括 OpenAI、Ideogram、Stability、Google Imagen。
+</Update>
+
+<Update label="6 月 23 日">
+  - 推出 [應用標識碼 APP-Code](/cn/api/App-code)，為開發者們提供全部模型 10% 優惠；
+</Update>
+
+<Update label="6 月 18 日">
+  - 新增 [HTTP 狀態碼](/cn/FAQs/HTTP-Codes) 文件，幫助使用者更好地理解錯誤資訊。
+</Update>
+
+<Update label="6 月 15 日">
+  - 新增 Veo3.0 逆向呼叫方式，單次影片產生總費用僅為 $0.41。
+</Update>
+
+<Update label="6 月 13 日">
+  - 新增 [Veo3.0](https://aihubmix.com/models?model=veo-3.0-generate-preview) 影片產生支援，豐富創作形式。
+</Update>
+
+<Update label="6 月 12 日">
+  - 整合 Claude Code，在國內穩定使用。
+</Update>
+
+<Update label="6 月 9 日">
+  - 支援 openai 的推理總結 (Reasoning summaries) 顯示，適用於 responses api。
+</Update>
+
+<Update label="6 月 5 日">
+  - 新增 Gemini 隱式快取功能，支援自動命中與命中回饋。開發者可以透過 usage_metadata 判斷命中情況。成本節省非保證，實際效果因請求結構和使用情境而異。
+</Update>
+
+<Update label="5 月 31 日">
+  **Claude 4 新功能全面支援**
+
+  - ⏳ **新的快取週期**：1 小時級別的快取<sup>Beta</sup> 支援
+  - 🎉 **新的文字編輯工具**：Claude 4 模型支援全新的 `text_editor_20250429` 工具類型和 `str_replace_based_edit_tool` 工具名稱
+  - 🚫 **拒絕停止原因**：引入新的 `refusal` 停止原因，用於處理模型因安全原因拒絕產生的內容
+  - 🧠 **擴展思考**：Claude 4 模型返回完整思考過程的摘要，提供擴展思考的全部智慧優勢
+  - 🔄 **交錯思考**：支援工具使用與擴展思考交錯，實現更自然的對話體驗（Beta）
+  - ⚠️ **不再支援的功能**：
+    - Claude 4 文字編輯工具不再支援 `undo_edit` 命令
+    - 移除了 `token-efficient-tools-2025-02-19` 支援（僅 Claude 3.7 可用）
+    - 移除了 `output-128k-2025-02-19` 支援（僅 Claude 3.7 可用）
+  - 📚 更新了完整的遷移指南和程式碼範例，幫助使用者從 Claude 3.7 平滑遷移到 Claude 4
+</Update>
+
+<Update label="5 月 22 日">
+  - 新增對 Dify 外掛的支援，實現 Aihubmix 模型在 Dify 中的無縫整合。只需一個密鑰，擴展並管理兩百多個模型。
+</Update>
+
+<Update label="5 月 17 日">
+  - 支援為程式任務而生的 codex-mini-latest，可透過 Responses api 端點或 Codex CLI 呼叫。
+  - 支援 Google imagen 3.0 繪圖和 veo 2.0 影片產生，豐富你的創作形式。
+  - gemini-2.0-flash-exp 升級為正式預覽版 gemini-2.0-flash-preview-image-generation
+</Update>
+
+<Update label="5 月 9 日">
+  新增 [Ideogram AI V3](/cn/api/IdeogramAI) 介面，Ideogram 最先進的圖像產生模型。
+</Update>
+
+<Update label="5 月 6 日">
+  新增 [實用管理腳本](/cn/api/Cli)，支援命令列管理密鑰、查看帳戶和可用模型清單等。
+</Update>
+
+<Update label="4 月 26 日">
+  1. 萬眾期待的 OpenAI 繪圖介面 `gpt-image-1` 正式上線，支援文生圖、圖生圖。
+  2. 支援 Gemini 原生呼叫，可以精準控制 Flash 2.5 的推理預算。
+</Update>
+
+<Update label="4 月 24 日">
+  整合了 Jina AI 的三個核心介面，助你輕鬆建構功能強大的智慧體。三個介面分別是：向量嵌入 (Embeddings)、重排序 (Rerank) 和深度搜尋 (DeepSearch)
+</Update>
+
+<Update label="4 月 22 日">
+  GPT 4o 繪圖介面搶先體驗（逆向）
+</Update>
+
+<Update label="4 月 20 日">
+  OpenAI Responses api 端點支援，工具支援更全面。
+</Update>
+
+<Update label="4 月 17 日">
+  新增 OpenAI [CodeX CLI 支援](/cn/api/Codex-CLI)！在命令列中用自然語言程式設計。
+</Update>
+
+<Update label="4 月 12 日">
+  透過在模型 id 後方追加 `:surfing`，[<sup>讓任何模型具備搜尋能力 Beta</sup>](/cn/api/LLM-Search)
+</Update>
+
+<Update label="4 月 9 日">
+  支援 Claude prompt caching，高頻提示詞重複使用可節省高達 76% 成本！
+</Update>
+
+<Update label="4 月 7 日">
+  支援 Ideogram AI 繪圖介面，文字繪製能力強勁，支援生圖、混合、局部編輯和放大等。
+</Update>
+
+<Update label="4 月 5 日">
+  全新文件，帶給大家更好的體驗
+</Update>
+
+<Update label="3 月 30 日">
+  支援 Claude 文字編輯工具 (Claude Text Edit Tool)
+</Update>
+
+<Update label="3 月 24 日">
+  啟用全新的三叉戟 Logo
+</Update>
+
+<Update label="3 月 16 日">
+  新增了對 OpenAi 和 Google Gemini 模型的原生搜尋功能的支援；未來將完善這個介面擴展支援第三方搜尋；
+</Update>
+
+<Update label="3 月 15 日">
+  新增模型：gpt-4o-mini-search-preview 和 gpt-4o-search-preview
+</Update>
+
+<Update label="3 月 07 日">
+  o1 和 o3-mini 價格下降 10%，與官網一致；
+</Update>
+
+<Update label="3 月 06 日">
+  aihubmix-DeepSeek-R1 因微軟價格上漲 7 倍因此該模型價格上漲 7 倍，推薦使用火山的 DeepSeek-R1，穩定又便宜；新增 qwen-qwq-32b 和 qwen2.5-vl-72b-instruct
+</Update>
+
+<Update label="2 月 28 日">
+  Claude 模型全面降價 15%；新增模型 gpt-4.5-preview；注意價格極其昂貴，呼叫請注意；
+</Update>
+
+<Update label="2 月 26 日">
+  提升 Deepseek 穩定性；來自字節的最穩定，推薦用這兩個：DeepSeek-R1 和 DeepSeek-V3；
+</Update>
+
+<Update label="2 月 25 日">
+  增模型 claude-3-7-sonnet-20250219
+</Update>
+
+<Update label="2 月 24 日">
+  - gpt-4o 概率性出現返回很慢的情況，這是廠商問題；建議暫時改用 gpt-4o-2024-11-20
+  - Perplexity api 暫時下線，Perplexity 官方的計費模式較為複雜，成本高於本平台的定價結構，我們調整價格後重新上線；
+  - 字節官方限時折扣結束恢復原價，DeepSeek-R1 價格已上調
+  - 新增模型詳情頁及參數資訊
+</Update>
+
+<Update label="2 月 23 日">
+  - 字節官方限時折扣結束恢復原價，DeepSeek-V3 價格已上調；預計字節的 R1 近期也會恢復原價，所以我們也會同步漲價
+</Update>
+
+<Update label="2 月 18 日">
+  - 新增模型：kimi-latest（官方計費根據輸入內容長度 8k,32k,128k 分 3 檔計費，本站不支援該計費結構，取中 32k 檔為計費標準，價格敏感者請勿用）
+  - 優化了網站頁面結構；
+  - 日誌頁面併入用量統計頁；
+  - 公告內容移到模型廣場頁，
+  - 設定移到頭像下面；
+  - aihubmix-DeepSeek-R1 價格下降 50%
+  - 新增模型：gemini-2.0-pro-exp-02-05-search，gemini-2.0-flash-exp-search，整合了 Google 官方搜尋聯網功能
+  - 新增模型：gemini-2.0-flash、gemini-2.0-pro-exp-02-05、gemini-2.0-flash-lite-preview-02-05 新增模型：o3-mini，o1（註這兩個模型後台扣費比官方貴 10% 左右，因為這兩個模型帳號有限）
+</Update>
+
+<Update label="2 月 4 日">
+  - o1 模型 openai 官方不支援傳入參數 stream
+  - o3-mini 不支援傳入參數 temperature，o3-mini 新增參數 Reasoning effort；可以傳入"low, medium, high" 如果不傳預設為 medium
+</Update>
+
+<Update label="2 月 1 日">
+  功能：新增 openai 聲音模型輸入輸出的功能支援，api.aihubmix.com 伺服器可用，主站伺服器穩定 1 週後更新支援。整體後台扣費和官方一致，暫時日誌只展示文字部分 token 聲音費用暫時無法展示，但不影響使用
+
+  新增模型：
+
+  - o3-mini，o1；（註這兩個模型後台扣費比官方貴 10% 左右，因為這兩個模型帳號有限）
+  - aihubmix-DeepSeek-R1（推薦，較穩定）
+  - qwen-max-0125（即 Qwen2.5-Max）、sonar-reasoning
+  - deepseek-ai/DeepSeek-R1-Zero 和 deepseek-ai/DeepSeek-R1，deepseek-r1-distill-llama-70b
+  - aihub-Phi-4
+  - Doubao-1.5-pro-256k、Doubao-1.5-pro-32k、Doubao-1.5-lite-32k、Doubao-1.5-vision-pro-32k
+  - sonar、sonar-pro（perplexity ai 最新發布）
+  - gemini-2.0-flash-thinking-exp-01-21
+  - deepseek-reasoner（即 DeepSeek-R1）
+  - MiniMax-Text-01
+  - codestral-latest（Mistral 推出了新的 code 模型 - Codestral 25.01）
+</Update>
+
+<Update label="1 月 23 日">
+  新增模型：
+
+  - aihub-Phi-4
+  - Doubao-1.5-pro-256k、Doubao-1.5-pro-32k、Doubao-1.5-lite-32k、Doubao-1.5-vision-pro-32k
+  - sonar、sonar-pro（perplexity ai 最新發布）
+  - gemini-2.0-flash-thinking-exp-01-21
+  - deepseek-reasoner（即 DeepSeek-R1）
+</Update>
+
+<Update label="1 月 19 日">
+  - 新增 Perplexity Ai API 模型；僅支援 api.aihubmix.com 預覽版伺服器呼叫，如果沒問題我們會更新到主伺服器 aihubmix.com；
+    api.aihubmix.com 為預覽版伺服器，後續新功能先更新到這個伺服器，通常穩定 1 週我們再更新到主伺服器 aihubmix.com
+
+  新增模型：
+
+  - MiniMax-Text-01
+  - codestral-latest（Mistral 推出了新的 code 模型 - Codestral 25.01）
+  - gpt-4o-zh，輸入任何語言自動翻譯為英文給模型，模型輸出內容自動翻譯為中文返回；該功能測試階段不支援高併發請求，僅支援 gpt-4o 模型；
+</Update>
+
+<Update label="1 月 6 日">
+  - 新增 gemini-2.0-flash-exp-search，支援 Google 原生聯網搜尋功能；官方 gemini 2.0 flash 模型的聯網需要額外傳入參數才支援聯網功能，aihubmix 做了整合，模型名字加上 search 參數即可使用
+  - 新增模型 deepseek-ai/DeepSeek-V3
+</Update>
+
+<Update label="1 月 1 日">
+  - 新增模型廣場頁面代替原來的模型/價格頁面
+</Update>
+
+<Update label="12 月 30 日">
+  - 修復 gemini-2.0-flash-thinking-exp-1219 模型只輸出思考沒有答案問題
+  - 修復餘額提醒郵件收不到問題
+</Update>
+
+<Update label="12 月 22 日">
+  - 新增用量統計頁面，新增充值記錄頁面
+  - 新增豆包系列模型：Doubao-lite-128k、Doubao-lite-32k、Doubao-lite-4k、Doubao-pro-128k、Doubao-pro-256k、Doubao-pro-32k、Doubao-pro-4k
+  - 新增模型：gemini-2.0-flash-thinking-exp-1219
+  - 新增模型：gemini-2.0-flash-exp、aihubmix-Mistral-Large-2411、aihubmix-Llama-3-3-70B-Instruct、grok-2-1212、grok-2-vision-1212
+  - 新增模型：gemini-exp-1206、llama-3.3-70b-versatile、learnlm-1.5-pro-experimental
+</Update>
+
+<Update label="12 月 14 日">
+  - 新增模型：gemini-2.0-flash-exp、aihubmix-Mistral-Large-2411、aihubmix-Llama-3-3-70B-Instruct
+</Update>
+
+<Update label="12 月 8 日">
+  - 新增模型：gemini-exp-1206、llama-3.3-70b-versatile、learnlm-1.5-pro-experimental
+  - 新增用量統計頁面
+</Update>
+
+<Update label="11 月 21 日">
+  - 近期新增模型：gpt-4o-2024-11-20，step-2-16k，grok-vision-beta，
+  - 千問 2.5turbo 百萬上下文模型：qwen-turbo-2024-11-01
+</Update>
+
+<Update label="11 月 07 日">
+  - 相容 Claude 原生 sdk，v1/messages 介面已支援上線；
+  - Claude 原生介面的快取和控制計算機功能還不支援（prompt caching 和 computer use）我們會在接下來的兩週內繼續完善。
+</Update>
+
+<Update label="11 月 05 日">
+  - 新增模型：claude-3-5-haiku-20241022
+  - 新增馬斯克 x.ai 最新模型 grok-beta
+</Update>
+
+<Update label="10 月 23 日">
+  - 新增模型：claude-3-5-sonnet-20241022
+</Update>
+
+<Update label="10 月 10 日">
+  OpenAI 最新的快取功能現已上線。此功能目前支援以下模型：
+
+  - GPT-4o
+  - GPT-4o-mini
+  - o1-preview
+  - o1-mini
+
+  請注意，gpt-4o-2024-05-13 版本不在官方支援範圍內。
+  如果請求命中快取，您將能夠在後台日誌中看到相關的快取 token 資料。
+  更多詳細資訊和使用規則，請參閱 OpenAI 官方網站：[OpenAI 快取功能詳情](https://openai.com/index/api-prompt-caching/)
+</Update>
+
+<Update label="10 月 03 日">
+  - gpt-4o 模型後台計費下降價格同步官方
+  - 新增模型：aihubmix-Llama-3-2-90B-Vision，aihubmix-Llama-3-70B-Instruct
+  - 新增 Cohere 最新模型 aihubmix-command-r-08-2024，aihubmix-command-r-plus-08-2024
+</Update>
+
+<Update label="9 月 19 日">
+  - 新增模型：whisper-large-v3 和 distil-whisper-large-v3-en
+  - 注意：Whisper 模型實際計費是按照輸入的秒數計費的，但是目前頁面價格展示有問題未來會修復，後台底層計費沒有問題 whisper-1 完全同步 Openai 官方扣費
+</Update>
+
+<Update label="9 月 13 日">
+  - **新增模型 o1-mini 和 o1-preview；**\
+    註：最新這兩個模型，要求傳入參數有變，一些殼軟體如果不更新預設傳入的參數會報錯;
+
+  #### 需要注意
+
+  經測試，o1 模型不支援以下內容，並報錯：
+
+  - system 欄位：400 報錯
+  - tools 欄位：400 報錯
+  - 圖片輸入：400 報錯
+  - json_object 輸出：500 報錯
+  - structured 輸出：400 報錯
+  - logprobs 輸出：403 報錯
+  - stream 輸出：400 報錯
+  - o1 系列：20 RPM，150,000,000 TPM，很低，隨時 429 報錯
+  - 其他：temperature, top_p and n 被固定為 1；presence_penalty 和 frequency_penalty 被固定為 0
+</Update>
+
+<Update label="9 月 10 日">
+  - 新增模型：mattshumer/Reflection-Llama-3.1-70B；ps：據說 llama3.1-70b 最強微調版本
+  - claude-3 模型價格上調調整，為了維持 Claude 模型穩定供應，目前呼叫我們會比直接呼叫官方貴 10%，後續會逐步下調；
+  - 增加了 Openai 系列模型的併發能力，理論上基本支援無限併發；
+</Update>
+
+<Update label="8 月 11 日">
+  - 新增模型：Phi3medium128k、ahm-Phi-3-medium-4k、ahm-Phi-3-small-128k
+  - 增加了 Llama 相關模型的穩定性
+  - 進一步優化了 Claude 模型的相容性
+</Update>
+
+<Update label="8 月 7 日">
+  - 新增 Openai 剛剛更新 4o 版本 gpt-4o-2024-08-06，見 https://platform.openai.com/docs/guides/structured-outputs
+  - 新增 Google 最新模型：gemini-1.5-pro-exp-0801
+</Update>
+
+<Update label="8 月 4 日">
+  - 增加了線上直接支付充值
+  - 修復了 Claude 多輪對話格式報錯問題：1、messages: roles must alternate between "user" and "assistant", but found multiple "user" roles in a row；
+  - 優化了 Claude 模型的使用 function 功能時 index 問題
+  - https://orisound.cn 備用伺服器將在 9 月 7 日全面下線；目前在使用這個地址的請抽空改成主伺服器 https://aihubmix.com 或者備用伺服器 https://api.aihubmix.com
+</Update>
+
+<Update label="7 月 27 日">
+  - 新增支援 Mistral Large 2，模型名稱：Mistral-large-2407 或 aihubmix-Mistral-large-2407；
+  - 系統優化
+</Update>
+
+<Update label="7 月 24 日">
+  - 新增最新 llama-3.1 模型 llama-3.1-405b-instruct、llama-3.1-70b-versatile 和 llama-3.1-8b-instant，歡迎嘗試；
+</Update>
+
+<Update label="7 月 20 日">
+  - 已修復 gpt-4o-mini 模型在價格計算方面的問題。具體情況如下：\
+    文字輸入價格：OpenAI 官方的 gpt-4o-mini 模型輸入文字的價格僅為 gpt-4o 模型價格的 1/33。\
+    圖片輸入價格：OpenAI 官方的 gpt-4o-mini 模型輸入圖片的價格與 gpt-4o 模型價格相等。
+  - 為了確保價格計算的準確性，我們在計算 gpt-4o-mini 模型輸入圖片的 token 數時，將其乘以 33 倍，以與官方價格對齊。
+  - 詳情可見 [Open AI 官方價格](https://openai.com/api/pricing/)
+
+    ![圖片](/media/cn/4ominijiage.png)
+
+    ![圖片](/media/cn/4ojiage.png)
+</Update>
+
+<Update label="7 月 19 日">
+  - 新增支援 gpt-4o-mini 模型，後台計費同步官方
+</Update>
+
+<Update label="7 月 15 日 公告">
+  - 支援官方的 api 參數 include_usage，傳入參數可返回 stream 模式下的 usage，詳情見 [官方文件](https://platform.openai.com/docs/api-reference/chat/create#chat-create-stream_options)
+</Update>
+
+<Update label="7 月 14 日 公告">
+  - 新版本 nextweb 增加了支援呼叫非 Openai 模型 [呼叫本站非 OpenAI 模型](https://doc.aihubmix.com/%E5%A6%82%E4%BD%95%E8%B0%83%E7%94%A8%E6%9C%AC%E7%AB%99%E9%9D%9EOpenAI%E6%A8%A1%E5%9E%8B)
+  - 增加了阿里千問模型的後台扣費，總體呼叫我們的成本比呼叫阿里雲官方貴 10% 左右
+  - 優化 azure openai 返回的輸出更好地相容了 Openai 介面
+  - 支援 Claude-3 的 tool Calling
+  - 增加了很多新模型，見設定/可用模型
+</Update>
+
+<Update label="7 月 3 日 公告">
+  - 整體後台介面進行了優化
+  - 日誌每條請求記錄增加了展示請求時當時的模型單價
+  - 增加了模型及價格頁面 [模型/價格](https://doc.aihubmix.com/%E5%A6%82%E4%BD%95%E8%B0%83%E7%94%A8%E6%9C%AC%E7%AB%99%E9%9D%9EOpenAI%E6%A8%A1%E5%9E%8B)
+</Update>
+
+<Update label="6 月 20 日 公告">
+  - 最新 claude-3-5-sonnet-20240620 已支援，呼叫方法見 [呼叫本站非 open AI 模型教學](https://doc.aihubmix.com/%E5%A6%82%E4%BD%95%E8%B0%83%E7%94%A8%E6%9C%AC%E7%AB%99%E9%9D%9EOpenAI%E6%A8%A1%E5%9E%8B)
+</Update>
+
+<Update label="6 月 18 日 公告">
+  - 後台日誌頁面現在開始，支援下載使用請求記錄
+</Update>
+
+<Update label="6 月 16 日 公告">
+  - 降低了隨機到 azure openai 的機率，現在幾乎很小機率會隨機到
+</Update>
+
+<Update label="6 月 13 日 公告">
+  - 下調 Claude-3 相關模型的費用（Claude 3 Haiku、Claude 3 Sonnet、Claude 3 Opus）後台扣費和官方一致；因此目前我們網站額度零售價格，使用我們的 API 的成本相當於官網 86 折；
+</Update>
+
+<Update label="6 月 10 日 公告">
+  - 整體服務架構升級，全部伺服器和資料遷入微軟 Azure；
+  - 未來我將基於 one api 的開源版本專案進行二次深度開發和優化（原本我們已通過贊助獲得 oneapi 專案商業版授權）
+  - 日誌部分資料量太大（超過 1 億級的請求日誌）因此暫時無法遷移，如需查詢之前的老日誌請聯絡客服
+  - 優化 gpt-4o 的 token 計費，tokenizer 的 cI100k_base 改為 0200k_base，之前的 gpt-4 系列用的是 cI100k_base；結果就是中文、韓文、日文的流式請求的 token 計數會比之前下降；
+</Update>
+
+<Update label="6 月 8 日 公告">
+  - 新增阿里最新開源模型 Qinwen2
+  - alibaba/Qwen2-7B-Instruct、alibaba/Qwen2-57B-A14B-Instruct、alibaba/Qwen2-72B-Instruct
+</Update>
+
+<Update label="5 月 20 日 公告">
+  - 新增模型 gemini-1.5-flash
+  - 新增模型 gpt-4o
+  - 江蘇地區進入充值頁面報錯，因為充值域名被電信劫持，請先 [聯絡客服](https://doc.aihubmix.com/%E5%85%85%E5%80%BC%E4%B8%8E%E4%BA%BA%E5%B7%A5%E5%AE%A2%E6%9C%8D) 進行充值。
+  - 新增 llama3（llama3-70b-8192、llama3-8b-8192）gemini-1.5-pro、command-r、command-r-plus、歡迎呼叫嘗試
+  - Claude-3 模型恢復供應；目前本站正在連接 Claude-3 部署在 aws 和 Google cloud 上的端點。
+  - 為了維持伺服器費用及團隊成本，Claude-3 模型和價格後台扣費比官方貴 10%
+  - 後續呼叫量增加的話，會逐步下調至 5% 左右，甚至更低，
+  - 目前併發有待測試和隨著呼叫增加而去申請更高的併發呼叫。
+</Update>

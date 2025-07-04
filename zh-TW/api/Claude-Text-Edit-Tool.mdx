@@ -1,0 +1,224 @@
+---
+title: "Claude 文本编辑工具"
+description: "Claude 的文本编辑工具可以直接查看和修改文件，帮助您调试代码、改进文档，实现更高效的人机协作。"
+icon: "pen"
+---
+
+Claude 可以使用 Anthropic 定義的文本编辑工具來查看和修改文本文件，幫助你調試、修復和改進代碼或其他文本文檔。這使得 Claude 能够直接與你的文件進行交互，提供實際的操作幫助，而不仅仅是提出建議。
+
+## 使用文本编辑工具前的准备
+
+選擇兼容的模型
+Anthropic 的文本编辑工具支持以下 Claude 模型：
+
+- **Claude 4 系列模型** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
+
+<Warning>
+Claude 4 模型使用了全新的文本编辑工具，與舊版本不兼容。請確保使用正確的工具類型和名稱。
+</Warning>
+
+## 模型对应的工具配置
+
+| 模型版本 | 工具类型 | 工具名称 | 支持的功能 |
+|---------|---------|---------|-----------|
+| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
+| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+
+<Tip>
+**重要变化：** Claude 4 模型不再支持 `undo_edit` 命令，請在代码中移除对此功能的依赖。
+</Tip>
+
+## 评估使用场景
+
+以下是使用文本编辑工具的一些典型场景：
+
+- 代码调试：帮助识别和修复代码中的問題，從語法錯誤到邏輯問題。
+- 代码重构：通过有针对性的编辑来改进代码结构、可讀性和性能。
+- 文档生成：为你的代码庫添加文档字符串、注釋或 README 文件。
+- 测试创建：根据对实现的理解创建单元测试。
+
+## 使用文本编辑工具
+
+通过 Messages API 向 Claude 提供文本编辑工具（命名为 `str_replace_editor`）：
+需要安装 `anthropic` 包：
+
+```shell
+pip install anthropic
+```
+
+**調用示例：**
+
+<CodeGroup>
+
+```python Python-Claude 4
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # 或 claude-opus-4-20250514
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250429",
+            "name": "str_replace_based_edit_tool"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "There's a syntax error in my primes.py file. Can you help me fix it?"
+        }
+    ]
+)
+
+print("Response content:")
+for message in response.content:
+    print(message.text)
+```
+
+```py Python-Claude 3.7
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250124",
+            "name": "str_replace_editor"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "There's a syntax error in my primes.py file. Can you help me fix it?"
+        }
+    ]
+)
+
+print("Response content:")
+for message in response.content:
+    print(message.text)
+```
+
+
+```shell Curl-Claude 4
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
+      }
+    ]
+  }'
+```
+
+```shell Curl-Claude 3.7
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-3-7-sonnet-20250219",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
+      }
+    ]
+  }'
+```
+
+</CodeGroup>
+
+## 迁移到 Claude 4
+
+如果您正在從 Claude 3.7 Sonnet 遷移到 Claude 4 模型，請注意以下變化：
+
+### 更新工具配置
+
+```py python
+# Claude 3.7 Sonnet
+tools=[
+    {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+    }
+]
+
+# Claude 4 (Opus/Sonnet)
+tools=[
+    {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+    }
+]
+```
+
+### 移除不支持的功能
+
+- **`undo_edit` 命令**：Claude 4 模型不再支持撤销编辑功能
+- 請從您的代码中移除任何依賴 `undo_edit` 的邏輯
+
+返回示例：
+
+```json
+{
+  "id": "msg_bdrk_012xyNaFCQg4zsVcTk5VkDAe",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I'd be happy to help you fix the syntax error in your `primes.py` file. First, let me take a look at the file to identify the issue."
+    },
+    {
+      "type": "tool_use",
+      "text": "",
+      "id": "toolu_bdrk_01P6jQG6suDSsDjzugqGVHWC",
+      "name": "str_replace_based_edit_tool",
+      "input": {
+        "command": "view",
+        "path": "/repo/primes.py"
+      }
+    }
+  ],
+  "model": "claude-sonnet-4-20250514",
+  "stop_reason": "tool_use",
+  "usage": {
+    "input_tokens": 1042,
+    "output_tokens": 115
+  }
+}
+```

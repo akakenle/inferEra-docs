@@ -1,0 +1,323 @@
+---
+title: "GPT 繪圖嘗鮮（逆向）"
+description: " "
+icon: "paintbrush"
+---
+
+## 介面說明
+
+為滿足用戶的強烈需求，我們特別推出了兩個逆向介面：`gpt-4o-image` 與 `gpt-4o-image-vip`。其中，VIP 模型在效能和穩定性方面表現更為出色。\
+請注意，這些逆向介面無法保證完全穩定，可能會出現 `🕐 Queuing...` 排隊狀態或生成失敗的情況，因此建議僅將其用於體驗新功能或進行測試。\
+鑑於 OpenAI 已正式發布 `gpt-image-1` 介面，考慮到呼叫成本因素，我們將暫時保留這些逆向介面，並提供完全相容的呼叫方式。
+
+## 注意事項
+
+<Warning>
+  - 生成過程中，無論任何情況導致的中斷或失敗，**介面呼叫一經發出，費用都會被扣取**
+  - 還在世的藝術家名稱（如「宮崎駿」、「新海誠」等）會觸發 `input_moderation` 報錯，**導致生成失敗**。你可以透過「吉卜力」、「明亮的現代日式動漫風格」等非敏感詞來規避
+  - 總的來說,「風格」比「藝術家」安全，像是「皮克斯」也是支援的
+  - 更穩妥的做法是採用已故藝術家或對應的風格，如「梵高」、「蒙娜麗莎」等
+</Warning>
+
+## 模型與費率
+
+| 模型                 | 後台扣費 (美元/次) | 約 (人民幣/次) |
+| ------------------ | ----------- | --------- |
+| `gpt-4o-image-vip` | $0.009      | 折合約 ¥0.06 |
+| `gpt-4o-image`     | $0.005      | 折合約 ¥0.04 |
+
+<Info>
+  1. 後台費率以美元為準。
+  2. 由於逆向介面的維護成本上升，單次呼叫的價格已經上調。<sub>（更新日期：20250604）</sub>
+  3. 正式的 `gpt-image-1` 輸入文字 Token 部分的費率是 $5/百萬 Tokens，逆向介面只按圖片繪製次數計算。
+</Info>
+
+## Python 調用示例
+
+使用大家熟悉的 `v1/completions` 端點來提供支持，完美兼容，具體使用可以參考：
+
+<CodeGroup>
+
+```py 文生圖
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1"
+)
+
+# 創建聊天完成請求
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #list: gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """Redesign [Girl wearing a pearl earring] as an anime-style illustrated cover. Preserve original essence and composition. Render in refined Kyoto Anime-inspired style—soft brushwork, cinematic lighting, progressive depth. 
+Format in AV cover layout: 
+Japanese-English mixed typography, serif title with significant visual hierarchy - sense of design is the key.
+Extract words tha conveys profound meanings as title, then creative slogan, the original name can be a smaller information ONLY if necessary.
+Subtly embed watermark "jerlin" in clothing or background. Maintain emotional tone and posture, soften only when necessary. 2:3 portrait"""
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# 使用 for 循環處理流式響應
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n處理響應時出現錯誤：{str(e)}")
+```
+
+
+```py 圖文生圖
+from openai import OpenAI
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the image
+base64_image = encode_image(image_path)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert the image into the style of ghibli，bright tone. 3:2"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n處理響應時出現錯誤：{str(e)}")
+```
+
+
+```py 多圖+文生圖
+from openai import OpenAI
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the first image
+base64_image1 = encode_image(image_path)
+
+# Get the second image path
+image_path2 = "ref.jpeg"
+
+# Encode the second image
+base64_image2 = encode_image(image_path2)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 換成你在後台生成的 Key
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert image 1 into the style of image 2, bright tone. 2:3"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image1}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image2}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# 使用 for 循環處理流式響應
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n處理響應時出現錯誤：{str(e)}")
+```
+
+</CodeGroup>
+
+## 輸出示例
+
+```
+{
+  "prompt": "Redesign 'Girl with a Pearl Earring' as an anime-style illustrated cover. Preserve the original essence and composition: the iconic side-glance pose, serene expression, and intimate framing. Render in refined Kyoto Anime-inspired style with soft brushwork, cinematic lighting, and progressive depth. Create an AV cover layout with Japanese-English mixed typography, using a prominent serif title with strong visual hierarchy. Extract profound words for the title and include a creative slogan. The original name 'Girl with a Pearl Earring' should appear as smaller text if needed. Subtly embed the watermark 'jerlin' in clothing or background. For modesty, replace any potential nudity with flowing fabric, hair, or veils while maintaining the emotional tone and posture. Soften details only when necessary.",
+  "ratio": "2:3"
+}
+
+>🕐 Queuing.
+
+>⚡ Generating.....
+
+>🏃‍ Progress 11....19....27...34....42....50....57...64....[100](https://videos.openai.com/vg-assets/assets%2Ftask_01jsccq77nfcsab7dn8bx7z230%2Fsrc_1.png?st=2025-04-21T13%3A08%3A48Z&se=2025-04-27T14%3A08%3A48Z&sks=b&skt=2025-04-21T13%3A08%3A48Z&ske=2025-04-27T14%3A08%3A48Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=xm6K6M7au3F3Vd9qcYxR3mYWrqAHsgbagbUV5GQo39w%3D&az=oaivgprodscus)
+
+> ✅ Generation complete
+
+
+![gen_01jsccq83pfg6ssfqf3pzfaytj](https://filesystem.site/cdn/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+![gen_01jsccq83nf6ftmtx8y48h383y](https://filesystem.site/cdn/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
+```
+
+## OpenAI 正式介面兼容
+
+如果你更偏好 OpenAI 最新發布的 Image generation 呼叫方式，可以參考以下處理，注意 3 點即可：
+
+1. 不能傳質量參數，模型 `gpt-4o-image-vip` 和 `gpt-4o-image` 自身捆綁了
+2. 不支持打印追蹤 Token 用量的 usage 字段
+3. 最新的輸出是 Base64 圖片數據，用例已經做了自動保存
+
+```py Python
+from openai import OpenAI
+import os
+import requests
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 替換成你的 AiHubMix 密鑰
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+redesign poster of the movie [Black Swam], 3D cartoon, smooth render, bright tone, 2:3
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # 單次數量
+    size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    #quality="high" # 逆向模型不能傳質量參數，模型捆綁了 📍
+)
+
+print(result) # 打印完整的 API 響應，逆向介面不支持 usage 📍
+
+# 定義文件名前綴和保存目錄
+output_dir = "." # 可以指定其他目錄
+file_prefix = "image_gen-逆向"
+
+# 確保輸出目錄存在
+os.makedirs(output_dir, exist_ok=True)
+
+# 遍歷所有返回的圖片數據
+for i, image_data in enumerate(result.data):
+    # 優先處理 base64 字符串
+    if hasattr(image_data, "b64_json") and image_data.b64_json:
+        image_bytes = base64.b64decode(image_data.b64_json)
+        current_index = i
+        while True:
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name)
+            if not os.path.exists(file_path):
+                break
+            current_index += 1
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"圖片已保存至：{file_path} (base64)")
+    # 其次處理 url 字段（保留穩健處理，防止兼容介面再變更）
+    elif hasattr(image_data, "url") and image_data.url:
+        try:
+            response = requests.get(image_data.url, stream=True)
+            response.raise_for_status()
+            image_bytes = response.content
+            current_index = i
+            while True:
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name)
+                if not os.path.exists(file_path):
+                    break
+                current_index += 1
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"圖片已保存至：{file_path} (url)")
+        except requests.exceptions.RequestException as e:
+            print(f"下載第 {i} 張圖片失敗：{e}")
+        except Exception as e:
+            print(f"處理第 {i} 張圖片時發生錯誤：{e}")
+    else:
+        print(f"第 {i} 張圖片數據中既無 b64_json 也無 url，跳過保存。")
+```
+
+## 效果展示
+
+<Card title="戴珍珠項鏈的女孩" img="../../public/en/Girl-with-a-Pearl-Earring.PNG">
+  1. 名畫重演繹，帶排版和水印直出。
+</Card>
+
+<Card title="皮克斯卡通" img="../../public/en/pixar.png">
+  1. 皮克斯 3D 卡通風格，穩如老狗。
+</Card>
+
+<Card title="3D" img="../../public/en/ghibli.png">
+  1. 最受欢迎的吉卜力
+</Card>
+
+## 實用提示
+
+<Tip>
+  - 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本。
+  - 画幅比例在 prompt 中指定，否则 4o 自动判断。支持 2:3、3:2、1:1。
+  - 没有灵感就给参考图，支持单图和多图。
+  - 上传的图片可以做压缩预处理，提升速度。
+  - 支持透明背景，免抠图。——只需要在 Prompt 中补充要求。
+</Tip>
