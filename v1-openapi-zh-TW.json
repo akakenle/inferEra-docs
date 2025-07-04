@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "AIHubMix API",
+    "description": "AIHubMix 提供的 API 服務，支援多種 AI 模型的調用。支援 OpenAI 相容接口，可以直接替換官方 SDK 使用。\n\n取得 API 金鑰：[https://aihubmix.com/token/add](https://aihubmix.com/token/add)\n查看可用模型：[https://aihubmix.com/models](https://aihubmix.com/models)",
+    "version": "1.0.0x"
+  },
+  "servers": [
+    {
+      "url": "https://aihubmix.com/v1",
+      "description": "生產環境伺服器"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/chat/completions": {
+      "post": {
+        "summary": "建立聊天補全",
+        "description": "根據提供的訊息產生 AI 回覆，支援多種模型與參數設定",
+        "x-codeSamples": [
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from openai import OpenAI\n\nclient = OpenAI(\n    base_url=\"https://aihubmix.com/v1\",\n    api_key=\"AIHUBMIX_API_KEY\"\n)\n\ncompletion = client.chat.completions.create(\n    model=\"gpt-3.5-turbo\",\n    messages=[{\"role\": \"user\", \"content\": \"你好\"}]\n)\n\nprint(completion.choices[0].message)"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "import OpenAI from 'openai';\n\nconst openai = new OpenAI({\n  baseURL: 'https://aihubmix.com/v1',\n  apiKey: 'AIHUBMIX_API_KEY'\n});\n\nasync function main() {\n  const completion = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [\n      {\n        'role': 'user',\n        'content': '你好'\n      }\n    ]\n  });\n\n  console.log(completion.choices[0].message);\n}\n\nmain();"
+          },
+          {
+            "lang": "curl",
+            "label": "Curl",
+            "source": "curl https://aihubmix.com/v1/chat/completions \\\n  -H \"Authorization: Bearer AIHUBMIX_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"model\\\": \\\"gpt-3.5-turbo\\\",\\\"messages\\\": [{\\\"role\\\": \\\"user\\\", \\\"content\\\": \\\"你好\\\"}]}\""
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["model", "messages"],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "要使用的模型 ID，可在 [模型廣場](https://aihubmix.com/models) 查看"
+                  },
+                  "messages": {
+                    "type": "array",
+                    "description": "對話訊息列表，包含角色與內容資訊",
+                    "items": {
+                      "type": "object",
+                      "required": ["role", "content"],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "description": "訊息角色，支援 user、assistant、system、developer 等"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "訊息內容"
+                        }
+                      }
+                    }
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "description": "取樣溫度，控制輸出的隨機性，範圍 0-2，值越大隨機性越高",
+                    "default": 0.8
+                  },
+                  "max_tokens": {
+                    "type": "integer",
+                    "description": "產生文字的最大長度，可依模型能力設定不同值",
+                    "default": 1024
+                  },
+                  "top_p": {
+                    "type": "number",
+                    "description": "核取樣參數，控制輸出文字的多樣性",
+                    "default": 1
+                  },
+                  "frequency_penalty": {
+                    "type": "number",
+                    "description": "頻率懲罰參數，避免重複產生相似內容",
+                    "default": 0
+                  },
+                  "presence_penalty": {
+                    "type": "number",
+                    "description": "存在懲罰參數，鼓勵產生新內容",
+                    "default": 0
+                  },
+                  "stream": {
+                    "type": "boolean",
+                    "description": "是否啟用串流輸出，及時返回產生內容",
+                    "default": false
+                  },
+                  "web_search_options": {
+                    "type": "object",
+                    "description": "搜尋模型的網路搜尋選項，僅支援特定搜尋模型"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功回應",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "description": "訊息角色，通常為 assistant"
+                              },
+                              "content": {
+                                "type": "string",
+                                "description": "產生的回覆內容"
+                              }
+                            }
+                          },
+                          "finish_reason": {
+                            "type": "string",
+                            "description": "產生結束的原因，如 stop、length 等"
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "prompt_tokens": {
+                          "type": "integer",
+                          "description": "輸入訊息使用的 token 數量"
+                        },
+                        "completion_tokens": {
+                          "type": "integer",
+                          "description": "產生回覆使用的 token 數量"
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "description": "總共使用的 token 數量"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "請求參數錯誤"
+          },
+          "401": {
+            "description": "認證失敗"
+          },
+          "429": {
+            "description": "請求過於頻繁"
+          },
+          "500": {
+            "description": "伺服器內部錯誤"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer 認證，需要在請求標頭中加入 Authorization: Bearer AIHUBMIX_API_KEY，可在 [這裡](https://aihubmix.com/token/add) 取得 API 金鑰"
+      }
+    }
+  }
+}

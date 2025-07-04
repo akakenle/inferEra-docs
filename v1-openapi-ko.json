@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "AIHubMix API",
+    "description": "AIHubMix는 다양한 AI 모델을 위한 API 서비스를 제공합니다. 엔드포인트는 OpenAI 사양과 완전히 호환되므로 공식 SDK의 대체로 사용할 수 있습니다.\n\nAPI 키 받기: [https://aihubmix.com/token/add](https://aihubmix.com/token/add)\n사용 가능한 모델 보기: [https://aihubmix.com/models](https://aihubmix.com/models)",
+    "version": "1.0.0x"
+  },
+  "servers": [
+    {
+      "url": "https://aihubmix.com/v1",
+      "description": "프로덕션 서버"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/chat/completions": {
+      "post": {
+        "summary": "채팅 응답 생성",
+        "description": "제공된 메시지를 기반으로 AI 응답을 생성합니다. 여러 모델과 다양한 파라미터를 지원합니다.",
+        "x-codeSamples": [
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from openai import OpenAI\n\nclient = OpenAI(\n    base_url=\"https://aihubmix.com/v1\",\n    api_key=\"AIHUBMIX_API_KEY\"\n)\n\ncompletion = client.chat.completions.create(\n    model=\"gpt-3.5-turbo\",\n    messages=[{\"role\": \"user\", \"content\": \"Hello\"}]\n)\n\nprint(completion.choices[0].message)"
+          },
+          {
+            "lang": "javascript",
+            "label": "Node.js",
+            "source": "import OpenAI from 'openai';\n\nconst openai = new OpenAI({\n  baseURL: 'https://aihubmix.com/v1',\n  apiKey: 'AIHUBMIX_API_KEY'\n});\n\nasync function main() {\n  const completion = await openai.chat.completions.create({\n    model: 'gpt-3.5-turbo',\n    messages: [\n      {\n        'role': 'user',\n        'content': 'Hello'\n      }\n    ]\n  });\n\n  console.log(completion.choices[0].message);\n}\n\nmain();"
+          },
+          {
+            "lang": "curl",
+            "label": "Curl",
+            "source": "curl https://aihubmix.com/v1/chat/completions \\\n  -H \"Authorization: Bearer AIHUBMIX_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"model\\\": \\\"gpt-3.5-turbo\\\",\\\"messages\\\": [{\\\"role\\\": \\\"user\\\", \\\"content\\\": \\\"Hello\\\"}]}\""
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["model", "messages"],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "사용할 모델 ID입니다. [모델 허브](https://aihubmix.com/models)에서 확인하세요."
+                  },
+                  "messages": {
+                    "type": "array",
+                    "description": "역할과 내용을 포함한 대화 메시지입니다.",
+                    "items": {
+                      "type": "object",
+                      "required": ["role", "content"],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "description": "메시지 역할입니다. user, assistant, system, developer 등 다양한 값을 지원합니다."
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "메시지 내용입니다."
+                        }
+                      }
+                    }
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "description": "샘플링 온도(0-2). 값이 높을수록 더 무작위성이 커집니다.",
+                    "default": 0.8
+                  },
+                  "max_tokens": {
+                    "type": "integer",
+                    "description": "생성할 최대 토큰 수(모델에 따라 다름).",
+                    "default": 1024
+                  },
+                  "top_p": {
+                    "type": "number",
+                    "description": "다양성을 제어하는 Top-p 누클리어스 샘플링 파라미터입니다.",
+                    "default": 1
+                  },
+                  "frequency_penalty": {
+                    "type": "number",
+                    "description": "반복을 줄이기 위한 빈도 패널티입니다.",
+                    "default": 0
+                  },
+                  "presence_penalty": {
+                    "type": "number",
+                    "description": "새로운 주제를 유도하기 위한 프레즌스 패널티입니다.",
+                    "default": 0
+                  },
+                  "stream": {
+                    "type": "boolean",
+                    "description": "실시간 출력을 위한 스트리밍 응답을 활성화합니다.",
+                    "default": false
+                  },
+                  "web_search_options": {
+                    "type": "object",
+                    "description": "웹 검색 옵션(특정 검색 모델에서만 지원)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공적인 응답",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "description": "메시지 역할(일반적으로 'assistant')."
+                              },
+                              "content": {
+                                "type": "string",
+                                "description": "생성된 응답 내용입니다."
+                              }
+                            }
+                          },
+                          "finish_reason": {
+                            "type": "string",
+                            "description": "생성이 종료된 이유(예: stop, length 등)."
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "prompt_tokens": {
+                          "type": "integer",
+                          "description": "프롬프트에 포함된 토큰 수."
+                        },
+                        "completion_tokens": {
+                          "type": "integer",
+                          "description": "생성된 응답의 토큰 수."
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "description": "사용된 전체 토큰 수."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청 파라미터"
+          },
+          "401": {
+            "description": "인증 실패"
+          },
+          "429": {
+            "description": "요청이 너무 많음"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "베어러 인증. 요청 헤더에 Authorization: Bearer AIHUBMIX_API_KEY를 추가하세요. API 키 받기: [여기](https://aihubmix.com/token/add)에서 확인하세요."
+      }
+    }
+  }
+} 
