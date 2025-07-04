@@ -230,10 +230,10 @@
         "language": "jp",
         "tabs": [
           {
-            "tab": "User Guide",
+            "tab": "ユーザーガイド",
             "groups": [
               {
-                "group": "Basics",
+                "group": "基本",
                 "pages": [
                   "jp/index",
                   "jp/quick-start",
@@ -273,7 +273,7 @@
                 ]
               },
               {
-                "group": "Terms and Privacy",
+                "group": "利用規約とプライバシー",
                 "pages": [
                   "jp/terms-and-privacy/Terms",
                   "jp/terms-and-privacy/Privacy"
@@ -282,7 +282,7 @@
             ]
           },
           {
-            "tab": "Use Cases",
+            "tab": "利用ケース",
             "pages": [
               "jp/clients/Cherry-Studio",
               "jp/clients/AnythingLLM",
@@ -313,7 +313,7 @@
             ]
           },
           {
-            "tab": "FAQs",
+            "tab": "よくある質問",
             "pages": [
               "jp/FAQs/faq",
               "jp/FAQs/HTTP-Codes",
@@ -321,13 +321,13 @@
             ]
           },
           {
-            "tab": "Updates",
+            "tab": "アップデート",
             "pages": [
               "jp/changelog/News"
             ]
           },
           {
-            "tab": "Blogs",
+            "tab": "ブログ",
             "pages": [
               "jp/blogs/Building"
             ]
@@ -338,10 +338,10 @@
         "language": "ko",
         "tabs": [
           {
-            "tab": "User Guide",
+            "tab": "사용자 가이드",
             "groups": [
               {
-                "group": "Basics",
+                "group": "기본",
                 "pages": [
                   "ko/index",
                   "ko/quick-start",
@@ -381,7 +381,7 @@
                 ]
               },
               {
-                "group": "Terms and Privacy",
+                "group": "약관 및 개인정보처리방침",
                 "pages": [
                   "ko/terms-and-privacy/Terms",
                   "ko/terms-and-privacy/Privacy"
@@ -390,7 +390,7 @@
             ]
           },
           {
-            "tab": "Use Cases",
+            "tab": "사용 사례",
             "pages": [
               "ko/clients/Cherry-Studio",
               "ko/clients/AnythingLLM",
@@ -421,7 +421,7 @@
             ]
           },
           {
-            "tab": "FAQs",
+            "tab": "자주 묻는 질문",
             "pages": [
               "ko/FAQs/faq",
               "ko/FAQs/HTTP-Codes",
@@ -429,13 +429,13 @@
             ]
           },
           {
-            "tab": "Updates",
+            "tab": "업데이트",
             "pages": [
               "ko/changelog/News"
             ]
           },
           {
-            "tab": "Blogs",
+            "tab": "블로그",
             "pages": [
               "ko/blogs/Building"
             ]
@@ -446,10 +446,10 @@
         "language": "zh-Hant",
         "tabs": [
           {
-            "tab": "User Guide",
+            "tab": "使用指南",
             "groups": [
               {
-                "group": "Basics",
+                "group": "基礎入門",
                 "pages": [
                   "zh-Hant/index",
                   "zh-Hant/quick-start",
@@ -489,7 +489,7 @@
                 ]
               },
               {
-                "group": "Terms and Privacy",
+                "group": "條款與隱私政策",
                 "pages": [
                   "zh-Hant/terms-and-privacy/Terms",
                   "zh-Hant/terms-and-privacy/Privacy"
@@ -498,7 +498,7 @@
             ]
           },
           {
-            "tab": "Use Cases",
+            "tab": "使用情境",
             "pages": [
               "zh-Hant/clients/Cherry-Studio",
               "zh-Hant/clients/AnythingLLM",
@@ -529,7 +529,7 @@
             ]
           },
           {
-            "tab": "FAQs",
+            "tab": "常見問題",
             "pages": [
               "zh-Hant/FAQs/faq",
               "zh-Hant/FAQs/HTTP-Codes",
@@ -537,13 +537,13 @@
             ]
           },
           {
-            "tab": "Updates",
+            "tab": "更新資訊",
             "pages": [
               "zh-Hant/changelog/News"
             ]
           },
           {
-            "tab": "Blogs",
+            "tab": "部落格",
             "pages": [
               "zh-Hant/blogs/Building"
             ]

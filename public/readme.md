@@ -17,7 +17,7 @@
 英文 en
 日文 jp
 韩文 ko
-繁体中文 zh（不支持 zh-TW）
+繁体中文 zh-Hant（不支持 zh-TW）
 
 ## 指令
 
@@ -44,3 +44,5 @@ rules：
 "/public/cn/ghibli.png" ❌  
 "../../public/cn/ghibli.png" ✅  
 这样所有语言、所有文档都能安全、方便地访问同一份资源。
+
+[Mintlify 多语言](https://mintlify.com/docs/navigation#languages)
