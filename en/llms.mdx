@@ -1,5 +1,120 @@
 ---
-title: 'New file'
-description: 'Description of your new file.'
+title: "LLMs.txt"
+description: "AI-friendly documentation navigation for LLMs"
 ---
 
+This is the canonical version of [`llms.txt`](https://yinchao.oss-cn-hangzhou.aliyuncs.com/docs/llms.txt), self-hosted and stripped of Mintlify’s extra multilingual content. The block below reflects it exactly.
+
+```txt
+# AiHubMix
+
+> AiHubMix is a comprehensive AI model API routing service that uses the OpenAI API as a standardized interface, supporting not only all OpenAI models and leading language models like Claude, Gemini, Deepseek, and Qwen, but also a full spectrum of multimodal AI capabilities including image generation, text-to-speech, embeddings, reranking, and video processing. Switch between any model type by simply modifying the model name in your request.
+
+[AiHubMix](https://aihubmix.com/) is operated by the U.S.-registered company AiHubMix, LLC, ensuring stable service and high concurrency across all supported model types. Our unified API approach simplifies integration whether you're working with text, images, audio, video, or embedding models.
+
+**Comprehensive Model Support:**
+- **Language Models**: ChatGPT, Claude, Gemini, Qwen, Deepseek, and more
+- **Image Generation**: GPT Image-1, DALL-E 3, Ideogram V3, Stability SD 3.5 Large, Google Imagen
+- **Audio & Speech**: Advanced text-to-speech with multiple voice options
+- **Embeddings & Search**: Jina AI embeddings, reranking, and enhanced search capabilities
+
+Key features:
+- **Unified Interface**: One API standard for all model types - language, vision, audio, and embeddings
+- **Stability**: Ensures seamless operations for open-source software updates and maintenance
+- **Convenience**: Effortlessly integrates anywhere OpenAI APIs are used, now with multimodal support
+- **Speed**: Continuous optimization of routing services for the fastest possible experience across all model types
+- **Flexibility**: No subscription or membership plans鈥攑ay-as-you-go simplicity for any AI capability
+
+## Quick Start
+
+- [Apply Your API Key](https://aihubmix.com/token): Get your API key from AiHubMix dashboard
+- [Quick Start](https://docs.aihubmix.com/en/quick-start): Complete guide to get started with AiHubMix API, including direct API calls, OpenAI SDK usage, and third-party client integration
+
+## API Documentation
+
+### Core APIs
+
+- [General Model Forwarding](https://docs.aihubmix.com/en/api/General-Model-Forwarding): Standard forwarding mechanism for all supported models
+- [OpenAI Library Integration](https://docs.aihubmix.com/en/api/OpenAI-library): Using official OpenAI libraries with AiHubMix
+- [Responses API](https://docs.aihubmix.com/en/api/Responses-API): Support the Openai Responses API multi-function interface
+- [Using Non-OpenAI Models](https://docs.aihubmix.com/en/api/Non-OpenAI-Models): How to use aggregated models like Gemini and Claude by changing model names
+- [Model List API](https://docs.aihubmix.com/en/api/Model-List): Retrieve available models for user's group or token
+- [Model Information API](https://docs.aihubmix.com/en/api/Model-Information): Get detailed information about available models
+
+### Claude Models
+
+- [Claude Native API Integration](https://docs.aihubmix.com/en/api/Claude-Native): Access Claude models via official native API with extended thinking and interleaved thinking features
+- [Claude Cache API](https://docs.aihubmix.com/en/api/Claude-Cache): Optimize performance and reduce costs with prompt caching
+- [Claude Code](https://docs.aihubmix.com/en/api/Claude-Code): Powered by Aihubmix, Claude Code ensures a stable connection and eliminates worries about purchasing quotas
+- [Claude Text Edit Tool](https://docs.aihubmix.com/en/api/Claude-Text-Edit-Tool): Advanced text editing capabilities with Claude
+
+### Gemini Models
+
+- [Gemini Guides](https://docs.aihubmix.com/en/api/Gemini-Guides): Comprehensive guides for Gemini model usage
+- [Multimodal Interaction with Gemini](https://docs.aihubmix.com/en/api/Multimodal-Interaction-with-Gemini): Gemini image and video generation
+- [Gemini CLI](https://docs.aihubmix.com/en/api/Gemini-Cli): Command-line interface for Gemini models
+
+### Image Generation
+
+- [Universal Image Generation API](https://docs.aihubmix.com/en/api/Image-Gen): Unified API for multiple image generation models including OpenAI, Ideogram V3, Stability SD, and Google Imagen
+- [GPT Image-1 API](https://docs.aihubmix.com/en/api/GPT-Image-1): Latest GPT image generation capabilities
+- [GPT Image (Reverse)](https://docs.aihubmix.com/en/api/GPT-4o-image): Two reverse-engineered interfaces: `gpt-4o-image` and `gpt-4o-image-vip
+- [IdeogramAI Integration](https://docs.aihubmix.com/en/api/IdeogramAI): Detailed documentation for Ideogram AI image generation
+
+### Other Model APIs
+
+- [Qwen Model Integration](https://docs.aihubmix.com/en/api/Qwen): Specific integration guide for Qwen language models
+- [Jina AI Integration](https://docs.aihubmix.com/en/api/Jina-AI): Embeddings, Reranker, and DeepSearch capabilities with Jins AI
+
+### Specialized Features
+
+- [Text-to-Speech API](https://docs.aihubmix.com/en/api/TTS): Generate audio from text using various voice models
+- [LLM Search](https://docs.aihubmix.com/en/api/LLM-Search): Enhanced search capabilities with web search integration
+- [Fill-in-the-Middle (FIM)](https://docs.aihubmix.com/en/api/FIM): Code completion and infilling capabilities
+- [Codex CLI Tools](https://docs.aihubmix.com/en/api/Codex-CLI): Specialized CLI for code generation tasks
+- [Dify Plugin Integration](https://docs.aihubmix.com/en/api/Dify-plugin): Connect with Dify platform for no-code AI workflows
+- [AiHubMix Cli](https://docs.aihubmix.com/en/api/Cli): Manage API keys, view account information, and access available models through the AiHubMix CLI utility scripts
+
+## Client Integration Guides
+
+- [Cursor IDE Integration](https://docs.aihubmix.com/en/clients/Cursor): Setup AiHubMix with Cursor IDE for AI-powered coding
+- [Lobe Chat Integration](https://docs.aihubmix.com/en/clients/Lobe-Chat): Configure AiHubMix with Lobe Chat web interface
+- [ChatGPT Next Web](https://docs.aihubmix.com/en/clients/ChatGPT-Next-Web): Setup guide for ChatGPT Next Web client
+- [LangChain Integration](https://docs.aihubmix.com/en/clients/LangChain): Use AiHubMix models with LangChain framework
+- [OpenAI Translator](https://docs.aihubmix.com/en/clients/OpenAI-Translator): Browser extension for translation services
+- [Dify Platform](https://docs.aihubmix.com/en/clients/Dify): Connect AiHubMix models to Dify no-code AI platform
+- [Cherry Studio](https://docs.aihubmix.com/en/clients/Cherry-Studio): Desktop AI chat application integration
+- [Immersive Translate](https://docs.aihubmix.com/en/clients/Immersive-Translate): Web page translation extension setup
+
+### Authentication & Integration
+
+- [App Code Integration](https://docs.aihubmix.com/en/api/App-code): Application-level integration patterns and best practices
+- [Third-party Application Integration Guide](https://docs.aihubmix.com/en/api/Auth): OAuth2-based authentication for third-party applications with security best practices
+
+## FAQs
+
+- [FAQs](https://docs.aihubmix.com/en/FAQs/faq): Common questions about model behavior, token usage, authentication, and service usage
+- [HTTP Status Codes Overview](https://docs.aihubmix.com/en/FAQs/HTTP-Codes): Key error code mapping table with troubleshooting guidance
+- [Human Customer Support](https://docs.aihubmix.com/en/FAQs/Human-Customer-Support): How to contact customer service for assistance
+
+## Optional
+
+- [AnythingLLM Setup](https://docs.aihubmix.com/en/clients/AnythingLLM): Private AI chat and knowledge base platform integration
+- [Bob Translation Tool](https://docs.aihubmix.com/en/clients/Bob): macOS translation application setup
+- [Obsidian AI Plugin](https://docs.aihubmix.com/en/clients/Obsidian): Knowledge management with AI assistance
+- [ChatAll Integration](https://docs.aihubmix.com/en/clients/ChatAll): Multi-model chat comparison tool
+- [ChatBox Setup](https://docs.aihubmix.com/en/clients/ChatBox): Desktop chat application configuration
+- [ChatHub Integration](https://docs.aihubmix.com/en/clients/ChatHub): Browser extension for multiple AI models
+- [Chatx Mobile App](https://docs.aihubmix.com/en/clients/Chatx): iOS/Android chat application setup
+- [Cline VS Code Extension](https://docs.aihubmix.com/en/clients/Cline): AI-powered coding assistant for VS Code
+- [GPT Academic](https://docs.aihubmix.com/en/clients/GPT-Academic): Academic writing and research tool integration
+- [Gptme Terminal Tool](https://docs.aihubmix.com/en/clients/Gptme): Command-line AI assistant
+- [LibreChat Platform](https://docs.aihubmix.com/en/clients/LibreChat): Open-source chat interface
+- [On-CS Browser Extension](https://docs.aihubmix.com/en/clients/On-CS): Chrome/Firefox AI assistant extension
+- [Open WebUI](https://docs.aihubmix.com/en/clients/Open-WebUI): Self-hosted web interface for LLMs
+- [Oulu AI Tool](https://docs.aihubmix.com/en/clients/Oulu): Specialized AI productivity tool
+- [Pot App Translation](https://docs.aihubmix.com/en/clients/Pot-App): Cross-platform translation application
+- [Utools ChatGPT Plugin](https://docs.aihubmix.com/en/clients/Utools-ChatGPT): Productivity tool integration
+- [Zotero AI Assistant](https://docs.aihubmix.com/en/clients/Zotero): Research management with AI capabilities
+- [Avante.nvim](https://docs.aihubmix.com/en/clients/Avante.nvim): Neovim AI coding assistant plugin
+```
