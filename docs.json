@@ -333,6 +333,222 @@
             ]
           }
         ]
+      },
+      {
+        "language": "zh-TW",
+        "tabs": [
+          {
+            "tab": "User Guide",
+            "groups": [
+              {
+                "group": "Basics",
+                "pages": [
+                  "zh-TW/index",
+                  "zh-TW/quick-start",
+                  "zh-TW/api-playground/inferUsages",
+                  "zh-TW/api/Dify-plugin"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": [
+                  "zh-TW/api/Model-Information",
+                  "zh-TW/api/Model-List",
+                  "zh-TW/api/OpenAI-library",  
+                  "zh-TW/api/Responses-API",  
+                  "zh-TW/api/GPT-Image-1",
+                  "zh-TW/api/GPT-4o-image",
+                  "zh-TW/api/Image-Gen",
+                  "zh-TW/api/FIM",
+                  "zh-TW/api/Codex-CLI",
+                  "zh-TW/api/Non-OpenAI-Models",
+                  "zh-TW/api/LLM-Search",
+                  "zh-TW/api/General-Model-Forwarding",
+                  "zh-TW/api/Claude-Native",
+                  "zh-TW/api/Claude-Code",
+                  "zh-TW/api/Claude-Text-Edit-Tool",
+                  "zh-TW/api/Claude-Cache",
+                  "zh-TW/api/Gemini-Guides",
+                  "zh-TW/api/Multimodal-Interaction-with-Gemini",
+                  "zh-TW/api/Gemini-Cli",
+                  "zh-TW/api/Qwen",
+                  "zh-TW/api/TTS",
+                  "zh-TW/api/IdeogramAI",
+                  "zh-TW/api/Jina-AI",
+                  "zh-TW/api/Cli",
+                  "zh-TW/api/App-code",
+                  "zh-TW/api/Auth"
+                ]
+              },
+              {
+                "group": "Terms and Privacy",
+                "pages": [
+                  "zh-TW/terms-and-privacy/Terms",
+                  "zh-TW/terms-and-privacy/Privacy"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Use Cases",
+            "pages": [
+              "zh-TW/clients/Cherry-Studio",
+              "zh-TW/clients/AnythingLLM",
+              "zh-TW/clients/Avante.nvim",
+              "zh-TW/clients/Bob",
+              "zh-TW/clients/ChatAll",
+              "zh-TW/clients/ChatBox",
+              "zh-TW/clients/ChatGPT-Next-Web",
+              "zh-TW/clients/ChatHub",
+              "zh-TW/clients/Chatx",
+              "zh-TW/clients/Cline",
+              "jp/clients/Cursor",
+              "zh-TW/clients/Dify",
+              "zh-TW/clients/GPT-Academic",
+              "zh-TW/clients/Gptme",
+              "zh-TW/clients/LangChain",
+              "zh-TW/clients/LibreChat",
+              "zh-TW/clients/Lobe-Chat",
+              "zh-TW/clients/Obsidian",
+              "zh-TW/clients/Open-WebUI",
+              "zh-TW/clients/OpenAI-Translator",
+              "zh-TW/clients/Pot-App",
+              "zh-TW/clients/Utools-ChatGPT",
+              "zh-TW/clients/Zotero",
+              "zh-TW/clients/Immersive-Translate",
+              "zh-TW/clients/On-CS",
+              "jp/clients/Oulu"
+            ]
+          },
+          {
+            "tab": "FAQs",
+            "pages": [
+              "zh-TW/FAQs/faq",
+              "zh-TW/FAQs/HTTP-Codes",
+              "zh-TW/FAQs/Human-Customer-Support"
+            ]
+          },
+          {
+            "tab": "Updates",
+            "pages": [
+              "zh-TW/changelog/News"
+            ]
+          },
+          {
+            "tab": "Blogs",
+            "pages": [
+              "zh-TW/blogs/Building"
+            ]
+          }
+        ]
+      },
+      {
+        "language": "ko",
+        "tabs": [
+          {
+            "tab": "User Guide",
+            "groups": [
+              {
+                "group": "Basics",
+                "pages": [
+                  "ko/index",
+                  "ko/quick-start",
+                  "ko/api-playground/inferUsages",
+                  "ko/api/Dify-plugin"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": [
+                  "ko/api/Model-Information",
+                  "ko/api/Model-List",
+                  "ko/api/OpenAI-library",  
+                  "ko/api/Responses-API",  
+                  "ko/api/GPT-Image-1",
+                  "ko/api/GPT-4o-image",
+                  "ko/api/Image-Gen",
+                  "ko/api/FIM",
+                  "ko/api/Codex-CLI",
+                  "ko/api/Non-OpenAI-Models",
+                  "ko/api/LLM-Search",
+                  "ko/api/General-Model-Forwarding",
+                  "ko/api/Claude-Native",
+                  "ko/api/Claude-Code",
+                  "ko/api/Claude-Text-Edit-Tool",
+                  "ko/api/Claude-Cache",
+                  "ko/api/Gemini-Guides",
+                  "ko/api/Multimodal-Interaction-with-Gemini",
+                  "ko/api/Gemini-Cli",
+                  "ko/api/Qwen",
+                  "ko/api/TTS",
+                  "ko/api/IdeogramAI",
+                  "ko/api/Jina-AI",
+                  "ko/api/Cli",
+                  "ko/api/App-code",
+                  "ko/api/Auth"
+                ]
+              },
+              {
+                "group": "Terms and Privacy",
+                "pages": [
+                  "ko/terms-and-privacy/Terms",
+                  "ko/terms-and-privacy/Privacy"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Use Cases",
+            "pages": [
+              "ko/clients/Cherry-Studio",
+              "ko/clients/AnythingLLM",
+              "ko/clients/Avante.nvim",
+              "ko/clients/Bob",
+              "ko/clients/ChatAll",
+              "ko/clients/ChatBox",
+              "ko/clients/ChatGPT-Next-Web",
+              "ko/clients/ChatHub",
+              "ko/clients/Chatx",
+              "ko/clients/Cline",
+              "ko/clients/Cursor",
+              "ko/clients/Dify",
+              "ko/clients/GPT-Academic",
+              "ko/clients/Gptme",
+              "ko/clients/LangChain",
+              "ko/clients/LibreChat",
+              "ko/clients/Lobe-Chat",
+              "ko/clients/Obsidian",
+              "ko/clients/Open-WebUI",
+              "ko/clients/OpenAI-Translator",
+              "ko/clients/Pot-App",
+              "ko/clients/Utools-ChatGPT",
+              "ko/clients/Zotero",
+              "ko/clients/Immersive-Translate",
+              "ko/clients/On-CS",
+              "ko/clients/Oulu"
+            ]
+          },
+          {
+            "tab": "FAQs",
+            "pages": [
+              "ko/FAQs/faq",
+              "ko/FAQs/HTTP-Codes",
+              "ko/FAQs/Human-Customer-Support"
+            ]
+          },
+          {
+            "tab": "Updates",
+            "pages": [
+              "ko/changelog/News"
+            ]
+          },
+          {
+            "tab": "Blogs",
+            "pages": [
+              "ko/blogs/Building"
+            ]
+          }
+        ]
       }
     ]
   },
@@ -406,11 +622,6 @@
     {
       "source": "/en",
       "destination": "/en/index"
-    },
-    {
-      "source": "/llms.txt",
-      "destination": "/public/llms.txt",
-      "permanent": false
     }
   ],
   "integrations": {
