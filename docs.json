@@ -409,7 +409,7 @@
     },
     {
       "source": "/llms",
-      "destination": "/public/llms.txt",
+      "destination": "/llms.txt",
       "permanent": false
     }
   ],
