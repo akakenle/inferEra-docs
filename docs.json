@@ -656,7 +656,7 @@
     },
     {
       "source": "/en/llms",
-      "destination": "https://yinchao.oss-cn-hangzhou.aliyuncs.com/docs/llms.txt",
+      "destination": "https://www.resource.nestsound.cn/docs/llms.txt",
       "permanent": false
     }
   ],
