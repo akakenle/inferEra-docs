@@ -572,6 +572,37 @@
       "href": "https://aihubmix.com"
     }
   },
+  "seo": {
+    "metatags": {
+      "description": "AiHubMix is a comprehensive AI model API routing service, providing unified access to OpenAI, Claude, Gemini, Deepseek, Qwen, and more. Effortlessly integrate LLMs, multimodal AI, and developer tools with a single, standardized API.",
+      "keywords": "AI, documentation, AiHubMix, LLM, API, integration, developer, OpenAI, Claude, Gemini, Deepseek, Qwen, multimodal, image generation, text-to-speech, embeddings, reranking, video processing",
+      "author": "AiHubMix Team",
+      "og:title": "AiHubMix Documentation Hub",
+      "og:description": "Unified API docs for OpenAI, Claude, Gemini, Deepseek, Qwen, and more. Integrate LLMs and multimodal AI with ease.",
+      "og:image": "https://docs.aihubmix.com/favicon.svg",
+      "og:url": "https://docs.aihubmix.com",
+      "og:type": "website",
+      "og:site_name": "AiHubMix",
+      "twitter:card": "summary_large_image",
+      "twitter:title": "AiHubMix Documentation Hub",
+      "twitter:description": "Unified API docs for OpenAI, Claude, Gemini, Deepseek, Qwen, and more. Integrate LLMs and multimodal AI with ease.",
+      "twitter:image": "https://docs.aihubmix.com/favicon.svg",
+      "theme-color": "#2563EB",
+      "robots": "index, follow",
+      "viewport": "width=device-width, initial-scale=1.0",
+      "charset": "UTF-8",
+      "color-scheme": "light dark",
+      "googlebot": "index, follow",
+      "generator": "Mintlify",
+      "referrer": "origin",
+      "language": "en",
+      "distribution": "global",
+      "category": "Technology",
+      "apple-mobile-web-app-capable": "yes",
+      "application-name": "AiHubMix",
+      "msapplication-TileColor": "#2563EB"
+    }
+  },
   "footer": {
     "socials": {
       "x": "https://x.com/intent/follow?screen_name=AiHubMix",
