@@ -334,6 +334,8 @@ curl https://aihubmix.com/v1/chat/completions \
 Aihubmix currently supports uploading multimedia files (images, audio, and video) **up to 20MB** via `inline_data`.
 For files exceeding 20MB, a File API will be required. This functionality is not yet available; progress tracking and upload_url retrieval are under development.
 
+Our Gemini integration supports automatic routing through both AI Studio and VertexAI. By adding the `EDIARESOLUTION_MEDIUM` parameter, you can adjust the image resolution, which significantly reduces input costs and minimizes the risk of errors with large images.
+
 <CodeGroup>
 
 ```py Image
@@ -350,7 +352,7 @@ client = genai.Client(
 )
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     contents=types.Content(
         parts=[
             types.Part(
@@ -363,6 +365,15 @@ response = client.models.generate_content(
                 text="Describe the image."
             )
         ]
+    ),
+    config=types.GenerateContentConfig(
+        system_instruction="You are a helpful assistant that can describe images.",
+        max_output_tokens=768,
+        temperature=0.1,
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=0, include_thoughts=False
+        ),
+        media_resolution=types.MediaResolution.MEDIA_RESOLUTION_MEDIUM # 256 tokens
     )
 )
 

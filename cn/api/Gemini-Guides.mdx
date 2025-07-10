@@ -339,6 +339,8 @@ curl https://aihubmix.com/v1/chat/completions \
 Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、视频），用 `inline_data` 上传。\
 大于 20M 的多媒体需要用 File API（尚未支持），待完善状态跟踪，返回 `upload_url`。
 
+我们的 Gemini 调用支持 AI Studio 和 VertexAI 自动路由，可以增加 `EDIARESOLUTION_MEDIUM` 参数来调整图片的精度，从而大幅节省输入的费用以及减少大图报错的可能性。
+
 <CodeGroup>
 
 ```py 图片
@@ -356,7 +358,7 @@ client = genai.Client(
 )
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     contents=types.Content(
         parts=[
             types.Part(
@@ -369,6 +371,15 @@ response = client.models.generate_content(
                 text="Describe the image."
             )
         ]
+    ),
+    config=types.GenerateContentConfig(
+        system_instruction="You are a helpful assistant that can describe images.",
+        max_output_tokens=768,
+        temperature=0.1,
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=0, include_thoughts=False
+        ),
+        media_resolution=types.MediaResolution.MEDIA_RESOLUTION_MEDIUM # 256 tokens
     )
 )
 
@@ -578,7 +589,7 @@ generate_content_sync()
 > cached_content_token_count=2003
 > ```
 
-**核心结论：**隐式缓存支持自动命中与命中反馈。开发者可以通过 usage_metadata 判断命中情况。成本节省非保证，实际效果因请求结构和使用场景而异。
+**核心结论**：隐式缓存支持自动命中与命中反馈。开发者可以通过 usage_metadata 判断命中情况。成本节省非保证，实际效果因请求结构和使用场景而异。
 
 ## Function calling
 
