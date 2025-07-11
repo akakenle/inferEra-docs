@@ -1,40 +1,43 @@
 ---
 title: "LLM 模型联网搜索"
 description: " "
-icon: 'globe'
+icon: "globe"
 ---
 
 ## 1️⃣ 实时联网支持：突破 LLM 时效限制，让输出更准确、更可靠
 
-我们为 OpenAI 和 Gemini 系列大模型接口带来了获取最新网络信息的能力，帮助你：  
-✅ **获取最新资讯**：无论是今日热点、最新研究还是实时数据，都能即时获取  
-✅ **消除知识盲区**：突破大模型训练数据的时间限制，获取训练后的新信息   
-✅ **降低幻觉风险**：基于实时网络搜索的事实回答，大幅减少 AI 已读乱回的可能性  
-✅ **提升决策质量**：基于最新事实的分析和建议，让你的决策更有把握  
+我们为 OpenAI 和 Gemini 系列大模型接口带来了获取最新网络信息的能力，帮助你：\
+✅ **获取最新资讯**：无论是今日热点、最新研究还是实时数据，都能即时获取\
+✅ **消除知识盲区**：突破大模型训练数据的时间限制，获取训练后的新信息\
+✅ **降低幻觉风险**：基于实时网络搜索的事实回答，大幅减少 AI 已读乱回的可能性\
+✅ **提升决策质量**：基于最新事实的分析和建议，让你的决策更有把握
 
 **支持的模型：**
 目前支持 OpenAI 和 Gemini 大模型系列，包含两种接入方式：
 
 **1. 原生搜索能力模型：**
 **Gemini 系列** (Ground with Google search)：
+
 - gemini-2.0-pro-exp-02-05-search
 - gemini-2.0-flash-exp-search
 - gemini-2.0-flash-search
 
 **OpenAI 系列** (Bing search)：
+
 - gpt-4o-search-preview
 - gpt-4o-mini-search-preview
 
 **2. 参数支持方式：**
-只需增加参数`web_search_options={}`，即可为所有 gemini、OpenAI 大模型开启联网能力。Gemini 系列的搜索费率为 3.5 美元/千次；
-
+只需增加参数`web_search_options={}`，即可为所有 gemini、OpenAI 大模型开启联网能力。Gemini 系列的搜索费率为 35 美元/千次；
 
 ### 使用方法
 
 使用前需要运行`pip install -U openai`升级 openai 包。
 
 **示例：**
+
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -63,7 +66,8 @@ chat_completion = client.chat.completions.create(
 print(chat_completion.choices[0].message.content)
 ```
 
-```ts Typescript 
+
+```ts Typescript
 import OpenAI from 'openai';
 
 const client = new OpenAI({
@@ -95,6 +99,7 @@ async function main() {
 main().catch(console.error);
 ```
 
+
 ```shell Curl
 curl "https://aihubmix.com/v1/chat/completions" \
     -H "Content-Type: application/json" \
@@ -116,22 +121,26 @@ curl "https://aihubmix.com/v1/chat/completions" \
     "stream": false
 }'
 ```
+
 </CodeGroup>
 
 ## 2️⃣ 智能冲浪：让 AI 自由驰骋互联网
 
 通过在模型 id 后方追加 `:surfing`，让任何大语言模型具备搜索能力。
+
 - 追加后缀即可，不需要复杂的整合
 - 这种方式会默认将用户请求转发给 **Tavily 搜索服务**，LLM 根据返回的搜索结果参考作答
 - 搜索费用 **0.006 美元/次**
 - 目前「日志明细」里未列出每次搜索的费用，费用直接在「额度变动」扣取，后续会列出
 
 <Tip>
-模型 id 在[模型广场](https://aihubmix.com/models)中复制即可。
+  模型 id 在[模型广场](https://aihubmix.com/models)中复制即可。
 </Tip>
 
 **示例：**
+
 <CodeGroup>
+
 ```py Python
 import requests
 import json
@@ -165,9 +174,11 @@ except json.JSONDecodeError as e:
 except Exception as e:
     print(f"其他错误：{e}")
 ```
+
 </CodeGroup>
 
 **API 响应示例：**
+
 ```json
 {
   "id": "chatcmpl-BLMY8YIKvcjNpiFmyvIfEGQMvPAAh",

@@ -1,12 +1,13 @@
 ---
 title: "LLM Search"
 description: " "
-icon: 'globe'
+icon: "globe"
 ---
 
 ## 1️⃣ Real-time Web Search: Breaking LLM Time Limitations for More Accurate and Reliable Outputs
 
-We've enhanced OpenAI and Gemini series models with the ability to access the latest information from the web, helping you:  
+We've enhanced OpenAI and Gemini series models with the ability to access the latest information from the web, helping you:
+
 - ✅ **Access Latest Information**: Get real-time updates on current events, latest research, or live data
 - ✅ **Eliminate Knowledge Gaps**: Overcome the time limitations of LLM training data by accessing post-training information
 - ✅ **Reduce Hallucinations**: Provide fact-based answers through real-time web searches, significantly reducing AI confabulations
@@ -17,24 +18,27 @@ Currently supporting OpenAI and Gemini model series with two integration methods
 
 **1. Models with Native Search Capabilities**
 **Gemini Series** (Ground with Google search):
+
 - gemini-2.0-pro-exp-02-05-search
 - gemini-2.0-flash-exp-search
 - gemini-2.0-flash-search
 
 **OpenAI Series** (Bing search):
+
 - gpt-4o-search-preview
 - gpt-4o-mini-search-preview
 
 **2. Parameter-Based Support**
-Simply add the parameter `web_search_options={}` to enable web connectivity for all Gemini and OpenAI models. 
-The search fee for Gemini models is $3.5 per thousand searches.
+Simply add the parameter `web_search_options={}` to enable web connectivity for all Gemini and OpenAI models. The search fee for Gemini models is \$35 per thousand searches.
 
 ## Usage Guide
 
 Before using, run `pip install -U openai` to upgrade the openai package.
 
 **Example:**
+
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -63,7 +67,8 @@ chat_completion = client.chat.completions.create(
 print(chat_completion.choices[0].message.content)
 ```
 
-```ts Typescript 
+
+```ts Typescript
 import OpenAI from 'openai';
 
 const client = new OpenAI({
@@ -95,6 +100,7 @@ async function main() {
 main().catch(console.error);
 ```
 
+
 ```shell Curl
 curl "https://aihubmix.com/v1/chat/completions" \
     -H "Content-Type: application/json" \
@@ -122,17 +128,20 @@ curl "https://aihubmix.com/v1/chat/completions" \
 ## 2️⃣ Smart Surfing: Allowing AI to Explore the Internet Freely
 
 By appending `:surfing` to the model id, any large language model can be equipped with search capabilities.
+
 - Simply append the suffix, no complex integration is required
 - This method will default to forwarding the user's request to the **Tavily search service**, and the LLM will reference the search results for response
-- Search fee: **$0.006 per search**
+- Search fee: **\$0.006 per search**
 - The fee is currently deducted directly from the "credit change", and the "log detail" does not list the search fee yet, but will be shown in the future
 
 <Tip>
-The model id can be copied from the [model gallery](https://aihubmix.com/models).
+  The model id can be copied from the [model gallery](https://aihubmix.com/models).
 </Tip>
 
 **Example:**
+
 <CodeGroup>
+
 ```py Python
 import requests
 import json
@@ -166,9 +175,11 @@ except json.JSONDecodeError as e:
 except Exception as e:
     print(f"Other error: {e}")
 ```
+
 </CodeGroup>
 
 **API Response Example:**
+
 ```json
 {
   "id": "chatcmpl-BLN21dGcrv8MrbeHfForjY4bYZHBF",

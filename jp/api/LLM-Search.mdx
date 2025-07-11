@@ -1,15 +1,15 @@
 ---
 title: "LLMモデルのインターネット検索"
 description: " "
-icon: 'globe'
+icon: "globe"
 ---
 
 ## 1️⃣ リアルタイムインターネットサポート：LLMの時効制限を打ち破り、より正確で信頼性の高い出力を実現
 
 OpenAIおよびGeminiシリーズの大規模モデルインターフェースに、最新のネットワーク情報を取得する機能を追加しました。これにより、以下のことが可能になります。
-✅ **最新情報の取得**：今日のホットトピック、最新の研究、リアルタイムデータなど、即座に取得できます。  
-✅ **知識の盲点を解消**：大規模モデルのトレーニングデータの時間制限を突破し、トレーニング後の新しい情報を取得できます。  
-✅ **幻覚のリスクを低減**：リアルタイムのインターネット検索に基づいた事実に基づいた回答により、AIが誤った情報を返す可能性を大幅に低減します。  
+✅ **最新情報の取得**：今日のホットトピック、最新の研究、リアルタイムデータなど、即座に取得できます。\
+✅ **知識の盲点を解消**：大規模モデルのトレーニングデータの時間制限を突破し、トレーニング後の新しい情報を取得できます。\
+✅ **幻覚のリスクを低減**：リアルタイムのインターネット検索に基づいた事実に基づいた回答により、AIが誤った情報を返す可能性を大幅に低減します。\
 ✅ **意思決定の質を向上**：最新の事実に基づいた分析と提案により、意思決定に自信を持てます。
 
 **サポートされているモデル：**
@@ -17,24 +17,27 @@ OpenAIおよびGeminiシリーズの大規模モデルインターフェース�
 
 **1. ネイティブ検索機能モデル：**
 **Geminiシリーズ** (Google検索と連携)：
+
 - gemini-2.0-pro-exp-02-05-search
 - gemini-2.0-flash-exp-search
 - gemini-2.0-flash-search
 
 **OpenAIシリーズ** (Bing検索)：
+
 - gpt-4o-search-preview
 - gpt-4o-mini-search-preview
 
 **2. パラメータサポート方式：**
-`web_search_options={}`パラメータを追加するだけで、すべてのGemini、OpenAI大規模モデルでインターネット接続機能を有効にできます。Geminiシリーズの検索料金は3.5ドル/千回です。
-
+`web_search_options={}`パラメータを追加するだけで、すべてのGemini、OpenAI大規模モデルでインターネット接続機能を有効にできます。Geminiシリーズの検索料金は35ドル/千回です。
 
 ### 使用方法
 
 使用する前に、`pip install -U openai`を実行してOpenAIパッケージをアップグレードする必要があります。
 
 **例：**
+
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -63,7 +66,8 @@ chat_completion = client.chat.completions.create(
 print(chat_completion.choices[0].message.content)
 ```
 
-```ts Typescript 
+
+```ts Typescript
 import OpenAI from 'openai';
 
 const client = new OpenAI({
@@ -95,6 +99,7 @@ async function main() {
 main().catch(console.error);
 ```
 
+
 ```shell Curl
 curl "https://aihubmix.com/v1/chat/completions" \
     -H "Content-Type: application/json" \
@@ -116,22 +121,26 @@ curl "https://aihubmix.com/v1/chat/completions" \
     "stream": false
 }'
 ```
+
 </CodeGroup>
 
 ## 2️⃣ スマートサーフィン：AIにインターネットを自由に駆け巡らせる
 
 モデルIDの末尾に`:surfing`を追加するだけで、あらゆる大規模言語モデルに検索機能を持たせることができます。
+
 - 接尾辞を追加するだけで、複雑な統合は不要です。
 - この方法では、ユーザーのリクエストはデフォルトで**Tavily検索サービス**に転送され、LLMは返された検索結果を参照して回答を作成します。
 - 検索料金は**1回あたり0.006ドル**です。
 - 現在、「ログ詳細」には各検索の料金は表示されていません。料金は「クレジット変動」から直接差し引かれますが、後で表示される予定です。
 
 <Tip>
-モデルIDは[モデル一覧](https://aihubmix.com/models)からコピーできます。
+  モデルIDは[モデル一覧](https://aihubmix.com/models)からコピーできます。
 </Tip>
 
 **例：**
+
 <CodeGroup>
+
 ```py Python
 import requests
 import json
@@ -165,9 +174,11 @@ except json.JSONDecodeError as e:
 except Exception as e:
     print(f"その他のエラー：{e}")
 ```
+
 </CodeGroup>
 
 **API応答例：**
+
 ```json
 {
   "id": "chatcmpl-BLMY8YIKvcjNpiFmyvIfEGQMvPAAh",
