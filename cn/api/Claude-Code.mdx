@@ -79,4 +79,33 @@ Do you want to use this API key?
 Enter to confirm .Esc to cancel
 ```
 
+### 切换模型
+
+使用 Claude Code 命令：
+
+```shell
+/model [model id]
+```
+
+默认模型为 `Sonnet 4`，你可以用效果更好的 `Opus 4`：
+
+```shell opus
+/model opus
+```
+
+或者，换成其他 claude 模型：
+
+<CodeGroup>
+
+```shell sonnet 3.7
+/model  claude-3-7-sonnet-20250219
+```
+
+
+```shell sonnet 3.5
+/model claude-3-5-sonnet-20241022
+```
+
+</CodeGroup>
+
 祝你使用愉快！
