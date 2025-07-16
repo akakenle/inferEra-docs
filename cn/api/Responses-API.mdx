@@ -9,6 +9,7 @@ icon: "o"
 - Image input：图文输入
 - Streaming：流式调用
 - Web search：搜索
+- Deep research：深度研究
 - Reasoning：推理深度，支持 3 档
 - Functions：函数调用
 - image_generation：绘图工具调用，图片生成部分按 `gpt-image-1` 计价
@@ -28,11 +29,15 @@ client = OpenAI(
 )
 ```
 
-对于推理模型，支持通过以下参数来输出推理总结，总结细节的丰富程度为 detailed \> auto \> None，其中 auto 为最佳平衡。
+<Tip>
+  1. 对于推理模型，支持通过以下参数来输出推理总结，总结细节的丰富程度为 detailed \> auto \> None，其中 auto 为最佳平衡。
 
-```py
-"summary": "auto" 
-```
+  ```py
+  "summary": "auto" 
+  ```
+
+  2. 深度推理模型可选：`o3-deep-research` 和 `o4-mini-deep-research`，仅支持 `responses` 端口
+</Tip>
 
 <CodeGroup>
 
@@ -119,6 +124,39 @@ response = client.responses.create(
 print(response)
 ```
 
+```py Deep Research
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    base_url="https://aihubmix.com/v1",
+    timeout=3600
+)
+
+input_text = """
+Research the economic impact of semaglutide on global healthcare systems.
+Do:
+- Include specific figures, trends, statistics, and measurable outcomes.
+- Prioritize reliable, up-to-date sources: peer-reviewed research, health
+  organizations (e.g., WHO, CDC), regulatory agencies, or pharmaceutical
+  earnings reports.
+- Include inline citations and return all source metadata.
+
+Be analytical, avoid generalities, and ensure that each section supports
+data-backed reasoning that could inform healthcare policy or financial modeling.
+"""
+
+response = client.responses.create(
+  model="o3-deep-research", # o4-mini-deep-research
+  input=input_text,
+  tools=[
+    {"type": "web_search_preview"},
+    {"type": "code_interpreter", "container": {"type": "auto"}},
+  ],
+)
+
+print(response.output_text)
+```
 
 ```py 推理
 from openai import OpenAI

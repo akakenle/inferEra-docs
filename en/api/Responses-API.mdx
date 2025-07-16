@@ -9,6 +9,7 @@ Support the Openai Responses API multi-function interface, the following functio
 - Image input: Image input
 - Streaming: Streaming
 - Web search: Web search
+- Deep research: For complex analysis and research tasks
 - Reasoning: Reasoning
 - Functions: Functions
 - image_generation tool usage: Image drawing and generation are billed under `gpt-image-1`.
@@ -28,11 +29,15 @@ client = OpenAI(
 )
 ```
 
-For inference models, the output inference summary can be controlled using the following parameter, with the detail richness of the summary ranked as detailed \> auto \> None, where auto provides the best balance.
+<Tip>
+  1. For inference models, the output inference summary can be controlled using the following parameter, with the detail richness of the summary ranked as detailed \> auto \> None, where auto provides the best balance.
 
-```py
-"summary": "auto"
-```
+  ```py
+  "summary": "auto"
+  ```
+
+  2. Optional deep reasoning models: ‎⁠o3-deep-research⁠ and ‎⁠o4-mini-deep-research⁠, only supported on the ‎⁠responses⁠ endpoint.
+</Tip>
 
 <CodeGroup>
 
@@ -116,6 +121,41 @@ response = client.responses.create(
 )
 
 print(response)
+```
+
+
+```py Deep Research
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Your Key "sk-***"
+    base_url="https://aihubmix.com/v1",
+    timeout=3600
+)
+
+input_text = """
+Research the economic impact of semaglutide on global healthcare systems.
+Do:
+- Include specific figures, trends, statistics, and measurable outcomes.
+- Prioritize reliable, up-to-date sources: peer-reviewed research, health
+  organizations (e.g., WHO, CDC), regulatory agencies, or pharmaceutical
+  earnings reports.
+- Include inline citations and return all source metadata.
+
+Be analytical, avoid generalities, and ensure that each section supports
+data-backed reasoning that could inform healthcare policy or financial modeling.
+"""
+
+response = client.responses.create(
+  model="o3-deep-research", # o4-mini-deep-research
+  input=input_text,
+  tools=[
+    {"type": "web_search_preview"},
+    {"type": "code_interpreter", "container": {"type": "auto"}},
+  ],
+)
+
+print(response.output_text)
 ```
 
 
