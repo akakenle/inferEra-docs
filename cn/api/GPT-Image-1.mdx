@@ -60,7 +60,7 @@ result = client.images.generate(
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default) 
     quality="high", # high, medium, low, auto (default)
     moderation="low", # low, auto (default) 需要升级 openai 包 📍
-    # background="auto", # transparent, opaque, auto (default)，Azure 版不支持该参数，可以在 Prompt 中要求
+    background="auto", # transparent, opaque, auto (default)
 )
 
 print(result.usage)

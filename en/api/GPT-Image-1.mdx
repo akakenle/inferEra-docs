@@ -60,7 +60,7 @@ result = client.images.generate(
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default) 
     quality="high", # high, medium, low, auto (default)
     moderation="low", # low, auto (default) - requires updated openai package 📍
-    # background="auto", # transparent, opaque, auto (default),The Azure version does not support this parameter, you can specify the requirement in the prompt.
+    background="auto", # transparent, opaque, auto (default)
 )
 
 print(result.usage)
