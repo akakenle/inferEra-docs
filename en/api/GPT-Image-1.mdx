@@ -60,7 +60,7 @@ result = client.images.generate(
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default) 
     quality="high", # high, medium, low, auto (default)
     moderation="low", # low, auto (default) - requires updated openai package 📍
-    background="auto", # transparent, opaque, auto (default)
+    # background="auto", # transparent, opaque, auto (default),The Azure version does not support this parameter, you can specify the requirement in the prompt.
 )
 
 print(result.usage)
@@ -194,10 +194,11 @@ Error message when a request is rejected:
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
 
-When requesting 2-10 images in a single generation, if the system detects that the request violates platform policies, the flagged content will not be generated. This may result in fewer images generated than the number originally requested. however, no `moderation_blocked` error will be thrown in multi-image generation. 
+When requesting 2-10 images in a single generation, if the system detects that the request violates platform policies, the flagged content will not be generated. This may result in fewer images generated than the number originally requested. however, no `moderation_blocked` error will be thrown in multi-image generation.
 Therefore, it’s recommended to proactively avoid potential intellectual property (IP) or copyright issues to minimize the risk of system rejection and ensure smooth generation.
 
-**✍️ Key recommendations:**  
+**✍️ Key recommendations:**
+
 - Avoid direct use of copyrighted characters, logos, celebrity likenesses, etc.
 - Consider using "style inspiration", "creative reinterpretation", or "generalized descriptions" instead
 - If referencing specific elements, check whether they fall within the public domain

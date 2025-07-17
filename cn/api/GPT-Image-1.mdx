@@ -6,38 +6,41 @@ icon: "palette"
 
 ## 接口说明
 
-OpenAI 的绘图接口 `gpt-image-1`，支持文生图（generate）、图文生图（edit）。  
+OpenAI 的绘图接口 `gpt-image-1`，支持文生图（generate）、图文生图（edit）。\
 使用前请运行 `pip install -U openai` 升级到最新的 openai 包。
 
 ## 注意事项
 
 <Warning>
-- 生成过程中，无论任何情况导致的中断或失败，**接口调用一经发出，都会被扣取费用**
-- 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `moderation_blocked` 报错，**导致生成失败**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避。衣着暴露或含有暗示的图片同理。
-- 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的。
-- 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等。
+  - 生成过程中，无论任何情况导致的中断或失败，**接口调用一经发出，都会被扣取费用**
+  - 还在世的艺术家名称（如「宫崎骏」、「新海诚」等）会触发 `moderation_blocked` 报错，**导致生成失败**。你可以通过「吉卜力」、「明亮的现代日式动漫风格」等非敏感词来规避。衣着暴露或含有暗示的图片同理。
+  - 总的来说,「风格」比「艺术家」安全，像是「皮克斯」也是支持的。
+  - 更稳妥的做法是采用已故艺术家或对应的风格，如「梵高」、「蒙娜丽莎」等。
 </Warning>
 
 ## 模型和费率
 
-| 模型 | 质量 | 1024x1024 | 1024x1536 | 1536x1024 |
-| ------------------ | ------------ | ------------ | ------------ | ------------ |
-| gpt-image-1 | low | $0.011 | $0.016 | $0.016 |
-| gpt-image-1 | medium | $0.042 | $0.063 | $0.063 |
-| gpt-image-1 | high | $0.167 | $0.25 | $0.25 |
+| 模型          | 质量     | 1024x1024 | 1024x1536 | 1536x1024 |
+| ----------- | ------ | --------- | --------- | --------- |
+| gpt-image-1 | low    | \$0.011   | \$0.016   | \$0.016   |
+| gpt-image-1 | medium | \$0.042   | \$0.063   | \$0.063   |
+| gpt-image-1 | high   | \$0.167   | \$0.25    | \$0.25    |
 
 <Info>
-注意：输入文本 Token 部分的费率是 $5/百万 Tokens，额外计算。
+  注意：输入文本 Token 部分的费率是 \$5/百万 Tokens，额外计算。
 </Info>
-  
+
 ## 调用方法
 
 **端点 (Endpoints)**
+
 1. 绘图：`https://aihubmix.com/v1/images/generations`
 2. 编辑：`https://aihubmix.com/v1/images/edits`
 
-**Python 调用示例如下：**  
+**Python 调用示例如下：**
+
 <CodeGroup>
+
 ```py 生成 (文生图)
 from openai import OpenAI
 import base64
@@ -57,7 +60,7 @@ result = client.images.generate(
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default) 
     quality="high", # high, medium, low, auto (default)
     moderation="low", # low, auto (default) 需要升级 openai 包 📍
-    background="auto", # transparent, opaque, auto (default)
+    # background="auto", # transparent, opaque, auto (default)，Azure 版不支持该参数，可以在 Prompt 中要求
 )
 
 print(result.usage)
@@ -95,8 +98,8 @@ for i, image_data in enumerate(result.data):
         print(f"图片已保存至：{file_path}")
     else:
         print(f"第 {i} 张图片数据为空，跳过保存。")
-
 ```
+
 
 ```py 编辑 (多图+文生图)
 from openai import OpenAI
@@ -160,34 +163,42 @@ for i, image_item in enumerate(result.data):
     except Exception as e:
         print(f"保存第 {i+1} 张图片时出错 ({file_path}): {e}")
 ```
+
 </CodeGroup>
+
 更多的参数细节可以参考 [OpenAI 官方文档](https://platform.openai.com/docs/api-reference/images/create)
 
 ## 输出示例
+
 <CodeGroup>
+
 ```json 生成
 Usage(input_tokens=150, input_tokens_details=UsageInputTokensDetails(image_tokens=0, text_tokens=150), output_tokens=6240, total_tokens=6390)
 图片已保存至：./image_gen_14.png
 ```
+
 
 ```json 编辑
 Usage(input_tokens=992, input_tokens_details=UsageInputTokensDetails(image_tokens=646, text_tokens=346), output_tokens=12480, total_tokens=13472)
 第 1 张编辑后的图片已保存至：./image_edit_1.png
 第 2 张编辑后的图片已保存至：./image_edit_2.png
 ```
+
 </CodeGroup>
 
 ## 被拒的情况
 
 请求被拒的错误信息如下：
+
 ```json
 Error code: 400 - {'error': {'message': 'Your request was rejected as a result of our safety system. Your request may contain content that is not allowed by our safety system.', 'type': 'user_error', 'param': None, 'code': 'moderation_blocked'}}
 ```
 
-对于单次请求生成 2-10 张图片的情况，如果系统检测到请求涉嫌违反平台政策，该请求中的违规部分将不会被生成。这可能导致实际生成图片数量少于用户请求数量，然而多图的情况下，不会抛出 `moderation_blocked`。 
+对于单次请求生成 2-10 张图片的情况，如果系统检测到请求涉嫌违反平台政策，该请求中的违规部分将不会被生成。这可能导致实际生成图片数量少于用户请求数量，然而多图的情况下，不会抛出 `moderation_blocked`。
 因此，请在创作中主动规避潜在的知识产权（IP）或版权问题，以减少生成被系统拦截的风险，确保创作顺利完成。
 
 **✍️ 关键提示：**
+
 - 避免直接使用已知的受版权保护角色、品牌标志、名人肖像等
 - 可以采用「风格借鉴」「创意改编」「泛指描述」等方式表达
 - 若需引用特定元素，请提前确认该元素是否处于公有领域
@@ -195,12 +206,12 @@ Error code: 400 - {'error': {'message': 'Your request was rejected as a result o
 ## 实用提示
 
 <Tip>
-- 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本
-- size 参数不支持显示传入 size="auto"，默认即 auto
-- 画幅比例可以在 prompt 中指定，支持 2:3、3:2、1:1，也可以在 size 参数中设置。
-- 支持控制敏感度的 `moderation` 参数，但这个参数设为 low 也可能被拒，比如说维纳斯过于暴露
-- edits 端口不支持 `moderation` 参数
-- 文本描述和参考图搭配，融图效果更准确
-- 上传的图片可以做压缩预处理，提升速度
-- 支持透明背景，免抠图。——只需要在 Prompt 中补充要求
+  - 支持任何语言，中文绘制也很稳定，但我们也不建议绘制大量的文本
+  - size 参数不支持显示传入 size="auto"，默认即 auto
+  - 画幅比例可以在 prompt 中指定，支持 2:3、3:2、1:1，也可以在 size 参数中设置。
+  - 支持控制敏感度的 `moderation` 参数，但这个参数设为 low 也可能被拒，比如说维纳斯过于暴露
+  - edits 端口不支持 `moderation` 参数
+  - 文本描述和参考图搭配，融图效果更准确
+  - 上传的图片可以做压缩预处理，提升速度
+  - 支持透明背景，免抠图。——只需要在 Prompt 中补充要求
 </Tip>
