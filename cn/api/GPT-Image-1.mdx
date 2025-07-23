@@ -119,6 +119,7 @@ result = client.images.edit(
     n=2, # 单次数量
     prompt=prompt,
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    input_fidelity="high", # 特征保留参数，默认 low
     # moderation="low", # edit 不支持 moderation
     quality="high" # high, medium, low, auto (default)
 )

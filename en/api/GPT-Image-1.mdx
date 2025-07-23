@@ -119,6 +119,7 @@ result = client.images.edit(
     n=2, # Number of images to generate
     prompt=prompt,
     size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    input_fidelity="high", # "low" as default
     # moderation="low", # editing doesn't support moderation
     quality="high" # high, medium, low, auto (default)
 )
