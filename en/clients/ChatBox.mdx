@@ -1,13 +1,182 @@
 ---
 title: "Using ChatBox"
-description: ""
-icon: ''
 ---
 
-ChatGPT Open Source Desktop Application, Compatible with All Desktop Platforms.  
-Download Link: https://github.com/Bin-Huang/chatbox/releases  
-Instructions: As shown in the image, enter[our site's Key](https://aihubmix.com/token)，in the settings and configure the proxy (API domain) as  
+ChatBox is an Open Source Desktop Application, Compatible with All Desktop Platforms.\
+Download Link: https://github.com/Bin-Huang/chatbox/releases\
+Instructions: As shown in the image, enter[our site's Key](https://aihubmix.com/token)，in the settings and configure the proxy (API domain) as
+
 ```
 https://aihubmix.com
 ```
-![图片](../../public/cn/image2.png) 
+
+![图片](../../public/cn/image2.png)
+
+## Quick Import of AiHubMix Configuration
+
+Starting from version 1.15.1, Chatbox supports importing model provider configurations in JSON format. You can manually copy the configuration and import it into Chatbox with a single click. Refer to the following instructions:
+
+```json
+{
+  "id": "aihubmix",
+  "name": "aihubmix",
+  "type": "openai",
+  "iconUrl": "https://www.resource.nestsound.cn/docs/favicon.svg",
+  "urls": {
+    "website": "https://aihubmix.com/",
+    "getApiKey": "https://aihubmix.com/token",
+    "docs": "https://docs.aihubmix.com/",
+    "models": "https://aihubmix.com/models"
+  },
+  "settings": {
+    "apiHost": "https://aihubmix.com/",
+    "apiPath": "/v1/chat/completions",
+    "models": [
+      {
+        "modelId": "deepseek-chat",
+        "nickname": "deepseek-chat",
+        "type": "chat",
+        "capabilities": ["tool_use"],
+        "contextWindow": 64000,
+        "maxOutput": 64000
+      },
+      {
+        "modelId": "chatgpt-4o-latest",
+        "nickname": "chatgpt-4o-latest",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 128000
+      },
+      {
+        "modelId": "deepseek-reasoner",
+        "nickname": "deepseek-reasoner",
+        "type": "chat",
+        "capabilities": ["reasoning"],
+        "contextWindow": 64000,
+        "maxOutput": 64000
+      },
+      {
+        "modelId": "gemini-2.0-flash",
+        "nickname": "gemini-2.0-flash",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 1000000
+      },
+      {
+        "modelId": "gpt-4.1",
+        "nickname": "gpt-4.1",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 32768
+      },
+      {
+        "modelId": "gpt-4.1-mini",
+        "nickname": "gpt-4.1-mini",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 32768
+      },
+      {
+        "modelId": "o3",
+        "nickname": "o3",
+        "type": "chat",
+        "capabilities": ["vision", "reasoning", "tool_use"],
+        "contextWindow": 200000,
+        "maxOutput": 100000
+      },
+      {
+        "modelId": "o4-mini",
+        "nickname": "o4-mini",
+        "type": "chat",
+        "capabilities": ["vision", "reasoning", "tool_use"],
+        "contextWindow": 200000,
+        "maxOutput": 100000
+      },
+      {
+        "modelId": "qwen3-235b-a22b",
+        "nickname": "qwen3-235b-a22b",
+        "type": "chat",
+        "capabilities": ["tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 8192
+      },
+      {
+        "modelId": "llama-4-maverick",
+        "nickname": "llama-4-maverick",
+        "type": "chat",
+        "capabilities": ["tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "gemini-2.5-flash",
+        "nickname": "gemini-2.5-flash",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "gemini-2.5-flash-nothink",
+        "nickname": "gemini-2.5-flash-nothink",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "claude-sonnet-4-20250514",
+        "nickname": "claude-sonnet-4-20250514",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 200000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "claude-opus-4-20250514",
+        "nickname": "claude-opus-4-20250514",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 200000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "gemini-2.5-pro",
+        "nickname": "gemini-2.5-pro",
+        "type": "chat",
+        "capabilities": ["vision", "reasoning", "tool_use"],
+        "contextWindow": 1000000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "doubao-1.5-vision-pro-250328",
+        "nickname": "doubao-1.5-vision-pro-250328",
+        "type": "chat",
+        "capabilities": ["vision"],
+        "contextWindow": 128000,
+        "maxOutput": 16000
+      },
+      {
+        "modelId": "grok-4",
+        "nickname": "grok-4",
+        "type": "chat",
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 0
+      },
+      {
+        "modelId": "kimi-k2-0711-preview",
+        "nickname": "kimi-k2-0711-preview",
+        "type": "chat",
+        "capabilities": ["tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 0
+      }
+    ]
+  }
+}
+```
