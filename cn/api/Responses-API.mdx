@@ -229,7 +229,13 @@ client = OpenAI(
 response = client.responses.create(
     model="gpt-4.1-mini",
     input="Generate an image of gray tabby cat hugging an otter with an orange scarf",
-    tools=[{"type": "image_generation"}],
+    tools=[
+        {
+            "type": "image_generation",
+            "background": "opaque", 
+            "quality": "high",
+        }
+    ],
 )
 
 # 保存为图片文件
