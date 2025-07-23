@@ -14,7 +14,7 @@ https://aihubmix.com
 
 ## Quick Import of AiHubMix Configuration
 
-Starting from version 1.15.1, Chatbox supports importing model provider configurations in JSON format. You can manually copy the configuration and import it into Chatbox with a single click. OpenAI-compatible LLM configuration reference is as follows::
+Starting from version 1.15.1, Chatbox supports importing model provider configurations in JSON format. You can manually copy the configuration and import it into Chatbox with a single click. OpenAI-compatible LLM configuration reference is as follows:
 
 ```json
 {
@@ -33,12 +33,12 @@ Starting from version 1.15.1, Chatbox supports importing model provider configur
     "apiPath": "/v1/chat/completions",
     "models": [
       {
-        "modelId": "deepseek-chat",
-        "nickname": "deepseek-chat",
+        "modelId": "gpt-4o-mini",
+        "nickname": "gpt-4o-mini",
         "type": "chat",
-        "capabilities": ["tool_use"],
-        "contextWindow": 64000,
-        "maxOutput": 64000
+        "capabilities": ["vision", "tool_use"],
+        "contextWindow": 128000,
+        "maxOutput": 16384
       },
       {
         "modelId": "chatgpt-4o-latest",
@@ -47,10 +47,17 @@ Starting from version 1.15.1, Chatbox supports importing model provider configur
         "capabilities": ["vision", "tool_use"],
         "contextWindow": 128000,
         "maxOutput": 128000
+      },      {
+        "modelId": "DeepSeek-V3",
+        "nickname": "DeepSeek-V3",
+        "type": "chat",
+        "capabilities": ["tool_use"],
+        "contextWindow": 64000,
+        "maxOutput": 8000
       },
       {
-        "modelId": "deepseek-reasoner",
-        "nickname": "deepseek-reasoner",
+        "modelId": "DeepSeek-R1",
+        "nickname": "DeepSeek-R1",
         "type": "chat",
         "capabilities": ["reasoning"],
         "contextWindow": 64000,

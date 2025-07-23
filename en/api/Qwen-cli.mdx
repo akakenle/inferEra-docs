@@ -1,0 +1,52 @@
+---
+title: "Qwen Code"
+description: "Power Qwen Code with any large language model on the Aihubmix platform."
+icon: "terminal"
+---
+
+## Quick Setup Guide:
+
+### 1️⃣ Install the npm Package Globally
+
+Make sure your Node.js version is ≥ 20, then run the following in your terminal:
+
+```shell
+npm install -g @qwen-code/qwen-code
+qwen --version
+```
+
+For more details, refer to the[official repository](https://github.com/QwenLM/qwen-code)
+
+### 2️⃣ Configure Environment Variables
+
+Add your Aihubmix key and forwarding address to your system environment variables. You can generate a key on the Aihubmix [Keys page](https://aihubmix.com/token).
+
+For example, add the following to your ~/.zshrc:
+
+```shell
+export OPENAI_API_KEY="your_aihubmix_key"
+export OPENAI_BASE_URL="https://aihubmix.com/v1"
+export OPENAI_MODEL="your_model"
+```
+
+<Tip>
+  For Mac users, you can reveal the hidden `.zshrc` file in your home directory with the shortcut `⌘ + ⇧ + .`. Open it with the system “TextEdit” app and add the lines above.
+</Tip>
+
+### 3️⃣ Apply the Configuration
+
+After adding the configuration, run ‎`source ~/.zshrc` in your terminal and press Enter.
+
+### 4️⃣ Launch and Use
+
+Type the following in your terminal:
+
+```shell
+qwen
+```
+
+After launching, enter ‎`/about` and press Enter to confirm your setup. You’ll see the current version and the selected large language model:
+
+![about](../../public/cn/Qwen-code-en.png)
+
+You’re now ready to use Qwen Code as normal.
