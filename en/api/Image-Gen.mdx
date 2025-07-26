@@ -9,6 +9,7 @@ icon: "palette"
 To simplify the integration of different image generation models, Aihubmix provides a unified image API that supports the following mainstream models:
 
 - [OpenAI Series](#openai)
+- [Flux Series](#flux)
 - [Ideogram V3](#ideogram-v3)
 - [Stability SD 3.5 Large](#stability)
 - [Google Imagen Series](#google-imagen)
@@ -92,6 +93,88 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 
 </CodeGroup>
 
+## Flux
+
+### Supported Models:
+
+- flux-Kontext-max
+- flux-Kontext-pro
+
+<Note>
+  - All flux models use asynchronous endpoints and require a **2-step request process**.
+  - Lightning fast responses—almost instant.
+  - `flux-Kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
+  - The supported `aspect_ratio` range is from `21:9` to `9:21`.
+  - The `safety_tolerance` parameter ranges from 0 (strictest) to 6 (most lenient). For image-to-image tasks, the max allowed is 2.
+  - Reference images can be provided via URL or Base64—URL is recommended.
+  - For more details, see: [FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
+</Note>
+
+### Usage:
+
+**Step 1: Submit an Image Generation Request**
+
+<CodeGroup>
+
+```shell Curl flux-Kontext-max Text-to-Image
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 6
+  }
+}'
+```
+
+```shell Curl flux-Kontext-max Imgae-to-Image
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 2,
+    "input_image": "https://www.resource.nestsound.cn/docs/ghibli.png"
+  }
+}'
+```
+
+```shell Curl flux-Kontext-pro Text-to-Image
+curl https://api.aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. ghibli anime",
+    "width": 768,
+    "height": 1280,
+    "safety_tolerance": 6
+  }
+}'
+```
+
+</CodeGroup>
+
+Sample Output:
+
+```shell
+{"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
+```
+
+**Step 2: Retrieve the Generated Image Link**
+
+Replace the string after `tasks/` with the taskId from Step 1:
+
+```shell Get Image
+curl https://api.aihubmix.com/v1/tasks/api.us1.bfl.*** \
+    -H "Authorization: Bearer sk-***" \
+    -X GET
+```
+
 ## Ideogram V3
 
 ### Supported Models:
@@ -116,30 +199,6 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace, in the style of Pixar 3D",
     "rendering_speed": "QUALITY",
     "aspect_ratio": "2x1"
-  }
-}'
-```
-
-</CodeGroup>
-
-## Stability
-
-### Supported Models:
-
-- Stable-Diffusion-3-5-Large
-
-### Usage:
-
-<CodeGroup>
-
-```shell Curl
-curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "n": 1
   }
 }'
 ```
@@ -172,6 +231,30 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
   "input": {
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
     "numberOfImages": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+## Stability
+
+### Supported Models:
+
+- Stable-Diffusion-3-5-Large
+
+### Usage:
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "n": 1
   }
 }'
 ```

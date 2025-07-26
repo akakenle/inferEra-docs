@@ -1,5 +1,5 @@
 ---
-title: "通用图形接口"
+title: "智能绘图统一接口"
 description: " "
 icon: "palette"
 ---
@@ -9,9 +9,10 @@ icon: "palette"
 为了方便开发者调用不同的图像生成模型，Aihubmix 提供了统一的图形接口，支持以下多种主流模型：
 
 - [OpenAI 系列](#openai)
+- [Flux 系列](#fLux)
 - [Ideogram V3](#ideogram-v3)
-- [Stability SD 3.5 Large](#stability)
 - [Google Imagen 系列](#google-imagen)
+- [Stability SD 3.5 Large](#stability)
 
 **接口规格：**
 
@@ -32,13 +33,15 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 - `<model_path>` 为模型路径，支持：
   - `opanai/gpt-image-1`
   - `opanai/dall-e-3`
+  - `flux-kontext-max`
+  - `flux-kontext-pro`
   - `ideogram/V3`
-  - `stability/Stable-Diffusion-3-5-Large`
   - `imagen-4.0-ultra-generate-preview-06-06`
   - `imagen-4.0-generate-preview-06-06`
   - `imagen-4.0-ultra-generate-exp-05-20`
   - `imagen-4.0-generate-preview-05-20`
   - `imagen-3.0-generate-002`
+  - `stability/Stable-Diffusion-3-5-Large`
 - `sk-***` 为你在 Aihubmix 生成的 API Key
 
 ---
@@ -92,6 +95,90 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 
 </CodeGroup>
 
+## Flux
+
+### 支持的模型：
+
+- flux-Kontext-max
+- flux-Kontext-pro
+
+<Note>
+  - flux 系列均为异步端口，需要分 2 步请求
+  - 速度极快，几乎秒出
+  - `flux-Kontext-max` 支持文生图和参考图生图，`flux-Kontext-pro` 端口只支持文生图
+  - 画幅比例 `aspect_ratio` 支持的范围是：`21:9` 到 `9:21`
+  - 审核宽松度参数 `safety_tolerance` 范围在 0 到 6 之间，0 表示最严格，6 表示最宽松。图像转图像的限制为 2。
+  - 参考图支持 URL 或 Base64 格式，推荐采用前者
+  - 更多细节参考：[FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
+</Note>
+
+### 调用方法：
+
+**第一步：发出绘图请求**
+
+<CodeGroup>
+
+```shell Curl flux-Kontext-max 文生图
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 6
+  }
+}'
+```
+
+
+```shell Curl flux-Kontext-max 图生图
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 2,
+    "input_image": "https://www.resource.nestsound.cn/docs/ghibli.png"
+  }
+}'
+```
+
+
+```shell Curl flux-Kontext-pro 文生图
+curl https://api.aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. ghibli anime",
+    "width": 768,
+    "height": 1280,
+    "safety_tolerance": 6
+  }
+}'
+```
+
+</CodeGroup>
+
+输出结果示例：
+
+```shell
+{"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
+```
+
+**第二步：获取生成的图片链接**
+
+`tasks/` 后面的字符串替换成第一步获取的 taskId：
+
+```shell 获取图片
+curl https://api.aihubmix.com/v1/tasks/api.us1.bfl.*** \
+    -H "Authorization: Bearer sk-***" \
+    -X GET
+```
+
 ## Ideogram V3
 
 ### 支持的模型：
@@ -116,30 +203,6 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace, in the style of Pixar 3D",
     "rendering_speed": "QUALITY",
     "aspect_ratio": "2x1"
-  }
-}'
-```
-
-</CodeGroup>
-
-## Stability
-
-### 支持的模型：
-
-- Stable-Diffusion-3-5-Large
-
-### 调用方法：
-
-<CodeGroup>
-
-```shell Curl
-curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "n": 1
   }
 }'
 ```
@@ -172,6 +235,30 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
   "input": {
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
     "numberOfImages": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+## Stability
+
+### 支持的模型：
+
+- Stable-Diffusion-3-5-Large
+
+### 调用方法：
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "n": 1
   }
 }'
 ```
