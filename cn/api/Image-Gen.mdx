@@ -107,7 +107,7 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
   - 速度极快，几乎秒出
   - `flux-Kontext-max` 支持文生图和参考图生图，`flux-Kontext-pro` 端口只支持文生图
   - 画幅比例 `aspect_ratio` 支持的范围是：`21:9` 到 `9:21`
-  - 审核宽松度参数 `safety_tolerance` 范围在 0 到 6 之间，0 表示最严格，6 表示最宽松。图像转图像的限制为 2。
+  - 审核宽松度参数 `safety_tolerance` 范围在 `0` 到 `6` 之间`0` 表示最严格`6` 表示最宽松。使用参考图时限制为 `2`。
   - 参考图支持 URL 或 Base64 格式，推荐采用前者
   - 更多细节参考：[FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
 </Note>
@@ -148,7 +148,7 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 
 
 ```shell Curl flux-Kontext-pro 文生图
-curl https://api.aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
     -d '{

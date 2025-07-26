@@ -33,13 +33,15 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 - `<model_path>` is the model path, available models:
   - `opanai/gpt-image-1`
   - `opanai/dall-e-3`
+  - `flux-kontext-max`
+  - `flux-kontext-pro`
   - `ideogram/V3`
-  - `stability/Stable-Diffusion-3-5-Large`
   - `imagen-4.0-ultra-generate-preview-06-06`
   - `imagen-4.0-generate-preview-06-06`
   - `imagen-4.0-ultra-generate-exp-05-20`
   - `imagen-4.0-generate-preview-05-20`
   - `imagen-3.0-generate-002`
+  - `stability/Stable-Diffusion-3-5-Large`
 - `sk-***` is your API Key generated in Aihubmix
 
 ---
@@ -105,7 +107,7 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
   - Lightning fast responses—almost instant.
   - `flux-Kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
   - The supported `aspect_ratio` range is from `21:9` to `9:21`.
-  - The `safety_tolerance` parameter ranges from 0 (strictest) to 6 (most lenient). For image-to-image tasks, the max allowed is 2.
+  - The `safety_tolerance` parameter ranges from `0` (strictest) to `6` (most lenient). For image-to-image tasks, the max allowed is `2`.
   - Reference images can be provided via URL or Base64—URL is recommended.
   - For more details, see: [FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
 </Note>
@@ -129,6 +131,7 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
+
 ```shell Curl flux-Kontext-max Imgae-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
@@ -143,8 +146,9 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
+
 ```shell Curl flux-Kontext-pro Text-to-Image
-curl https://api.aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
     -d '{
