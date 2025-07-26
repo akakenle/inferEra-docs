@@ -9,10 +9,10 @@ icon: "palette"
 To simplify the integration of different image generation models, Aihubmix provides a unified image API that supports the following mainstream models:
 
 - [OpenAI Series](#openai)
+- [Google Imagen Series](#google-imagen)
 - [Flux Series](#flux)
 - [Ideogram V3](#ideogram-v3)
 - [Stability SD 3.5 Large](#stability)
-- [Google Imagen Series](#google-imagen)
 
 **API Specification:**
 
@@ -33,14 +33,14 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 - `<model_path>` is the model path, available models:
   - `opanai/gpt-image-1`
   - `opanai/dall-e-3`
-  - `flux-kontext-max`
-  - `flux-kontext-pro`
-  - `ideogram/V3`
   - `imagen-4.0-ultra-generate-preview-06-06`
   - `imagen-4.0-generate-preview-06-06`
   - `imagen-4.0-ultra-generate-exp-05-20`
   - `imagen-4.0-generate-preview-05-20`
   - `imagen-3.0-generate-002`
+  - `flux-kontext-max`
+  - `flux-kontext-pro`
+  - `ideogram/V3`
   - `stability/Stable-Diffusion-3-5-Large`
 - `sk-***` is your API Key generated in Aihubmix
 
@@ -79,7 +79,6 @@ curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
 }'
 ```
 
-
 ```shell Curl dall-e-3
 curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     -H "Content-Type: application/json" \
@@ -89,6 +88,38 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
     "size": "1024x1024", 
     "n": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+## Google Imagen
+
+### Supported Models:
+
+- `imagen-4.0-ultra-generate-preview-06-06`
+- `imagen-4.0-generate-preview-06-06`
+- `imagen-4.0-ultra-generate-exp-05-20`
+- `imagen-4.0-generate-preview-05-20`
+- `imagen-3.0-generate-002`
+
+<Note>
+  Gemini series models are not supported
+</Note>
+
+### Usage:
+
+<CodeGroup>
+
+```shell Curl
+curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "numberOfImages": 1
   }
 }'
 ```
@@ -131,7 +162,6 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-
 ```shell Curl flux-Kontext-max Imgae-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
@@ -145,7 +175,6 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
   }
 }'
 ```
-
 
 ```shell Curl flux-Kontext-pro Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
@@ -203,38 +232,6 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace, in the style of Pixar 3D",
     "rendering_speed": "QUALITY",
     "aspect_ratio": "2x1"
-  }
-}'
-```
-
-</CodeGroup>
-
-## Google Imagen
-
-### Supported Models:
-
-- `imagen-4.0-ultra-generate-preview-06-06`
-- `imagen-4.0-generate-preview-06-06`
-- `imagen-4.0-ultra-generate-exp-05-20`
-- `imagen-4.0-generate-preview-05-20`
-- `imagen-3.0-generate-002`
-
-<Note>
-  Gemini series models are not supported
-</Note>
-
-### Usage:
-
-<CodeGroup>
-
-```shell Curl
-curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "numberOfImages": 1
   }
 }'
 ```
