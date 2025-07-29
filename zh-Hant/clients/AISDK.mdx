@@ -1,0 +1,276 @@
+---
+title: "AI SDK - Aihubmix 提供者"
+description: "在 AI SDK 中使用 Aihubmix 作為大型模型供應商，一個金鑰即可接入海量模型。"
+icon: "terminal"
+---
+
+## 支援的功能
+
+Aihubmix provider 支援以下 AI 功能，讓您的產品不再侷限於 LLM 驅動：
+
+- **文字生成**：使用各種模型生成文字內容
+- **串流文字**：即時文字串流傳輸
+- **圖像生成**：從文字提示建立圖像
+- **向量嵌入**：單一和批次文字嵌入
+- **物件生成**：結構化資料生成
+- **串流物件**：即時結構化資料串流傳輸
+- **語音合成**：文字轉語音
+- **語音轉錄**：語音轉文字
+- **工具**：連網搜尋和其他工具
+
+## 安裝
+
+Aihubmix 可在 `@aihubmix/ai-sdk-provider` 模組中取得。透過 [@aihubmix/ai-sdk-provider](https://www.npmjs.com/package/@aihubmix/ai-sdk-provider) 進行安裝：
+
+```bash
+npm i @aihubmix/ai-sdk-provider
+```
+
+## Provider 實例
+
+您可以從 `@aihubmix/ai-sdk-provider` 匯入預設的 provider 實例 `aihubmix`：
+
+```ts
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+```
+
+## 設定
+
+將您的 Aihubmix API 金鑰設定為環境變數，以確保安全讀取：
+
+```bash
+export AIHUBMIX_API_KEY="your-api-key-here"
+```
+
+或直接傳遞給 provider：
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+
+const aihubmix = createAihubmix({
+  apiKey: 'your-api-key-here',
+});
+```
+
+## 使用
+
+匯入必要的函式：
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+import { 
+  generateText, 
+  streamText, 
+  generateImage, 
+  embed, 
+  embedMany, 
+  generateObject, 
+  streamObject, 
+  generateSpeech, 
+  transcribe 
+} from 'ai';
+import { z } from 'zod';
+```
+
+各種類型的 AI 生成呼叫範例：
+
+<CodeGroup>
+
+```ts 產生文字
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('o4-mini'),
+  prompt: '為4個人寫一個素食千層麵食譜。',
+});
+```
+
+```ts Claude 模型
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('claude-3-7-sonnet-20250219'),
+  prompt: '用簡單的術語解釋量子計算。',
+});
+```
+
+```ts Gemini 模型
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gemini-2.5-flash'),
+  prompt: '建立一個Python指令碼來對數字列表進行排序。',
+});
+```
+
+```ts 串流文字
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamText } from 'ai';
+
+const result = streamText({
+  model: aihubmix('gpt-3.5-turbo'),
+  prompt: '寫一個關於機器人學習繪畫的短篇故事。',
+  maxOutputTokens: 256,
+  temperature: 0.3,
+  maxRetries: 3,
+});
+
+let fullText = '';
+for await (const textPart of result.textStream) {
+  fullText += textPart;
+  process.stdout.write(textPart);
+}
+
+console.log('\n使用情況:', await result.usage);
+console.log('完成原因:', await result.finishReason);
+```
+
+```ts 產生物件
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateObject } from 'ai';
+import { z } from 'zod';
+
+const result = await generateObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: '產生一個千層麵食譜。',
+});
+
+console.log(JSON.stringify(result.object.recipe, null, 2));
+console.log('Token使用情況:', result.usage);
+console.log('完成原因:', result.finishReason);
+```
+
+```ts 串流物件
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamObject } from 'ai';
+import { z } from 'zod';
+
+const result = await streamObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: '產生一個千層麵食譜。',
+});
+
+for await (const objectPart of result.partialObjectStream) {
+  console.log(objectPart);
+}
+
+console.log('Token使用情況:', result.usage);
+console.log('最終物件:', result.object);
+```
+
+
+```ts 工具呼叫
+// Aihubmix provider 支援各種工具，包括網路搜尋：
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gpt-4'),
+  prompt: 'AI的最新發展是什麼？',
+  tools: {
+    webSearchPreview: aihubmix.tools.webSearchPreview({
+      searchContextSize: 'high',
+    }),
+  },
+});
+```
+
+
+```ts 圖像生成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateImage } from 'ai';
+
+const { image } = await generateImage({
+  model: aihubmix.image('gpt-image-1'),
+  prompt: '山間美麗的日落',
+});
+```
+
+
+```ts 語音合成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateSpeech } from 'ai';
+
+const { audio } = await generateSpeech({
+  model: aihubmix.speech('tts-1'),
+  text: '你好，這是語音合成的測試。',
+});
+
+// 儲存音訊檔案
+await saveAudioFile(audio);
+console.log('音訊生成成功:', audio);
+```
+
+
+```ts 語音轉錄
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { transcribe } from 'ai';
+
+const { text } = await transcribe({
+  model: aihubmix.transcription('whisper-1'),
+  audio: audioFile,
+});
+```
+
+
+```ts 向量嵌入
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embed } from 'ai';
+
+const { embedding } = await embed({
+  model: aihubmix.embedding('text-embedding-ada-002'),
+  value: '你好，世界！',
+});
+```
+
+
+```ts 批次嵌入
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embedMany } from 'ai';
+
+const { embeddings, usage } = await embedMany({
+  model: aihubmix.embedding('text-embedding-3-small'),
+  values: [
+    '海灘上的晴天',
+    '城市裡的雨天下午',
+    '山間的雪夜',
+  ],
+});
+
+console.log('嵌入向量:', embeddings);
+console.log('使用情況:', usage);
+```
+
+</CodeGroup>
+
+## 相關資源：
+
+- [Aihubmix 提供者](https://v5.ai-sdk.dev/providers/community-providers/aihubmix)
+- [AI SDK](https://ai-sdk.dev/docs)

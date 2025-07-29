@@ -69,6 +69,7 @@
           {
             "tab": "使用场景",
             "pages": [
+              "cn/clients/AISDK",              
               "cn/clients/Cherry-Studio",
               "cn/clients/Lobe-Chat",
               "cn/clients/OpenAI-Translator",
@@ -178,6 +179,7 @@
           {
             "tab": "Use Cases",
             "pages": [
+              "en/clients/AISDK",         
               "en/clients/Cherry-Studio",
               "en/clients/AnythingLLM",
               "en/clients/Avante.nvim",
@@ -287,6 +289,7 @@
           {
             "tab": "利用ケース",
             "pages": [
+              "jp/clients/AISDK",         
               "jp/clients/Cherry-Studio",
               "jp/clients/AnythingLLM",
               "jp/clients/Avante.nvim",
@@ -396,6 +399,7 @@
           {
             "tab": "사용 사례",
             "pages": [
+              "ko/clients/AISDK",         
               "ko/clients/Cherry-Studio",
               "ko/clients/AnythingLLM",
               "ko/clients/Avante.nvim",
@@ -505,6 +509,7 @@
           {
             "tab": "使用情境",
             "pages": [
+              "zh-Hant/clients/AISDK",         
               "zh-Hant/clients/Cherry-Studio",
               "zh-Hant/clients/AnythingLLM",
               "zh-Hant/clients/Avante.nvim",

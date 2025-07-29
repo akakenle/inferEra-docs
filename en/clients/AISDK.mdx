@@ -1,0 +1,281 @@
+---
+title: "AI SDK - Aihubmix Provider"
+description: "Use Aihubmix as a large model provider in the AI SDK, accessing a massive number of models with a single key."
+icon: "terminal"
+---
+
+## Supported Features
+
+The Aihubmix provider supports the following AI features, so your product is no longer limited to being LLM-driven:
+
+- **Text Generation**: Generate text content using various models
+- **Streaming Text**: Real-time text streaming
+- **Image Generation**: Create images from text prompts
+- **Vector Embeddings**: Single and batch text embeddings
+- **Object Generation**: Structured data generation
+- **Streaming Objects**: Real-time structured data streaming
+- **Speech Synthesis**: Text-to-speech
+- **Transcription**: Speech-to-text
+- **Tools**: Web search and other tools
+
+## Installation
+
+Aihubmix is available in the `@aihubmix/ai-sdk-provider` module. Install it via [@aihubmix/ai-sdk-provider](https://www.npmjs.com/package/@aihubmix/ai-sdk-provider):
+
+```bash
+npm i @aihubmix/ai-sdk-provider
+```
+
+## Provider Instance
+
+You can import the default provider instance, `aihubmix`, from `@aihubmix/ai-sdk-provider`:
+
+```ts
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+```
+
+## Configuration
+
+Set your Aihubmix API key as an environment variable for secure access:
+
+```bash
+export AIHUBMIX_API_KEY="your-api-key-here"
+```
+
+Or pass it directly to the provider:
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+
+const aihubmix = createAihubmix({
+  apiKey: 'your-api-key-here',
+});
+```
+
+## Usage
+
+Import the necessary functions:
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+import { 
+  generateText, 
+  streamText, 
+  generateImage, 
+  embed, 
+  embedMany, 
+  generateObject, 
+  streamObject, 
+  generateSpeech, 
+  transcribe 
+} from 'ai';
+import { z } from 'zod';
+```
+
+Examples of various types of AI generation calls:
+
+<CodeGroup>
+
+```ts Generate Text
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('o4-mini'),
+  prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+});
+```
+
+
+```ts Claude Model
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('claude-3-7-sonnet-20250219'),
+  prompt: 'Explain quantum computing in simple terms.',
+});
+```
+
+
+```ts Gemini Model
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gemini-2.5-flash'),
+  prompt: 'Create a Python script to sort a list of numbers.',
+});
+```
+
+
+```ts Stream Text
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamText } from 'ai';
+
+const result = streamText({
+  model: aihubmix('gpt-3.5-turbo'),
+  prompt: 'Write a short story about a robot learning to paint.',
+  maxOutputTokens: 256,
+  temperature: 0.3,
+  maxRetries: 3,
+});
+
+let fullText = '';
+for await (const textPart of result.textStream) {
+  fullText += textPart;
+  process.stdout.write(textPart);
+}
+
+console.log('\nUsage:', await result.usage);
+console.log('Finish Reason:', await result.finishReason);
+```
+
+
+```ts Generate Object
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateObject } from 'ai';
+import { z } from 'zod';
+
+const result = await generateObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: 'Generate a lasagna recipe.',
+});
+
+console.log(JSON.stringify(result.object.recipe, null, 2));
+console.log('Token Usage:', result.usage);
+console.log('Finish Reason:', result.finishReason);
+```
+
+
+```ts Stream Object
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamObject } from 'ai';
+import { z } from 'zod';
+
+const result = await streamObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: 'Generate a lasagna recipe.',
+});
+
+for await (const objectPart of result.partialObjectStream) {
+  console.log(objectPart);
+}
+
+console.log('Token Usage:', result.usage);
+console.log('Final Object:', result.object);
+```
+
+
+```ts Tool Calling
+// The Aihubmix provider supports various tools, including web search:
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gpt-4'),
+  prompt: 'What are the latest developments in AI?',
+  tools: {
+    webSearchPreview: aihubmix.tools.webSearchPreview({
+      searchContextSize: 'high',
+    }),
+  },
+});
+```
+
+
+```ts Image Generation
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateImage } from 'ai';
+
+const { image } = await generateImage({
+  model: aihubmix.image('gpt-image-1'),
+  prompt: 'A beautiful sunset in the mountains',
+});
+```
+
+
+```ts Speech Synthesis
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateSpeech } from 'ai';
+
+const { audio } = await generateSpeech({
+  model: aihubmix.speech('tts-1'),
+  text: 'Hello, this is a test of speech synthesis.',
+});
+
+// Save the audio file
+await saveAudioFile(audio);
+console.log('Audio generated successfully:', audio);
+```
+
+
+```ts Transcription
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { transcribe } from 'ai';
+
+const { text } = await transcribe({
+  model: aihubmix.transcription('whisper-1'),
+  audio: audioFile,
+});
+```
+
+
+```ts Vector Embedding
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embed } from 'ai';
+
+const { embedding } = await embed({
+  model: aihubmix.embedding('text-embedding-ada-002'),
+  value: 'Hello, world!',
+});
+```
+
+
+```ts Batch Embedding
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embedMany } from 'ai';
+
+const { embeddings, usage } = await embedMany({
+  model: aihubmix.embedding('text-embedding-3-small'),
+  values: [
+    'A sunny day at the beach',
+    'A rainy afternoon in the city',
+    'A snowy night in the mountains',
+  ],
+});
+
+console.log('Embeddings:', embeddings);
+console.log('Usage:', usage);
+```
+
+</CodeGroup>
+
+## Related Resources:
+
+- [Aihubmix provider](https://v5.ai-sdk.dev/providers/community-providers/aihubmix)
+- [AI SDK](https://ai-sdk.dev/docs)

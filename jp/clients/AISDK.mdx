@@ -1,0 +1,281 @@
+---
+title: "AI SDK - Aihubmix プロバイダー"
+description: "AI SDKでAihubmixを大規模モデルプロバイダーとして使用し、1つのキーで多数のモデルにアクセスします。"
+icon: "terminal"
+---
+
+## サポートされている機能
+
+Aihubmixプロバイダーは以下のAI機能をサポートしており、あなたの製品がLLM駆動に限定されなくなります：
+
+- **テキスト生成**：様々なモデルを使用してテキストコンテンツを生成します
+- **ストリーミングテキスト**：リアルタイムのテキストストリーミング
+- **画像生成**：テキストプロンプトから画像を生成します
+- **ベクトル埋め込み**：単一およびバッチのテキスト埋め込み
+- **オブジェクト生成**：構造化データの生成
+- **ストリーミングオブジェクト**：リアルタイムの構造化データストリーミング
+- **音声合成**：テキストを音声に変換します
+- **文字起こし**：音声をテキストに変換します
+- **ツール**：ウェブ検索やその他のツール
+
+## インストール
+
+Aihubmixは `@aihubmix/ai-sdk-provider` モジュールで利用可能です。[@aihubmix/ai-sdk-provider](https://www.npmjs.com/package/@aihubmix/ai-sdk-provider) を介してインストールします：
+
+```bash
+npm i @aihubmix/ai-sdk-provider
+```
+
+## プロバイダーインスタンス
+
+`@aihubmix/ai-sdk-provider` からデフォルトのプロバイダーインスタンス `aihubmix` をインポートできます：
+
+```ts
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+```
+
+## 設定
+
+Aihubmix APIキーを環境変数として設定し、安全な読み取りを確保します：
+
+```bash
+export AIHUBMIX_API_KEY="your-api-key-here"
+```
+
+または、プロバイダーに直接渡します：
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+
+const aihubmix = createAihubmix({
+  apiKey: 'your-api-key-here',
+});
+```
+
+## 使用方法
+
+必要な関数をインポートします：
+
+```ts
+import { createAihubmix } from '@aihubmix/ai-sdk-provider';
+import { 
+  generateText, 
+  streamText, 
+  generateImage, 
+  embed, 
+  embedMany, 
+  generateObject, 
+  streamObject, 
+  generateSpeech, 
+  transcribe 
+} from 'ai';
+import { z } from 'zod';
+```
+
+各種AI生成呼び出しの例：
+
+<CodeGroup>
+
+```ts テキスト生成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('o4-mini'),
+  prompt: '4人分のベジタリアンラザニアのレシピを書いてください。',
+});
+```
+
+
+```ts Claude モデル
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('claude-3-7-sonnet-20250219'),
+  prompt: '量子コンピューティングを簡単な言葉で説明してください。',
+});
+```
+
+
+```ts Gemini モデル
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gemini-2.5-flash'),
+  prompt: '数値のリストをソートするPythonスクリプトを作成してください。',
+});
+```
+
+
+```ts ストリーミングテキスト
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamText } from 'ai';
+
+const result = streamText({
+  model: aihubmix('gpt-3.5-turbo'),
+  prompt: '絵を学ぶロボットについての短い物語を書いてください。',
+  maxOutputTokens: 256,
+  temperature: 0.3,
+  maxRetries: 3,
+});
+
+let fullText = '';
+for await (const textPart of result.textStream) {
+  fullText += textPart;
+  process.stdout.write(textPart);
+}
+
+console.log('\n使用状況:', await result.usage);
+console.log('完了理由:', await result.finishReason);
+```
+
+
+```ts オブジェクト生成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateObject } from 'ai';
+import { z } from 'zod';
+
+const result = await generateObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: 'ラザニアのレシピを生成してください。',
+});
+
+console.log(JSON.stringify(result.object.recipe, null, 2));
+console.log('トークン使用状況:', result.usage);
+console.log('完了理由:', result.finishReason);
+```
+
+
+```ts ストリーミングオブジェクト
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { streamObject } from 'ai';
+import { z } from 'zod';
+
+const result = await streamObject({
+  model: aihubmix('gpt-4o-mini'),
+  schema: z.object({
+    recipe: z.object({
+      name: z.string(),
+      ingredients: z.array(
+        z.object({
+          name: z.string(),
+          amount: z.string(),
+        }),
+      ),
+      steps: z.array(z.string()),
+    }),
+  }),
+  prompt: 'ラザニアのレシピを生成してください。',
+});
+
+for await (const objectPart of result.partialObjectStream) {
+  console.log(objectPart);
+}
+
+console.log('トークン使用状況:', result.usage);
+console.log('最終オブジェクト:', result.object);
+```
+
+
+```ts ツール呼び出し
+// Aihubmixプロバイダーは、ウェブ検索を含む様々なツールをサポートしています：
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+  model: aihubmix('gpt-4'),
+  prompt: 'AIの最新の進展は何ですか？',
+  tools: {
+    webSearchPreview: aihubmix.tools.webSearchPreview({
+      searchContextSize: 'high',
+    }),
+  },
+});
+```
+
+
+```ts 画像生成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateImage } from 'ai';
+
+const { image } = await generateImage({
+  model: aihubmix.image('gpt-image-1'),
+  prompt: '山間の美しい夕日',
+});
+```
+
+
+```ts 音声合成
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { generateSpeech } from 'ai';
+
+const { audio } = await generateSpeech({
+  model: aihubmix.speech('tts-1'),
+  text: 'こんにちは、これは音声合成のテストです。',
+});
+
+// 音声ファイルを保存
+await saveAudioFile(audio);
+console.log('音声生成成功:', audio);
+```
+
+
+```ts 文字起こし
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { transcribe } from 'ai';
+
+const { text } = await transcribe({
+  model: aihubmix.transcription('whisper-1'),
+  audio: audioFile,
+});
+```
+
+
+```ts ベクトル埋め込み
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embed } from 'ai';
+
+const { embedding } = await embed({
+  model: aihubmix.embedding('text-embedding-ada-002'),
+  value: 'こんにちは、世界！',
+});
+```
+
+
+```ts バッチ埋め込み
+import { aihubmix } from '@aihubmix/ai-sdk-provider';
+import { embedMany } from 'ai';
+
+const { embeddings, usage } = await embedMany({
+  model: aihubmix.embedding('text-embedding-3-small'),
+  values: [
+    'ビーチの晴れた日',
+    '街の雨の午後',
+    '山間の雪の夜',
+  ],
+});
+
+console.log('埋め込みベクトル:', embeddings);
+console.log('使用状況:', usage);
+```
+
+</CodeGroup>
+
+## 関連リソース：
+
+- [Aihubmix provider](https://v5.ai-sdk.dev/providers/community-providers/aihubmix)
+- [AI SDK](https://ai-sdk.dev/docs)
