@@ -116,4 +116,88 @@ Enter to confirm .Esc to cancel
 /model moonshotai/kimi-k2-instruct
 ```
 
+### 使用 AiHubMix 平台的任何大模型
+
+1️⃣ 全局安装 @aihubmix/claude-code:
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+
+2️⃣ 设置系统环境变量（推荐）
+
+```
+export AIHUBMIX_API_KEY="your-aihubmix-api-key"
+export HOST="127.0.0.1"  # Optional
+export PORT="3456"        # Optional
+export LOG="true"         # Optional
+export API_TIMEOUT_MS="30000"  # Optional
+```
+
+3️⃣ 生成配置文件
+注意 `sk-***` 要换成你在 AiHubMix 生成的密钥，模型意外的配置项会以系统环境变量优先的顺序处理。
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+4️⃣ 使用
+
+<CodeGroup>
+
+```shell 启动服务
+acc start
+```
+
+
+```shell 停止服务
+acc stop
+```
+
+
+```shell 运行 CC
+acc code
+```
+
+
+```shell 重启服务（修改配置需要用的）
+acc restart
+```
+
+
+```shell 状态检测
+acc status
+```
+
+
+```shell 显示帮助
+acc help
+```
+
+
+```shell 查看版本
+acc version
+```
+
+</CodeGroup>
+
+- [更多细节](https://dashboard.mintlify.com/aihubmix/aihubmix/editor/main)
+- [npm 包](https://www.npmjs.com/package/@aihubmix/claude-code)
+
 祝你使用愉快！
