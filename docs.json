@@ -64,7 +64,7 @@
           {
             "tab": "CLI 工具",
             "pages": [
-              "cn/api/Claude-Cache",
+              "cn/api/Claude-Code",
               "cn/api/Gemini-Cli",
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
