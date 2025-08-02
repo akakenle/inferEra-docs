@@ -30,6 +30,7 @@
 - 先处理 logo 和品牌色版，后续需要改成 iferEra
 - 导航形式只能在顶部 tab 和侧边 sidebar 二选一
 - 多语言支持 @navigation/localization.mdx
+- 中、英先行，gemini cli 翻译其他版本补上（jp、ko、zh-Hant）
 - 📍 文档名称规范：使用英语、"-" 连接符，否则会导致：
   - 不利于 SEO 且显示异常
   - 导航异常
@@ -56,9 +57,16 @@ Tips：
 </Info>
 ```
 
-代码编组：
+代码示例用编组收纳：
 ```
 <CodeGroup>
+
+```shell 清晰的名称
+```
+
+```py 清晰的名称
+```
+
 </CodeGroup>
 ```
 
