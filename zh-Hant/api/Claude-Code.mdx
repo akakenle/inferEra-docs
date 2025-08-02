@@ -72,5 +72,82 @@ Do you want to use this API key?
 
 Enter to confirm .Esc to cancel
 ```
+## 在 AiHubMix 平台上使用任何 LLM
+
+### 1️⃣ 全域安裝 @aihubmix/claude-code
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+### 2️⃣ 設定系統環境變數（建議）
+
+```shell
+export AIHUBMIX_API_KEY="your-aihubmix-api-key"
+export HOST="127.0.0.1"  # 選用
+export PORT="3456"       # 選用
+export LOG="true"        # 選用
+export API_TIMEOUT_MS="30000"  # 選用
+```
+
+### 3️⃣ 產生設定檔
+
+注意：請將 sk-*** 替換為您在 AiHubMix 上產生的金鑰。模型本身以外的設定選項如果存在，將會被系統環境變數覆寫。
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ 使用方式
+
+<CodeGroup>
+
+```shell
+acc start
+```
+
+```shell
+acc stop
+```
+
+```shell
+acc code
+```
+
+```shell
+acc restart
+```
+
+```shell
+acc status
+```
+
+```shell
+acc help
+```
+
+```shell
+acc version
+```
+
+</CodeGroup>
+
+-[更多詳細資訊](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+-[npm 套件](https://www.npmjs.com/package/@aihubmix/claude-code)
 
 祝你使用愉快！

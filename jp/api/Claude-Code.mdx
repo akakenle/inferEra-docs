@@ -73,4 +73,82 @@ ANTHROPIC_API_KEY: sk-***
 Enterで確認。Escでキャンセル
 ```
 
+## AiHubMixプラットフォームで任意のLLMを使用する
+
+### 1️⃣ @aihubmix/claude-codeをグローバルにインストールする
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+### 2️⃣ システム環境変数を設定する（推奨）
+
+```shell
+export AIHUBMIX_API_KEY="your-aihubmix-api-key"
+export HOST="127.0.0.1"  # オプション
+export PORT="3456"       # オプション
+export LOG="true"        # オプション
+export API_TIMEOUT_MS="30000"  # オプション
+```
+
+### 3️⃣ 設定ファイルを生成する
+
+注意：sk-***をAiHubMixで生成したキーに置き換えてください。モデル自体以外の設定オプションは、システム環境変数が存在する場合、そちらで上書きされます。
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ 使い方
+
+<CodeGroup>
+
+```shell
+acc start
+```
+
+```shell
+acc stop
+```
+
+```shell
+acc code
+```
+
+```shell
+acc restart
+```
+
+```shell
+acc status
+```
+
+```shell
+acc help
+```
+
+```shell
+acc version
+```
+
+</CodeGroup>
+
+-[詳細はこちら](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+-[npmパッケージ](https://www.npmjs.com/package/@aihubmix/claude-code)
+
 どうぞお楽しみください！
