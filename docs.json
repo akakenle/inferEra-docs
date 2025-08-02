@@ -155,8 +155,8 @@
                   "en/api/LLM-Search",
                   "en/api/General-Model-Forwarding",
                   "en/api/Claude-Native",
-                  "en/api/Claude-Code",
                   "en/api/Claude-Text-Edit-Tool",
+                  "en/api/Claude-Cache",
                   "en/api/Gemini-Guides",
                   "en/api/Multimodal-Interaction-with-Gemini",
                   "en/api/Qwen",
@@ -179,7 +179,7 @@
           {
             "tab": "AI CLI",
             "pages": [
-              "en/api/Claude-Cache",
+              "en/api/Claude-Code",
               "en/api/Gemini-Cli",
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
@@ -294,7 +294,7 @@
           {
             "tab": "コマンドラインツール",
             "pages": [
-              "jp/api/Claude-Cache",
+              "jp/api/Claude-Code",
               "jp/api/Gemini-Cli",
               "jp/api/Codex-CLI",
               "jp/api/Qwen-code",
@@ -409,7 +409,7 @@
           {
             "tab": "명령줄 도구",
             "pages": [
-              "ko/api/Claude-Cache",
+              "ko/api/Claude-Code",
               "ko/api/Gemini-Cli",
               "ko/api/Codex-CLI",
               "ko/api/Qwen-code",
@@ -524,7 +524,7 @@
           {
             "tab": "命令列工具",
             "pages": [
-              "zh-Hant/api/Claude-Cache",
+              "zh-Hant/api/Claude-Code",
               "zh-Hant/api/Gemini-Cli",
               "zh-Hant/api/Codex-CLI",
               "zh-Hant/api/Qwen-code",
