@@ -36,23 +36,18 @@
                   "cn/api/GPT-4o-image",
                   "cn/api/Image-Gen",
                   "cn/api/FIM",
-                  "cn/api/Codex-CLI",
                   "cn/api/Non-OpenAI-Models",
                   "cn/api/LLM-Search",
                   "cn/api/General-Model-Forwarding",
                   "cn/api/Claude-Native",
-                  "cn/api/Claude-Code",
                   "cn/api/Claude-Text-Edit-Tool",
                   "cn/api/Claude-Cache",
                   "cn/api/Gemini-Guides",
                   "cn/api/Multimodal-Interaction-with-Gemini",
-                  "cn/api/Gemini-Cli",
                   "cn/api/Qwen",
-                  "cn/api/Qwen-code",
                   "cn/api/TTS",
                   "cn/api/IdeogramAI",
                   "cn/api/Jina-AI",
-                  "cn/api/Cli",
                   "cn/api/App-code",
                   "cn/api/Auth"
                 ]
@@ -64,6 +59,16 @@
                   "cn/terms-and-privacy/Privacy"
                 ]
               }
+            ]
+          },
+          {
+            "tab": "CLI 工具",
+            "pages": [
+              "cn/api/Claude-Cache",
+              "cn/api/Gemini-Cli",
+              "cn/api/Codex-CLI",
+              "cn/api/Qwen-code",
+              "cn/api/Cli"
             ]
           },
           {
@@ -146,23 +151,18 @@
                   "en/api/GPT-4o-image",
                   "en/api/Image-Gen",
                   "en/api/FIM",
-                  "en/api/Codex-CLI",
                   "en/api/Non-OpenAI-Models",
                   "en/api/LLM-Search",
                   "en/api/General-Model-Forwarding",
                   "en/api/Claude-Native",
                   "en/api/Claude-Code",
                   "en/api/Claude-Text-Edit-Tool",
-                  "en/api/Claude-Cache",
                   "en/api/Gemini-Guides",
                   "en/api/Multimodal-Interaction-with-Gemini",
-                  "en/api/Gemini-Cli",
                   "en/api/Qwen",
-                  "en/api/Qwen-code",
                   "en/api/TTS",
                   "en/api/IdeogramAI",
                   "en/api/Jina-AI",
-                  "en/api/Cli",
                   "en/api/App-code",
                   "en/api/Auth"
                 ]
@@ -174,6 +174,16 @@
                   "en/terms-and-privacy/Privacy"
                 ]
               }
+            ]
+          },
+          {
+            "tab": "AI CLI",
+            "pages": [
+              "en/api/Claude-Cache",
+              "en/api/Gemini-Cli",
+              "en/api/Codex-CLI",
+              "en/api/Qwen-code",
+              "en/api/Cli"
             ]
           },
           {
@@ -256,23 +266,18 @@
                   "jp/api/GPT-4o-image",
                   "jp/api/Image-Gen",
                   "jp/api/FIM",
-                  "jp/api/Codex-CLI",
                   "jp/api/Non-OpenAI-Models",
                   "jp/api/LLM-Search",
                   "jp/api/General-Model-Forwarding",
                   "jp/api/Claude-Native",
-                  "jp/api/Claude-Code",
                   "jp/api/Claude-Text-Edit-Tool",
                   "jp/api/Claude-Cache",
                   "jp/api/Gemini-Guides",
                   "jp/api/Multimodal-Interaction-with-Gemini",
-                  "jp/api/Gemini-Cli",
                   "jp/api/Qwen",
-                  "jp/api/Qwen-code",
                   "jp/api/TTS",
                   "jp/api/IdeogramAI",
                   "jp/api/Jina-AI",
-                  "jp/api/Cli",
                   "jp/api/App-code",
                   "jp/api/Auth"
                 ]
@@ -284,6 +289,16 @@
                   "jp/terms-and-privacy/Privacy"
                 ]
               }
+            ]
+          },
+          {
+            "tab": "コマンドラインツール",
+            "pages": [
+              "jp/api/Claude-Cache",
+              "jp/api/Gemini-Cli",
+              "jp/api/Codex-CLI",
+              "jp/api/Qwen-code",
+              "jp/api/Cli"
             ]
           },
           {
@@ -366,23 +381,18 @@
                   "ko/api/GPT-4o-image",
                   "ko/api/Image-Gen",
                   "ko/api/FIM",
-                  "ko/api/Codex-CLI",
                   "ko/api/Non-OpenAI-Models",
                   "ko/api/LLM-Search",
                   "ko/api/General-Model-Forwarding",
                   "ko/api/Claude-Native",
-                  "ko/api/Claude-Code",
                   "ko/api/Claude-Text-Edit-Tool",
                   "ko/api/Claude-Cache",
                   "ko/api/Gemini-Guides",
                   "ko/api/Multimodal-Interaction-with-Gemini",
-                  "ko/api/Gemini-Cli",
                   "ko/api/Qwen",
-                  "ko/api/Qwen-code",
                   "ko/api/TTS",
                   "ko/api/IdeogramAI",
                   "ko/api/Jina-AI",
-                  "ko/api/Cli",
                   "ko/api/App-code",
                   "ko/api/Auth"
                 ]
@@ -394,6 +404,16 @@
                   "ko/terms-and-privacy/Privacy"
                 ]
               }
+            ]
+          },
+          {
+            "tab": "명령줄 도구",
+            "pages": [
+              "ko/api/Claude-Cache",
+              "ko/api/Gemini-Cli",
+              "ko/api/Codex-CLI",
+              "ko/api/Qwen-code",
+              "ko/api/Cli"
             ]
           },
           {
@@ -476,23 +496,18 @@
                   "zh-Hant/api/GPT-4o-image",
                   "zh-Hant/api/Image-Gen",
                   "zh-Hant/api/FIM",
-                  "zh-Hant/api/Codex-CLI",
                   "zh-Hant/api/Non-OpenAI-Models",
                   "zh-Hant/api/LLM-Search",
                   "zh-Hant/api/General-Model-Forwarding",
                   "zh-Hant/api/Claude-Native",
-                  "zh-Hant/api/Claude-Code",
                   "zh-Hant/api/Claude-Text-Edit-Tool",
                   "zh-Hant/api/Claude-Cache",
                   "zh-Hant/api/Gemini-Guides",
                   "zh-Hant/api/Multimodal-Interaction-with-Gemini",
-                  "zh-Hant/api/Gemini-Cli",
                   "zh-Hant/api/Qwen",
-                  "zh-Hant/api/Qwen-code",
                   "zh-Hant/api/TTS",
                   "zh-Hant/api/IdeogramAI",
                   "zh-Hant/api/Jina-AI",
-                  "zh-Hant/api/Cli",
                   "zh-Hant/api/App-code",
                   "zh-Hant/api/Auth"
                 ]
@@ -504,6 +519,16 @@
                   "zh-Hant/terms-and-privacy/Privacy"
                 ]
               }
+            ]
+          },
+          {
+            "tab": "命令列工具",
+            "pages": [
+              "zh-Hant/api/Claude-Cache",
+              "zh-Hant/api/Gemini-Cli",
+              "zh-Hant/api/Codex-CLI",
+              "zh-Hant/api/Qwen-code",
+              "zh-Hant/api/Cli"
             ]
           },
           {
