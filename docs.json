@@ -607,6 +607,9 @@
       "href": "https://aihubmix.com"
     }
   },
+  "thumbnails": {
+    "disable": true
+  },
   "seo": {
     "metatags": {
       "robots": "index, follow",
