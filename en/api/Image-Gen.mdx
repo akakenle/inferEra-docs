@@ -79,6 +79,7 @@ curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
 }'
 ```
 
+
 ```shell Curl dall-e-3
 curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     -H "Content-Type: application/json" \
@@ -130,13 +131,13 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 ### Supported Models:
 
-- flux-Kontext-max
-- flux-Kontext-pro
+- flux-kontext-max
+- flux-kontext-pro
 
 <Note>
   - All flux models use asynchronous endpoints and require a **2-step request process**.
   - Lightning fast responses—almost instant.
-  - `flux-Kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
+  - `flux-kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
   - The supported `aspect_ratio` range is from `21:9` to `9:21`.
   - The `safety_tolerance` parameter ranges from `0` (strictest) to `6` (most lenient). For image-to-image tasks, the max allowed is `2`.
   - Reference images can be provided via URL or Base64—URL is recommended.
@@ -149,7 +150,7 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 <CodeGroup>
 
-```shell Curl flux-Kontext-max Text-to-Image
+```shell Curl flux-kontext-max Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -162,7 +163,8 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-```shell Curl flux-Kontext-max Imgae-to-Image
+
+```shell Curl flux-kontext-max Imgae-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -176,7 +178,8 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-```shell Curl flux-Kontext-pro Text-to-Image
+
+```shell Curl flux-kontext-pro Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
