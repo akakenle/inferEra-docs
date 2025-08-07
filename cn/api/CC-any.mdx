@@ -1,0 +1,104 @@
+---
+title: "Claude Code with any LLM"
+description: " "
+icon: "terminal"
+---
+
+使用 Aihubmix 平台上的任何大模型为 Claude Code 提供强劲动力，彻底告别连接不稳定和额度难买的烦恼。Aihubmix 的转发服务基于官方渠道，合规安全，无需担心账号风险或隐性限制。
+
+<Warning>
+  由于 Claude Code 的多智能体属性，额度消耗会比较夸张，建议为你的 Key 设置有限额度，防止账单刺客。
+</Warning>
+
+## 快速配置指引
+
+### 1️⃣ 全局安装 npm 包
+
+使用终端运行：
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+
+### 2️⃣ 设置系统环境变量（推荐）
+
+注意 `sk-***` 要换成你在 AiHubMix 生成的[密钥](https://aihubmix.com/token)，模型以外的配置项会以系统环境变量优先的顺序处理。
+
+```
+export AIHUBMIX_API_KEY="sk-***"
+export HOST="127.0.0.1"  # Optional
+export PORT="3456"        # Optional
+export LOG="true"         # Optional
+export API_TIMEOUT_MS="30000"  # Optional
+```
+
+<Tip>
+  - 对于 Mac 用户，你可以在`用户名`目录通过快捷键 `⌘ + ⇧ + .` 显示隐藏的 .zshrc 文件，用系统的「文本编辑」APP 打开并添加上述内容。
+  - 添加配置之后，终端执行 `source ~/.zshrc`，回车，使配置生效
+</Tip>
+
+
+### 3️⃣ 生成配置文件
+
+将下方的 `sk-***` 替换成你的 AiHubMix 密钥，然后使用终端一键运行即可：
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ 使用
+
+<CodeGroup>
+
+```shell 启动服务
+acc start
+```
+
+```shell 停止服务
+acc stop
+```
+
+```shell 运行 CC
+acc code
+```
+
+```shell 重启服务（修改配置需要用的）
+acc restart
+```
+
+```shell 状态检测
+acc status
+```
+
+```shell 显示帮助
+acc help
+```
+
+```shell 查看版本
+acc version
+```
+
+</CodeGroup>
+
+## 更多资源
+- [Claude Code 转发](/cn/api/Claude-Code)
+- [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+- [npm 包](https://www.npmjs.com/package/@aihubmix/claude-code)
+- [官方最佳实践](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [官方配置指引](https://docs.anthropic.com/en/docs/claude-code/settings#settings-files)
