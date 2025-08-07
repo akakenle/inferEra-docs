@@ -49,7 +49,8 @@
                   "cn/api/IdeogramAI",
                   "cn/api/Jina-AI",
                   "cn/api/App-code",
-                  "cn/api/Auth"
+                  "cn/api/Auth",
+                  "cn/api/Cli"
                 ]
               },
               {
@@ -68,13 +69,12 @@
               "cn/api/Gemini-Cli",
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
-              "cn/api/Cli"
+              "cn/clients/AISDK"
             ]
           },
           {
             "tab": "使用场景",
-            "pages": [
-              "cn/clients/AISDK",              
+            "pages": [        
               "cn/clients/Cherry-Studio",
               "cn/clients/Lobe-Chat",
               "cn/clients/OpenAI-Translator",
@@ -164,7 +164,8 @@
                   "en/api/IdeogramAI",
                   "en/api/Jina-AI",
                   "en/api/App-code",
-                  "en/api/Auth"
+                  "en/api/Auth",
+                  "en/api/Cli"
                 ]
               },
               {
@@ -183,13 +184,12 @@
               "en/api/Gemini-Cli",
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
-              "en/api/Cli"
+              "en/clients/AISDK"
             ]
           },
           {
             "tab": "Use Cases",
-            "pages": [
-              "en/clients/AISDK",         
+            "pages": [       
               "en/clients/Cherry-Studio",
               "en/clients/AnythingLLM",
               "en/clients/Avante.nvim",
@@ -279,7 +279,8 @@
                   "jp/api/IdeogramAI",
                   "jp/api/Jina-AI",
                   "jp/api/App-code",
-                  "jp/api/Auth"
+                  "jp/api/Auth",
+                  "jp/api/Cli"
                 ]
               },
               {
@@ -298,13 +299,12 @@
               "jp/api/Gemini-Cli",
               "jp/api/Codex-CLI",
               "jp/api/Qwen-code",
-              "jp/api/Cli"
+              "jp/clients/AISDK"
             ]
           },
           {
             "tab": "利用ケース",
-            "pages": [
-              "jp/clients/AISDK",         
+            "pages": [       
               "jp/clients/Cherry-Studio",
               "jp/clients/AnythingLLM",
               "jp/clients/Avante.nvim",
@@ -394,7 +394,8 @@
                   "ko/api/IdeogramAI",
                   "ko/api/Jina-AI",
                   "ko/api/App-code",
-                  "ko/api/Auth"
+                  "ko/api/Auth",
+                  "ko/api/Cli"
                 ]
               },
               {
@@ -413,13 +414,12 @@
               "ko/api/Gemini-Cli",
               "ko/api/Codex-CLI",
               "ko/api/Qwen-code",
-              "ko/api/Cli"
+              "ko/clients/AISDK"
             ]
           },
           {
             "tab": "사용 사례",
-            "pages": [
-              "ko/clients/AISDK",         
+            "pages": [      
               "ko/clients/Cherry-Studio",
               "ko/clients/AnythingLLM",
               "ko/clients/Avante.nvim",
@@ -509,7 +509,8 @@
                   "zh-Hant/api/IdeogramAI",
                   "zh-Hant/api/Jina-AI",
                   "zh-Hant/api/App-code",
-                  "zh-Hant/api/Auth"
+                  "zh-Hant/api/Auth",
+                  "zh-Hant/api/Cli"
                 ]
               },
               {
@@ -528,13 +529,12 @@
               "zh-Hant/api/Gemini-Cli",
               "zh-Hant/api/Codex-CLI",
               "zh-Hant/api/Qwen-code",
-              "zh-Hant/api/Cli"
+              "zh-Hant/clients/AISDK"
             ]
           },
           {
             "tab": "使用情境",
-            "pages": [
-              "zh-Hant/clients/AISDK",         
+            "pages": [       
               "zh-Hant/clients/Cherry-Studio",
               "zh-Hant/clients/AnythingLLM",
               "zh-Hant/clients/Avante.nvim",
