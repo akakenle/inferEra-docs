@@ -62,7 +62,7 @@
             ]
           },
           {
-            "tab": "CLI 工具",
+            "tab": "开发工具",
             "pages": [
               "cn/api/Claude-Code",
               "cn/api/Gemini-Cli",
