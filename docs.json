@@ -138,6 +138,7 @@
                   "en/index",
                   "en/quick-start",
                   "en/api-playground/inferUsages",
+                  "en/api/CC-any",
                   "en/api/Dify-plugin"
                 ]
               },
@@ -253,6 +254,7 @@
                   "jp/index",
                   "jp/quick-start",
                   "jp/api-playground/inferUsages",
+                  "jp/api/CC-any",
                   "jp/api/Dify-plugin"
                 ]
               },
@@ -368,6 +370,7 @@
                   "ko/index",
                   "ko/quick-start",
                   "ko/api-playground/inferUsages",
+                  "ko/api/CC-any",
                   "ko/api/Dify-plugin"
                 ]
               },
@@ -483,6 +486,7 @@
                   "zh-Hant/index",
                   "zh-Hant/quick-start",
                   "zh-Hant/api-playground/inferUsages",
+                  "zh-Hant/api/CC-any",
                   "zh-Hant/api/Dify-plugin"
                 ]
               },

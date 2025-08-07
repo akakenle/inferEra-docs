@@ -1,0 +1,108 @@
+---
+title: "Claude Code with any LLM"
+description: "Power Claude Code with any large model on the Aihubmix platform, completely eliminating connection instability and quota purchase difficulties. Aihubmix's forwarding service is based on official channels, compliant and secure, with no need to worry about account risks or hidden restrictions."
+icon: "terminal"
+---
+
+<Warning>
+  Due to Claude Code's multi-agent nature, quota consumption can be quite significant. It's recommended to set limited quotas for your Key to prevent billing surprises.
+</Warning>
+
+## Quick Configuration Guide
+
+### 1️⃣ Global npm Package Installation
+
+Run in terminal:
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+
+### 2️⃣ Set System Environment Variables (Recommended)
+
+Replace `sk-***` with your [API key](https://aihubmix.com/token) generated on AiHubMix. Configuration items other than models will be processed with system environment variables taking priority.
+
+```
+export AIHUBMIX_API_KEY="sk-***"
+export HOST="127.0.0.1"  # Optional
+export PORT="3456"        # Optional
+export LOG="true"         # Optional
+export API_TIMEOUT_MS="30000"  # Optional
+```
+
+<Tip>
+  - For Mac users, you can navigate to your `username` directory and press `⌘ + ⇧ + .` to show the hidden .zshrc file, then open it with the system's "TextEdit" app and add the above content.
+  - After adding the configuration, run `source ~/.zshrc` in terminal and press enter to make the configuration effective.
+</Tip>
+
+### 3️⃣ Generate Configuration File
+
+Replace `sk-***` below with your AiHubMix API key, then run this one-liner in terminal:
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ Usage
+
+<CodeGroup>
+
+```shell Start Service
+acc start
+```
+
+
+```shell Stop Service
+acc stop
+```
+
+
+```shell Run CC
+acc code
+```
+
+
+```shell Restart Service (needed after configuration changes)
+acc restart
+```
+
+
+```shell Status Check
+acc status
+```
+
+
+```shell Show Help
+acc help
+```
+
+
+```shell Check Version
+acc version
+```
+
+</CodeGroup>
+
+## More Resources
+
+- [Claude Code Forwarding](/en/api/Claude-Code)
+- [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+- [npm Package](https://www.npmjs.com/package/@aihubmix/claude-code)
+- [Official Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [Official Configuration Guide](https://docs.anthropic.com/en/docs/claude-code/settings#settings-files)

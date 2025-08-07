@@ -1,0 +1,108 @@
+---
+title: "Claude Code with any LLM"
+description: "使用 Aihubmix 平台上的任何大型模型為 Claude Code 提供強勁動力，徹底告別連接不穩定和額度難買的煩惱。Aihubmix 的轉發服務基於官方管道，合規安全，無需擔心帳號風險或隱性限制。"
+icon: "terminal"
+---
+
+<Warning>
+  由於 Claude Code 的多智能體屬性，額度消耗會比較誇張，建議為你的 Key 設置有限額度，防止帳單刺客。
+</Warning>
+
+## 快速配置指引
+
+### 1️⃣ 全域安裝 npm 套件
+
+使用終端運行：
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+
+### 2️⃣ 設置系統環境變數（推薦）
+
+注意 `sk-***` 要換成你在 AiHubMix 生成的[密鑰](https://aihubmix.com/token)，模型以外的配置項會以系統環境變數優先的順序處理。
+
+```
+export AIHUBMIX_API_KEY="sk-***"
+export HOST="127.0.0.1"  # 可選
+export PORT="3456"        # 可選
+export LOG="true"         # 可選
+export API_TIMEOUT_MS="30000"  # 可選
+```
+
+<Tip>
+  - 對於 Mac 用戶，你可以在`用戶名`目錄通過快捷鍵 `⌘ + ⇧ + .` 顯示隱藏的 .zshrc 檔案，用系統的「文字編輯」APP 開啟並添加上述內容。
+  - 添加配置之後，終端執行 `source ~/.zshrc`，回車，使配置生效
+</Tip>
+
+### 3️⃣ 生成配置檔案
+
+將下方的 `sk-***` 替換成你的 AiHubMix 密鑰，然後使用終端一鍵運行即可：
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ 使用
+
+<CodeGroup>
+
+```shell 啟動服務
+acc start
+```
+
+
+```shell 停止服務
+acc stop
+```
+
+
+```shell 運行 CC
+acc code
+```
+
+
+```shell 重啟服務（修改配置需要用的）
+acc restart
+```
+
+
+```shell 狀態檢測
+acc status
+```
+
+
+```shell 顯示幫助
+acc help
+```
+
+
+```shell 查看版本
+acc version
+```
+
+</CodeGroup>
+
+## 更多資源
+
+- [Claude Code 轉發](/ch-Hant/api/Claude-Code)
+- [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+- [npm 套件](https://www.npmjs.com/package/@aihubmix/claude-code)
+- [官方最佳實踐](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [官方配置指引](https://docs.anthropic.com/en/docs/claude-code/settings#settings-files)

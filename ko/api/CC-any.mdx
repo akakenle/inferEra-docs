@@ -1,0 +1,108 @@
+---
+title: "Claude Code with any LLM"
+description: "Aihubmix 플랫폼의 모든 대형 모델로 Claude Code를 강력하게 지원하여 연결 불안정과 할당량 구매 어려움을 완전히 해결합니다. Aihubmix의 전달 서비스는 공식 채널을 기반으로 하여 규정 준수 및 보안이 확보되며, 계정 위험이나 숨겨진 제한에 대해 걱정할 필요가 없습니다."
+icon: "terminal"
+---
+
+<Warning>
+  Claude Code의 멀티 에이전트 특성으로 인해 할당량 소비가 상당할 수 있습니다. 청구서 충격을 방지하기 위해 키에 제한된 할당량을 설정하는 것이 좋습니다.
+</Warning>
+
+## 빠른 설정 가이드
+
+### 1️⃣ 글로벌 npm 패키지 설치
+
+터미널에서 실행:
+
+```shell
+npm install -g @aihubmix/claude-code
+```
+
+### 2️⃣ 시스템 환경 변수 설정 (권장)
+
+`sk-***`를 AiHubMix에서 생성한 [API 키](https://aihubmix.com/token)로 바꾸세요. 모델 외의 설정 항목은 시스템 환경 변수가 우선하는 순서로 처리됩니다.
+
+```
+export AIHUBMIX_API_KEY="sk-***"
+export HOST="127.0.0.1"  # 선택사항
+export PORT="3456"        # 선택사항
+export LOG="true"         # 선택사항
+export API_TIMEOUT_MS="30000"  # 선택사항
+```
+
+<Tip>
+  - Mac 사용자의 경우, `사용자명` 디렉토리에서 `⌘ + ⇧ + .` 단축키를 사용하여 숨겨진 .zshrc 파일을 표시하고, 시스템의 "텍스트 편집" 앱으로 열어 위 내용을 추가할 수 있습니다.
+  - 설정을 추가한 후, 터미널에서 `source ~/.zshrc`를 실행하고 엔터를 누르면 설정이 적용됩니다.
+</Tip>
+
+### 3️⃣ 설정 파일 생성
+
+아래의 `sk-***`를 귀하의 AiHubMix API 키로 바꾸고, 터미널에서 원라이너를 실행하세요:
+
+```shell
+mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
+{
+  "API_KEY": "sk-***",
+  "HOST": "127.0.0.1",
+  "PORT": 3456,
+  "LOG": true,
+  "API_TIMEOUT_MS": 30000,
+  "Router": {
+    "default": "claude-sonnet-4-20250514",
+    "background": "claude-3-5-haiku-20241022",
+    "think": "claude-sonnet-4-20250514",
+    "longContext": "gpt-4.1",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini-2.0-flash-search"
+  }
+}
+EOF
+```
+
+### 4️⃣ 사용법
+
+<CodeGroup>
+
+```shell 서비스 시작
+acc start
+```
+
+
+```shell 서비스 중지
+acc stop
+```
+
+
+```shell CC 실행
+acc code
+```
+
+
+```shell 서비스 재시작 (설정 변경 시 필요)
+acc restart
+```
+
+
+```shell 상태 확인
+acc status
+```
+
+
+```shell 도움말 표시
+acc help
+```
+
+
+```shell 버전 확인
+acc version
+```
+
+</CodeGroup>
+
+## 추가 리소스
+
+- [Claude Code 전달](/ko/api/Claude-Code)
+- [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+- [npm 패키지](https://www.npmjs.com/package/@aihubmix/claude-code)
+- [공식 모범 사례](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [공식 설정 가이드](https://docs.anthropic.com/en/docs/claude-code/settings#settings-files)

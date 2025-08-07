@@ -1,10 +1,8 @@
 ---
 title: "Claude Code with any LLM"
-description: " "
+description: "使用 Aihubmix 平台上的任何大模型为 Claude Code 提供强劲动力，彻底告别连接不稳定和额度难买的烦恼。Aihubmix 的转发服务基于官方渠道，合规安全，无需担心账号风险或隐性限制。"
 icon: "terminal"
 ---
-
-使用 Aihubmix 平台上的任何大模型为 Claude Code 提供强劲动力，彻底告别连接不稳定和额度难买的烦恼。Aihubmix 的转发服务基于官方渠道，合规安全，无需担心账号风险或隐性限制。
 
 <Warning>
   由于 Claude Code 的多智能体属性，额度消耗会比较夸张，建议为你的 Key 设置有限额度，防止账单刺客。
@@ -36,7 +34,6 @@ export API_TIMEOUT_MS="30000"  # Optional
   - 对于 Mac 用户，你可以在`用户名`目录通过快捷键 `⌘ + ⇧ + .` 显示隐藏的 .zshrc 文件，用系统的「文本编辑」APP 打开并添加上述内容。
   - 添加配置之后，终端执行 `source ~/.zshrc`，回车，使配置生效
 </Tip>
-
 
 ### 3️⃣ 生成配置文件
 
@@ -70,25 +67,31 @@ EOF
 acc start
 ```
 
+
 ```shell 停止服务
 acc stop
 ```
+
 
 ```shell 运行 CC
 acc code
 ```
 
+
 ```shell 重启服务（修改配置需要用的）
 acc restart
 ```
+
 
 ```shell 状态检测
 acc status
 ```
 
+
 ```shell 显示帮助
 acc help
 ```
+
 
 ```shell 查看版本
 acc version
@@ -97,6 +100,7 @@ acc version
 </CodeGroup>
 
 ## 更多资源
+
 - [Claude Code 转发](/cn/api/Claude-Code)
 - [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
 - [npm 包](https://www.npmjs.com/package/@aihubmix/claude-code)
