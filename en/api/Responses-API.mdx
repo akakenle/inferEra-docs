@@ -39,6 +39,7 @@ client = OpenAI(
 
   2. Optional deep reasoning models: ‎⁠o3-deep-research⁠ and ‎⁠o4-mini-deep-research⁠, only supported on the ‎⁠responses⁠ endpoint.
   3. The gpt-5 series focuses on stable reasoning and consistent outputs, and no longer supports the `temperature` and `top_p` parameters for controlling randomness. If you need more freedom, you can try `gpt-5-chat-latest`, which supports `temperature`.
+  4. Reasoning models (o series / gpt-5 series) no longer support ‎`max_tokens`. Please use ‎`max_completion_tokens` to clearly define the output token limit.
 </Tip>
 
 <CodeGroup>
