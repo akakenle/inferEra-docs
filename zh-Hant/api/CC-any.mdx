@@ -5,7 +5,8 @@ icon: "terminal"
 ---
 
 <Warning>
-  由於 Claude Code 的多智能體屬性，額度消耗會比較誇張，建議為你的 Key 設置有限額度，防止帳單刺客。
+  1. 由於 Claude Code 的多智能體屬性，額度消耗會比較誇張，建議為你的 Key 設置有限額度，防止帳單刺客。
+  2. 使用時請確保已關閉本地 VPN，否則可能會遇到 GPT-5 延遲的情況。
 </Warning>
 
 ## 快速配置指引
@@ -50,7 +51,7 @@ mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<
   "Router": {
     "default": "gpt-5",
     "background": "claude-3-5-haiku-20241022",
-    "think": "claude-sonnet-4-20250514",
+    "think": "gpt-5",
     "longContext": "gpt-5",
     "longContextThreshold": 60000,
     "webSearch": "gemini-2.0-flash-search"

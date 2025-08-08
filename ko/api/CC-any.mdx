@@ -5,7 +5,8 @@ icon: "terminal"
 ---
 
 <Warning>
-  Claude Code의 멀티 에이전트 특성으로 인해 할당량 소비가 상당할 수 있습니다. 청구서 충격을 방지하기 위해 키에 제한된 할당량을 설정하는 것이 좋습니다.
+  1. Claude Code의 멀티 에이전트 특성으로 인해 할당량 소비가 상당할 수 있습니다. 청구서 충격을 방지하기 위해 키에 제한된 할당량을 설정하는 것이 좋습니다.
+  2. 사용 중에는 로컬 VPN을 비활성화해야 합니다. 그렇지 않으면 GPT-5에서 지연이 발생할 수 있습니다.
 </Warning>
 
 ## 빠른 설정 가이드
@@ -50,7 +51,7 @@ mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<
   "Router": {
     "default": "gpt-5",
     "background": "claude-3-5-haiku-20241022",
-    "think": "claude-sonnet-4-20250514",
+    "think": "gpt-5",
     "longContext": "gpt-5",
     "longContextThreshold": 60000,
     "webSearch": "gemini-2.0-flash-search"

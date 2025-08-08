@@ -5,7 +5,8 @@ icon: "terminal"
 ---
 
 <Warning>
-  Claude Codeのマルチエージェント属性により、クォータの消費が非常に大きくなる可能性があります。請求額サプライズを防ぐため、お客様のキーに限定クォータを設定することをお勧めします。
+  1. Claude Codeのマルチエージェント属性により、クォータの消費が非常に大きくなる可能性があります。請求額サプライズを防ぐため、お客様のキーに限定クォータを設定することをお勧めします。
+  2. ご利用の際はローカルVPNを無効にしてください。そうしないと、GPT-5で遅延が発生する可能性があります。
 </Warning>
 
 ## クイック設定ガイド
@@ -50,7 +51,7 @@ mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<
   "Router": {
     "default": "gpt-5",
     "background": "claude-3-5-haiku-20241022",
-    "think": "claude-sonnet-4-20250514",
+    "think": "gpt-5",
     "longContext": "gpt-5",
     "longContextThreshold": 60000,
     "webSearch": "gemini-2.0-flash-search"
