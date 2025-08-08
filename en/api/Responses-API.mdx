@@ -11,6 +11,7 @@ Support the Openai Responses API multi-function interface, the following functio
 - Web search: Web search
 - Deep research: For complex analysis and research tasks
 - Reasoning: Reasoning
+- Verbose: Output length, `gpt-5` supports 3 levels
 - Functions: Functions
 - image_generation tool usage: Image drawing and generation are billed under `gpt-image-1`.
 - Code Interpreter: Allow models to write and run Python to solve problems
@@ -37,9 +38,34 @@ client = OpenAI(
   ```
 
   2. Optional deep reasoning models: ‎⁠o3-deep-research⁠ and ‎⁠o4-mini-deep-research⁠, only supported on the ‎⁠responses⁠ endpoint.
+  3. The gpt-5 series focuses on stable reasoning and consistent outputs, and no longer supports the `temperature` and `top_p` parameters for controlling randomness. If you need more freedom, you can try `gpt-5-chat-latest`, which supports `temperature`.
 </Tip>
 
 <CodeGroup>
+
+```py gpt-5 series
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # Replace with the key generated in your AIHubMix dashboard
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
+    input="Why is tarot divination effective? What are the underlying principles and transferable methods? Output format: Markdown", # GPT-5 does not output in Markdown format by default, so you need to explicitly specify it.
+    reasoning={
+        "effort": "minimal" # Reasoning depth – Controls how many reasoning tokens the model generates before producing a response. Value can be "minimal", "medium", or "high". Default is "medium".
+    },
+    text={
+        "verbosity": "low" # Output length – Verbosity determines how many output tokens are generated. Value can be "low", "medium", or "high". Models before GPT-5 defaulted to "medium" verbosity.
+    },
+    stream=True
+)
+
+for event in response:
+  print(event)
+```
 
 ```py Text input
 from openai import OpenAI
