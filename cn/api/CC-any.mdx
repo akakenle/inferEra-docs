@@ -15,7 +15,7 @@ icon: "terminal"
 使用终端运行：
 
 ```shell
-npm install -g @aihubmix/claude-code
+npm install -g @aihubmix/claude-code@latest
 ```
 
 ### 2️⃣ 设置系统环境变量（推荐）
@@ -48,10 +48,10 @@ mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<
   "LOG": true,
   "API_TIMEOUT_MS": 30000,
   "Router": {
-    "default": "claude-sonnet-4-20250514",
+    "default": "gpt-5",
     "background": "claude-3-5-haiku-20241022",
     "think": "claude-sonnet-4-20250514",
-    "longContext": "gpt-4.1",
+    "longContext": "gpt-5",
     "longContextThreshold": 60000,
     "webSearch": "gemini-2.0-flash-search"
   }
