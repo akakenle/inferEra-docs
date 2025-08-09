@@ -10,8 +10,8 @@ icon: "o"
 - Streaming：流式调用
 - Web search：搜索
 - Deep research：深度研究
-- Reasoning：推理深度控制，支持 4 档 (minimal / low / medium /high)
-- Verbose: 输出篇幅，`gpt-5` 支持 3 档 (low / medium /high)
+- Reasoning：推理深度控制，支持 4 档 (minimal / low / medium /high)，其中 minimal 仅适用于 gpt-5 系列
+- Verbose: 输出篇幅，gpt-5 系列支持 3 档 (low / medium /high)
 - Functions：函数调用
 - image_generation：绘图工具调用，图片生成部分按 `gpt-image-1` 计价
 - Code Interpreter：代码解析器
@@ -37,7 +37,7 @@ client = OpenAI(
   "summary": "auto" 
   ```
 
-  2. 深度推理模型可选：`o3-deep-research` 和 `o4-mini-deep-research`，仅支持 `responses` 端口
+  2. 深度研究模型可选：`o3-deep-research` 和 `o4-mini-deep-research`，仅支持 `responses` 端口
   3. gpt-5 系列强调稳定推理和一致性输出，不再支持用于控制随机性的 `temprature` 和 `top_p` 参数，如果你需要更多自由度，可以尝试支持 `temprature` 的 `gpt-5-chat-latest`
   4. 推理模型（o 系列 / gpt-5 系列）已废弃 ‎`max_tokens`，请使用 ‎`max_completion_tokens` 明确限定输出 token 上限。
 </Tip>
