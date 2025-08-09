@@ -40,7 +40,7 @@ client = OpenAI(
   2. `gpt-5-chat` 在不传入 reasoning.effort 的情况下，相当于关闭推理，适用于会话场景。
   3. 深度研究模型可选：`o3-deep-research` 和 `o4-mini-deep-research`，仅支持 `responses` 端口
   4. gpt-5 系列强调稳定推理和一致性输出，不再支持用于控制随机性的 `temprature` 和 `top_p` 参数，如果你需要更多自由度，可以尝试支持 `temprature` 的 `gpt-5-chat-latest`
-  5. 推理模型（o 系列 / gpt-5 系列）已废弃 ‎`max_tokens`，请使用 ‎`max_completion_tokens` 明确限定输出 token 上限。
+  5. 推理模型（o 系列 / gpt-5 系列）已废弃 ‎`max_tokens`，请[使用 completion](https://platform.openai.com/docs/api-reference/chat/create) 的 ‎`max_completion_tokens` 或 [responses](https://platform.openai.com/docs/api-reference/responses/create) 的 `max_output_tokens` 明确限定输出 token 上限。
 </Tip>
 
 <CodeGroup>
@@ -68,6 +68,7 @@ response = client.responses.create(
 for event in response:
   print(event)
 ```
+
 
 ```py 文本
 from openai import OpenAI
@@ -152,6 +153,7 @@ response = client.responses.create(
 print(response)
 ```
 
+
 ```py Deep Research
 from openai import OpenAI
 
@@ -185,6 +187,7 @@ response = client.responses.create(
 
 print(response.output_text)
 ```
+
 
 ```py 推理
 from openai import OpenAI
