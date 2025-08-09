@@ -9,7 +9,8 @@ OpenAIのResponses APIの多機能インターフェースをサポートして�
 - Image input：画像とテキストの入力
 - Streaming：ストリーミング呼び出し
 - Web search：検索
-- Reasoning：推論、4段階の推論深度に対応
+- Reasoning：推論深度の制御。4 段階に対応（minimal / low / medium / high）
+- Verbose: 出力長（冗長度）。gpt-5 は 3 段階に対応（low / medium / high）
 - Functions：関数呼び出し
 - image_generation：描画ツール呼び出し、画像生成部分は `gpt-image-1` で課金されます
 - Code Interpreter：コード解析器
@@ -36,6 +37,31 @@ client = OpenAI(
 
 <CodeGroup>
 
+```py GPT-5
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AIHubMix ダッシュボードで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
+    input="なぜタロット占いは効果的なのか？その根底にある原理と転用可能な方法は何か？ 出力形式: Markdown", # GPT-5 はデフォルトで Markdown 形式で出力しないため、明示的に指定する必要があります。
+    reasoning={
+        "effort": "minimal" # 推論の深さ — 応答を生成する前にモデルが生成する推論トークンの数を制御します。値は "minimal"、"low"、"medium"、"high"。既定は "medium"。
+    },
+    text={
+        "verbosity": "low" # 出力長 — 冗長度は生成される出力トークン数を決定します。値は "low"、"medium"、"high"。GPT-5 以前のモデルの既定は "medium" の冗長度でした。
+    },
+    stream=True
+)
+
+for event in response:
+  print(event)
+
+```
+
 ```py テキスト
 from openai import OpenAI
 import os
@@ -52,7 +78,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 画像とテキスト
 from openai import OpenAI
@@ -81,7 +106,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py ストリーミング
 from openai import OpenAI
 
@@ -100,7 +124,6 @@ response = client.responses.create(
 for event in response:
   print(event)
 ```
-
 
 ```py 検索
 from openai import OpenAI

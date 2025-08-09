@@ -9,7 +9,8 @@ icon: "o"
 - Image input：圖文輸入
 - Streaming：串流調用
 - Web search：搜尋
-- Reasoning：推理深度，支援 3 檔
+- Reasoning：推理深度控制，支援 4 個等級（minimal / low / medium / high）
+- Verbose：輸出長度（冗長度），gpt-5 支援 3 個等級（low / medium / high）
 - Functions：函數調用
 - image_generation：繪圖工具調用，圖片生成部分按 `gpt-image-1` 計價
 - Code Interpreter：程式碼解析器
@@ -36,6 +37,30 @@ client = OpenAI(
 
 <CodeGroup>
 
+```py GPT-5 系列
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 將其替換為你在 AIHubMix 後台產生的金鑰
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
+    input="為什麼塔羅占卜有效？其背後的原理是什麼？有哪些可遷移的方法？輸出格式：Markdown", # GPT-5 預設不以 Markdown 格式輸出，因此需要明確指定。
+    reasoning={
+        "effort": "minimal" # 推理深度——控制模型在產生回覆前會生成多少推理 token。可用值為 "minimal"、"low"、"medium" 或 "high"。預設為 "medium"。
+    },
+    text={
+        "verbosity": "low" # 輸出長度——冗長度決定會生成多少輸出 token。可用值為 "low"、"medium" 或 "high"。GPT-5 之前的模型預設為 "medium" 冗長度。
+    },
+    stream=True
+)
+
+for event in response:
+  print(event)
+```
+
 ```py 文字
 from openai import OpenAI
 import os
@@ -52,7 +77,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 圖文
 from openai import OpenAI

@@ -9,7 +9,8 @@ Openai Responses API 다기능 인터페이스를 지원하며, 다음 기능들
 - Image input: 이미지 입력
 - Streaming: 스트리밍
 - Web search: 웹 검색
-- Reasoning: 추론
+- Reasoning: 추론 깊이 제어. 4단계 지원 (minimal / low / medium / high)
+- Verbose: 출력 길이. gpt-5는 3단계 지원 (low / medium / high)
 - Functions: 함수
 - image_generation tool usage: 이미지 그리기 및 생성은 `gpt-image-1`로 청구됩니다.
 - Code Interpreter: 모델이 Python을 작성하고 실행하여 문제를 해결할 수 있도록 합니다
@@ -36,6 +37,30 @@ client = OpenAI(
 
 <CodeGroup>
 
+```py GPT-5
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 將其替換為你在 AIHubMix 後台產生的金鑰
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.responses.create(
+    model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
+    input="為什麼塔羅占卜有效？其背後的原理是什麼？有哪些可遷移的方法？輸出格式：Markdown", # GPT-5 預設不以 Markdown 格式輸出，因此需要明確指定。
+    reasoning={
+        "effort": "minimal" # 推理深度——控制模型在產生回覆前會生成多少推理 token。可用值為 "minimal"、"low"、"medium" 或 "high"。預設為 "medium"。
+    },
+    text={
+        "verbosity": "low" # 輸出長度——冗長度決定會生成多少輸出 token。可用值為 "low"、"medium" 或 "high"。GPT-5 之前的模型預設為 "medium" 冗長度。
+    },
+    stream=True
+)
+
+for event in response:
+  print(event)
+```
+
 ```py 텍스트 입력
 from openai import OpenAI
 
@@ -51,7 +76,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 이미지 입력
 from openai import OpenAI
@@ -80,7 +104,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py 스트리밍
 from openai import OpenAI
 
@@ -100,7 +123,6 @@ for event in response:
   print(event)
 ```
 
-
 ```py 웹 검색
 from openai import OpenAI
 
@@ -117,7 +139,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 추론
 from openai import OpenAI
@@ -138,7 +159,6 @@ response = client.responses.create(
 
 print(response)
 ```
-
 
 ```py 함수
 from openai import OpenAI
@@ -177,7 +197,6 @@ response = client.responses.create(
 print(response)
 ```
 
-
 ```py 이미지 생성 도구
 from openai import OpenAI
 import base64
@@ -206,7 +225,6 @@ if image_data:
         f.write(base64.b64decode(image_base64))
 ```
 
-
 ```py 코드 인터프리터
 from openai import OpenAI
 
@@ -234,7 +252,6 @@ resp = client.responses.create(
 
 print(resp.output)
 ```
-
 
 ```py 원격 MCP
 from openai import OpenAI
