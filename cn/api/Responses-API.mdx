@@ -10,7 +10,7 @@ icon: "o"
 - Streaming：流式调用
 - Web search：搜索
 - Deep research：深度研究
-- Reasoning：推理深度，支持 3 档
+- Reasoning：推理，支持 4 档推理深度
 - Verbose: 输出篇幅，`gpt-5` 支持 3 档
 - Functions：函数调用
 - image_generation：绘图工具调用，图片生成部分按 `gpt-image-1` 计价
@@ -56,7 +56,7 @@ response = client.responses.create(
     model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
     input="塔罗占卜为何有效，背后的原理和可迁移的方法是什么？Output format: Markdown", # GPT-5 默认不使用 Markdown 格式输出，需要明确指定。
     reasoning={
-        "effort": "minimal" # 推理深度 - Controls how many reasoning tokens the model generates before producing a response. value can be "minimal", "medium", "high", default is "medium"
+        "effort": "minimal" # 推理深度 - Controls how many reasoning tokens the model generates before producing a response. value can be "minimal", "low", "medium", "high", default is "medium"
     },
     text={
         "verbosity": "low" # 输出篇幅 - Verbosity determines how many output tokens are generated. value can be "low", "medium", "high", Models before GPT-5 have used medium verbosity by default. 

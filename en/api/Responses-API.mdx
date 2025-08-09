@@ -10,7 +10,7 @@ Support the Openai Responses API multi-function interface, the following functio
 - Streaming: Streaming
 - Web search: Web search
 - Deep research: For complex analysis and research tasks
-- Reasoning: Reasoning
+- Reasoning: Reasoning, Supports 4 levels of reasoning depth
 - Verbose: Output length, `gpt-5` supports 3 levels
 - Functions: Functions
 - image_generation tool usage: Image drawing and generation are billed under `gpt-image-1`.
@@ -56,7 +56,7 @@ response = client.responses.create(
     model="gpt-5", # gpt-5, gpt-5-chat-latest, gpt-5-mini, gpt-5-nano
     input="Why is tarot divination effective? What are the underlying principles and transferable methods? Output format: Markdown", # GPT-5 does not output in Markdown format by default, so you need to explicitly specify it.
     reasoning={
-        "effort": "minimal" # Reasoning depth – Controls how many reasoning tokens the model generates before producing a response. Value can be "minimal", "medium", or "high". Default is "medium".
+        "effort": "minimal" # Reasoning depth – Controls how many reasoning tokens the model generates before producing a response. Value can be "minimal", "low", "medium" or "high". Default is "medium".
     },
     text={
         "verbosity": "low" # Output length – Verbosity determines how many output tokens are generated. Value can be "low", "medium", or "high". Models before GPT-5 defaulted to "medium" verbosity.
