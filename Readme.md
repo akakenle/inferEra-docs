@@ -19,12 +19,16 @@
 
 **两种图片引用格式示例**
 1. 卡片
+```
 <Card title="Girl with a Pearl Earring" img="/media/en/Girl-with-a-Pearl-Earring.PNG">
   1. The famous painting is reinterpreted, with text and watermark directly output.
 </Card>
+```
 
 2. 直接显示，注意文字标题要有清晰的语义，如：
+```
 ![auth](../../public/cn/claude-auth.png)
+```
 
 **带格式的功能信息块**
 带有特殊功能的信息块用以下 xml 标签组来展示，不需要 codeblock。
