@@ -28,24 +28,32 @@
 
 **带格式的功能信息块**
 带有特殊功能的信息块用以下 xml 标签组来展示，不需要 codeblock。
+注意，当前使用 ```codeblock``` 主要用于 Github 解析。
 
 辅助信息
+```
 <Info>
   辅助信息
 </Info>
+```
 
 实用技巧
+```
 <Tip>
   实用技巧
 </Tip>
+```
 
 警告或提醒
+```
 <Warning>
   需要强调的注意事项
 </Warning>
+```
 
 代码示例务必用编组收纳，确保良好的可读性：
 
+```
 <CodeGroup>
 
 ```shell 清晰的名称
@@ -55,6 +63,7 @@
 ```
 
 </CodeGroup>
+```
 
 邮件链接：
 [business@aihubmix.com](mailto:business@aihubmix.com)
