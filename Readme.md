@@ -1,17 +1,5 @@
-- 确认只能主号 commit deploy
-- 建立骨架
-- API 目录下的文档细节修复
-- Sidebar 改成 Tab
-- review 中文版结构
-- 多语言适配：只需要在对应语种目录下添加对应语言的文件，docs 引用即可
-- 迁移英文版
-- 修复双语配置顺序
-- 双语版本的路径：中文/cn/index 英文/en/index
-- 域名迁移
-- 正式发布 🎉
-
-**文档撰写规范**
-不用于简单的操作手册，除了指引开发者/AI IDE 如何使用，更应该体现功能和更新等的作用。简要规范如下，也适用于更新日志：
+## 文档撰写规范
+- Aihubmix Docs 不是简单的操作手册，除了指引开发者/AI IDE 如何使用，更应该体现功能和更新等的作用。简要规范如下，也适用于更新日志：
 ```
 [更新]，[作用]
 ```
@@ -23,42 +11,41 @@
 # 更新
 新增 OpenAI CodeX CLI 支持！在命令行中用自然语言编程。
 ```
-
-**注意事项：**
-- 本地开发：`mintlify dev` 运行
-- 根目录的 docs.json 管理全局的配置，新增文档要在这里引用
-- 先处理 logo 和品牌色版，后续需要改成 iferEra
-- 导航形式只能在顶部 tab 和侧边 sidebar 二选一
-- 多语言支持 @navigation/localization.mdx
-- 中、英先行，gemini cli 翻译其他版本补上（jp、ko、zh-Hant）
 - 📍 文档名称规范：使用英语、"-" 连接符，否则会导致：
   - 不利于 SEO 且显示异常
   - 导航异常
   - 底部无法翻页
 - 引用链接时，文件名的空格要替换为 %20，例如：[Claude 原生接口调用](/api/Claude%20原生接口调用)
-  
-带格式的信息块 （不需要 codeblock）：
-Tips：
-```
-<Tip>
-</Tip>
-```
 
-警告：
-```
-<Warning>
-需要强调的注意事项也可以使用
-</Warning>
-```
+**两种图片引用格式示例**
+1. 卡片
+<Card title="Girl with a Pearl Earring" img="/media/en/Girl-with-a-Pearl-Earring.PNG">
+  1. The famous painting is reinterpreted, with text and watermark directly output.
+</Card>
 
-备注：
-```
+2. 直接显示，注意文字标题要有清晰的语义，如：
+![auth](../../public/cn/claude-auth.png)
+
+**带格式的功能信息块**
+带有特殊功能的信息块用以下 xml 标签组来展示，不需要 codeblock。
+
+辅助信息
 <Info>
+  辅助信息
 </Info>
-```
 
-代码示例用编组收纳：
-```
+实用技巧
+<Tip>
+  实用技巧
+</Tip>
+
+警告或提醒
+<Warning>
+  需要强调的注意事项
+</Warning>
+
+代码示例务必用编组收纳，确保良好的可读性：
+
 <CodeGroup>
 
 ```shell 清晰的名称
@@ -68,16 +55,27 @@ Tips：
 ```
 
 </CodeGroup>
-```
 
 邮件链接：
 [business@aihubmix.com](mailto:business@aihubmix.com)
 
 ---
 
-<Info>
-  **Prerequisite**: Please install Node.js (version 19 or higher) before proceeding.
-</Info>
+## 实用方法
+1. 图片在 Github 仓库上传
+2. 优先处理 cn → Claude Code 批处理翻译为 en、jp、ko、zh-Hant
+3. 主要配置项为文档路径 docs.json 和每种语言目录下的更新日志 changelog/News.mdx
+4. 优先发布 cn 和 en，完成宣发后排期补其他语言
+
+## 注意事项
+- 只能主号 commit deploy
+- 本地开发：`mintlify dev` 运行
+- 根目录的 docs.json 管理全局的配置，新增文档要在这里引用
+- 先处理 logo 和品牌色版，后续需要改成 iferEra
+- 导航形式只能在顶部 tab 和侧边 sidebar 二选一
+- 多语言支持 @navigation/localization.mdx
+
+---
 
 **Step 1**: Install the Mintlify CLI:
 
@@ -199,3 +197,17 @@ We suggest using extensions on your IDE to recognize and format MDX. If you're a
     Solution: Go to the root of your device and delete the ~/.mintlify folder. Afterwards, run `mintlify dev` again.
   </Accordion>
 </AccordionGroup>
+
+## 文档迁移完成
+
+- 确认只能主号 commit deploy
+- 建立骨架
+- API 目录下的文档细节修复
+- Sidebar 改成 Tab
+- review 中文版结构
+- 多语言适配：只需要在对应语种目录下添加对应语言的文件，docs 引用即可
+- 迁移英文版
+- 修复双语配置顺序
+- 双语版本的路径：中文/cn/index 英文/en/index
+- 域名迁移
+- 正式发布 🎉
