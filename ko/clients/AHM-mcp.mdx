@@ -1,0 +1,88 @@
+---
+title: "Aihubmix 이미지 생성 MCP"
+description: "Description of your new file."
+icon: "paintbrush"
+---
+
+## 소개
+
+Aihubmix는 통합 인터페이스 방식으로 시장의 주요 이미지 생성 API를 통합하고, MCP 방식으로 패키징하여 개발자들이 LLM과의 상호작용에 더 편리하게 통합할 수 있도록 하며, 사용자는 자연어 입력으로 이미지 생성을 트리거할 수 있습니다.
+
+현재 통합된 모델은 다음과 같습니다:
+
+- openai/gpt-image-1
+- ideogram/V3
+- google/imagen-4.0-ultra-generate-preview-06-06
+- google/imagen-4.0-generate-preview-06-06
+- bfl/flux-kontext-max
+- bfl/flux-kontext-pro
+
+
+<Note>
+  gpt-image-1 모델의 반환 결과는 base64 인코딩되어 있어 Claude Desktop에서 너무 길어 오류가 발생할 수 있습니다. 현재 V3 / Flux / Imagen을 우선적으로 사용하는 것을 권장합니다.
+</Note>
+
+## 1️⃣ 설치
+
+다음은 일반적인 AI 도구들의 MCP 설치 방법 예시입니다. 명령어를 실행하기 전에 `sk-***`를 본인의 Aihubmix API 키로 교체해야 합니다.
+
+설치 후에는 도구를 재시작해야 변경사항이 적용됩니다.
+
+### Claude Code에 설치
+
+터미널에서 설치 명령어 실행:
+
+```shell
+claude mcp add --transport http aihubmix-api https://aihubmix.com/mcp/ \
+  --header "Authorization: Bearer sk-***" 
+```
+
+`claude` 명령어로 Claude Code를 시작한 후, `/mcp`를 입력하여 설치를 확인할 수 있습니다.
+
+### Claude Desktop에 설치
+
+아바타 → Settings → Developer → Edit Config → 다음 구성 추가:
+
+```shell
+"aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": ["-y", "@aihubmix/mcp"],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    }
+}
+```
+
+### Warp AI에 설치
+
+아바타 → Settings → AI → Manage MCP Servers → Add → 다음 구성 추가:
+
+```shell
+{
+  "aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@aihubmix/mcp"
+    ],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    },
+    "working_directory": null
+  }
+```
+
+2️⃣ 사용법
+
+1. 자연어 입력을 사용하여 mcp와 대상을 지정합니다. 예:
+```shell prompt
+aihubmix mcp를 사용하여 정원에서 노는 귀여운 고양이를 Pixar 3D 카툰 스타일, 3:2로 그려주고, 자동으로 프롬프트를 최적화하여 실행해주세요
+```
+Claude Desktop 사용 예시:
+![Aihubmix MCP 사용](../../public/cn/aihubmix-mcp.png)  
+
+2. flux-kontext-max, ideogram/V3 등의 대상 모델을 지정할 수 있습니다. 정확히 일치시킬 필요는 없으며, LLM이 자동으로 키워드를 매칭합니다
+3. 더 많은 제약 조건을 지정합니다. 예:
+```shell prompt
+영화적 조명, 로우 앵글, 모델 V3, 2장 생성
+```

@@ -1,0 +1,88 @@
+---
+title: "Aihubmix Image Generation MCP"
+description: "Description of your new file."
+icon: "paintbrush"
+---
+
+## Introduction
+
+Aihubmix integrates mainstream image generation APIs through a unified interface and encapsulates them as MCP (Model Context Protocol), making it more convenient for developers to integrate with LLM interactions. Users can trigger image generation using natural language input.
+
+Currently integrated models include:
+
+- openai/gpt-image-1
+- ideogram/V3
+- google/imagen-4.0-ultra-generate-preview-06-06
+- google/imagen-4.0-generate-preview-06-06
+- bfl/flux-kontext-max
+- bfl/flux-kontext-pro
+
+
+<Note>
+  The gpt-image-1 model returns base64 encoded results, which may cause errors in Claude Desktop due to excessive length. Currently, we recommend prioritizing V3 / Flux / Imagen models.
+</Note>
+
+## 1️⃣ Installation
+
+Below are MCP installation examples for common AI tools. Before running the commands, replace `sk-***` with your Aihubmix API key.
+
+After installation, you need to restart the tool for changes to take effect.
+
+### Install to Claude Code
+
+Run the installation command in terminal:
+
+```shell
+claude mcp add --transport http aihubmix-api https://aihubmix.com/mcp/ \
+  --header "Authorization: Bearer sk-***" 
+```
+
+After starting Claude Code with the `claude` command, enter `/mcp` to confirm installation.
+
+### Install to Claude Desktop
+
+Avatar → Settings → Developer → Edit Config → Add the following configuration:
+
+```shell
+"aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": ["-y", "@aihubmix/mcp"],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    }
+}
+```
+
+### Install to Warp AI
+
+Avatar → Settings → AI → Manage MCP Servers → Add → Add the following configuration:
+
+```shell
+{
+  "aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@aihubmix/mcp"
+    ],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    },
+    "working_directory": null
+  }
+```
+
+2️⃣ Usage
+
+1. Use natural language input, specify mcp and target, for example:
+```shell prompt
+Use aihubmix mcp to draw a cute kitten playing in a garden, Pixar 3D cartoon style, 3:2, automatically optimize the prompt for me and execute
+```
+Claude Desktop usage example:
+![Using Aihubmix MCP](../../public/cn/aihubmix-mcp.png)  
+
+2. You can specify target models, such as flux-kontext-max, ideogram/V3, etc. Exact matching is not required, LLM will automatically match keywords
+3. Specify more constraints, for example:
+```shell prompt
+Cinematic lighting, low angle, model V3, generate 2 images
+```

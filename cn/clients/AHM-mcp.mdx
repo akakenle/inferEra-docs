@@ -1,0 +1,88 @@
+---
+title: "Aihubmix 图片生成 MCP"
+description: "Description of your new file."
+icon: "paintbrush"
+---
+
+## 简介
+
+Aihubmix 使用统一接口的方式整合了市面上主流的图片生成 API，以 MCP 的方式封装设计，让开发者们可以更便利地整合到与 LLM 的交互中，用户使用自然语音输入，即可触发图片生成。
+
+目前整合的模型如下：
+
+- openai/gpt-image-1
+- ideogram/V3
+- google/imagen-4.0-ultra-generate-preview-06-06
+- google/imagen-4.0-generate-preview-06-06
+- bfl/flux-kontext-max
+- bfl/flux-kontext-pro
+
+
+<Note>
+  gpt-image-1 模型的返回结果为 base64 编码，在 Claude Desktop 中可能会因为太长导致报错。目前建议优先使用 V3 / Flux / Imagen。
+</Note>
+
+## 1️⃣ 安装
+
+下面是一些常用 AI 工具的 MCP 安装方式示例，运行指令之前需要将 `sk-***` 替换为你的 Aihubmix 密钥。
+
+安装之后都需要重启工具才能生效。
+
+### 安装到 Claude Code
+
+终端运行安装指令
+
+```shell
+claude mcp add --transport http aihubmix-api https://aihubmix.com/mcp/ \
+  --header "Authorization: Bearer sk-***" 
+```
+
+使用 `claude` 命令启动 Claude Code 之后，输入 `/mcp` 即可确认
+
+### 安装到 Claude Desktop
+
+头像 → Settings → Developer → Edit Config → 加入以下配置
+
+```shell
+"aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": ["-y", "@aihubmix/mcp"],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    }
+}
+```
+
+### 安装到 Warp AI
+
+头像 → Settings → AI → Manage MCP Servers → Add → 加入以下配置
+
+```shell
+{
+  "aihubmix-mcp-stdio": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@aihubmix/mcp"
+    ],
+    "env": {
+      "AIHUBMIX_API_KEY": "sk-***"
+    },
+    "working_directory": null
+  }
+```
+
+2️⃣ 使用
+
+1. 使用自然语言输入，指定 mcp 和目标，比如：
+```shell prompt
+使用 aihubmix mcp 绘制一只可爱小猫在花园里玩耍，Pixar 3d 卡通风格，3:2,, 自动为我优化 prompt 并执行
+```
+Claude Desktop 使用示例：
+![使用 Aihubmix MCP](../../public/cn/aihubmix-mcp.png)  
+
+2. 可以指定目标模型，比如 flux-kontext-max、ideogram/V3 等，不需要精确对应，LLM 会自动匹配关键字眼
+3. 指定更多约束，比如
+```shell prompt
+影视光、低视角、模型 V3，生成 2 张
+```
