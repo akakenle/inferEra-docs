@@ -58,7 +58,6 @@
 
 代码示例务必用编组收纳，确保良好的可读性：
 
-```
 <CodeGroup>
 
 ```shell 清晰的名称
@@ -68,7 +67,6 @@
 ```
 
 </CodeGroup>
-```
 
 邮件链接：
 [business@aihubmix.com](mailto:business@aihubmix.com)
