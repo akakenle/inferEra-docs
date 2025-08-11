@@ -115,15 +115,15 @@
             ]
           },
           {
-            "tab": "更新",
-            "pages": [
-              "cn/changelog/News"
-            ]
-          },
-          {
             "tab": "博客",
             "pages": [
               "cn/blogs/Building"
+            ]
+          },
+          {
+            "tab": "更新",
+            "pages": [
+              "cn/changelog/News"
             ]
           }
         ]
@@ -233,15 +233,15 @@
             ]
           },
           {
-            "tab": "Updates",
-            "pages": [
-              "en/changelog/News"
-            ]
-          },
-          {
             "tab": "Blogs",
             "pages": [
               "en/blogs/Building"
+            ]
+          },
+          {
+            "tab": "Updates",
+            "pages": [
+              "en/changelog/News"
             ]
           }
         ]
@@ -351,15 +351,15 @@
             ]
           },
           {
-            "tab": "アップデート",
-            "pages": [
-              "jp/changelog/News"
-            ]
-          },
-          {
             "tab": "ブログ",
             "pages": [
               "jp/blogs/Building"
+            ]
+          },
+          {
+            "tab": "アップデート",
+            "pages": [
+              "jp/changelog/News"
             ]
           }
         ]
@@ -469,15 +469,15 @@
             ]
           },
           {
-            "tab": "업데이트",
-            "pages": [
-              "ko/changelog/News"
-            ]
-          },
-          {
             "tab": "블로그",
             "pages": [
               "ko/blogs/Building"
+            ]
+          },
+          {
+            "tab": "업데이트",
+            "pages": [
+              "ko/changelog/News"
             ]
           }
         ]
@@ -587,15 +587,15 @@
             ]
           },
           {
-            "tab": "更新資訊",
-            "pages": [
-              "zh-Hant/changelog/News"
-            ]
-          },
-          {
             "tab": "部落格",
             "pages": [
               "zh-Hant/blogs/Building"
+            ]
+          },
+          {
+            "tab": "更新資訊",
+            "pages": [
+              "zh-Hant/changelog/News"
             ]
           }
         ]
