@@ -560,7 +560,7 @@
               "zh-Hant/clients/ChatHub",
               "zh-Hant/clients/Chatx",
               "zh-Hant/clients/Cline",
-              "jp/clients/Cursor",
+              "zh-Hant/clients/Cursor",
               "zh-Hant/clients/Dify",
               "zh-Hant/clients/GPT-Academic",
               "zh-Hant/clients/Gptme",
@@ -575,7 +575,7 @@
               "zh-Hant/clients/Zotero",
               "zh-Hant/clients/Immersive-Translate",
               "zh-Hant/clients/On-CS",
-              "jp/clients/Oulu"
+              "zh-Hant/clients/Oulu"
             ]
           },
           {
