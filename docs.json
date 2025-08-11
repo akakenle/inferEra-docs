@@ -71,7 +71,7 @@
               "cn/api/Gemini-Cli",
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
-              "cn/clients/AISDK"
+              "cn/api/AISDK"
             ]
           },
           {
@@ -189,7 +189,7 @@
               "en/api/Gemini-Cli",
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
-              "en/clients/AISDK"
+              "en/api/AISDK"
             ]
           },
           {
@@ -307,7 +307,7 @@
               "jp/api/Gemini-Cli",
               "jp/api/Codex-CLI",
               "jp/api/Qwen-code",
-              "jp/clients/AISDK"
+              "jp/api/AISDK"
             ]
           },
           {
@@ -425,7 +425,7 @@
               "ko/api/Gemini-Cli",
               "ko/api/Codex-CLI",
               "ko/api/Qwen-code",
-              "ko/clients/AISDK"
+              "ko/api/AISDK"
             ]
           },
           {
@@ -543,7 +543,7 @@
               "zh-Hant/api/Gemini-Cli",
               "zh-Hant/api/Codex-CLI",
               "zh-Hant/api/Qwen-code",
-              "zh-Hant/clients/AISDK"
+              "zh-Hant/api/AISDK"
             ]
           },
           {
