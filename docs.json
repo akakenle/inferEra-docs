@@ -31,8 +31,8 @@
                 "pages": [
                   "cn/api/Model-Information",
                   "cn/api/Model-List",
-                  "cn/api/OpenAI-library", 
-                  "cn/api/Responses-API",  
+                  "cn/api/OpenAI-library",
+                  "cn/api/Responses-API",
                   "cn/api/GPT-Image-1",
                   "cn/api/GPT-4o-image",
                   "cn/api/Image-Gen",
@@ -76,7 +76,7 @@
           },
           {
             "tab": "使用场景",
-            "pages": [        
+            "pages": [ 
               "cn/clients/AHM-mcp",
               "cn/clients/Cherry-Studio",
               "cn/clients/Lobe-Chat",
@@ -149,8 +149,8 @@
                 "pages": [
                   "en/api/Model-Information",
                   "en/api/Model-List",
-                  "en/api/OpenAI-library",  
-                  "en/api/Responses-API",  
+                  "en/api/OpenAI-library",
+                  "en/api/Responses-API",
                   "en/api/GPT-Image-1",
                   "en/api/GPT-4o-image",
                   "en/api/Image-Gen",
@@ -194,7 +194,7 @@
           },
           {
             "tab": "Use Cases",
-            "pages": [       
+            "pages": [ 
               "en/clients/AHM-mcp",
               "en/clients/Cherry-Studio",
               "en/clients/AnythingLLM",
@@ -267,8 +267,8 @@
                 "pages": [
                   "jp/api/Model-Information",
                   "jp/api/Model-List",
-                  "jp/api/OpenAI-library",  
-                  "jp/api/Responses-API",  
+                  "jp/api/OpenAI-library",
+                  "jp/api/Responses-API",
                   "jp/api/GPT-Image-1",
                   "jp/api/GPT-4o-image",
                   "jp/api/Image-Gen",
@@ -312,7 +312,7 @@
           },
           {
             "tab": "利用ケース",
-            "pages": [    
+            "pages": [
               "jp/clients/AHM-mcp",
               "jp/clients/Cherry-Studio",
               "jp/clients/Lobe-Chat",
@@ -548,7 +548,7 @@
           },
           {
             "tab": "使用情境",
-            "pages": [       
+            "pages": [
               "zh-Hant/clients/AHM-mcp",
               "zh-Hant/clients/Cherry-Studio",
               "zh-Hant/clients/Lobe-Chat",
