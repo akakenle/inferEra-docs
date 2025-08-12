@@ -49,6 +49,7 @@
                   "cn/api/TTS",
                   "cn/api/STT",
                   "cn/api/IdeogramAI",
+                  "cn/api/EBD",
                   "cn/api/Jina-AI",
                   "cn/api/App-code",
                   "cn/api/Auth",

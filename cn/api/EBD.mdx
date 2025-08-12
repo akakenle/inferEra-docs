@@ -1,0 +1,82 @@
+---
+title: '向量嵌入'
+description: 'AiHubMix 提供兼容 OpenAI 标准的高效向量嵌入方案'
+icon: "binary"
+---
+
+## 调用指引
+
+AiHubMix 的嵌入模型能够高效地将文本或文档内容转化为可检索的向量数据，广泛应用于 RAG 问答系统和智能客服。无论文本还是文档，均可一键生成嵌入，显著提升语义处理表现。
+
+<CodeGroup>
+  
+```py 通用 Embedding
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.embeddings.create(
+    input="Your text string goes here",
+    model="gemini-embedding-001"
+)
+
+print(response.data[0].embedding)
+```
+
+```py 文档读取并嵌入
+from openai import OpenAI
+import os
+
+# Initialize OpenAI client
+client = OpenAI(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    base_url="https://aihubmix.com/v1"
+)
+
+# Read file
+def read_whimery_file():
+    try:
+        with open('yourpath/file.md', 'r', encoding='utf-8') as file:
+            return file.read()
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
+
+# Read the content and create embeddings
+content = read_whimery_file()
+if content:
+    response = client.embeddings.create(
+        input=content,
+        model="gemini-embedding-001"
+    )
+    
+    print("File content successfully processed into embeddings")
+    print(f"Embedding dimensions: {len(response.data[0].embedding)}")
+    print("First 10 embedding values:", response.data[0].embedding)
+else:
+    print("Failed to read file content")
+
+```
+
+</CodeGroup>
+
+## 可用模型
+
+- gemini-embedding-001
+- text-embedding-3-large
+- text-embedding-3-small
+- text-embedding-ada-002
+- gemini-embedding-exp-03-07
+- text-embedding-v4
+- Qwen/Qwen3-Embedding-0.6B
+- gemini-embedding-exp-03-07
+- jina-embeddings-v4
+- jina-embeddings-v3
+- jina-embeddings-v2-base-code
+- doubao-embedding-large-text-240915
+- doubao-embedding-text-240715
+
