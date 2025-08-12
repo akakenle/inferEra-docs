@@ -168,6 +168,7 @@
                   "en/api/TTS",
                   "en/api/STT",
                   "en/api/IdeogramAI",
+                  "en/api/EBD",
                   "en/api/Jina-AI",
                   "en/api/App-code",
                   "en/api/Auth",
