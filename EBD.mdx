@@ -1,21 +1,21 @@
 ---
-title: '向量嵌入'
-description: 'AiHubMix 提供兼容 OpenAI 标准的高效向量嵌入方案'
+title: 'Embedding'
+description: 'AiHubMix offers an OpenAI-compatible, high-efficiency vector embedding solution.'
 icon: "binary"
 ---
 
-## 调用指引
+## Usage Guide
 
-AiHubMix 的嵌入模型能够高效地将文本或文档内容转化为可检索的向量数据，广泛应用于 RAG 问答系统和智能客服。无论文本还是文档，均可一键生成嵌入，显著提升语义处理表现。
+AiHubMix embedding models efficiently convert text or document content into searchable vector data, widely used in RAG Q&A systems and intelligent customer support. Whether for plain text or full documents, you can generate embeddings with a single call to significantly improve semantic processing.
 
 <CodeGroup>
   
-```py 通用 Embedding
+```py Universal Embedding
 from openai import OpenAI
 import os
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    api_key="sk-***", # Replace with the key you generated in the AIHUBMIX dashboard
     base_url="https://aihubmix.com/v1"
 )
 
@@ -27,12 +27,12 @@ response = client.embeddings.create(
 print(response.data[0].embedding)
 ```
 
-```py 文档读取并嵌入
+```py Read Document and Embed
 from openai import OpenAI
 import os
 
 client = OpenAI(
-    api_key="AIHUBMIX_API_KEY", # 换成你在后台生成的 Key "sk-***"
+    api_key="sk-***", # Replace with the key you generated in the AIHUBMIX dashboard
     base_url="https://aihubmix.com/v1"
 )
 
@@ -63,7 +63,7 @@ else:
 
 </CodeGroup>
 
-## 可用模型
+## Available Models
 
 - gemini-embedding-001
 - text-embedding-3-large
