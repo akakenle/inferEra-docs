@@ -1,0 +1,153 @@
+---
+title: "模型管理 API"
+description: "獲取模型列表和模型詳細資訊"
+icon: 'circle-info'
+---
+
+## 獲取模型列表
+
+- 端點（Endpoint）： `GET /v1/models`
+
+- 有用戶登入獲取用戶分組下的可用列表，無用戶登入獲取 default 分組下的可用列表。
+- header 中有 Authorization 欄位則查詢 key 對應的 token 下配置的模型列表。
+
+**返回示例：**
+
+```json
+{
+  "data": [
+    {
+      "id": "gpt-4o-mini",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "OpenAI",
+      "permission": [
+        {
+          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
+          "object": "model_permission",
+          "created": 1626777600,
+          "allow_create_engine": true,
+          "allow_sampling": true,
+          "allow_logprobs": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "allow_fine_tuning": false,
+          "organization": "*",
+          "group": null,
+          "is_blocking": false
+        }
+      ],
+      "root": "gpt-4o-mini",
+      "parent": null
+    }
+  ]
+}
+```
+
+### 返回結果
+
+|狀態碼 | 狀態碼含義 | 說明 | 資料模型|
+|---|---|---|---|
+|200|OK|none|Inline|
+
+### 返回資料結構
+
+狀態碼 **200**
+
+|名稱 | 類型 | 必選 | 約束 | 中文名 | 說明|
+|---|---|---|---|---|---|
+|» data|[object]|true|none||none|
+|»» id|string|true|none|模型 ID|none|
+|»» object|string|true|none|model|none|
+|»» created|integer|true|none|創建時間|none|
+|»» owned_by|string|true|none|開發者|none|
+|»» permission|[object]¦null|true|none||none|
+|»»» id|string|true|none||none|
+|»»» object|string|true|none||none|
+|»»» created|integer|true|none||none|
+|»»» allow_create_engine|boolean|true|none||none|
+|»»» allow_sampling|boolean|true|none||none|
+|»»» allow_logprobs|boolean|true|none||none|
+|»»» allow_search_indices|boolean|true|none||none|
+|»»» allow_view|boolean|true|none||none|
+|»»» allow_fine_tuning|boolean|true|none||none|
+|»»» organization|string|true|none||none|
+|»»» group|null|true|none||none|
+|»»» is_blocking|boolean|true|none||none|
+|»» root|string|true|none|模型名稱|none|
+|»» parent|null|true|none|父節點|none|
+
+## 獲取模型資訊
+
+端點（Endpoint）：`GET /v1/models/:model`
+
+### 請求參數
+
+|名稱 | 位置 | 類型 | 必選 | 說明|
+|---|---|---|---|---|
+|model|path|string| 是 |模型 ID|
+
+**返回示例：**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "string",
+  "object": "string",
+  "created": 0,
+  "owned_by": "string",
+  "permission": [
+    {
+      "id": "string",
+      "object": "string",
+      "created": 0,
+      "allow_create_engine": true,
+      "allow_sampling": true,
+      "allow_logprobs": true,
+      "allow_search_indices": true,
+      "allow_view": true,
+      "allow_fine_tuning": true,
+      "organization": "string",
+      "group": null,
+      "is_blocking": true
+    }
+  ],
+  "root": "string",
+  "parent": null
+}
+```
+
+### 返回結果
+
+|狀態碼 | 狀態碼含義 | 說明 | 資料模型|
+|---|---|---|---|
+|200|OK|none|Inline|
+
+### 返回資料結構
+
+狀態碼 **200**
+
+|名稱 | 類型 | 必選 | 約束 | 中文名 | 說明|
+|---|---|---|---|---|---|
+|id|string|true|none|模型 ID|none|
+|object|string|true|none|model|none|
+|created|integer|true|none|創建時間|none|
+|owned_by|string|true|none|開發者|none|
+|permission|[object]|true|none||none|
+|» id|string|false|none||none|
+|» object|string|false|none||none|
+|» created|integer|false|none||none|
+|» allow_create_engine|boolean|false|none||none|
+|» allow_sampling|boolean|false|none||none|
+|» allow_logprobs|boolean|false|none||none|
+|» allow_search_indices|boolean|false|none||none|
+|» allow_view|boolean|false|none||none|
+|» allow_fine_tuning|boolean|false|none||none|
+|» organization|string|false|none||none|
+|» group|null|false|none||none|
+|» is_blocking|boolean|false|none||none|
+|root|string|true|none|模型名稱|none|
+|parent|null|true|none|父節點|none|

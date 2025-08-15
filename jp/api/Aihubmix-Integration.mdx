@@ -1,0 +1,105 @@
+---
+title: "Aihubmix 完全統合ガイド"
+description: "Aihubmixの汎用モデル呼び出し方法をワンストップで理解"
+icon: 'rocket'
+---
+
+AihubmixはOpenAIモデル呼び出しインターフェースを標準とし、OpenAI、Google Gemini、Anthropic Claudeなどの複数のモデルを統合しています。どのモデルも同じ方法で呼び出すことができ、対応する`モデルID`を変更するだけです。中国本土のユーザーは**直接接続**できます。
+
+<Tip>
+核心ポイント：クライアント内部に転送用の`base_url`とAiHubMixプラットフォームの[APIキー](https://aihubmix.com/token)を追加するだけです。
+モデルIDは[モデル広場のカード](https://aihubmix.com/models)で「コピーボタン」をクリックして取得できます。
+</Tip>
+
+## 基本統合：OpenAI公式ライブラリの使用
+
+### Python例
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # AiHubMixで生成したAPIキーに置き換える
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Say this is a test",
+        }
+    ],
+    model="gpt-4o-mini",  # サポートされている任意のモデルIDに置き換える
+)
+
+print(chat_completion)
+```
+
+<Info>
+OpenAI公式の現在のサービス状況[確認](https://status.openai.com/)
+</Info>
+
+## 汎用モデル転送API
+
+エンドポイント： `POST` /v1/chat/completions
+
+**Bodyリクエストパラメータ：**
+
+```json
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+}
+```
+
+### リクエストパラメータ
+
+|名前 | 位置 | タイプ | 必須 | 説明|
+|---|---|---|---|---|
+|Authorization|header|string| いいえ |Bearer AIHUBMIX_API_KEY|
+|Content-Type|header|string| いいえ |none|
+|body|body|object| いいえ |none|
+
+**レスポンス例：**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "chatcmpl-AzJqsyf2h02BKjrqHMA1HVUQpiDfL",
+  "model": "gpt-4o-mini",
+  "object": "chat.completion",
+  "created": 1739177682,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The meaning of life is a philosophical question that has been debated for centuries. Different people and cultures may have different beliefs about the purpose and significance of life. Some believe that the meaning of life is to seek happiness and fulfillment, while others believe in spiritual or religious meanings such as serving a higher power or fulfilling a destiny. Ultimately, the meaning of life may be a deeply personal and individual question that each person must answer for themselves."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_0165350fbb",
+  "usage": {
+    "prompt_tokens": 14,
+    "completion_tokens": 86,
+    "total_tokens": 100
+  }
+}
+```
+
+### レスポンス結果
+
+|ステータスコード | ステータスコードの意味 | 説明 | データモデル|
+|---|---|---|---|
+|200|OK|none|Inline|
+

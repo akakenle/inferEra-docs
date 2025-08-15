@@ -1,0 +1,153 @@
+---
+title: "모델 관리 API"
+description: "모델 목록 및 모델 상세 정보 획득"
+icon: 'circle-info'
+---
+
+## 모델 목록 획득
+
+- 엔드포인트: `GET /v1/models`
+
+- 사용자가 로그인한 경우 사용자 그룹의 사용 가능한 목록을 가져오고, 사용자가 로그인하지 않은 경우 default 그룹의 사용 가능한 목록을 가져옵니다.
+- header에 Authorization 필드가 있으면 key에 해당하는 token 하위에 구성된 모델 목록을 조회합니다.
+
+**응답 예제:**
+
+```json
+{
+  "data": [
+    {
+      "id": "gpt-4o-mini",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "OpenAI",
+      "permission": [
+        {
+          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
+          "object": "model_permission",
+          "created": 1626777600,
+          "allow_create_engine": true,
+          "allow_sampling": true,
+          "allow_logprobs": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "allow_fine_tuning": false,
+          "organization": "*",
+          "group": null,
+          "is_blocking": false
+        }
+      ],
+      "root": "gpt-4o-mini",
+      "parent": null
+    }
+  ]
+}
+```
+
+### 응답 결과
+
+|상태 코드 | 상태 코드 의미 | 설명 | 데이터 모델|
+|---|---|---|---|
+|200|OK|none|Inline|
+
+### 응답 데이터 구조
+
+상태 코드 **200**
+
+|이름 | 타입 | 필수 | 제약 | 중국어명 | 설명|
+|---|---|---|---|---|---|
+|» data|[object]|true|none||none|
+|»» id|string|true|none|모델 ID|none|
+|»» object|string|true|none|model|none|
+|»» created|integer|true|none|생성 시간|none|
+|»» owned_by|string|true|none|개발자|none|
+|»» permission|[object]¦null|true|none||none|
+|»»» id|string|true|none||none|
+|»»» object|string|true|none||none|
+|»»» created|integer|true|none||none|
+|»»» allow_create_engine|boolean|true|none||none|
+|»»» allow_sampling|boolean|true|none||none|
+|»»» allow_logprobs|boolean|true|none||none|
+|»»» allow_search_indices|boolean|true|none||none|
+|»»» allow_view|boolean|true|none||none|
+|»»» allow_fine_tuning|boolean|true|none||none|
+|»»» organization|string|true|none||none|
+|»»» group|null|true|none||none|
+|»»» is_blocking|boolean|true|none||none|
+|»» root|string|true|none|모델명|none|
+|»» parent|null|true|none|부모 노드|none|
+
+## 모델 정보 획득
+
+엔드포인트: `GET /v1/models/:model`
+
+### 요청 매개변수
+
+|이름 | 위치 | 타입 | 필수 | 설명|
+|---|---|---|---|---|
+|model|path|string| 예 |모델 ID|
+
+**응답 예제:**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "string",
+  "object": "string",
+  "created": 0,
+  "owned_by": "string",
+  "permission": [
+    {
+      "id": "string",
+      "object": "string",
+      "created": 0,
+      "allow_create_engine": true,
+      "allow_sampling": true,
+      "allow_logprobs": true,
+      "allow_search_indices": true,
+      "allow_view": true,
+      "allow_fine_tuning": true,
+      "organization": "string",
+      "group": null,
+      "is_blocking": true
+    }
+  ],
+  "root": "string",
+  "parent": null
+}
+```
+
+### 응답 결과
+
+|상태 코드 | 상태 코드 의미 | 설명 | 데이터 모델|
+|---|---|---|---|
+|200|OK|none|Inline|
+
+### 응답 데이터 구조
+
+상태 코드 **200**
+
+|이름 | 타입 | 필수 | 제약 | 중국어명 | 설명|
+|---|---|---|---|---|---|
+|id|string|true|none|모델 ID|none|
+|object|string|true|none|model|none|
+|created|integer|true|none|생성 시간|none|
+|owned_by|string|true|none|개발자|none|
+|permission|[object]|true|none||none|
+|» id|string|false|none||none|
+|» object|string|false|none||none|
+|» created|integer|false|none||none|
+|» allow_create_engine|boolean|false|none||none|
+|» allow_sampling|boolean|false|none||none|
+|» allow_logprobs|boolean|false|none||none|
+|» allow_search_indices|boolean|false|none||none|
+|» allow_view|boolean|false|none||none|
+|» allow_fine_tuning|boolean|false|none||none|
+|» organization|string|false|none||none|
+|» group|null|false|none||none|
+|» is_blocking|boolean|false|none||none|
+|root|string|true|none|모델명|none|
+|parent|null|true|none|부모 노드|none|

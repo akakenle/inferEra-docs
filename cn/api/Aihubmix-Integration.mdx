@@ -1,0 +1,104 @@
+---
+title: "Aihubmix 一站式集成"
+description: "了解 Aihubmix 的通用模型调用方式"
+icon: 'rocket'
+---
+
+Aihubmix 以 OpenAI 模型调用接口为标准，聚合了多个模型，包括 OpenAI、谷歌 Gemini、Anthropic Claude 等系列模型。调用任何模型都使用相同的方式，只需要修改对应的 `模型 ID` 即可，大陆用户可以**直连使用**。
+
+<Tip>
+核心要点：只需要在 client 内部加入转发的 `base_url` 和 AiHubMix 平台的[密钥](https://aihubmix.com/token)。
+模型 ID 可以在[模型广场的卡片上](https://aihubmix.com/models)点击「复制按钮」来获取。
+</Tip>
+
+## 基础集成：使用 OpenAI 官方库
+
+### Python 示例
+
+```py Python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-***", # 换成你在 AiHubMix 生成的密钥
+    base_url="https://aihubmix.com/v1"
+)
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Say this is a test",
+        }
+    ],
+    model="gpt-4o-mini",  # 替换为任意支持的模型 ID
+)
+
+print(chat_completion)
+```
+
+<Info>
+OpenAI 官方当前服务状态 [查询](https://status.openai.com/)
+</Info>
+
+## 通用模型转发 API
+
+端点（Endpoint）： `POST` /v1/chat/completions
+
+**Body 请求参数：**
+
+```json
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+}
+```
+
+### 请求参数
+
+|名称 | 位置 | 类型 | 必选 | 说明|
+|---|---|---|---|---|
+|Authorization|header|string| 否 |Bearer AIHUBMIX_API_KEY|
+|Content-Type|header|string| 否 |none|
+|body|body|object| 否 |none|
+
+**返回示例：**
+
+```json
+200 Response
+```
+
+```json
+{
+  "id": "chatcmpl-AzJqsyf2h02BKjrqHMA1HVUQpiDfL",
+  "model": "gpt-4o-mini",
+  "object": "chat.completion",
+  "created": 1739177682,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The meaning of life is a philosophical question that has been debated for centuries. Different people and cultures may have different beliefs about the purpose and significance of life. Some believe that the meaning of life is to seek happiness and fulfillment, while others believe in spiritual or religious meanings such as serving a higher power or fulfilling a destiny. Ultimately, the meaning of life may be a deeply personal and individual question that each person must answer for themselves."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp_0165350fbb",
+  "usage": {
+    "prompt_tokens": 14,
+    "completion_tokens": 86,
+    "total_tokens": 100
+  }
+}
+```
+
+### 返回结果
+
+|状态码 | 状态码含义 | 说明 | 数据模型|
+|---|---|---|---|
+|200|OK|none|Inline|
