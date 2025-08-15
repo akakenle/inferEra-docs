@@ -689,22 +689,6 @@
       "destination": "/cn/index"
     },
     {
-      "source": "/en",
-      "destination": "/en/index"
-    },
-    {
-      "source": "/jp",
-      "destination": "/jp/index"
-    },
-    {
-      "source": "/ko",
-      "destination": "/ko/index"
-    },
-    {
-      "source": "/zh-Hant",
-      "destination": "/zh-Hant/index"
-    },
-    {
       "source": "/en/llms",
       "destination": "https://www.resource.nestsound.cn/docs/llms.txt",
       "permanent": false
