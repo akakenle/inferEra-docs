@@ -287,6 +287,221 @@ Here's how you can configure Claude models in a third-party application like Lob
 5. Add your chosen model to the model list.
    - It's recommended to copy the model name from AiHubMix's settings page and paste it in the application.
 
-![图片](/media/en/cla1.png)
+![图片](../../public/en/cla1.png)
 
-![图片](/media/en/cla2.png)
+![图片](../../public/en/cla2.png)
+
+## Claude Text Editor Tool
+
+Claude can use Anthropic's text editor tool to view and modify text files, helping you debug, fix, and improve code or other text documents. This enables Claude to interact directly with your files, providing practical assistance rather than just suggestions.
+
+### Preparation Before Using the Text Editor Tool
+
+Select a Compatible Model
+Anthropic's text editor tool supports the following Claude models:
+
+- **Claude 4 Models** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
+- **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
+
+<Warning>
+Claude 4 models use a completely new text editor tool that is incompatible with older versions. Make sure to use the correct tool type and name.
+</Warning>
+
+### Model-Specific Tool Configuration
+
+| Model Version | Tool Type | Tool Name | Supported Features |
+|---------------|-----------|-----------|-------------------|
+| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
+| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+
+<Tip>
+**Important Change:** Claude 4 models no longer support the `undo_edit` command. Please remove any dependencies on this functionality from your code.
+</Tip>
+
+### Evaluating Use Cases
+Here are some typical scenarios for using the text editor tool:
+
+- Code Debugging: Help identify and fix issues in code, from syntax errors to logical problems.
+- Code Refactoring: Improve code structure, readability, and performance through targeted edits.
+- Documentation Generation: Add docstrings, comments, or README files to your codebase.
+- Test Creation: Create unit tests based on implementation understanding.
+
+### Using the Text Editor Tool
+Provide the text editor tool to Claude through the Messages API:
+You need to install the `anthropic` package:
+```shell
+pip install anthropic
+```
+
+**Usage Example:**
+<CodeGroup>
+  
+```py python-Claude 4
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",  # or claude-opus-4-20250514
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250429",
+            "name": "str_replace_based_edit_tool"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "There's a syntax error in my primes.py file. Can you help me fix it?"
+        }
+    ]
+)
+
+print("Response content:")
+for message in response.content:
+    print(message.text)
+```
+
+```py python-Claude 3.7
+import anthropic
+
+client = anthropic.Anthropic(
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-3-7-sonnet-20250219",
+    max_tokens=1024,
+    tools=[
+        {
+            "type": "text_editor_20250124",
+            "name": "str_replace_editor"
+        }
+    ],
+    messages=[
+        {
+            "role": "user", 
+            "content": "There's a syntax error in my primes.py file. Can you help me fix it?"
+        }
+    ]
+)
+
+print("Response content:")
+for message in response.content:
+    print(message.text)
+```
+
+```shell Curl-Claude 4
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
+      }
+    ]
+  }'
+```
+
+```shell Curl-Claude 3.7
+curl -X POST https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: xxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-3-7-sonnet-20250219",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "There'\''s a syntax error in my primes.py file. Can you help me fix it?"
+      }
+    ]
+  }'
+```
+
+</CodeGroup>
+
+### Migrating to Claude 4 (Text Editor Tool)
+
+If you're migrating from Claude 3.7 Sonnet to Claude 4 models, please note the following changes:
+
+#### Update Tool Configuration
+
+```py python
+# Claude 3.7 Sonnet
+tools=[
+    {
+        "type": "text_editor_20250124",
+        "name": "str_replace_editor"
+    }
+]
+
+# Claude 4 (Opus/Sonnet)
+tools=[
+    {
+        "type": "text_editor_20250429",
+        "name": "str_replace_based_edit_tool"
+    }
+]
+```
+
+#### Remove Unsupported Features
+
+- **`undo_edit` command**: Claude 4 models no longer support the undo edit functionality
+- Please remove any logic that depends on `undo_edit` from your code
+
+Response Example:
+```json
+{
+  "id": "msg_bdrk_012xyNaFCQg4zsVcTk5VkDAe",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I'd be happy to help you fix the syntax error in your `primes.py` file. First, let me take a look at the file to identify the issue."
+    },
+    {
+      "type": "tool_use",
+      "text": "",
+      "id": "toolu_bdrk_01P6jQG6suDSsDjzugqGVHWC",
+      "name": "str_replace_based_edit_tool",
+      "input": {
+        "command": "view",
+        "path": "/repo/primes.py"
+      }
+    }
+  ],
+  "model": "claude-sonnet-4-20250514",
+  "stop_reason": "tool_use",
+  "usage": {
+    "input_tokens": 1042,
+    "output_tokens": 115
+  }
+}
+```
