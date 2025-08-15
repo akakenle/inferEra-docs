@@ -1,0 +1,79 @@
+---
+title: '임베딩'
+description: 'AiHubMix는 OpenAI 호환 고효율 벡터 임베딩 솔루션을 제공합니다.'
+icon: "binary"
+---
+
+## 사용 가이드
+
+AiHubMix 임베딩 모델은 텍스트나 문서 콘텐츠를 검색 가능한 벡터 데이터로 효율적으로 변환하며, RAG Q&A 시스템과 지능형 고객 지원에서 널리 사용됩니다. 일반 텍스트든 전체 문서든, 단일 호출로 임베딩을 생성하여 의미 처리를 크게 개선할 수 있습니다.
+
+<CodeGroup>
+  
+```py 범용 임베딩
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="sk-***", # AIHUBMIX 대시보드에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.embeddings.create(
+    input="여기에 텍스트 문자열이 들어갑니다",
+    model="gemini-embedding-001"
+)
+
+print(response.data[0].embedding)
+```
+
+```py 문서를 읽고 임베딩
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="sk-***", # AIHUBMIX 대시보드에서 생성한 키로 교체
+    base_url="https://aihubmix.com/v1"
+)
+
+# 파일 읽기
+def read_whimery_file():
+    try:
+        with open('yourpath/file.md', 'r', encoding='utf-8') as file:
+            return file.read()
+    except Exception as e:
+        print(f"파일 읽기 오류: {e}")
+        return None
+
+# 콘텐츠를 읽고 임베딩 생성
+content = read_whimery_file()
+if content:
+    response = client.embeddings.create(
+        input=content,
+        model="gemini-embedding-001"
+    )
+    
+    print("파일 콘텐츠가 임베딩으로 성공적으로 처리되었습니다")
+    print(f"임베딩 차원: {len(response.data[0].embedding)}")
+    print("첫 10개 임베딩 값:", response.data[0].embedding[:10])
+else:
+    print("파일 콘텐츠 읽기 실패")
+
+```
+
+</CodeGroup>
+
+## 사용 가능한 모델
+
+- gemini-embedding-001
+- gemini-embedding-exp-03-07
+- text-embedding-3-large
+- text-embedding-3-small
+- text-embedding-ada-002
+- jina-embeddings-v4
+- jina-embeddings-v3
+- jina-embeddings-v2-base-code
+- text-embedding-v4
+- Qwen/Qwen3-Embedding-0.6B
+- doubao-embedding-large-text-240915
+- doubao-embedding-text-240715

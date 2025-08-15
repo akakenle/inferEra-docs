@@ -1,0 +1,79 @@
+---
+title: 'エンベディング'
+description: 'AiHubMixは、OpenAI互換の高効率ベクトルエンベディングソリューションを提供します。'
+icon: "binary"
+---
+
+## 使用ガイド
+
+AiHubMixエンベディングモデルは、テキストや文書コンテンツを検索可能なベクトルデータに効率的に変換し、RAG Q&Aシステムやインテリジェント顧客サポートで広く使用されています。プレーンテキストでも完全な文書でも、1回の呼び出しでエンベディングを生成して、セマンティック処理を大幅に改善できます。
+
+<CodeGroup>
+  
+```py 汎用エンベディング
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="sk-***", # AIHUBMIXダッシュボードで生成したキーに置き換える
+    base_url="https://aihubmix.com/v1"
+)
+
+response = client.embeddings.create(
+    input="ここにテキスト文字列を入力",
+    model="gemini-embedding-001"
+)
+
+print(response.data[0].embedding)
+```
+
+```py 文書を読み取ってエンベディング
+from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key="sk-***", # AIHUBMIXダッシュボードで生成したキーに置き換える
+    base_url="https://aihubmix.com/v1"
+)
+
+# ファイルを読み取る
+def read_whimery_file():
+    try:
+        with open('yourpath/file.md', 'r', encoding='utf-8') as file:
+            return file.read()
+    except Exception as e:
+        print(f"ファイル読み取りエラー: {e}")
+        return None
+
+# コンテンツを読み取ってエンベディングを作成
+content = read_whimery_file()
+if content:
+    response = client.embeddings.create(
+        input=content,
+        model="gemini-embedding-001"
+    )
+    
+    print("ファイルコンテンツがエンベディングに正常に処理されました")
+    print(f"エンベディング次元: {len(response.data[0].embedding)}")
+    print("最初の10個のエンベディング値:", response.data[0].embedding[:10])
+else:
+    print("ファイルコンテンツの読み取りに失敗しました")
+
+```
+
+</CodeGroup>
+
+## 利用可能なモデル
+
+- gemini-embedding-001
+- gemini-embedding-exp-03-07
+- text-embedding-3-large
+- text-embedding-3-small
+- text-embedding-ada-002
+- jina-embeddings-v4
+- jina-embeddings-v3
+- jina-embeddings-v2-base-code
+- text-embedding-v4
+- Qwen/Qwen3-Embedding-0.6B
+- doubao-embedding-large-text-240915
+- doubao-embedding-text-240715
