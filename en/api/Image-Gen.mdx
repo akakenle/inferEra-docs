@@ -40,6 +40,8 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
   - `imagen-3.0-generate-002`
   - `flux-kontext-max`
   - `flux-kontext-pro`
+  - `FLUX.1-Kontext-pro`
+  - `FLUX-1.1-pro`
   - `ideogram/V3`
   - `stability/Stable-Diffusion-3-5-Large`
 - `sk-***` is your API Key generated in Aihubmix
@@ -133,9 +135,12 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 - flux-kontext-max
 - flux-kontext-pro
+- FLUX.1-Kontext-pro
+- FLUX-1.1-pro
 
 <Note>
-  - All flux models use asynchronous endpoints and require a **2-step request process**.
+  - `flux-kontext-max` and `flux-kontext-pro` use asynchronous endpoints and require a **2-step request process**.
+  - `FLUX.1-Kontext-pro` and `FLUX-1.1-pro` use unified endpoints that supports one-step generation.
   - Lightning fast responses—almost instant.
   - `flux-kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
   - The supported `aspect_ratio` range is from `21:9` to `9:21`.
@@ -146,7 +151,32 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 ### Usage:
 
-**Step 1: Submit an Image Generation Request**
+**FLUX One-step generation：** for `FLUX.1-Kontext-pro` and `FLUX-1.1-pro`
+
+<CodeGroup>
+
+```shell Curl extract base64 data as image
+curl 'https://aihubmix.com/v1/images/generations' \
+  -H 'accept: */*' \
+  -H 'accept-language: zh-CN' \
+  -H 'authorization: Bearer sk-***' \
+  -H 'content-type: application/json' \
+  -H 'priority: u=1, i' \
+  -H 'referer: http://localhost:5173/' \
+  -H 'sec-ch-ua: "Not)A;Brand";v="8", "Chromium";v="138"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  --data-raw '{"prompt":"a cat in the garden, cute cartoon","model":"FLUX.1-Kontext-pro","safety_tolerance":6}' \
+| jq -r '.data[0].b64_json' \
+| base64 -D > "$HOME/Desktop/image_extract.png"
+```
+
+</CodeGroup>
+
+**flux-Step 1: Submit an Image Generation Request**
 
 <CodeGroup>
 
@@ -178,7 +208,6 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-
 ```shell Curl flux-kontext-pro Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
     -H "Content-Type: application/json" \
@@ -201,7 +230,7 @@ Sample Output:
 {"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
 ```
 
-**Step 2: Retrieve the Generated Image Link**
+**flux-Step 2: Retrieve the Generated Image Link**
 
 Replace the string after `tasks/` with the taskId from Step 1:
 
