@@ -160,14 +160,6 @@ curl 'https://aihubmix.com/v1/images/generations' \
   -H 'accept-language: zh-CN' \
   -H 'authorization: Bearer sk-***' \
   -H 'content-type: application/json' \
-  -H 'priority: u=1, i' \
-  -H 'referer: http://localhost:5173/' \
-  -H 'sec-ch-ua: "Not)A;Brand";v="8", "Chromium";v="138"' \
-  -H 'sec-ch-ua-mobile: ?0' \
-  -H 'sec-ch-ua-platform: "macOS"' \
-  -H 'sec-fetch-dest: empty' \
-  -H 'sec-fetch-mode: cors' \
-  -H 'sec-fetch-site: cross-site' \
   --data-raw '{"prompt":"a cat in the garden, cute cartoon","model":"FLUX.1-Kontext-pro","safety_tolerance":6}' \
 | jq -r '.data[0].b64_json' \
 | base64 -D > "$HOME/Desktop/image_extract.png"
