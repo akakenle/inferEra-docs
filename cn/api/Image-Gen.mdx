@@ -40,6 +40,8 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
   - `imagen-3.0-generate-002`
   - `flux-kontext-max`
   - `flux-kontext-pro`
+  - `FLUX.1-Kontext-pro`
+  - `FLUX-1.1-pro`
   - `ideogram/V3`
   - `stability/Stable-Diffusion-3-5-Large`
 - `sk-***` 为你在 Aihubmix 生成的 API Key
@@ -133,10 +135,12 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 - flux-kontext-max
 - flux-kontext-pro
+- FLUX.1-Kontext-pro
+- FLUX-1.1-pro
 
 <Note>
-  - flux 系列均为异步端口，需要分 2 步请求
-  - 速度极快，几乎秒出
+  - `flux-kontext-max` 和 `flux-kontext-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
+  - `FLUX.1-Kontext-pro` 和 `FLUX-1.1-pro` 使用通用接口，一步到位
   - `flux-Kontext-max` 支持文生图和参考图生图，`flux-kontext-pro` 端口只支持文生图
   - 画幅比例 `aspect_ratio` 支持的范围是：`21:9` 到 `9:21`
   - 审核宽松度参数 `safety_tolerance` 范围在 `0` 到 `6` 之间`0` 表示最严格`6` 表示最宽松。使用参考图时限制为 `2`。
@@ -146,7 +150,32 @@ curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
 
 ### 调用方法：
 
-**第一步：发出绘图请求**
+**FLUX 一步绘图：** 支持 `FLUX.1-Kontext-pro` 和 `FLUX-1.1-pro`
+
+<CodeGroup>
+
+```shell Curl 直接提取 base64 结果为图片
+curl 'https://aihubmix.com/v1/images/generations' \
+  -H 'accept: */*' \
+  -H 'accept-language: zh-CN' \
+  -H 'authorization: Bearer sk-***' \
+  -H 'content-type: application/json' \
+  -H 'priority: u=1, i' \
+  -H 'referer: http://localhost:5173/' \
+  -H 'sec-ch-ua: "Not)A;Brand";v="8", "Chromium";v="138"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  --data-raw '{"prompt":"a cat in the garden, cute cartoon","model":"FLUX.1-Kontext-pro","safety_tolerance":6}' \
+| jq -r '.data[0].b64_json' \
+| base64 -D > "$HOME/Desktop/image_extract.png"
+```
+
+</CodeGroup>
+
+**flux 异步类型第一步：发出绘图请求**
 
 <CodeGroup>
 
@@ -201,7 +230,7 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
 {"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
 ```
 
-**第二步：获取生成的图片链接**
+**flux 异步类型第二步：获取生成的图片链接**
 
 `tasks/` 后面的字符串替换成第一步获取的 taskId：
 
