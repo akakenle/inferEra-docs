@@ -9,7 +9,7 @@ icon: "palette"
 OpenAI's `gpt-image-1` image generation API offers both text-to-image generation and image-to-image editing with text guidance capabilities.\
 Before using this API, please ensure you have the latest OpenAI package installed by running `pip install -U openai`.
 
-## Important Notes
+### Important Notes
 
 <Warning>
   - Once an API call is sent, **you will be charged regardless of any interruptions or failures** during the generation process
@@ -18,7 +18,7 @@ Before using this API, please ensure you have the latest OpenAI package installe
   - A more reliable approach is to use deceased artists or their corresponding styles, such as "Van Gogh" or "Mona Lisa"
 </Warning>
 
-## Model and Pricing
+### Model and Pricing
 
 | Model       | Quality | 1024x1024 | 1024x1536 | 1536x1024 |
 | ----------- | ------- | --------- | --------- | --------- |
@@ -30,7 +30,7 @@ Before using this API, please ensure you have the latest OpenAI package installe
   Note: The input text tokens are billed separately at \$5 per million tokens.
 </Info>
 
-## API Usage
+### API Usage
 
 **Endpoints**
 
@@ -169,7 +169,7 @@ for i, image_item in enumerate(result.data):
 
 For more parameter details, please refer to the [OpenAI official documentation](https://platform.openai.com/docs/api-reference/images/create)
 
-## Output Examples
+### Output Examples
 
 <CodeGroup>
 
@@ -187,7 +187,7 @@ Edited image 2 saved to: ./image_edit_2.png
 
 </CodeGroup>
 
-## Rejection Scenarios
+### Rejection Scenarios
 
 Error message when a request is rejected:
 
@@ -204,7 +204,7 @@ Therefore, it’s recommended to proactively avoid potential intellectual proper
 - Consider using "style inspiration", "creative reinterpretation", or "generalized descriptions" instead
 - If referencing specific elements, check whether they fall within the public domain
 
-## Practical Tips
+### Practical Tips
 
 <Tip>
   - Supports all languages. Chinese text works reliably, though we don't recommend generating large amounts of text in any language
@@ -225,7 +225,7 @@ To meet the strong expectations of our users, we have specially launched two rev
 Please note that reverse-engineered interfaces cannot guarantee full stability and may encounter `🕐 Queuing...` status or generation failures. They are recommended only for trial experiences and functional testing.\
 OpenAI's official interface `gpt-image-1` has been released. Considering the cost of usage, the current reverse-engineered interfaces will be temporarily retained, with compatible calling methods provided for everyone.
 
-## Notes
+### Notes
 
 <Warning>
   - **Special Note**: Regardless of the cause, once the API call is initiated, charges will apply even if the generation fails.
@@ -234,7 +234,7 @@ OpenAI's official interface `gpt-image-1` has been released. Considering the cos
   - A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
 </Warning>
 
-## Model and Pricing
+### Model and Pricing
 
 | Model              | Price (\$/IMG) |
 | ------------------ | -------------- |
@@ -246,7 +246,7 @@ OpenAI's official interface `gpt-image-1` has been released. Considering the cos
   <sub>(Updated on: 2025-06-04)</sub>.
 </Info>
 
-## Python Example
+### Python Example
 
 Using the familiar `v1/completions` endpoint, we provide support, which is fully compatible. For specific usage, please refer to:
 
@@ -406,7 +406,7 @@ for chunk in stream:
 
 </CodeGroup>
 
-## Output Example
+### Output Example
 
 ```
 {
@@ -432,7 +432,7 @@ for chunk in stream:
 [Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
 ```
 
-## Compatibility with Official OpenAI API
+### Compatibility with Official OpenAI API
 
 If you prefer using the latest image generation method released by OpenAI, you can refer to the following implementation. Just keep these 3 points in mind:
 
@@ -511,7 +511,7 @@ for i, image_data in enumerate(result.data):
         print(f"No b64_json or url found in image #{i}, skipping save.")
 ```
 
-## Effect Demonstration
+### Effect Demonstration
 
 <Card title="Girl with a Pearl Earring" img="/media/en/Girl-with-a-Pearl-Earring.PNG">
   1. The famous painting is reinterpreted, with text and watermark directly output.
@@ -525,7 +525,7 @@ for i, image_data in enumerate(result.data):
   1. The most popular Ghibli
 </Card>
 
-## Practical Tips
+### Practical Tips
 
 <Tip>
   - Support any language, Chinese drawing is also stable, but we don't recommend drawing a large amount of text.
