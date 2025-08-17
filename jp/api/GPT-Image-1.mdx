@@ -4,7 +4,7 @@ description: " "
 icon: "palette"
 ---
 
-## インターフェースの説明
+## 1️⃣ gpt-image-1 インターフェースの説明
 
 OpenAIの描画インターフェース`gpt-image-1`は、テキストから画像を生成する機能（generate）と、画像とテキストから画像を編集する機能（edit）をサポートしています。
 使用する前に、`pip install -U openai`を実行して最新のOpenAIパッケージにアップグレードしてください。
@@ -203,4 +203,328 @@ Error code: 400 - {'error': {'message': 'Your request was rejected as a result o
 - テキスト記述と参照画像を組み合わせることで、画像合成の効果がより正確になります。
 - アップロードする画像を圧縮前処理することで、速度を向上させることができます。
 - 透明な背景をサポートしており、切り抜き不要です。——プロンプトで要求を追加するだけです。
+</Tip>
+
+---
+
+## 2️⃣ GPT描画の先行体験（逆方向）
+
+ユーザーの強い要望に応えるため、`gpt-4o-image`と`gpt-4o-image-vip`という2つの逆方向インターフェースを特別にリリースしました。このうち、VIPモデルは性能と安定性において優れています。
+これらの逆方向インターフェースは完全に安定しているとは限らず、`🕐 Queuing...`のキューイング状態や生成失敗が発生する可能性があるため、新機能の体験やテストにのみ使用することをお勧めします。
+OpenAIが`gpt-image-1`インターフェースを正式にリリースしたことを考慮し、呼び出しコストの観点から、これらの逆方向インターフェースは一時的に保持し、完全に互換性のある呼び出し方法を提供します。
+
+## 注意事項
+
+<Warning>
+  - 生成中に、いかなる状況で中断または失敗した場合でも、**インターフェース呼び出しが一度発行されると、料金が請求されます**
+  - 存命のアーティスト名（例：「宮崎駿」、「新海誠」など）は`input_moderation`エラーをトリガーし、**生成が失敗します**。これを回避するには、「ジブリ」、「明るい現代的な日本のアニメスタイル」などの非機密語を使用できます
+  - 全体的に、「スタイル」は「アーティスト」よりも安全です。「ピクサー」などもサポートされています
+  - より確実な方法は、故人アーティストまたは対応するスタイルを使用することです。例：「ゴッホ」、「モナリザ」など
+</Warning>
+
+## モデルと料金
+
+| モデル                 | バックエンド料金 (米ドル/回) | 約 (日本円/回) |
+| ------------------ | ----------- | --------- |
+| `gpt-4o-image-vip` | \$0.009     | 約 ¥0.06 |
+| `gpt-4o-image`     | \$0.005     | 約 ¥0.04 |
+
+<Info>
+  1. バックエンド料金は米ドルに基づいています。
+  2. 逆方向インターフェースの維持コストが増加したため、1回あたりの呼び出し価格が引き上げられました。<sub>（更新日：20250604）</sub>
+  3. 正式な`gpt-image-1`インターフェースの入力テキストトークン部分の料金は100万トークンあたり\$5ですが、逆方向インターフェースは画像描画回数のみで計算されます。
+</Info>
+
+## Python呼び出し例
+
+おなじみの`v1/completions`エンドポイントを使用してサポートを提供します。完全に互換性があり、具体的な使用方法は以下を参照してください。
+
+<CodeGroup>
+
+```py テキストから画像
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキー "sk-***" に置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+# チャット完了リクエストを作成
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #リスト: gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """[真珠の耳飾りの少女]をアニメ風のイラストカバーとして再デザインしてください。元の本質と構図を維持してください：象徴的な横顔の視線、穏やかな表情、親密なフレーミング。洗練された京都アニメ風のスタイルで、柔らかな筆致、映画のような照明、段階的な奥行きでレンダリングしてください。
+AVカバーレイアウトでフォーマットしてください：
+日本語と英語を混ぜたタイポグラフィ、視覚的な階層が重要なセリフのタイトル - デザインセンスが鍵です。
+深い意味を伝える言葉をタイトルとして抽出し、創造的なスローガンを付けてください。元の名前は、必要であれば小さな情報としてのみ表示してください。
+「jerlin」という透かしを服や背景にさりげなく埋め込んでください。感情的なトーンと姿勢を維持し、必要な場合にのみ柔らかくしてください。2:3のポートレート"""
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# forループを使用してストリーミング応答を処理
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n応答の処理中にエラーが発生しました：{str(e)}")
+```
+
+
+```py 画像とテキストから画像
+from openai import OpenAI
+import base64
+
+# 画像をエンコードする関数
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 画像パスを取得
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# 画像をエンコード
+base64_image = encode_image(image_path)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """画像をジブリ風に変換し、明るいトーンにしてください。3:2"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n応答の処理中にエラーが発生しました：{str(e)}")
+```
+
+
+```py 複数画像+テキストから画像
+from openai import OpenAI
+import base64
+
+# 画像をエンコードする関数
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# 画像パスを取得
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# 最初の画像をエンコード
+base64_image1 = encode_image(image_path)
+
+# 2番目の画像パスを取得
+image_path2 = "ref.jpeg"
+
+# 2番目の画像をエンコード
+base64_image2 = encode_image(image_path2)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # バックエンドで生成したキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """画像1を画像2のスタイルに変換し、明るいトーンにしてください。2:3"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image1}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image2}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# forループを使用してストリーミング応答を処理
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\n応答の処理中にエラーが発生しました：{str(e)}")
+```
+
+</CodeGroup>
+
+## 出力例
+
+```
+{
+  "prompt": "真珠の耳飾りの少女をアニメ風のイラストカバーとして再デザインしてください。元の本質と構図を維持してください：象徴的な横顔の視線、穏やかな表情、親密なフレーミング。洗練された京都アニメ風のスタイルで、柔らかな筆致、映画のような照明、段階的な奥行きでレンダリングしてください。
+AVカバーレイアウトでフォーマットしてください：
+日本語と英語を混ぜたタイポグラフィ、視覚的な階層が重要なセリフのタイトル - デザインセンスが鍵です。
+深い意味を伝える言葉をタイトルとして抽出し、創造的なスローガンを付けてください。元の名前は、必要であれば小さな情報としてのみ表示してください。
+「jerlin」という透かしを服や背景にさりげなく埋め込んでください。慎重に、潜在的なヌードを流れるような布、髪、またはベールで置き換え、感情的なトーンと姿勢を維持してください。必要な場合にのみ詳細を柔らかくしてください。2:3のポートレート",
+  "ratio": "2:3"
+}
+
+>🕐 キューイング中...
+
+>⚡ 生成中.....
+
+>🏃‍ 進捗 11....19....27...34....42....50....57...64....[100](https://videos.openai.com/vg-assets/assets%2Ftask_01jsccq77nfcsab7dn8bx7z230%2Fsrc_1.png?st=2025-04-21T13%3A08%3A48Z&se=2025-04-27T14%3A08%3A48Z&sks=b&skt=2025-04-21T13%3A08%3A48Z&ske=2025-04-27T14%3A08%3A48Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=xm6K6M7au3F3Vd9qcYxR3mYWrqAHsgbagbUV5GQo39w%3D&az=oaivgprodscus)
+
+> ✅ 生成完了
+
+
+![gen_01jsccq83pfg6ssfqf3pzfaytj](https://filesystem.site/cdn/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+[ダウンロードはこちら](https://filesystem.site/cdn/download/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+![gen_01jsccq83nf6ftmtx8y48h383y](https://filesystem.site/cdn/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)
+
+[ダウンロードはこちら](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%
+```
+
+## OpenAI 正式インターフェース互換
+
+OpenAIが最近リリースした画像生成の呼び出し方法を好む場合は、以下の処理を参照してください。3つの点に注意するだけです。
+
+1. 品質パラメータを渡すことはできません。モデル`gpt-4o-image-vip`と`gpt-4o-image`はそれ自体にバンドルされています。
+2. トークン使用量を追跡するusageフィールドの出力はサポートされていません。
+3. 最新の出力はBase64画像データであり、ユースケースは自動保存されています。
+
+```py Python
+from openai import OpenAI
+import os
+import requests
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # あなたのAiHubMixキーに置き換えてください
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+映画[ブラック・スワン]のポスターを再デザインしてください。3Dカートゥーン、スムーズなレンダリング、明るいトーン、2:3
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # 1回あたりの数量
+    size="1024x1536", # 1024x1024 (正方形), 1536x1024 (3:2横長), 1024x1536 (2:3縦長), auto (デフォルト)
+    #quality="high" # 逆方向モデルは品質パラメータを渡すことはできません。モデルにバンドルされています 📍
+)
+
+print(result) # 完全なAPI応答を出力します。逆方向インターフェースはusageをサポートしていません 📍
+
+# ファイル名のプレフィックスと保存ディレクトリを定義
+output_dir = "." # 他のディレクトリを指定できます
+file_prefix = "image_gen-逆方向"
+
+# 出力ディレクトリが存在することを確認
+os.makedirs(output_dir, exist_ok=True)
+
+# 返されたすべての画像データを反復処理
+for i, image_data in enumerate(result.data):
+    # まずbase64文字列を処理
+    if hasattr(image_data, "b64_json") and image_data.b64_json:
+        image_bytes = base64.b64decode(image_data.b64_json)
+        current_index = i
+        while True:
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name)
+            if not os.path.exists(file_path):
+                break
+            current_index += 1
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"画像は以下に保存されました：{file_path} (base64)")
+    # 次にurlフィールドを処理（互換性のあるインターフェースが変更されるのを防ぐために堅牢な処理を維持）
+    elif hasattr(image_data, "url") and image_data.url:
+        try:
+            response = requests.get(image_data.url, stream=True)
+            response.raise_for_status()
+            image_bytes = response.content
+            current_index = i
+            while True:
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name)
+                if not os.path.exists(file_path):
+                    break
+                current_index += 1
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"画像は以下に保存されました：{file_path} (url)")
+        except requests.exceptions.RequestException as e:
+            print(f"画像 {i} のダウンロードに失敗しました：{e}")
+        except Exception as e:
+            print(f"画像 {i} の処理中にエラーが発生しました：{str(e)}")
+    else:
+        print(f"画像 {i} のデータにはb64_jsonもurlもありません。保存をスキップします。")
+```
+
+## 効果展示
+
+<Card title="真珠の耳飾りの少女" img="../../public/en/Girl-with-a-Pearl-Earring.PNG">
+  1. 名画を再解釈し、レイアウトと透かしを直接出力。
+</Card>
+
+<Card title="ピクサーカートゥーン" img="../../public/en/pixar.png">
+  1. ピクサー3Dカートゥーンスタイル、安定性抜群。
+</Card>
+
+<Card title="3D" img="../../public/en/ghibli.png">
+  1. 最も人気のあるジブリ
+</Card>
+
+## 実用的なヒント
+
+<Tip>
+  - どの言語でもサポートされており、中国語の描画も非常に安定していますが、大量のテキストを描画することはお勧めしません。
+  - 描画比率はプロンプトで指定します。指定しない場合、4oが自動的に判断します。2:3、3:2、1:1をサポートします。
+  - インスピレーションがない場合は、参照画像を提供してください。単一画像と複数画像をサポートします。
+  - アップロードする画像を圧縮前処理することで、速度を向上させることができます。
+  - 透明な背景をサポートしており、切り抜き不要です。——プロンプトで要求を追加するだけです。
 </Tip>

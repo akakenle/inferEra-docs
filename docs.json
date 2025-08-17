@@ -42,7 +42,6 @@
                   "cn/api/Gemini-Guides",
                   "cn/api/Multimodal-Interaction-with-Gemini",
                   "cn/api/GPT-Image-1",
-                  "cn/api/GPT-4o-image",
                   "cn/api/IdeogramAI",
                   "cn/api/Qwen",
                   "cn/api/Jina-AI",
@@ -53,7 +52,7 @@
                 ]
               },
               {
-                "group": "隐私和条款",
+                "group": "隐私&条款",
                 "pages": [
                   "cn/terms-and-privacy/Terms",
                   "cn/terms-and-privacy/Privacy"
@@ -157,7 +156,6 @@
                   "en/api/Gemini-Guides",
                   "en/api/Multimodal-Interaction-with-Gemini",
                   "en/api/GPT-Image-1",
-                  "en/api/GPT-4o-image",
                   "en/api/IdeogramAI",
                   "en/api/Qwen",
                   "en/api/Jina-AI",
@@ -272,7 +270,6 @@
                   "jp/api/Gemini-Guides",
                   "jp/api/Multimodal-Interaction-with-Gemini",
                   "jp/api/GPT-Image-1",
-                  "jp/api/GPT-4o-image",
                   "jp/api/IdeogramAI",
                   "jp/api/Qwen",
                   "jp/api/Jina-AI",
@@ -387,7 +384,6 @@
                   "ko/api/Gemini-Guides",
                   "ko/api/Multimodal-Interaction-with-Gemini",
                   "ko/api/GPT-Image-1",
-                  "ko/api/GPT-4o-image",
                   "ko/api/IdeogramAI",
                   "ko/api/Qwen",
                   "ko/api/Jina-AI",
@@ -502,7 +498,6 @@
                   "zh-Hant/api/Gemini-Guides",
                   "zh-Hant/api/Multimodal-Interaction-with-Gemini",
                   "zh-Hant/api/GPT-Image-1",
-                  "zh-Hant/api/GPT-4o-image",
                   "zh-Hant/api/IdeogramAI",
                   "zh-Hant/api/Qwen",
                   "zh-Hant/api/Jina-AI",

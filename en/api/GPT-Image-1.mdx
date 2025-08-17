@@ -4,7 +4,7 @@ description: " "
 icon: "palette"
 ---
 
-## API Overview
+## 1️⃣ gpt-image-1 API
 
 OpenAI's `gpt-image-1` image generation API offers both text-to-image generation and image-to-image editing with text guidance capabilities.\
 Before using this API, please ensure you have the latest OpenAI package installed by running `pip install -U openai`.
@@ -215,4 +215,322 @@ Therefore, it’s recommended to proactively avoid potential intellectual proper
   - Combining text descriptions with reference images produces more accurate results
   - Compressing uploaded images as pre-processing can improve speed
   - Transparent backgrounds are supported (no need for manual cutouts) — just add this requirement to your prompt
+</Tip>
+
+---
+
+## 2️⃣ GPT Image (Reverse)
+
+To meet the strong expectations of our users, we have specially launched two reverse-engineered interfaces: `gpt-4o-image` and `gpt-4o-image-vip`. The VIP model offers superior performance and stability.\
+Please note that reverse-engineered interfaces cannot guarantee full stability and may encounter `🕐 Queuing...` status or generation failures. They are recommended only for trial experiences and functional testing.\
+OpenAI's official interface `gpt-image-1` has been released. Considering the cost of usage, the current reverse-engineered interfaces will be temporarily retained, with compatible calling methods provided for everyone.
+
+## Notes
+
+<Warning>
+  - **Special Note**: Regardless of the cause, once the API call is initiated, charges will apply even if the generation fails.
+  - The name of living artists (such as "Ghibli" and "Makoto Shinkai") will trigger `input_moderation` error, **causing generation failure**. You can avoid this by using non-sensitive words like "Ghibli" and "Bright Modern Japanese Anime Style".
+  - In general, "style" is safer than "artist", like "Pixar" is also supported.
+  - A more secure approach is to use the name of deceased artists or corresponding styles, such as "Van Gogh" and "Mona Lisa".
+</Warning>
+
+## Model and Pricing
+
+| Model              | Price (\$/IMG) |
+| ------------------ | -------------- |
+| `gpt-4o-image-vip` | \$0.009        |
+| `gpt-4o-image`     | \$0.005        |
+
+<Info>
+  Due to the rising maintenance costs of reverse-engineered interfaces, the price per call has been increased.
+  <sub>(Updated on: 2025-06-04)</sub>.
+</Info>
+
+## Python Example
+
+Using the familiar `v1/completions` endpoint, we provide support, which is fully compatible. For specific usage, please refer to:
+
+<CodeGroup>
+
+```py Text-to-Image
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Your Key Here
+    base_url="https://aihubmix.com/v1"
+)
+
+# Create a chat completion request
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #list: gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """Redesign [Girl wearing a pearl earring] as an anime-style illustrated cover. Preserve original essence and composition. Render in refined Kyoto Anime-inspired style—soft brushwork, cinematic lighting, progressive depth. 
+Format in AV cover layout: 
+Japanese-English mixed typography, serif title with significant visual hierarchy - sense of design is the key.
+Extract words tha conveys profound meanings as title, then creative slogan, the original name can be a smaller information ONLY if necessary.
+Subtly embed watermark "jerlin" in clothing or background. Maintain emotional tone and posture, soften only when necessary. 2:3 portrait"""
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+# Process the streaming response
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\nError occurred while processing the response: {str(e)}")
+```
+
+
+```py Text-to-Image with Image
+from openai import OpenAI
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the image
+base64_image = encode_image(image_path)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert the image into the style of ghibli，bright tone. 3:2"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\nError occurred while processing the response: {str(e)}")
+```
+
+
+```py Multi-Image with Text
+from openai import OpenAI
+import base64
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Get the image path
+image_path = "Portland_Head_Light__Maine.jpg"
+
+# Encode the first image
+base64_image1 = encode_image(image_path)
+
+# Get the second image path
+image_path2 = "ref.jpeg"
+
+# Encode the second image
+base64_image2 = encode_image(image_path2)
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Your Key Here
+    base_url="https://aihubmix.com/v1"
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o-image-vip", #gpt-4o-image-vip, gpt-4o-image
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """convert image 1 into the style of image 2, bright tone. 2:3"""
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image1}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image2}"
+                    }
+                }
+            ]
+        }
+    ],
+    stream=True
+)
+
+for chunk in stream:
+    try:
+        if chunk.choices and len(chunk.choices) > 0 and chunk.choices[0].delta and chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content, end="", flush=True)
+    except Exception as e:
+        print(f"\nError occurred while processing the response: {str(e)}")
+```
+
+</CodeGroup>
+
+## Output Example
+
+```
+{
+  "prompt": "Redesign 'Girl with a Pearl Earring' as an anime-style illustrated cover. Preserve the original essence and composition: the iconic side-glance pose, serene expression, and intimate framing. Render in refined Kyoto Anime-inspired style with soft brushwork, cinematic lighting, and progressive depth. Create an AV cover layout with Japanese-English mixed typography, using a prominent serif title with strong visual hierarchy. Extract profound words for the title and include a creative slogan. The original name 'Girl with a Pearl Earring' should appear as smaller text if needed. Subtly embed the watermark 'jerlin' in clothing or background. For modesty, replace any potential nudity with flowing fabric, hair, or veils while maintaining the emotional tone and posture. Soften details only when necessary.",
+  "ratio": "2:3"
+}
+
+>🕐 Queuing.
+
+>⚡ Generating.....
+
+>🏃‍ Progress 11....19....27...34....42....50....57...64....[100](https://videos.openai.com/vg-assets/assets%2Ftask_01jsccq77nfcsab7dn8bx7z230%2Fsrc_1.png?st=2025-04-21T13%3A08%3A48Z&se=2025-04-27T14%3A08%3A48Z&sks=b&skt=2025-04-21T13%3A08%3A48Z&ske=2025-04-27T14%3A08%3A48Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=aa5ddad1-c91a-4f0a-9aca-e20682cc8969&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=xm6K6M7au3F3Vd9qcYxR3mYWrqAHsgbagbUV5GQo39w%3D&az=oaivgprodscus)
+
+> ✅ Generation complete
+
+
+![gen_01jsccq83pfg6ssfqf3pzfaytj](https://filesystem.site/cdn/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/XBCrAs6qvMARG7BkFX0KI3MBs1qoto.png)
+
+![gen_01jsccq83nf6ftmtx8y48h383y](https://filesystem.site/cdn/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)
+
+[Click to download](https://filesystem.site/cdn/download/20250421/tQ62gh0BbdESApNmFJMNzsdUFDflkl.png)%      
+```
+
+## Compatibility with Official OpenAI API
+
+If you prefer using the latest image generation method released by OpenAI, you can refer to the following implementation. Just keep these 3 points in mind:
+
+1. Do not include the `quality` parameter — models like `gpt-4o-image-vip` and `gpt-4o-image` have it bundled internally.
+2. The `usage` field (token tracking) is not supported.
+3. The latest output returns Base64-encoded image data, and the current script already handles automatic saving.
+
+```py Python
+from openai import OpenAI
+import os
+import requests
+import base64
+
+client = OpenAI(
+    api_key="AIHUBMIX_API_KEY", # Replace with your AiHubMix API key
+    base_url="https://aihubmix.com/v1"
+)
+
+prompt = """
+redesign poster of the movie [Black Swam], 3D cartoon, smooth render, bright tone, 2:3
+"""
+
+result = client.images.generate(
+    model="gpt-4o-image-vip",
+    prompt=prompt,
+    n=1, # Number of images to generate
+    size="1024x1536", # 1024x1024 (square), 1536x1024 (3:2 landscape), 1024x1536 (2:3 portrait), auto (default)
+    #quality="high" # Do not pass quality for reverse model, it's internally bound 📍
+)
+
+print(result) # Print full API response; usage not supported for reverse API 📍
+
+# Define output filename prefix and directory
+output_dir = "." # You can specify another directory
+file_prefix = "image_gen-reverse"
+
+# Ensure output directory exists
+os.makedirs(output_dir, exist_ok=True)
+
+# Iterate through all returned image data
+for i, image_data in enumerate(result.data):
+    # Handle base64 string first
+    if hasattr(image_data, "b64_json") and image_data.b64_json:
+        image_bytes = base64.b64decode(image_data.b64_json)
+        current_index = i
+        while True:
+            file_name = f"{file_prefix}_{current_index}.png"
+            file_path = os.path.join(output_dir, file_name)
+            if not os.path.exists(file_path):
+                break
+            current_index += 1
+        with open(file_path, "wb") as f:
+            f.write(image_bytes)
+        print(f"Image saved to: {file_path} (base64)")
+    # Then handle url field (robust fallback in case of interface change)
+    elif hasattr(image_data, "url") and image_data.url:
+        try:
+            response = requests.get(image_data.url, stream=True)
+            response.raise_for_status()
+            image_bytes = response.content
+            current_index = i
+            while True:
+                file_name = f"{file_prefix}_{current_index}.png"
+                file_path = os.path.join(output_dir, file_name)
+                if not os.path.exists(file_path):
+                    break
+                current_index += 1
+            with open(file_path, "wb") as f:
+                f.write(image_bytes)
+            print(f"Image saved to: {file_path} (url)")
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to download image #{i}: {e}")
+        except Exception as e:
+            print(f"Error occurred while processing image #{i}: {e}")
+    else:
+        print(f"No b64_json or url found in image #{i}, skipping save.")
+```
+
+## Effect Demonstration
+
+<Card title="Girl with a Pearl Earring" img="/media/en/Girl-with-a-Pearl-Earring.PNG">
+  1. The famous painting is reinterpreted, with text and watermark directly output.
+</Card>
+
+<Card title="Pixar" img="/media/en/pixar.png">
+  1. The Pixar 3D Cartoon style, stable as ever.
+</Card>
+
+<Card title="Ghibli" img="/media/en/ghibli.png">
+  1. The most popular Ghibli
+</Card>
+
+## Practical Tips
+
+<Tip>
+  - Support any language, Chinese drawing is also stable, but we don't recommend drawing a large amount of text.
+  - Specify the aspect ratio in the prompt, otherwise 4o will automatically determine it. Supports 2:3, 3:2, 1:1.
+  - Give reference images if you don't have inspiration, support single image and multi-image.
+  - Upload images can be compressed for pre-processing, improve speed.
+  - Support transparent background, no need to remove the background.——just add the requirement in the prompt.
 </Tip>
