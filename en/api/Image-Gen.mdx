@@ -37,6 +37,9 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
   - `imagen-4.0-generate-preview-06-06`
   - `imagen-4.0-ultra-generate-exp-05-20`
   - `imagen-4.0-generate-preview-05-20`
+  - `imagen-4.0-fast-generate-001`
+  - `imagen-4.0-fast-generate-preview-06-06`
+  - 
   - `imagen-3.0-generate-002`
   - `flux-kontext-max`
   - `flux-kontext-pro`
@@ -105,6 +108,8 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 - `imagen-4.0-generate-preview-06-06`
 - `imagen-4.0-ultra-generate-exp-05-20`
 - `imagen-4.0-generate-preview-05-20`
+- `imagen-4.0-fast-generate-preview-06-06`
+- `imagen-4.0-fast-generate-001`
 - `imagen-3.0-generate-002`
 
 <Note>
@@ -116,7 +121,7 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
 <CodeGroup>
 
 ```shell Curl
-curl https://aihubmix.com/v1/models/google/imagen-3.0-generate-002/predictions \
+curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
     -d '{
@@ -199,6 +204,7 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
   }
 }'
 ```
+
 
 ```shell Curl flux-kontext-pro Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \

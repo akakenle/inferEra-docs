@@ -14,6 +14,8 @@ Imagen 是 Google 推出的先进图像生成 AI 模型系列，能够根据文�
 - `imagen-4.0-generate-preview-05-20`：正式预览版
 - `imagen-4.0-ultra-generate-preview-06-06`：更高级的 ultra 正式预览版
 - `imagen-4.0-ultra-generate-exp-05-20`：ultra 4.0 实验款
+- `imagen-4.0-fast-generate-001`：快速版本
+- `imagen-4.0-fast-generate-preview-06-06`：快速版本预览版
 - `imagen-3.0-generate-002`：3.0 正式版
 
 <Tip>
@@ -36,9 +38,10 @@ Imagen 目前仅支持英文提示词，并提供以下参数：
 
 使用 Imagen API 生成图像的费用如下：
 
-- imagen-3：$0.03/张
-- imagen-4：$0.04/张
-- imagen-4-ultra：$0.06/张
+- imagen-4-ultra：\$0.06/张
+- imagen-4：\$0.04/张
+- imagen-4-fast：\$0.02/张
+- imagen-3：\$0.03/张
 
 请注意，每次调用可以生成 1-4 张图像，费用将按实际生成的图像数量计算。
 
@@ -63,7 +66,7 @@ client = genai.Client(
 
 # 目前只支持英文 prompt，绘制大量文本的表现较差
 response = client.models.generate_images(
-    model='imagen-3.0-generate-002',
+    model='imagen-4.0-fast-generate-001',
     prompt='A minimalist logo for a LLM router market company on a solid white background. trident in a circle as the main symbol, with ONLY text \'InferEra\' below.',
     config=types.GenerateImagesConfig(
         number_of_images=1,
@@ -80,15 +83,28 @@ os.makedirs(output_dir, exist_ok=True)
 timestamp = int(time.time())
 
 # 保存并显示生成的图片
-for i, generated_image in enumerate(response.generated_images):
-  image = Image.open(BytesIO(generated_image.image.image_bytes))
-  image.show()
-  
-  file_name = f"imagen3_{timestamp}_{i+1}.png"
-  file_path = os.path.join(output_dir, file_name)
-  image.save(file_path)
-  
-  print(f"图片已保存至：{file_path}")
+if response and hasattr(response, 'generated_images') and response.generated_images:
+    for i, generated_image in enumerate(response.generated_images):
+        try:
+            image = Image.open(BytesIO(generated_image.image.image_bytes))
+            image.show()
+            
+            file_name = f"imagen3_{timestamp}_{i+1}.png"
+            file_path = os.path.join(output_dir, file_name)
+            image.save(file_path)
+            
+            print(f"图片已保存至：{file_path}")
+        except Exception as e:
+            print(f"处理图片 {i+1} 时出错：{e}")
+else:
+    print("错误：未收到有效的图片响应")
+    print(f"响应类型：{type(response)}")
+    if response:
+        print(f"响应属性：{dir(response)}")
+        if hasattr(response, 'generated_images'):
+            print(f"generated_images 值：{response.generated_images}")
+    else:
+        print("响应为空，请检查 API 密钥和网络连接")
 ```
 
 </CodeGroup>
@@ -557,7 +573,7 @@ print("视频已保存为 output.mp4")
 
 ## Veo 3.0 逆向接口调用方式
 
-AIhubmix 提供和官方效果一致但费率更低的逆向调用方式——单次生成总费用为 $0.41。但请注意，任何逆向的调用方式都不能保障稳定的生成，推荐在开发环境作为早期实验或仅用于个人体验。
+AIhubmix 提供和官方效果一致但费率更低的逆向调用方式——单次生成总费用为 \$0.41。但请注意，任何逆向的调用方式都不能保障稳定的生成，推荐在开发环境作为早期实验或仅用于个人体验。
 
 已知限制和官方正式接口一致，见上方「Veo 3.0 视频生成」章节。
 
