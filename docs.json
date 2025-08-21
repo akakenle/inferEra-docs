@@ -44,7 +44,12 @@
                   "cn/api/GPT-Image-1",
                   "cn/api/IdeogramAI",
                   "cn/api/Qwen",
-                  "cn/api/Jina-AI",
+                  "cn/api/Jina-AI"
+                ]
+              },
+              {
+                "group": "平台管理",
+                "pages": [
                   "cn/api/Models-API",
                   "cn/api/App-code",
                   "cn/api/Auth",
@@ -158,7 +163,12 @@
                   "en/api/GPT-Image-1",
                   "en/api/IdeogramAI",
                   "en/api/Qwen",
-                  "en/api/Jina-AI",
+                  "en/api/Jina-AI"
+                ]
+              },
+              {
+                "group": "Platform Management",
+                "pages": [
                   "en/api/Models-API",
                   "en/api/App-code",
                   "en/api/Auth",
@@ -272,7 +282,12 @@
                   "jp/api/GPT-Image-1",
                   "jp/api/IdeogramAI",
                   "jp/api/Qwen",
-                  "jp/api/Jina-AI",
+                  "jp/api/Jina-AI"
+                ]
+              },
+              {
+                "group": "プラットフォーム管理",
+                "pages": [
                   "jp/api/Models-API",
                   "jp/api/App-code",
                   "jp/api/Auth",
@@ -386,7 +401,12 @@
                   "ko/api/GPT-Image-1",
                   "ko/api/IdeogramAI",
                   "ko/api/Qwen",
-                  "ko/api/Jina-AI",
+                  "ko/api/Jina-AI"
+                ]
+              },
+              {
+                "group": "플랫폼 관리",
+                "pages": [
                   "ko/api/Models-API",
                   "ko/api/App-code",
                   "ko/api/Auth",
@@ -500,7 +520,12 @@
                   "zh-Hant/api/GPT-Image-1",
                   "zh-Hant/api/IdeogramAI",
                   "zh-Hant/api/Qwen",
-                  "zh-Hant/api/Jina-AI",
+                  "zh-Hant/api/Jina-AI"
+                ]
+              },
+              {
+                "group": "平台管理",
+                "pages": [
                   "zh-Hant/api/Models-API",
                   "zh-Hant/api/App-code",
                   "zh-Hant/api/Auth",
