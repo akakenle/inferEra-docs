@@ -675,6 +675,10 @@
             "href": "https://aihubmix.com/token"
           },
           {
+            "label": "Aihubmix Credits",
+            "href": "https://aihubmix.com/topup"
+          },
+          {
             "label": "llms.txt",
             "href": "https://docs.aihubmix.com/llms.txt"
           },
