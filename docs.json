@@ -671,6 +671,10 @@
         "header": "Resources",
         "items": [
           {
+            "label": "Aihubmix API Key",
+            "href": "https://aihubmix.com/token"
+          },
+          {
             "label": "llms.txt",
             "href": "https://docs.aihubmix.com/llms.txt"
           },
