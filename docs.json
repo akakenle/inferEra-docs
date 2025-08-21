@@ -647,7 +647,7 @@
         "items": [
           {
             "label": "llms.txt",
-            "href": "https://docs.aihubmix.com/en/llms"
+            "href": "https://docs.aihubmix.com/llms.txt"
           },
           {
             "label": "Auth Reference",
@@ -682,11 +682,6 @@
     {
       "source": "/cn",
       "destination": "/cn/index"
-    },
-    {
-      "source": "/en/llms",
-      "destination": "https://www.resource.nestsound.cn/docs/llms.txt",
-      "permanent": false
     }
   ],
   "integrations": {
