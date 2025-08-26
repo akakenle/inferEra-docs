@@ -123,8 +123,8 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 
 **Instructions:**
 
-- Model id: `gemini-2.0-flash-preview-image-generation`
-- Input/Outpt pricing: $0.1→$0.4/M tokens
+- Model id: `gemini-2.5-flash-image-preview`
+- Input/Outpt pricing: Text: \$0.3→\$2.5/M tokens; Image: \$0.3→\$30/M tokens
 - Need to add parameters to experience new features: `"modalities":["text","image"]`
 - Images are passed and output in Base64 encoding
 - As an experimental model, it's recommended to explicitly specify "output image", otherwise it might only output text
@@ -137,7 +137,7 @@ Gemini also offers image generation capabilities as an alternative. Compared to 
 ```json
 "modalities": ["text","image"]
 {
-    "model": "gemini-2.0-flash-preview-image-generation",
+    "model": "gemini-2.5-flash-image-preview",
     "messages": [
       {
         "role": "user",
@@ -209,7 +209,7 @@ curl https://aihubmix.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
-    "model": "gemini-2.0-flash-preview-image-generation",
+    "model": "gemini-2.5-flash-image-preview",
     "messages": [
       {
         "role": "user",
@@ -250,7 +250,7 @@ client = OpenAI(
 
 # Using text-only input
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-preview-image-generation",
+    model="gemini-2.5-flash-image-preview",
     messages=[
         {
             "role": "user",
@@ -341,7 +341,7 @@ def encode_image(image_path):
 base64_image = encode_image(image_path)
 
 response = client.chat.completions.create(
-    model="gemini-2.0-flash-preview-image-generation",
+    model="gemini-2.5-flash-image-preview",
     messages=[
         {
             "role": "user",
