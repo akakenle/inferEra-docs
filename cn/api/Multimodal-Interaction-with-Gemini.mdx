@@ -350,7 +350,7 @@ def encode_image(image_path):
 base64_image = encode_image(image_path)
 
 response = client.chat.completions.create(
-    model="ggemini-2.5-flash-image-preview",
+    model="gemini-2.5-flash-image-preview",
     messages=[
         {
             "role": "user",
