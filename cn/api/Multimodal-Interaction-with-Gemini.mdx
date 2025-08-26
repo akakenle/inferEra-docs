@@ -118,9 +118,9 @@ else:
 - **避免在提示词中包含大量文本**，仅使用重点关键词以获得更稳定的结果。
 - 关键词包含 `girl` 时容易触发 TypeError: 'NoneType' object is not iterable 报错，不推荐用于人物绘制
 
-## Gemini 2.0 Flash 图像生成
+## Gemini 2.5 Flash 图像生成
 
-Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.0 相比，Gemini 的图像生成更适合于需要上下文理解和推理的场景，而非追求极致的艺术表现和视觉质量。
+Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 系列相比，Gemini 的图像生成更适合于需要上下文理解和推理的场景，而非追求极致的艺术表现和视觉质量。
 
 - 更高的视觉质量 → 相比 exp 版，图像更锐利、更丰富、更清晰。
 - 更准确的文本呈现 → 生成的视觉中，文本更加精准、干净、易读。
@@ -146,7 +146,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen 3.
 ```json
 "modalities": ["text","image"]
 {
-    "model": "gemini-2.0-flash-preview-image-generation",
+    "model": "gemini-2.5-flash-image-preview",
     "messages": [
       {
         "role": "user",
