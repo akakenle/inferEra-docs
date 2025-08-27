@@ -128,12 +128,13 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen �
 
 **说明：**
 
-- 模型 id：`gemini-2.5-flash-image-preview`
+- 模型 id：`gemini-2.5-flash-image-preview` ，社交媒体上的别名是`nano-banana`
 - 费率（输入→输出）：Text: \$0.3→\$2.5/M tokens; Image: \$0.3→\$30/M tokens
 - 需要新增参数来体验新特性 `"modalities":["text","image"]`
 - 图片以 Base64 编码形式传递与输出
-- 输出图片的默认高度为 1024px
+- 输出图片的默认尺寸为 1024\*1024px，折合 1290 Tokens
 - python 调用需要最新的 openai sdk 支持，请先运行 `pip install -U openai`
+- Aihubmix 平台支持 gemini 原生与 OpenAI 兼容则 2 种请求格式，其中 gemini 原生的方式画质表现最佳
 - 了解更多请访问 [Gemini 官方文档](https://ai.google.dev/gemini-api/docs/image-generation)
 
 <Tip>
@@ -310,6 +311,7 @@ try:
 except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
+
 
 ```py Gemini Python
 import mimetypes
