@@ -39,6 +39,7 @@ client = OpenAI(
 1. 2.5 系列都是推理模型。
 2. 2.5 flash 是混合模型，类似 claude sonnet 3.7，可以通过用 `thinking_budget` 控制推理预算来达到最佳效果。
 3. 2.5 pro 是纯粹的推理模型，因此不能关闭 thinking、也不显式传递推理预算。
+4.  温度值支持范围 0 \<= `temprature` \<= 2
 
 **Python 调用参考如下：**
 
