@@ -134,7 +134,7 @@ Gemini 也提供了图像生成能力，作为一种替代方案。与 Imagen �
 - 图片以 Base64 编码形式传递与输出
 - 输出图片的默认尺寸为 1024\*1024px，折合 1290 Tokens
 - python 调用需要最新的 openai sdk 支持，请先运行 `pip install -U openai`
-- Aihubmix 平台支持 gemini 原生与 OpenAI 兼容则 2 种请求格式，其中 gemini 原生的方式画质表现最佳
+- Aihubmix 平台支持 gemini 原生与 OpenAI 兼容则 2 种请求格式
 - 了解更多请访问 [Gemini 官方文档](https://ai.google.dev/gemini-api/docs/image-generation)
 
 <Tip>
@@ -302,7 +302,7 @@ try:
                 # Save image
                 output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
                 os.makedirs(output_dir, exist_ok=True)
-                output_path = os.path.join(output_dir, "generated_image.jpg")
+                output_path = os.path.join(output_dir, "generated_image.png")
                 image.save(output_path)
                 print(f"✅ Image saved to: {output_path}")
             

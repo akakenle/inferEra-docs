@@ -292,7 +292,7 @@ try:
                 # Save image
                 output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
                 os.makedirs(output_dir, exist_ok=True)
-                output_path = os.path.join(output_dir, "generated_image.jpg")
+                output_path = os.path.join(output_dir, "generated_image.png")
                 image.save(output_path)
                 print(f"✅ Image saved to: {output_path}")
             
@@ -301,6 +301,7 @@ try:
 except Exception as e:
     print(f"Error processing response: {str(e)}")
 ```
+
 
 ```py Gemini Python
 import mimetypes
