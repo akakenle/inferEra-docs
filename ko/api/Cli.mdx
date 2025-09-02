@@ -30,18 +30,18 @@ AiHubMix CLI는 다음과 같은 주요 기능을 제공합니다:
 
 ### API 엔드포인트 개요
 
-| 엔드포인트                     | HTTP 메서드 | 설명                                        |
-| ---------------------------- | ----------- | -------------------------------------------------- |
-| `/api/user/self`             | GET         | 현재 사용자 정보 및 계정 잔액 가져오기   |
-| `/api/token/`                | GET         | 모든 API 키 목록 가져오기                           |
-| `/api/token/`                | POST        | 새 API 키 만들기                               |
-| `/api/token/`                | PUT         | 기존 API 키 업데이트                         |
-| `/api/token/{token_id}`      | GET         | 특정 API 키의 세부 정보 가져오기                  |
-| `/api/token/{token_id}`      | DELETE      | 특정 API 키 삭제                          |
-| `/api/token/search`          | GET         | API 키 검색 ( `?keyword=search_term` 사용) |
-| `/api/user/token`            | GET         | 사용자 API 키 가져오기                                   |
-| `/api/models`                | GET         | 사용 가능한 모든 모델 목록 가져오기                   |
-| `/api/user/available_models` | GET         | 현재 사용자가 사용할 수 있는 모델 목록 가져오기   |
+| 엔드포인트                        | HTTP 메서드 | 설명                                    |
+| ---------------------------- | -------- | ------------------------------------- |
+| `/api/user/self`             | GET      | 현재 사용자 정보 및 계정 잔액 가져오기                |
+| `/api/token/`                | GET      | 모든 API 키 목록 가져오기                      |
+| `/api/token/`                | POST     | 새 API 키 만들기                           |
+| `/api/token/`                | PUT      | 기존 API 키 업데이트                         |
+| `/api/token/{token_id}`      | GET      | 특정 API 키의 세부 정보 가져오기                  |
+| `/api/token/{token_id}`      | DELETE   | 특정 API 키 삭제                           |
+| `/api/token/search`          | GET      | API 키 검색 ( `?keyword=search_term` 사용) |
+| `/api/user/token`            | GET      | 사용자 API 키 가져오기                        |
+| `/api/models`                | GET      | 사용 가능한 모든 모델 목록 가져오기                  |
+| `/api/user/available_models` | GET      | 현재 사용자가 사용할 수 있는 모델 목록 가져오기           |
 
 ### 계정 관리
 
@@ -87,6 +87,12 @@ else:
 
 ```shell CLI 계정 잔액 가져오기
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+```
+
+
+```shell CLI에서 Key의 사용 가능한 잔액을 가져오기
+curl 'https://aihubmix.com/dashboard/billing/remain' \
+  -H 'authorization: Bearer sk-***' \
 ```
 
 </CodeGroup>
@@ -204,6 +210,7 @@ curl -X GET "https://aihubmix.com/api/token/search?keyword=search_term" \
   -H "Content-Type: application/json"
 ```
 
+
 ```py Python API 키 검색
 import requests
 import json
@@ -237,6 +244,7 @@ else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
 
+
 ```shell CLI API 키 검색
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "search_term"
 ```
@@ -257,6 +265,7 @@ curl -X PUT "https://aihubmix.com/api/token/" \
     "status": 1
   }'
 ```
+
 
 ```py Python API 키 업데이트
 import requests
@@ -295,6 +304,7 @@ else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
 
+
 ```shell CLI API 키 업데이트
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "새 이름" --expires 86400 --quota 100000 --status 1
 ```
@@ -308,6 +318,7 @@ curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python API 키 삭제
 import requests
@@ -335,6 +346,7 @@ else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
 
+
 ```shell CLI API 키 삭제
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
 ```
@@ -348,6 +360,7 @@ curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 사용자 API 키 가져오기
 import requests
@@ -374,6 +387,7 @@ else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
 
+
 ```shell CLI 사용자 API 키 가져오기
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
@@ -389,6 +403,7 @@ curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 사용 가능한 모든 모델 가져오기
 import requests
@@ -426,6 +441,7 @@ else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
 
+
 ```shell CLI 사용 가능한 모든 모델 가져오기
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
@@ -439,6 +455,7 @@ curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python 사용자가 사용할 수 있는 모델 가져오기
 import requests
@@ -466,6 +483,7 @@ if response.status_code == 200:
 else:
     print(f"요청 실패, 상태 코드: {response.status_code}")
 ```
+
 
 ```shell CLI 사용자가 사용할 수 있는 모델 가져오기
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
