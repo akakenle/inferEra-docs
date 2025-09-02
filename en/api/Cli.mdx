@@ -89,6 +89,12 @@ else:
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
 ```
 
+
+```shell Key quota
+curl 'https://aihubmix.com/dashboard/billing/remain' \
+  -H 'authorization: Bearer sk-***' \（key）
+```
+
 </CodeGroup>
 
 ### API Key Management
@@ -146,12 +152,6 @@ else:
 
 ```shell CLI Create New API Key
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "New Key Name" --expires -1 --quota 500000
-```
-
-
-```shell Key quota
-curl 'https://aihubmix.com/dashboard/billing/remain' \
-  -H 'authorization: Bearer sk-***' \（key）
 ```
 
 </CodeGroup>
