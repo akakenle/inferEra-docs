@@ -90,10 +90,19 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 
 ```shell CLI 获取 Key 的可用额度
 curl 'https://aihubmix.com/dashboard/billing/remain' \
-  -H 'authorization: Bearer sk-***' \（key）
+  -H 'authorization: Bearer sk-***' \
 ```
 
 </CodeGroup>
+
+Key 可用额度返回示例：
+
+```json
+
+{"object":"list","total_usage":0.06495} 代表剩余额度 $0.06495
+
+{"object":"list","total_usage":-0.000002}   -0.000002 代表无限额度
+```
 
 ### KEY 管理
 
