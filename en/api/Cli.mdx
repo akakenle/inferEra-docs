@@ -148,6 +148,12 @@ else:
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "New Key Name" --expires -1 --quota 500000
 ```
 
+
+```shell Key quota
+curl 'https://aihubmix.com/dashboard/billing/remain' \
+  -H 'authorization: Bearer sk-***' \（key）
+```
+
 </CodeGroup>
 
 <CodeGroup>
@@ -204,6 +210,7 @@ curl -X GET "https://aihubmix.com/api/token/search?keyword=search_term" \
   -H "Content-Type: application/json"
 ```
 
+
 ```py Python Search API Keys
 import requests
 import json
@@ -237,6 +244,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Search API Keys
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "search_term"
 ```
@@ -257,6 +265,7 @@ curl -X PUT "https://aihubmix.com/api/token/" \
     "status": 1
   }'
 ```
+
 
 ```py Python Update API Key
 import requests
@@ -295,6 +304,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Update API Key
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "New Name" --expires 86400 --quota 100000 --status 1
 ```
@@ -308,6 +318,7 @@ curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Delete API Key
 import requests
@@ -335,6 +346,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Delete API Key
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
 ```
@@ -348,6 +360,7 @@ curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Get User API Key
 import requests
@@ -374,6 +387,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Get User API Key
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
@@ -389,6 +403,7 @@ curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Get All Available Models
 import requests
@@ -426,6 +441,7 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
+
 ```shell CLI Get All Available Models
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
@@ -439,6 +455,7 @@ curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 
 ```py Python Get User Available Models
 import requests
@@ -466,6 +483,7 @@ if response.status_code == 200:
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
+
 
 ```shell CLI Get User Available Models
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
