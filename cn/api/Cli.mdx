@@ -41,7 +41,7 @@ AiHubMix CLI 提供以下主要功能：
 | `/api/models`                | GET     | 获取所有可用模型列表                   |
 | `/api/user/available_models` | GET     | 获取当前用户可用的模型列表                |
 
-### 账户管理
+### 账户管理的
 
 <CodeGroup>
 
@@ -85,6 +85,12 @@ else:
 
 ```shell CLI 获取账户余额
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
+```
+
+
+```shell CLI 获取 Key 的可用额度
+curl 'https://aihubmix.com/dashboard/billing/remain' \
+  -H 'authorization: Bearer sk-XXXX' \（key）
 ```
 
 </CodeGroup>
