@@ -1,13 +1,14 @@
 ---
 title: "OpenAI Codex CLI 통합"
 description: "AiHubMix를 통해 명령줄에서 OpenAI Codex를 구성하고 사용하세요"
-icon: 'terminal'
+icon: "terminal"
 ---
 
 # OpenAI Codex CLI 통합
 
-AiHubMix는 OpenAI [Codex CLI](https://github.com/openai/codex)와의 원활한 통합을 제공하여 명령줄 환경에서 직접 고급 AI 프로그래밍 지원을 활용할 수 있도록 합니다. 간단한 구성 단계를 통해 자연어를 사용하여 터미널에서 다양한 프로그래밍 및 시스템 작업을 수행할 수 있습니다.  
-사용하기 전에 다음 명령을 실행하여 설치하거나 업데이트하십시오:  
+AiHubMix는 OpenAI [Codex CLI](https://github.com/openai/codex)와의 원활한 통합을 제공하여 명령줄 환경에서 직접 고급 AI 프로그래밍 지원을 활용할 수 있도록 합니다. 간단한 구성 단계를 통해 자연어를 사용하여 터미널에서 다양한 프로그래밍 및 시스템 작업을 수행할 수 있습니다.\
+사용하기 전에 다음 명령을 실행하여 설치하거나 업데이트하십시오:
+
 ```bash
 npm install -g @openai/codex
 ```
@@ -19,12 +20,12 @@ npm install -g @openai/codex
 셸 구성 파일(예: `.zshrc` 또는 `.bashrc`)을 열고 다음 환경 변수를 추가합니다:
 
 ```bash
-export OPENAI_BASE_URL="https://api.aihubmix.com/v1"
+export OPENAI_BASE_URL="https://aihubmix.com/v1"
 export OPENAI_API_KEY="sk-***"
 ```
 
 <Warning>
-`OPENAI_API_KEY`는 [AiHubMix 키](https://aihubmix.com/token)여야 합니다. 변수 이름은 OpenAI 네이티브 클라이언트와의 호환성을 위해 `OPENAI_API_KEY`로 유지됩니다.
+  `OPENAI_API_KEY`는 [AiHubMix 키](https://aihubmix.com/token)여야 합니다. 변수 이름은 OpenAI 네이티브 클라이언트와의 호환성을 위해 `OPENAI_API_KEY`로 유지됩니다.
 </Warning>
 
 ### 2. 구성 변경 사항 적용
@@ -45,7 +46,8 @@ source ~/.bashrc  # bash를 사용하는 경우
 cd /your_project_path
 codex
 ```
-![Image](../../public/en/CodexCli-1-en.png)  
+
+![Image](../../public/en/CodexCli-1-en.png)
 
 ### 4. 자연어를 사용하여 작업 실행
 
@@ -55,24 +57,27 @@ codex
 # 샘플 입력
 TTSComponent를 분해하고 핵심 로직을 Mermaid 순서도로 추출하세요.
 ```
-![Image](../../public/en/CodexCli-2-en.png)  
+
+![Image](../../public/en/CodexCli-2-en.png)
 
 ## 고급 구성
 
 <Tip>
-- 기본 모델은 `codex-mini-latest`이며, 이는 Codex CLI에서 사용하기 위해 특별히 미세 조정된 `o4-mini` 버전으로 `~/.codex/config.json`에서 수정할 수 있습니다.
-- 현재 OpenAI 모델만 지원되며, 모델 목록은 [응답 API 문서](https://platform.openai.com/docs/api-reference/responses)에서 찾을 수 있습니다.
-- `~/.codex/instructions.md` 파일을 편집하여 시스템 프롬프트를 사용자 지정하여 AI 어시스턴트의 동작을 조정할 수 있습니다.
+  - 기본 모델은 `codex-mini-latest`이며, 이는 Codex CLI에서 사용하기 위해 특별히 미세 조정된 `o4-mini` 버전으로 `~/.codex/config.json`에서 수정할 수 있습니다.
+  - 현재 OpenAI 모델만 지원되며, 모델 목록은 [응답 API 문서](https://platform.openai.com/docs/api-reference/responses)에서 찾을 수 있습니다.
+  - `~/.codex/instructions.md` 파일을 편집하여 시스템 프롬프트를 사용자 지정하여 AI 어시스턴트의 동작을 조정할 수 있습니다.
 </Tip>
 
 ## 유용한 명령 참조
 
 ### 도움말 명령
+
 ```bash
 codex -h
 ```
 
 ### 전체 명령 옵션
+
 ```bash
   사용법
     $ codex [옵션] <프롬프트>

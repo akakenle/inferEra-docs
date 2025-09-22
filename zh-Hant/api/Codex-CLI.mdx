@@ -1,14 +1,15 @@
 ---
 title: "OpenAI Codex CLI 集成指南"
 description: "透過 AiHubMix 在命令列中支援 OpenAI Codex 呼叫"
-icon: 'terminal'
+icon: "terminal"
 ---
 
 # OpenAI Codex CLI 集成
 
 AiHubMix 提供了與 OpenAI [Codex CLI](https://github.com/openai/codex) 的無縫集成，讓你可以在命令列環境中利用先進的 AI 程式助手。透過簡單的配置步驟，即可在終端機中直接使用自然語言執行各種程式和系統操作任務。
 
-使用之前，請先執行以下指令安裝或更新：  
+使用之前，請先執行以下指令安裝或更新：
+
 ```bash
 npm install -g @openai/codex
 ```
@@ -20,12 +21,12 @@ npm install -g @openai/codex
 打開你的 Shell 配置檔（例如 `.zshrc` 或 `.bashrc`），新增以下環境變數：
 
 ```bash
-export OPENAI_BASE_URL="https://api.aihubmix.com/v1"
+export OPENAI_BASE_URL="https://aihubmix.com/v1"
 export OPENAI_API_KEY="sk-***" # 替換為你的 AiHubMix API 密鑰
 ```
 
 <Warning>
-這裡的 `OPENAI_API_KEY` 應該使用 AiHubMix 的[密鑰](https://aihubmix.com/token)，變數名稱保持為 `OPENAI_API_KEY` 是為了相容 OpenAI 原生客戶端。
+  這裡的 `OPENAI_API_KEY` 應該使用 AiHubMix 的[密鑰](https://aihubmix.com/token)，變數名稱保持為 `OPENAI_API_KEY` 是為了相容 OpenAI 原生客戶端。
 </Warning>
 
 ### 2. 套用配置變更
@@ -46,7 +47,8 @@ source ~/.bashrc  # 如果使用 bash
 cd /你的專案路徑
 codex
 ```
-![圖片](../../public/cn/CodexCli-1.png)  
+
+![圖片](../../public/cn/CodexCli-1.png)
 
 ### 4. 使用自然語言執行任務
 
@@ -56,24 +58,27 @@ codex
 # 範例輸入
 講解一下 AnimatedText
 ```
-![圖片](../../public/cn/CodexCli-2.png)  
+
+![圖片](../../public/cn/CodexCli-2.png)
 
 ## 進階配置
 
 <Tip>
-- 預設模型為 `codex-mini-latest`，一個專為編碼任務微調過的 `o4-mini`，可以在 `~/.codex/config.json`修改
-- 目前僅支援 OpenAI 家的模型，模型列表可在 [Responses API 文件](https://platform.openai.com/docs/api-reference/responses) 中查看
-- 你可以透過編輯 `~/.codex/instructions.md` 檔案來自訂系統提示詞，定制 AI 助手的行為
+  - 預設模型為 `codex-mini-latest`，一個專為編碼任務微調過的 `o4-mini`，可以在 `~/.codex/config.json`修改
+  - 目前僅支援 OpenAI 家的模型，模型列表可在 [Responses API 文件](https://platform.openai.com/docs/api-reference/responses) 中查看
+  - 你可以透過編輯 `~/.codex/instructions.md` 檔案來自訂系統提示詞，定制 AI 助手的行為
 </Tip>
 
 ## 實用指令參考
 
 ### 幫助指令
+
 ```bash
 codex -h
 ```
 
 ### 完整指令選項
+
 ```bash
 Usage
   $ codex [options] <prompt>

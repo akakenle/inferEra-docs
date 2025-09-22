@@ -1,13 +1,14 @@
 ---
 title: "OpenAI Codex CLI Integration"
 description: "Configure and use OpenAI Codex in your command line through AiHubMix"
-icon: 'terminal'
+icon: "terminal"
 ---
 
 # OpenAI Codex CLI Integration
 
-AiHubMix offers seamless integration with OpenAI [Codex CLI](https://github.com/openai/codex), enabling you to leverage advanced AI programming assistance directly in your command line environment. With simple configuration steps, you can use natural language to perform various programming and system operations from your terminal.  
-Before using, please run the following command to install or update:  
+AiHubMix offers seamless integration with OpenAI [Codex CLI](https://github.com/openai/codex), enabling you to leverage advanced AI programming assistance directly in your command line environment. With simple configuration steps, you can use natural language to perform various programming and system operations from your terminal.\
+Before using, please run the following command to install or update:
+
 ```bash
 npm install -g @openai/codex
 ```
@@ -19,12 +20,12 @@ npm install -g @openai/codex
 Open your shell configuration file (e.g., `.zshrc` or `.bashrc`) and add the following environment variables:
 
 ```bash
-export OPENAI_BASE_URL="https://api.aihubmix.com/v1"
+export OPENAI_BASE_URL="https://aihubmix.com/v1"
 export OPENAI_API_KEY="sk-***"
 ```
 
 <Warning>
-The `OPENAI_API_KEY` should be your [AiHubMix key](https://aihubmix.com/token). The variable name remains `OPENAI_API_KEY` for compatibility with the OpenAI native client.
+  The `OPENAI_API_KEY` should be your [AiHubMix key](https://aihubmix.com/token). The variable name remains `OPENAI_API_KEY` for compatibility with the OpenAI native client.
 </Warning>
 
 ### 2. Apply Configuration Changes
@@ -45,7 +46,8 @@ Navigate to your project directory and run the `codex` command:
 cd /your_project_path
 codex
 ```
-![Image](../../public/en/CodexCli-1-en.png)  
+
+![Image](../../public/en/CodexCli-1-en.png)
 
 ### 4. Execute Tasks Using Natural Language
 
@@ -55,24 +57,27 @@ Now you can input instructions to Codex CLI using natural language, for example:
 # Sample input
 Break down the TTSComponent, and distill its core logic into a Mermaid flowchart.
 ```
-![Image](../../public/en/CodexCli-2-en.png)  
+
+![Image](../../public/en/CodexCli-2-en.png)
 
 ## Advanced Configuration
 
 <Tip>
-- The default model is `codex-mini-latest` - a fine-tuned version of `o4-mini` specifically for use in Codex CLI, which can be modified in `~/.codex/config.json`
-- Currently only OpenAI models are supported, you can find the model list in the [Responses API documentation](https://platform.openai.com/docs/api-reference/responses)
-- You can customize the system prompt by editing the `~/.codex/instructions.md` file to tailor the AI assistant's behavior
+  - The default model is `codex-mini-latest` - a fine-tuned version of `o4-mini` specifically for use in Codex CLI, which can be modified in `~/.codex/config.json`
+  - Currently only OpenAI models are supported, you can find the model list in the [Responses API documentation](https://platform.openai.com/docs/api-reference/responses)
+  - You can customize the system prompt by editing the `~/.codex/instructions.md` file to tailor the AI assistant's behavior
 </Tip>
 
 ## Useful Command Reference
 
 ### Help Command
+
 ```bash
 codex -h
 ```
 
 ### Complete Command Options
+
 ```bash
   Usage
     $ codex [options] <prompt>

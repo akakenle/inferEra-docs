@@ -1,7 +1,7 @@
 ---
 title: "OpenAI Codex CLI 統合ガイド"
 description: "AiHubMixを介してコマンドラインでOpenAI Codexをサポート"
-icon: 'terminal'
+icon: "terminal"
 ---
 
 # OpenAI Codex CLI 統合
@@ -9,6 +9,7 @@ icon: 'terminal'
 AiHubMixは、OpenAI [Codex CLI](https://github.com/openai/codex)とのシームレスな統合を提供し、コマンドライン環境で高度なAIプログラミングアシスタントを利用できるようにします。簡単な設定手順で、ターミナルから直接自然言語を使用して、さまざまなプログラミングおよびシステム操作タスクを実行できます。
 
 使用する前に、以下のコマンドを実行してインストールまたは更新してください。
+
 ```bash
 npm install -g @openai/codex
 ```
@@ -20,12 +21,12 @@ npm install -g @openai/codex
 Shell設定ファイル（例：`.zshrc`または`.bashrc`）を開き、以下の環境変数を追加します。
 
 ```bash
-export OPENAI_BASE_URL="https://api.aihubmix.com/v1"
+export OPENAI_BASE_URL="https://aihubmix.com/v1"
 export OPENAI_API_KEY="sk-***" # あなたのAiHubMix APIキーに置き換えてください
 ```
 
 <Warning>
-ここの`OPENAI_API_KEY`はAiHubMixの[キー](https://aihubmix.com/token)を使用する必要があります。変数名が`OPENAI_API_KEY`のままであるのは、OpenAIネイティブクライアントとの互換性を保つためです。
+  ここの`OPENAI_API_KEY`はAiHubMixの[キー](https://aihubmix.com/token)を使用する必要があります。変数名が`OPENAI_API_KEY`のままであるのは、OpenAIネイティブクライアントとの互換性を保つためです。
 </Warning>
 
 ### 2. 設定変更の適用
@@ -46,7 +47,8 @@ source ~/.bashrc  # bashを使用している場合
 cd /あなたのプロジェクトパス
 codex
 ```
-![画像/media/en/CodexCli-1.png)  
+
+![画像/media/en/CodexCli-1.png)
 
 ### 4. 自然言語でタスクを実行
 
@@ -56,24 +58,27 @@ codex
 # 入力例
 AnimatedTextについて説明してください
 ```
-![画像/media/en/CodexCli-2.png)  
+
+![画像/media/en/CodexCli-2.png)
 
 ## 高度な設定
 
 <Tip>
-- デフォルトモデルは`codex-mini-latest`で、これはコーディングタスク用に微調整された`o4-mini`です。`~/.codex/config.json`で変更できます。
-- 現在、OpenAIのモデルのみをサポートしています。モデルリストは[Responses APIドキュメント](https://platform.openai.com/docs/api-reference/responses)で確認できます。
-- `~/.codex/instructions.md`ファイルを編集することで、システムプロンプトをカスタマイズし、AIアシスタントの動作を調整できます。
+  - デフォルトモデルは`codex-mini-latest`で、これはコーディングタスク用に微調整された`o4-mini`です。`~/.codex/config.json`で変更できます。
+  - 現在、OpenAIのモデルのみをサポートしています。モデルリストは[Responses APIドキュメント](https://platform.openai.com/docs/api-reference/responses)で確認できます。
+  - `~/.codex/instructions.md`ファイルを編集することで、システムプロンプトをカスタマイズし、AIアシスタントの動作を調整できます。
 </Tip>
 
 ## 実用的なコマンドリファレンス
 
 ### ヘルプコマンド
+
 ```bash
 codex -h
 ```
 
 ### 完全なコマンドオプション
+
 ```bash
 Usage
   $ codex [options] <prompt>
