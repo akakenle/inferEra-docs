@@ -1,0 +1,368 @@
+---
+title: "Aihubmix Third-party Integration Technical Guide"
+description: " Based on the core implementation logic of `@aihubmix/ai-sdk-provider`, `dify-plugin-aihubmix`, and `cherry-studio` projects, this document provides developers with a technical guide for quickly integrating the aihubmix unified gateway. "
+icon: "rocket"
+---
+
+## 1. Core Integration Patterns
+
+### 1.1 Unified Authentication and Routing
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    // Core logic: Replace API Key, Base URL, add APP-Code
+    const config = {
+      apiKey: 'your-aihubmix-api-key',  // Replace with aihubmix API Key
+      baseURL: 'https://aihubmix.com',   // Replace with aihubmix gateway
+      headers: {
+        'APP-Code': 'WHVL9885'  // Enjoy discount
+      }
+    };
+    
+    // Model routing rules
+    function routeModel(modelName: string) {
+      if (modelName.startsWith('claude')) {
+        // Claude models: Use Anthropic SDK
+        return 'anthropic';
+      } else if (modelName.startsWith('gemini') && !modelName.endsWith('-nothink') && !modelName.endsWith('-search')) {
+        // Gemini models: Use Google SDK, endpoint https://aihubmix.com/gemini
+        return 'gemini';
+      } else {
+        // Other models: Use OpenAI compatible interface
+        return 'openai';
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    # Core logic: Replace API Key, Base URL, add APP-Code
+    credentials = {
+        "api_key": "your-aihubmix-api-key",  # Replace with aihubmix API Key
+        "base_url": "https://aihubmix.com",   # Replace with aihubmix gateway
+        "extra_headers": {
+            "APP-Code": "WHVL9885"  # Enjoy discount
+        }
+    }
+    
+    # Model routing rules
+    def route_model(model_name: str):
+        if model_name.startswith("claude"):
+            # Claude models: Use Anthropic SDK
+            return "anthropic"
+        elif model_name.startswith("gemini") and not model_name.endswith(("-nothink", "-search")):
+            # Gemini models: Use Google SDK, endpoint https://aihubmix.com/gemini
+            return "gemini"
+        else:
+            # Other models: Use OpenAI compatible interface
+            return "openai"
+    ```
+  </Tab>
+</Tabs>
+
+### 1.2 Special Handling Points
+
+- **Empty Tools Fix**: When `tools=[]` and `tool_choice` exists, automatically remove `tool_choice`
+- **File Extensions**: Automatically set correct file extensions based on `mediaType`
+- **Cache Control**: Support `<cache>` tags for cache control
+
+## 2. Unified Integration Implementation
+
+### 2.1 Core Client Wrapper
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    class AihubmixModelClient {
+      private config: {
+        apiKey: string;
+        baseURL: string;
+        appCode: string;
+      };
+    
+      constructor(apiKey: string) {
+        this.config = {
+          apiKey,
+          baseURL: 'https://aihubmix.com',
+          appCode: 'WHVL9885'
+        };
+      }
+    
+      async chatCompletion(model: string, messages: any[], options: any = {}) {
+        // Automatically route to corresponding SDK based on model name
+        if (model.startsWith('claude')) {
+          return this.claudeCompletion(model, messages, options);
+        } else if (model.startsWith('gemini')) {
+          return this.geminiCompletion(model, messages, options);
+        } else {
+          return this.openaiCompletion(model, messages, options);
+        }
+      }
+    
+      private async claudeCompletion(model: string, messages: any[], options: any) {
+        const { Anthropic } = await import('@anthropic-ai/sdk');
+        const client = new Anthropic({
+          apiKey: this.config.apiKey,
+          baseURL: this.config.baseURL,
+          defaultHeaders: { 'APP-Code': this.config.appCode }
+        });
+        return client.messages.create({ model, messages, ...options });
+      }
+    
+      private async geminiCompletion(model: string, messages: any[], options: any) {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(this.config.apiKey, {
+          baseURL: `${this.config.baseURL}/gemini/v1beta`,
+          defaultHeaders: { 'APP-Code': this.config.appCode }
+        });
+        const genModel = genAI.getGenerativeModel({ model });
+        return genModel.generateContent(messages);
+      }
+    
+      private async openaiCompletion(model: string, messages: any[], options: any) {
+        const OpenAI = await import('openai');
+        const client = new OpenAI.default({
+          apiKey: this.config.apiKey,
+          baseURL: `${this.config.baseURL}/v1`,
+          defaultHeaders: { 'APP-Code': this.config.appCode }
+        });
+        return client.chat.completions.create({ model, messages, ...options });
+      }
+    }
+    
+    // Usage example
+    const client = new AihubmixModelClient('your-aihubmix-api-key');
+    await client.chatCompletion('gpt-4o-mini', messages);
+    await client.chatCompletion('claude-3-5-sonnet-20241022', messages);
+    await client.chatCompletion('gemini-2.5-flash', messages);
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    class AihubmixModelClient:
+        def __init__(self, api_key: str):
+            self.api_key = api_key
+            self.base_url = "https://aihubmix.com"
+            self.headers = {
+                "Authorization": f"Bearer {api_key}",
+                "APP-Code": "WHVL9885"
+            }
+      
+        def chat_completion(self, model: str, messages: list, **kwargs):
+            """Unified chat completion interface"""
+            if model.startswith("claude"):
+                return self._claude_completion(model, messages, **kwargs)
+            elif model.startswith("gemini"):
+                return self._gemini_completion(model, messages, **kwargs)
+            else:
+                return self._openai_completion(model, messages, **kwargs)
+      
+        def _claude_completion(self, model: str, messages: list, **kwargs):
+            import anthropic
+            client = anthropic.Anthropic(
+                api_key=self.api_key,
+                base_url=self.base_url,
+                extra_headers={"APP-Code": "WHVL9885"}
+            )
+            return client.messages.create(model=model, messages=messages, **kwargs)
+      
+        def _gemini_completion(self, model: str, messages: list, **kwargs):
+            import google.generativeai as genai
+            genai.configure(
+                api_key=self.api_key,
+                client_options={"api_endpoint": f"{self.base_url}/gemini/v1beta"}
+            )
+            genai._client._http_client._session.headers.update({"APP-Code": "WHVL9885"})
+            model_instance = genai.GenerativeModel(model)
+            return model_instance.generate_content(messages)
+      
+        def _openai_completion(self, model: str, messages: list, **kwargs):
+            import openai
+            client = openai.OpenAI(
+                api_key=self.api_key,
+                base_url=f"{self.base_url}/v1",
+                extra_headers={"APP-Code": "WHVL9885"}
+            )
+            return client.chat.completions.create(model=model, messages=messages, **kwargs)
+    
+    # Usage example
+    client = AihubmixModelClient("your-aihubmix-api-key")
+    await client.chat_completion("gpt-4o-mini", messages)
+    await client.chat_completion("claude-3-5-sonnet-20241022", messages)
+    await client.chat_completion("gemini-2.5-flash", messages)
+    ```
+  </Tab>
+</Tabs>
+
+### 2.2 Special Handling and Utility Functions
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    // Empty tools fix
+    function fixToolChoice(requestBody: any): any {
+      if (requestBody.tools?.length === 0 && requestBody.tool_choice) {
+        delete requestBody.tool_choice;
+      }
+      return requestBody;
+    }
+    
+    // File extension mapping
+    function setFileExtension(mediaType: string): string {
+      const mimeToExt: Record<string, string> = {
+        'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/flac': 'flac'
+      };
+      return mimeToExt[mediaType] || 'bin';
+    }
+    
+    // Cache control
+    function processCacheTags(content: string): { content: string; cacheControl?: any } {
+      if (content.includes('<cache>')) {
+        return { content: content.replace('<cache>', ''), cacheControl: { type: 'ephemeral' } };
+      }
+      return { content };
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    # Empty tools fix
+    def fix_tool_choice(request_body: dict) -> dict:
+        if request_body.get("tools") == [] and "tool_choice" in request_body:
+            del request_body["tool_choice"]
+        return request_body
+    
+    # File extension mapping
+    def set_file_extension(media_type: str) -> str:
+        mime_to_ext = {
+            'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/flac': 'flac'
+        }
+        return mime_to_ext.get(media_type, 'bin')
+    
+    # Cache control
+    def process_cache_tags(content: str):
+        if "<cache>" in content:
+            return {
+                "content": content.replace("<cache>", ""),
+                "cache_control": {"type": "ephemeral"}
+            }
+        return {"content": content}
+    ```
+  </Tab>
+</Tabs>
+
+## 3. Deployment and Configuration
+
+### 3.1 Environment Variables
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    const config = {
+      apiKey: process.env.AIHUBMIX_API_KEY || '',
+      baseURL: process.env.AIHUBMIX_BASE_URL || 'https://aihubmix.com',
+      appCode: process.env.AIHUBMIX_APP_CODE || 'WHVL9885'
+    };
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import os
+    
+    config = {
+        "api_key": os.getenv("AIHUBMIX_API_KEY", ""),
+        "base_url": os.getenv("AIHUBMIX_BASE_URL", "https://aihubmix.com"),
+        "app_code": os.getenv("AIHUBMIX_APP_CODE", "WHVL9885")
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### 3.2 Error Handling
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    class AihubmixError extends Error {
+      constructor(message: string, public code?: string, public status?: number) {
+        super(message);
+        this.name = 'AihubmixError';
+      }
+    }
+    
+    function handleAihubmixErrors(error: any): AihubmixError {
+      const message = error.message || 'Unknown error';
+      if (message.toLowerCase().includes('rate limit')) {
+        return new AihubmixError('Rate limit exceeded', 'RATE_LIMIT', 429);
+      } else if (message.toLowerCase().includes('unauthorized')) {
+        return new AihubmixError('Authentication failed', 'AUTH_ERROR', 401);
+      } else {
+        return new AihubmixError(message, error.code, error.status);
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    class AihubmixError(Exception):
+        def __init__(self, message: str, code: str = None, status: int = None):
+            super().__init__(message)
+            self.code = code
+            self.status = status
+    
+    def handle_aihubmix_errors(e: Exception) -> AihubmixError:
+        message = str(e).lower()
+        if "rate limit" in message:
+            return AihubmixError("Rate limit exceeded", "RATE_LIMIT", 429)
+        elif "unauthorized" in message:
+            return AihubmixError("Authentication failed", "AUTH_ERROR", 401)
+        else:
+            return AihubmixError(f"Request failed: {e}")
+    ```
+  </Tab>
+</Tabs>
+
+## 4. Reference Implementations and Alignment Checklist
+
+### 4.1 cherry-studio Client Reference (TypeScript)
+
+The following key points from `cherry-studio`'s `AihubmixAPIClient.ts` can serve as a landing pattern for third-party frontend/desktop applications integrating with aihubmix on the TypeScript side:
+
+- **Unified Discount Code Addition**: Merge `extra_headers` at Provider level and set `APP-Code` (using `MLTG2087` in the project)
+- **Multi-client Routing**:
+  - `claude*` → Use Anthropic client
+  - `gemini*`/`imagen*` that don't end with `-nothink`/`-search` and don't contain `embedding` → Use Gemini client (`apiHost: https://aihubmix.com/gemini`)
+  - OpenAI series (excluding `gpt-oss`) → Use OpenAI compatible response client
+  - Others → Fallback to default OpenAI client
+- **BaseURL Retrieval**: Export from current routed specific client, maintaining endpoint differences for each provider
+
+### 4.2 dify-plugin-aihubmix Reference (Python)
+
+The following key points from `dify-plugin-aihubmix` implementation can serve as a landing pattern for third-party Python tools integrating with aihubmix:
+
+- **Unified Discount Code Addition**: Merge `extra_headers` at Provider level and set `APP-Code` (using `Dify2025` in the project)
+- **Multi-client Routing**:
+  - `claude*` → Use Anthropic client
+  - `gemini*`/`imagen*` that don't end with `-nothink`/`-search` and don't contain `embedding` → Use Gemini client (`apiHost: https://aihubmix.com/gemini`)
+  - OpenAI series (excluding `gpt-oss`) → Use OpenAI compatible response client
+  - Others → Fallback to default OpenAI client
+- **BaseURL Retrieval**: Export from current routed specific client, maintaining endpoint differences for each provider
+
+### 4.3 Alignment Checklist
+
+- Provider entry unifies merging of `extra_headers` and injects `APP-Code`
+- Gemini client uses `https://aihubmix.com/gemini` as `apiHost`
+- Routing rules consistent with `claude*`, `gemini*/imagen*`, OpenAI series (excluding `gpt-oss`)
+- Default fallback to OpenAI client, maintaining OpenAI compatible interface behavior
+- `getBaseURL()` always exports from current routed client, avoiding hardcoding
+
+## 5. Migration Checklist
+
+- Replace API Key with aihubmix API Key
+- Replace Base URL with `https://aihubmix.com`
+- Add `APP-Code` header for discount
+- Implement model routing logic (claude/gemini/openai)
+- Handle `tool_choice` fix when tools are empty
+- Configure MIME type handling for file uploads
+- Test various model calls

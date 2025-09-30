@@ -53,6 +53,7 @@
                   "cn/api/Models-API",
                   "cn/api/App-code",
                   "cn/api/Auth",
+                  "cn/api/Third-PartyIntegrationTechnicalGuide",
                   "cn/api/Cli"
                 ]
               },
@@ -172,6 +173,7 @@
                   "en/api/Models-API",
                   "en/api/App-code",
                   "en/api/Auth",
+                  "en/api/Third-PartyIntegrationTechnicalGuide",
                   "en/api/Cli"
                 ]
               },

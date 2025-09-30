@@ -1,0 +1,371 @@
+---
+title: "Aihubmix 三方接入技术指南"
+description: "
+基于 `@aihubmix/ai-sdk-provider`、`dify-plugin-aihubmix` 和 `cherry-studio` 三个项目的核心实现逻辑，本文档为开发者提供快速接入 aihubmix 统一网关的技术指南。
+"
+icon: 'rocket'
+---
+
+## 1. 核心接入模式
+
+### 1.1 统一鉴权与路由
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+// 核心逻辑：替换 API Key、Base URL，添加 APP-Code
+const config = {
+  apiKey: 'your-aihubmix-api-key',  // 替换为 aihubmix API Key
+  baseURL: 'https://aihubmix.com',   // 替换为 aihubmix 网关
+  headers: {
+    'APP-Code': 'WHVL9885'  // 享受折扣
+  }
+};
+
+// 模型路由规则
+function routeModel(modelName: string) {
+  if (modelName.startsWith('claude')) {
+    // Claude 模型：使用 Anthropic SDK
+    return 'anthropic';
+  } else if (modelName.startsWith('gemini') && !modelName.endsWith('-nothink') && !modelName.endsWith('-search')) {
+    // Gemini 模型：使用 Google SDK，端点 https://aihubmix.com/gemini
+    return 'gemini';
+  } else {
+    // 其他模型：使用 OpenAI 兼容接口
+    return 'openai';
+  }
+}
+```
+</Tab>
+<Tab title="Python">
+```python
+# 核心逻辑：替换 API Key、Base URL，添加 APP-Code
+credentials = {
+    "api_key": "your-aihubmix-api-key",  # 替换为 aihubmix API Key
+    "base_url": "https://aihubmix.com",   # 替换为 aihubmix 网关
+    "extra_headers": {
+        "APP-Code": "WHVL9885"  # 享受折扣
+    }
+}
+
+# 模型路由规则
+def route_model(model_name: str):
+    if model_name.startswith("claude"):
+        # Claude 模型：使用 Anthropic SDK
+        return "anthropic"
+    elif model_name.startswith("gemini") and not model_name.endswith(("-nothink", "-search")):
+        # Gemini 模型：使用 Google SDK，端点 https://aihubmix.com/gemini
+        return "gemini"
+    else:
+        # 其他模型：使用 OpenAI 兼容接口
+        return "openai"
+```
+</Tab>
+</Tabs>
+
+### 1.2 特殊处理要点
+- **空工具修复**：当 `tools=[]` 且存在 `tool_choice` 时，自动移除 `tool_choice`
+- **文件扩展名**：根据 `mediaType` 自动设置正确的文件扩展名
+- **缓存控制**：支持 `<cache>` 标签实现缓存控制
+
+## 2. 统一接入实现
+
+### 2.1 核心客户端封装
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+class AihubmixModelClient {
+  private config: {
+    apiKey: string;
+    baseURL: string;
+    appCode: string;
+  };
+  
+  constructor(apiKey: string) {
+    this.config = {
+      apiKey,
+      baseURL: 'https://aihubmix.com',
+      appCode: 'WHVL9885'
+    };
+  }
+
+  async chatCompletion(model: string, messages: any[], options: any = {}) {
+    // 根据模型名称自动路由到对应的 SDK
+    if (model.startsWith('claude')) {
+      return this.claudeCompletion(model, messages, options);
+    } else if (model.startsWith('gemini')) {
+      return this.geminiCompletion(model, messages, options);
+    } else {
+      return this.openaiCompletion(model, messages, options);
+    }
+  }
+
+  private async claudeCompletion(model: string, messages: any[], options: any) {
+    const { Anthropic } = await import('@anthropic-ai/sdk');
+    const client = new Anthropic({
+      apiKey: this.config.apiKey,
+      baseURL: this.config.baseURL,
+      defaultHeaders: { 'APP-Code': this.config.appCode }
+    });
+    return client.messages.create({ model, messages, ...options });
+  }
+
+  private async geminiCompletion(model: string, messages: any[], options: any) {
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(this.config.apiKey, {
+      baseURL: `${this.config.baseURL}/gemini/v1beta`,
+      defaultHeaders: { 'APP-Code': this.config.appCode }
+    });
+    const genModel = genAI.getGenerativeModel({ model });
+    return genModel.generateContent(messages);
+  }
+
+  private async openaiCompletion(model: string, messages: any[], options: any) {
+    const OpenAI = await import('openai');
+    const client = new OpenAI.default({
+      apiKey: this.config.apiKey,
+      baseURL: `${this.config.baseURL}/v1`,
+      defaultHeaders: { 'APP-Code': this.config.appCode }
+    });
+    return client.chat.completions.create({ model, messages, ...options });
+  }
+}
+
+// 使用示例
+const client = new AihubmixModelClient('your-aihubmix-api-key');
+await client.chatCompletion('gpt-4o-mini', messages);
+await client.chatCompletion('claude-3-5-sonnet-20241022', messages);
+await client.chatCompletion('gemini-2.5-flash', messages);
+```
+</Tab>
+<Tab title="Python">
+```python
+class AihubmixModelClient:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://aihubmix.com"
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "APP-Code": "WHVL9885"
+        }
+    
+    def chat_completion(self, model: str, messages: list, **kwargs):
+        """统一的聊天完成接口"""
+        if model.startswith("claude"):
+            return self._claude_completion(model, messages, **kwargs)
+        elif model.startswith("gemini"):
+            return self._gemini_completion(model, messages, **kwargs)
+        else:
+            return self._openai_completion(model, messages, **kwargs)
+    
+    def _claude_completion(self, model: str, messages: list, **kwargs):
+        import anthropic
+        client = anthropic.Anthropic(
+            api_key=self.api_key,
+            base_url=self.base_url,
+            extra_headers={"APP-Code": "WHVL9885"}
+        )
+        return client.messages.create(model=model, messages=messages, **kwargs)
+    
+    def _gemini_completion(self, model: str, messages: list, **kwargs):
+        import google.generativeai as genai
+        genai.configure(
+            api_key=self.api_key,
+            client_options={"api_endpoint": f"{self.base_url}/gemini/v1beta"}
+        )
+        genai._client._http_client._session.headers.update({"APP-Code": "WHVL9885"})
+        model_instance = genai.GenerativeModel(model)
+        return model_instance.generate_content(messages)
+    
+    def _openai_completion(self, model: str, messages: list, **kwargs):
+        import openai
+        client = openai.OpenAI(
+            api_key=self.api_key,
+            base_url=f"{self.base_url}/v1",
+            extra_headers={"APP-Code": "WHVL9885"}
+        )
+        return client.chat.completions.create(model=model, messages=messages, **kwargs)
+
+# 使用示例
+client = AihubmixModelClient("your-aihubmix-api-key")
+await client.chat_completion("gpt-4o-mini", messages)
+await client.chat_completion("claude-3-5-sonnet-20241022", messages)
+await client.chat_completion("gemini-2.5-flash", messages)
+```
+</Tab>
+</Tabs>
+
+### 2.2 特殊处理与工具函数
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+// 空工具修复
+function fixToolChoice(requestBody: any): any {
+  if (requestBody.tools?.length === 0 && requestBody.tool_choice) {
+    delete requestBody.tool_choice;
+  }
+  return requestBody;
+}
+
+// 文件扩展名映射
+function setFileExtension(mediaType: string): string {
+  const mimeToExt: Record<string, string> = {
+    'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/flac': 'flac'
+  };
+  return mimeToExt[mediaType] || 'bin';
+}
+
+// 缓存控制
+function processCacheTags(content: string): { content: string; cacheControl?: any } {
+  if (content.includes('<cache>')) {
+    return { content: content.replace('<cache>', ''), cacheControl: { type: 'ephemeral' } };
+  }
+  return { content };
+}
+```
+</Tab>
+<Tab title="Python">
+```python
+# 空工具修复
+def fix_tool_choice(request_body: dict) -> dict:
+    if request_body.get("tools") == [] and "tool_choice" in request_body:
+        del request_body["tool_choice"]
+    return request_body
+
+# 文件扩展名映射
+def set_file_extension(media_type: str) -> str:
+    mime_to_ext = {
+        'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/flac': 'flac'
+    }
+    return mime_to_ext.get(media_type, 'bin')
+
+# 缓存控制
+def process_cache_tags(content: str):
+    if "<cache>" in content:
+        return {
+            "content": content.replace("<cache>", ""),
+            "cache_control": {"type": "ephemeral"}
+        }
+    return {"content": content}
+```
+</Tab>
+</Tabs>
+
+## 3. 部署与配置
+
+### 3.1 环境变量
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+const config = {
+  apiKey: process.env.AIHUBMIX_API_KEY || '',
+  baseURL: process.env.AIHUBMIX_BASE_URL || 'https://aihubmix.com',
+  appCode: process.env.AIHUBMIX_APP_CODE || 'WHVL9885'
+};
+```
+</Tab>
+<Tab title="Python">
+```python
+import os
+
+config = {
+    "api_key": os.getenv("AIHUBMIX_API_KEY", ""),
+    "base_url": os.getenv("AIHUBMIX_BASE_URL", "https://aihubmix.com"),
+    "app_code": os.getenv("AIHUBMIX_APP_CODE", "WHVL9885")
+}
+```
+</Tab>
+</Tabs>
+
+### 3.2 错误处理
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+class AihubmixError extends Error {
+  constructor(message: string, public code?: string, public status?: number) {
+    super(message);
+    this.name = 'AihubmixError';
+  }
+}
+
+function handleAihubmixErrors(error: any): AihubmixError {
+  const message = error.message || 'Unknown error';
+  if (message.toLowerCase().includes('rate limit')) {
+    return new AihubmixError('Rate limit exceeded', 'RATE_LIMIT', 429);
+  } else if (message.toLowerCase().includes('unauthorized')) {
+    return new AihubmixError('Authentication failed', 'AUTH_ERROR', 401);
+  } else {
+    return new AihubmixError(message, error.code, error.status);
+  }
+}
+```
+</Tab>
+<Tab title="Python">
+```python
+class AihubmixError(Exception):
+    def __init__(self, message: str, code: str = None, status: int = None):
+        super().__init__(message)
+        self.code = code
+        self.status = status
+
+def handle_aihubmix_errors(e: Exception) -> AihubmixError:
+    message = str(e).lower()
+    if "rate limit" in message:
+        return AihubmixError("Rate limit exceeded", "RATE_LIMIT", 429)
+    elif "unauthorized" in message:
+        return AihubmixError("Authentication failed", "AUTH_ERROR", 401)
+    else:
+        return AihubmixError(f"Request failed: {e}")
+```
+</Tab>
+</Tabs>
+
+## 4. 参考实现与对齐清单
+
+### 4.1 cherry-studio 客户端参考（TypeScript）
+
+下述要点来自 `cherry-studio` 的 `AihubmixAPIClient.ts`，可作为第三方前端/桌面端在 TypeScript 侧接入 aihubmix 的落地范式：
+
+- **统一追加折扣码**：在 Provider 级别合并 `extra_headers` 并设置 `APP-Code`（项目中为 `MLTG2087`）
+- **多客户端路由**：
+  - `claude*` → 使用 Anthropic 客户端
+  - `gemini*`/`imagen*` 且不以 `-nothink`/`-search` 结尾且不包含 `embedding` → 使用 Gemini 客户端（`apiHost: https://aihubmix.com/gemini`）
+  - OpenAI 系列（排除 `gpt-oss`）→ 使用 OpenAI 兼容响应客户端
+  - 其他 → 回退到默认 OpenAI 客户端
+- **BaseURL 获取**：从当前已路由的具体客户端导出，保持各家端点差异
+
+### 4.2 dify-plugin-aihubmix 参考（Python）
+
+下述要点来自 `dify-plugin-aihubmix` 的实现，可作为第三方 Python 工具接入 aihubmix 的落地范式：
+
+- **统一追加折扣码**：在 Provider 级别合并 `extra_headers` 并设置 `APP-Code`（项目中为 `Dify2025`）
+- **多客户端路由**：
+  - `claude*` → 使用 Anthropic 客户端
+  - `gemini*`/`imagen*` 且不以 `-nothink`/`-search` 结尾且不包含 `embedding` → 使用 Gemini 客户端（`apiHost: https://aihubmix.com/gemini`）
+  - OpenAI 系列（排除 `gpt-oss`）→ 使用 OpenAI 兼容响应客户端
+  - 其他 → 回退到默认 OpenAI 客户端
+- **BaseURL 获取**：从当前已路由的具体客户端导出，保持各家端点差异
+
+### 4.3 对齐清单
+
+- [ ] Provider 入口统一合并 `extra_headers` 并注入 `APP-Code`
+- [ ] Gemini 客户端使用 `https://aihubmix.com/gemini` 作为 `apiHost`
+- [ ] 路由规则与 `claude*`、`gemini*/imagen*`、OpenAI 系列（排除 `gpt-oss`）一致
+- [ ] 默认回退到 OpenAI 客户端，保持与 OpenAI 兼容接口行为
+- [ ] `getBaseURL()` 始终从当前路由客户端导出，避免硬编码
+
+## 5. 迁移检查清单
+
+- [ ] 替换 API Key 为 aihubmix API Key
+- [ ] 替换 Base URL 为 `https://aihubmix.com`
+- [ ] 添加 `APP-Code` header 享受折扣
+- [ ] 实现模型路由逻辑（claude/gemini/openai）
+- [ ] 处理空工具时的 `tool_choice` 修复
+- [ ] 配置文件上传的 MIME 类型处理
+- [ ] 测试各种模型调用
+- [ ] 配置错误处理和重试机制
+
