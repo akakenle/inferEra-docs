@@ -16,7 +16,7 @@ icon: "rocket"
       apiKey: 'your-aihubmix-api-key',  // Replace with aihubmix API Key
       baseURL: 'https://aihubmix.com',   // Replace with aihubmix gateway
       headers: {
-        'APP-Code': 'WHVL9885'  // Enjoy discount
+        'APP-Code': 'App Code'  // App Code can be obtained from https://aihubmix.com/appstore
       }
     };
     
@@ -42,7 +42,7 @@ icon: "rocket"
         "api_key": "your-aihubmix-api-key",  # Replace with aihubmix API Key
         "base_url": "https://aihubmix.com",   # Replace with aihubmix gateway
         "extra_headers": {
-            "APP-Code": "WHVL9885"  # Enjoy discount
+            "APP-Code": "App Code"  # App Code can be obtained from https://aihubmix.com/appstore
         }
     }
     
@@ -85,7 +85,7 @@ icon: "rocket"
         this.config = {
           apiKey,
           baseURL: 'https://aihubmix.com',
-          appCode: 'WHVL9885'
+          appCode: 'App Code can be obtained from https://aihubmix.com/appstore'
         };
       }
     
@@ -146,7 +146,7 @@ icon: "rocket"
             self.base_url = "https://aihubmix.com"
             self.headers = {
                 "Authorization": f"Bearer {api_key}",
-                "APP-Code": "WHVL9885"
+                "APP-Code": "App Code can be obtained from https://aihubmix.com/appstore"
             }
       
         def chat_completion(self, model: str, messages: list, **kwargs):
@@ -163,7 +163,7 @@ icon: "rocket"
             client = anthropic.Anthropic(
                 api_key=self.api_key,
                 base_url=self.base_url,
-                extra_headers={"APP-Code": "WHVL9885"}
+                extra_headers={"APP-Code": "App Code can be obtained from https://aihubmix.com/appstore"}
             )
             return client.messages.create(model=model, messages=messages, **kwargs)
       
@@ -173,7 +173,7 @@ icon: "rocket"
                 api_key=self.api_key,
                 client_options={"api_endpoint": f"{self.base_url}/gemini/v1beta"}
             )
-            genai._client._http_client._session.headers.update({"APP-Code": "WHVL9885"})
+            genai._client._http_client._session.headers.update({"APP-Code": "App Code can be obtained from https://aihubmix.com/appstore"})
             model_instance = genai.GenerativeModel(model)
             return model_instance.generate_content(messages)
       
@@ -182,7 +182,7 @@ icon: "rocket"
             client = openai.OpenAI(
                 api_key=self.api_key,
                 base_url=f"{self.base_url}/v1",
-                extra_headers={"APP-Code": "WHVL9885"}
+                extra_headers={"APP-Code": "App Code can be obtained from https://aihubmix.com/appstore"}
             )
             return client.chat.completions.create(model=model, messages=messages, **kwargs)
     
@@ -262,7 +262,7 @@ icon: "rocket"
     const config = {
       apiKey: process.env.AIHUBMIX_API_KEY || '',
       baseURL: process.env.AIHUBMIX_BASE_URL || 'https://aihubmix.com',
-      appCode: process.env.AIHUBMIX_APP_CODE || 'WHVL9885'
+      appCode: process.env.AIHUBMIX_APP_CODE || 'App Code can be obtained from https://aihubmix.com/appstore'
     };
     ```
   </Tab>
@@ -273,7 +273,7 @@ icon: "rocket"
     config = {
         "api_key": os.getenv("AIHUBMIX_API_KEY", ""),
         "base_url": os.getenv("AIHUBMIX_BASE_URL", "https://aihubmix.com"),
-        "app_code": os.getenv("AIHUBMIX_APP_CODE", "WHVL9885")
+        "app_code": os.getenv("AIHUBMIX_APP_CODE", "App Code can be obtained from https://aihubmix.com/appstore")
     }
     ```
   </Tab>
