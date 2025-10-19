@@ -159,7 +159,7 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 <CodeGroup>
 
 ```shell Curl Get API Key List
-curl -X GET "https://aihubmix.com/api/token/" \
+curl -X GET "https://aihubmix.com/api/token/?num=20" \ #Modifying the num parameter can adjust the number of output data items.
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
