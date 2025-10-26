@@ -77,7 +77,7 @@
               "cn/api/Qwen-code",
               "cn/api/AISDK",
               "cn/api/Crush",
-              "cn/api/opencode"
+              "cn/api/Opencode"
             ]
           },
           {
@@ -201,7 +201,7 @@
               "en/api/Qwen-code",
               "en/api/AISDK",
               "en/api/Crush",
-              "en/api/opencode"
+              "en/api/Opencode"
             ]
           },
           {
