@@ -1,0 +1,144 @@
+---
+title: "在 OpenCode 中使用 AiHubMix"
+description: "OpenCode 現已支援 AiHubMix 作為新的模型提供商。您可以在 OpenCode 中使用您的 AiHubMix API 金鑰來存取其模型服務。"
+icon: "terminal"
+---
+
+OpenCode 現已支援 AiHubMix 作為新的模型提供商。您可以在 OpenCode 中使用您的 AiHubMix API 金鑰來存取其模型服務。
+
+AiHubMix 目前支援主要的模型系列，包括 GPT、Claude、DeepSeek、Gemini 和 Qwen。為了在 OpenCode 中獲得最佳效能，建議使用以下模型：
+
+- `claude-sonnet-4-5`
+- `glm-4.6`
+- `gpt-5`
+- `gpt-5-codex`
+
+本指南提供在不同作業系統上安裝、配置和啟動 OpenCode，以及連接到 AiHubMix API 的詳細步驟。
+
+---
+
+## 系統需求
+
+安裝前，請確保您的系統符合以下需求：
+
+- Node.js ≥ 18.0.0
+- 套件管理器（視作業系統而定，可選）：
+  - macOS / Linux: `brew`
+  - Arch Linux: `paru`
+  - Windows: `choco`、`winget` 或 `scoop`
+
+---
+
+1. 安裝 OpenCode
+
+您可以使用以下任一方法安裝 OpenCode：
+
+**使用 Node.js**
+
+```
+# 使用 CURL 
+curl -fsSL https://opencode.ai/install | bash
+
+# 使用 NPM
+npm install -g opencode-ai
+
+# 使用 Bun
+bun install -g opencode-ai
+
+# 使用 PNPM
+pnpm install -g opencode-ai
+
+# 使用 Yarn
+yarn global add opencode-ai
+```
+
+---
+
+**使用 Homebrew (macOS / Linux)**
+
+```
+brew install sst/tap/opencode
+```
+
+---
+
+**使用 Paru (Arch Linux)**
+
+```
+paru -S opencode-bin
+```
+
+---
+
+**在 Windows 上**
+
+```
+# 使用 Chocolatey
+choco install opencode
+
+# 使用 WinGet
+winget install opencode
+
+# 使用 Scoop
+scoop bucket add extras
+scoop install extras/opencode
+
+# 使用 NPM（需要 Node.js 和管理員權限）
+npm install -g opencode-ai
+```
+
+---
+
+2. 啟動並登入 OpenCode
+
+安裝後，請按照以下步驟登入並配置 OpenCode。
+
+### 步驟 1. 登入
+
+在您的終端機中執行以下命令：
+
+```
+opencode auth login
+```
+
+---
+
+### 步驟 2. 選擇 AI 提供商
+
+在登入介面中，選擇 AiHubMix 作為您的模型提供商。
+
+![圖片](../../public/en/oc1.png)
+
+---
+
+### 步驟 3. 使用 API 金鑰進行授權
+
+登入您的 AiHubMix 帳戶以取得您的 API 金鑰。在 OpenCode 登入畫面中輸入以完成授權。
+
+![圖片](../../public/en/oc2.png)
+
+![圖片](../../public/en/oc3.png)
+
+---
+
+3. 驗證安裝
+
+要確認 OpenCode 已成功安裝並配置，請執行：
+
+```
+opencode
+```
+
+![圖片](../../public/en/oc4.png)  
+
+如果控制台返回有效的模型回應，則設定完成。
+
+![圖片](../../public/en/oc5.png)
+
+---
+
+4. 問題與提示
+
+- 如果您的 API 金鑰驗證失敗，請重新使用 AiHubMix 進行身份驗證，並檢查金鑰的狀態。
+- 檢視應用程式內說明：`opencode` -\> `/help`
+- 官方文件：https://opencode.ai/docs/

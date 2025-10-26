@@ -322,7 +322,8 @@
               "jp/api/Codex-CLI",
               "jp/api/Qwen-code",
               "jp/api/AISDK",
-              "jp/api/Crush"
+              "jp/api/Crush",
+              "jp/api/Opencode"
             ]
           },
           {
@@ -443,7 +444,8 @@
               "ko/api/Codex-CLI",
               "ko/api/Qwen-code",
               "ko/api/AISDK",
-              "ko/api/Crush"
+              "ko/api/Crush",
+              "ko/api/Opencode"
             ]
           },
           {
@@ -564,7 +566,8 @@
               "zh-Hant/api/Codex-CLI",
               "zh-Hant/api/Qwen-code",
               "zh-Hant/api/AISDK",
-              "zh-Hant/api/Crush"
+              "zh-Hant/api/Crush",
+              "zh-Hant/api/Opencode"
             ]
           },
           {
