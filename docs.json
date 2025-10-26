@@ -76,7 +76,8 @@
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
               "cn/api/AISDK",
-              "cn/api/Crush"
+              "cn/api/Crush",
+              "cn/api/opencode"
             ]
           },
           {
@@ -199,7 +200,8 @@
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
               "en/api/AISDK",
-              "en/api/Crush"
+              "en/api/Crush",
+              "en/api/opencode"
             ]
           },
           {
