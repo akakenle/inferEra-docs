@@ -115,7 +115,7 @@
           {
             "tab": "FAQs",
             "pages": [
-              "cn/FAQs/faq",
+              "cn/FAQs/Faq",
               "cn/FAQs/HTTP-Codes",
               "cn/FAQs/Human-Customer-Support"
             ]
@@ -239,7 +239,7 @@
           {
             "tab": "FAQs",
             "pages": [
-              "en/FAQs/faq",
+              "en/FAQs/Faq",
               "en/FAQs/HTTP-Codes",
               "en/FAQs/Human-Customer-Support"
             ]

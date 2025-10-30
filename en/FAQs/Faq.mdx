@@ -1,0 +1,170 @@
+---
+title: "FAQ"
+description: "Please check this document for common questions"
+icon: "square-question"
+---
+
+---
+
+## title: "FAQ"\
+description: "Please check this document for common questions"\
+icon: "square-question"
+
+## 1. Model Usage & Safety
+
+### Why do official products like Claude or GPT return different results than the API?
+
+The underlying model is the same; the difference comes from additional engineering optimizations on the web version.
+
+**Explanation:**
+
+- The web version is like a fully furnished apartment, with built-in features like search, memory, calculator, and system prompts.
+- API calls are like an unfinished apartment, providing only the core capabilities. Developers need to configure context and tools themselves.
+
+---
+
+### Why might using GPT-5 or the “o” series models result in an AiHubMix account suspension?
+
+If you prompt GPT-5 or “o” series models to “show reasoning steps,” “display chain of thought,” or “reasoning trace,” the system may trigger safety policies, which could temporarily restrict or suspend your account.
+
+**Explanation:**
+
+- Official safety policies for GPT-5 and “o” series models are stricter; normal use will not trigger a ban.
+- If your account is mistakenly flagged or you see abnormal messages, contact support via **email: **[**feedback@aihubmix.com**](mailto:feedback@aihubmix.com) for assistance.
+- To view model reasoning summaries, use the Response API instead of asking the model directly in the prompt, to avoid triggering safety policies.
+
+---
+
+### Why is GPT-5 not recommended for translation tools?
+
+GPT-5 is a reasoning model designed for complex inference and structured generation, not for high-frequency real-time tasks.
+
+**Reasons:**
+
+1. Slower response times due to multiple inference steps.
+2. Higher Token usage (long system prompts and reasoning context).
+3. Translation plugins may accidentally trigger safety policies.
+
+For translation or chat scenarios, use lightweight models like GPT-4o mini or Gemini for faster and more stable responses.
+
+---
+
+### Why does GPT-5 sometimes answer “I’m GPT-4” when asked “Who are you”?
+
+This is a known LLM hallucination, where the model inaccurately describes its own foundation, source, or capabilities. Developers using GPT-4, GPT-5, Claude, etc., may encounter confident but incorrect self-identifications.
+
+**Explanation:**
+
+- This behavior is not due to platform modifications or output tampering; it’s normal for LLMs.
+- GPT-5 was not given the name “GPT-5” during training; the name was assigned afterward by the official release.
+- The model does not know its own name or knowledge cutoff; the web version can answer correctly because it has built-in system prompts. Our API version is the official non-web API.
+- Asking the model directly via API may produce random or inaccurate answers because it lacks self-awareness.
+
+---
+
+### Why did sending just “Hello” consume so many Tokens?
+
+Some third-party tools (like Cline or Claude Code) automatically include context or system prompts in requests, which also count toward Token usage.
+
+Even if you only type “Hello,” the backend request may contain extensive chat history or preset text.
+
+These extra tokens come from the tool, not the AiHubMix platform.
+
+---
+
+### Why do I see 4o-mini usage even though I only called GPT-4o?
+
+Some third-party tools may call lightweight models (like 4o-mini) for conversation summarization, search, or auxiliary computation.\
+Thus, your bill or logs may show multiple models’ Token usage.
+
+This extra usage comes from tool configurations, not from AiHubMix automatically switching models.
+
+---
+
+### What is the concurrency limit for API requests?
+
+AiHubMix does not currently impose a uniform concurrency limit. Contact support via **email: **[**feedback@aihubmix.com**](mailto:feedback@aihubmix.com) if you encounter concurrency issues.
+
+---
+
+### Why do results vary for the same prompt?
+
+Large language models use probabilistic sampling (e.g., temperature, top-p) to generate text, randomly choosing from multiple possible tokens each time.
+
+- Lowering temperature or disabling sampling can make results more consistent.
+- Variations may also be affected by context, system prompts, or network conditions.
+
+---
+
+## 2. API Calls & Data
+
+### Which API endpoints are available?
+
+AiHubMix provides a unified gateway compatible with multiple mainstream model standards:
+
+- **OpenAI Standard Endpoint:** `https://aihubmix.com/v1` (supports GPT and compatible models)
+- **Gemini Dedicated Endpoint:** `https://aihubmix.com/gemini` (compatible with Google native standards)
+- **Claude Auto-Forwarding Endpoint:** `https://aihubmix.com` (supports Anthropic SDK calls)
+
+---
+
+### What data is recorded during API usage?
+
+We only log necessary usage data: account info, call records, models used, Token consumption, and payment info.
+
+**Privacy assurance:**
+
+- User input and model output are not stored.
+- Data is used solely for billing and service optimization, not content analysis or third-party sharing.
+- AiHubMix does not retain detailed request data; however, underlying cloud providers may log access for security or compliance, governed by their privacy policies.
+
+See [AiHubMix Privacy Policy](https://docs.aihubmix.com/cn/terms-and-privacy/Privacy) for details.
+
+---
+
+## 3. Model Knowledge & Common Phenomena
+
+### What is AI Hallucination?
+
+AI hallucination occurs when a large language model generates information that is factually incorrect, unsupported, or entirely fictional.
+
+**Possible causes:**
+
+- Biases or gaps in training data.
+- Overfitting of model parameters.
+- Randomness during generation.
+
+Hallucinations are common to all LLMs and do not indicate system failure.
+
+---
+
+## 4. Usage & Troubleshooting
+
+### How can I monitor API usage and consumption?
+
+You can view call volume, Token usage, and billing details through the AiHubMix dashboard.
+
+Supports categorization by model and time period, helping optimize usage and manage costs.
+
+---
+
+### What should I do if a call fails or returns an error?
+
+API errors include an error code and explanation.
+
+**Common causes:**
+
+- Incorrect request format.
+- Model unavailable or usage limit exceeded.
+
+Check the [API Guide](https://docs.aihubmix.com/cn/api-playground/inferUsages) for troubleshooting, or contact support via [**feedback@aihubmix.com**](mailto:feedback@aihubmix.com).
+
+---
+
+### How do I manage my API Key?
+
+Users can generate, revoke, or update API Keys via the dashboard.
+
+- Do not expose API Keys in public environments.
+- Use separate keys for different projects.
+- Rotate keys periodically to ensure account security.
