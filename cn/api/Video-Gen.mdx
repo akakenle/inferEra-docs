@@ -1,0 +1,91 @@
+---
+title: "视频生成接口"
+description: "Description of your new file."
+---
+
+## 接口说明
+
+为了方便开发者调用不同的视频生成模型，AiHubMix 提供了统一的视频接口，支持以下多种主流模型：
+
+- [Google Veo 系列](https://docs.aihubmix.com/cn/api/Image-Gen#Veo)
+- [OpenAI 系列](https://docs.aihubmix.com/cn/api/Image-Gen#openai)
+
+**接口规格：**
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "<model_path>",
+    "prompt": "your prompt"
+  }'
+```
+
+**其中：**
+
+- `https://aihubmix.com/v1/videos` 为固定前缀
+- `<model_path>` 为模型路径，支持：
+  - veo-3.1-generate-preview
+  - veo-3.0-generate-preview
+  - sora-2
+  - sora-2-pro
+- `sk-***` 为你在 AiHubMix 生成的 API Key
+
+---
+
+下面是各个模型的调用方法。
+
+## Veo
+
+### 支持的模型：
+
+- Veo-3.1-generate-preview
+- Veo-3.0-generate-preview
+
+
+- 视频的宽高比`aspectRatio`支持16：9 或 9：16
+- 视频的分辨率`resolution`默认 720p
+- 更多细节参考：[Veo API Reference](https://ai.google.dev/gemini-api/docs/video?hl=zh-cn&example=dialogue)
+
+### 调用方法：
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "Veo-3.1-generate-preview",
+    "prompt": "一只戴红色围巾的兔子在雪地里蹦跳，背景有飘落的雪花和松树，伴有轻微的风声",
+    "negativePrompt": "灰色兔子、晴天、汽车",
+    "aspectRatio": "16:9",
+    "resolution": "720p",
+    "durationSeconds": 6
+  }'
+```
+
+## OpenAI
+
+### 支持的模型：
+
+- sora-2
+- sora-2-pro
+
+
+- 视频长度支持4 / 8 / 12s，默认为4s
+- 更多细节参考：[Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
+
+### 调用方法：
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "sora-2-pro",
+    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
+    "size": "1792x1024",
+    "seconds": 8,
+    "negative_prompt": "blurry, low resolution, text, watermark"
+  }'
+```

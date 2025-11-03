@@ -1,0 +1,87 @@
+---
+title: "Video Generation API"
+description: "Description of your new file."
+---
+
+## Overview
+
+To make it easier for developers to integrate different video generation models, **AiHubMix** provides a unified video API that supports several mainstream models:
+
+- [Google Veo Series](https://docs.aihubmix.com/en/api/Image-Gen#Veo)
+- [OpenAI Series](https://docs.aihubmix.com/en/api/Image-Gen#openai)
+
+**API Specification:**
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "<model_path>",
+    "prompt": "your prompt"
+  }'
+```
+
+**Where:**
+
+- `https://aihubmix.com/v1/videos` is the fixed endpoint
+- `<model_path>` is the model path. Supported values:
+  - veo-3.1-generate-preview
+  - veo-3.0-generate-preview
+  - sora-2
+  - sora-2-pro
+- `sk-***` is your API Key generated in AiHubMix
+
+---
+
+Below are the usage examples for each model.
+
+## Veo
+
+### Supported Models:
+
+- Veo-3.1-generate-preview
+- Veo-3.0-generate-preview
+- The `aspectRatio` supports 16:9 or 9:16
+- The `resolution` defaults to 720p
+- For more details, see: [Veo API Reference](https://ai.google.dev/gemini-api/docs/video?hl=zh-cn&example=dialogue)
+
+### Usage：
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "Veo-3.1-generate-preview",
+    "prompt": "A rabbit wearing a red scarf hopping through the snow, with falling snowflakes, pine trees, and a gentle breeze.",
+    "negativePrompt": "gray rabbit, sunny day, car",
+    "aspectRatio": "16:9",
+    "resolution": "720p",
+    "durationSeconds": 6
+  }'
+```
+
+## OpenAI
+
+### Supported Models:
+
+- sora-2
+- sora-2-pro
+- Supported video lengths: 4 / 8 / 12 seconds (default: 4s)
+- For more details, see: [Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
+
+### Usage：
+
+```bash
+curl -X POST "https://aihubmix.com/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "model": "sora-2-pro",
+    "prompt": "An astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement.",
+    "size": "1792x1024",
+    "seconds": 8,
+    "negative_prompt": "blurry, low resolution, text, watermark"
+  }'
+```
