@@ -9,7 +9,7 @@ Power Claude Code with Aihubmix and leave behind the headaches of unstable conne
 <Warning>
   Due to Claude Code’s multi-agent nature, credit consumption can be quite high. It’s recommended to set a limit for your key to avoid unexpected charges.
 </Warning>
-  
+
 ## Quick Setup Guide:
 
 ### 1️⃣ Install the npm Package Globally
@@ -112,6 +112,24 @@ Or, switch to another Claude model:
 
 </CodeGroup>
 
+### Zhipu AI Support
+
+```shell
+/model <model-id>
+```
+
+model-id list:
+
+- cc-glm-4.6
+- cc-glm-4.5-air
+- cc-kimi-k2-instruct
+- cc-deepseek-v3.1
+- cc-deepseek-v3
+- cc-kimi-k2-instruct-0905
+- cc-kimi-dev-72b
+- cc-minimax-m2
+- cc-ernie-4.5-300b-a47b
+
 ### Kimi K2 Support
 
 After launching Claude Code, simply run the following command:
@@ -127,6 +145,7 @@ After launching Claude Code, simply run the following command:
 ```shell
 npm install -g @aihubmix/claude-code
 ```
+
 ### 2️⃣ Set system environment variables (recommended)
 
 ```shell
@@ -139,7 +158,7 @@ export API_TIMEOUT_MS="30000"  # Optional
 
 ### 3️⃣ Generate a configuration file
 
-Note: Replace sk-*** with the key you generated on AiHubMix. Configuration options beyond the model itself will be overridden by system environment variables if present.
+Note: Replace sk-\*\*\* with the key you generated on AiHubMix. Configuration options beyond the model itself will be overridden by system environment variables if present.
 
 ```shell
 mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
@@ -169,25 +188,31 @@ EOF
 acc start
 ```
 
+
 ```shell
 acc stop
 ```
+
 
 ```shell
 acc code
 ```
 
+
 ```shell
 acc restart
 ```
+
 
 ```shell
 acc status
 ```
 
+
 ```shell
 acc help
 ```
+
 
 ```shell
 acc version
@@ -195,7 +220,6 @@ acc version
 
 </CodeGroup>
 
--[Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
--[npm package](https://www.npmjs.com/package/@aihubmix/claude-code)
+-[Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md) -[npm package](https://www.npmjs.com/package/@aihubmix/claude-code)
 
-Enjoy coding with Claude\!
+Enjoy coding with Claude!
