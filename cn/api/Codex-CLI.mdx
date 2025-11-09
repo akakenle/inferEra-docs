@@ -1,24 +1,20 @@
 ---
 title: "OpenAI Codex CLI 集成"
-description: "通过 AiHubMix 在命令行中支持 OpenAI Codex 调用"
+description: "通过 AiHubMix 在命AiHubMix 提供了与 OpenAI Codex CLI 的无缝集成，让你可以在命令行环境中利用先进的 AI 编程助手。通过简单的配置步骤，即可在终端中直接使用自然语言执行各种编程和系统操作任务。"
 icon: "terminal"
 ---
 
-# OpenAI Codex CLI 集成
-
-AiHubMix 提供了与 OpenAI [Codex CLI](https://github.com/openai/codex) 的无缝集成，让你可以在命令行环境中利用先进的 AI 编程助手。通过简单的配置步骤，即可在终端中直接使用自然语言执行各种编程和系统操作任务。
-
-使用之前，请先运行以下命令安装或更新：
+**使用之前，请先运行以下命令安装或更新：**
 
 ```bash
 npm install -g @openai/codex
 ```
 
-## 配置步骤
+## **配置步骤**
 
-### 1. 环境变量设置
+### **1. 环境变量设置**
 
-打开你的 Shell 配置文件（例如 `.zshrc` 或 `.bashrc`），添加以下环境变量：
+\*\*打开你的 Shell 配置文件（例如 ****``.zshrc或 ** .bashrc），添加以下环境变量：``****
 
 ```bash
 export OPENAI_BASE_URL="https://aihubmix.com/v1"
@@ -26,12 +22,12 @@ export OPENAI_API_KEY="sk-***" # 替换为你的 AiHubMix API 密钥
 ```
 
 <Warning>
-  这里的 `OPENAI_API_KEY` 应该使用 AiHubMix 的[密钥](https://aihubmix.com/token)，变量名保持为 `OPENAI_API_KEY` 是为了兼容 OpenAI 原生客户端。。
+  \*\*这里的 [******`OPENAI_API_KEY应该使用 AiHubMix 的 密钥`******](https://aihubmix.com/token)，变量名保持为 \*\*`OPENAI_API_KEY`**是为了兼容 OpenAI 原生客户端。。**
 </Warning>
 
-### 2. 应用配置更改
+### **2. 应用配置更改**
 
-在终端中执行以下命令，使环境变量生效：
+**在终端中执行以下命令，使环境变量生效：**
 
 ```bash
 source ~/.zshrc  # 如果使用 zsh
@@ -39,9 +35,9 @@ source ~/.zshrc  # 如果使用 zsh
 source ~/.bashrc  # 如果使用 bash
 ```
 
-### 3. 启动 Codex CLI
+### **3. 启动 Codex CLI**
 
-定位到你的项目目录，然后运行 `codex` 命令：
+\*\*定位到你的项目目录，然后运行 \*\*`codex`**命令：**
 
 ```bash
 cd /你的项目路径
@@ -50,9 +46,9 @@ codex
 
 ![图片](../../public/cn/CodexCli-1.png)
 
-### 4. 使用自然语言执行任务
+### **4. 使用自然语言执行任务**
 
-现在你可以通过自然语言向 Codex CLI 输入指令，例如：
+**现在你可以通过自然语言向 Codex CLI 输入指令，例如：**
 
 ```bash
 # 示例输入
@@ -60,6 +56,24 @@ codex
 ```
 
 ![图片](../../public/cn/CodexCli-2.png)
+
+## 通过 cc-switch 配置
+
+1. Run CC-Switch and click "Add Vendor."
+
+![install](../../public/en/cc-codex-1.png)
+
+2. From the preset list, select "AiHubMix."
+
+![install](../../public/en/cc-codex-2.png)
+
+3. Enter your API key in the "API Key" field, then click "Add" to save the settings.
+
+![install](../../public/en/cc-codex-3.png)
+
+4. Return to the home page, select "AiHubMix" from the vendor list, and click "Start" to begin using it.
+
+![install](../../public/en/cc-codex-4.png)
 
 ## 高级配置
 
