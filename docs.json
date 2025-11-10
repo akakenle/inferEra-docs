@@ -639,7 +639,10 @@
         "method": "bearer"
       }
     },
-    "openapi": "/v1-openapi.json"
+    "openapi": [
+      "/v1-openapi.json",
+      "/v2-openapi.json"
+    ]
   },
   "navbar": {
     "primary": {
