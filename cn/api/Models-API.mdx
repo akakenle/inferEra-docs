@@ -1,7 +1,7 @@
 ---
 title: "模型管理API"
 description: "本API文档提供了对模型管理接口的详细说明，包括新版本和旧版本接口的功能、请求示例、参数说明及响应格式。"
-icon: 'circle-info'
+icon: "circle-info"
 ---
 
 ## 新版本接口
@@ -36,10 +36,12 @@ print(response.json())
 
 # 带筛选条件的请求
 params = {
-    "type": "llm",           # 筛选大语言模型
-    "tag": "coding",         # 筛选编程相关模型
-    "sort_by": "context_length",  # 按上下文长度排序
-    "sort_order": "desc"     # 降序排列
+    "type": "llm",                   
+	"modalities": "text",
+	"model": "gpt-5",
+	"features": "thinking",
+    "sort_by": "context_length",
+    "sort_order": "desc"    
 }
 response = requests.get(url, params=params)
 print(response.json())
@@ -55,9 +57,11 @@ fetch('https://aihubmix.com/api/v1/models')
 // 带筛选条件的请求
 const params = new URLSearchParams({
   type: 'llm',
-  tag: 'coding',
+  modalities: 'text',
+  model: 'gpt-5',
+  features: 'thinking',
   sort_by: 'context_length',
-  sort_order: 'desc'
+  sort_order: 'desc' 
 });
 
 fetch(`https://aihubmix.com/api/v1/models?${params}`)
@@ -71,7 +75,7 @@ fetch(`https://aihubmix.com/api/v1/models?${params}`)
 curl -X GET "https://aihubmix.com/api/v1/models"
 
 # 带筛选条件的请求
-curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=context_length&sort_order=desc"
+curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=gpt-5&features=thinking&sort_by=context_length&sort_order=desc"
 ```
 
 </CodeGroup>
@@ -81,19 +85,11 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 #### 筛选参数
 
 <ParamField query="type" path="string" type="string">
-  模型类型筛选。支持值：`llm`（大语言模型）、`image_generation`（图像生成）、`video`（视频处理）、`rerank`（重排序）等
-</ParamField>
-
-<ParamField query="tag" path="param" type="string">
-  模型标签筛选。支持值：`coding`、`chat`、`vision` 等，支持多标签查询（逗号分隔）
-</ParamField>
-
-<ParamField query="developer_id" path="param" type="integer">
-  开发者ID筛选
+  模型类型筛选。支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`
 </ParamField>
 
 <ParamField query="modalities" path="param" type="string">
-  输入模态筛选。支持值：`text`、`image`、`audio` 等，支持多模态查询（逗号分隔）
+  输入模态筛选。支持值：`text`、`image`、`audio` 、`video`、`pdf`，支持多模态查询（逗号分隔）
 </ParamField>
 
 <ParamField query="model" path="param" type="string">
@@ -101,7 +97,7 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 </ParamField>
 
 <ParamField query="features" path="param" type="string">
-  功能特性筛选。支持值：`function_calling`、`vision`、`streaming` 等，支持多功能查询（逗号分隔）
+  功能特性筛选。支持值：`thinking`（支持思考推理）、`tools`（支持工具调用）、`function_calling`（支持函数调用）、`web`（支持搜索）、`deepsearch`（支持深度搜索）、`long_context`（长上下文模型）、`structured_outputs`（结构化输出），支持多功能查询（逗号分隔）
 </ParamField>
 
 #### 排序参数
@@ -124,37 +120,79 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 
 ```json
 {
-  "success": true,
-  "message": "",
-  "data": [
-    {
-      "model_id": "openai/gpt-4",
-      "desc": "GPT-4 is a large multimodal model that can solve difficult problems with greater accuracy.",
-      "pricing": {
-        "input": 0.00003,
-        "output": 0.00006,
-        "cache_read": 0.000015
-      },
-      "types": "llm",
-      "features": "chat,function_calling",
-      "input_modalities": "text",
-      "max_output": 4096,
-      "context_length": 8192
-    },
-    {
-      "model_id": "anthropic/claude-3-opus",
-      "desc": "Claude 3 Opus - our most intelligent model.",
-      "pricing": {
-        "input": 0.000015,
-        "output": 0.000075
-      },
-      "types": "llm",
-      "features": "chat,function_calling,vision",
-      "input_modalities": "text,image",
-      "max_output": 4096,
-      "context_length": 200000
-    }
-  ]
+    "data": [
+        {
+            "model_id": "gpt-5",
+            "desc": "GPT-5 is OpenAI flagship model for coding, reasoning, and agentic tasks across domains.",
+            "pricing": {
+                "cache_read": 0.125,
+                "input": 1.25,
+                "output": 10
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 0,
+            "context_length": 0
+        },
+        {
+            "model_id": "gpt-5-codex",
+            "desc": "GPT-5-Codex is a version of GPT-5 optimized for autonomous coding tasks in Codex or similar environments. It is only available in the Responses API, and the underlying model snapshots will be updated regularly. https://docs.aihubmix.com/en/api/Responses-API You can also use it in codex-cll; see https://docs.aihubmix.com/en/api/Codex-CLI for using codex-cll through Aihubmix.",
+            "pricing": {
+                "cache_read": 0.125,
+                "input": 1.25,
+                "output": 10
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 0,
+            "context_length": 0
+        },
+        {
+            "model_id": "gpt-5-mini",
+            "desc": "GPT-5 mini is a faster, more cost-efficient version of GPT-5. It's great for well-defined tasks and precise prompts.",
+            "pricing": {
+                "cache_read": 0.025,
+                "input": 0.25,
+                "output": 2
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 0,
+            "context_length": 0
+        },
+        {
+            "model_id": "gpt-5-nano",
+            "desc": "GPT-5 Nano is our fastest, cheapest version of GPT-5. It's great for summarization and classification tasks.",
+            "pricing": {
+                "cache_read": 0.005,
+                "input": 0.05,
+                "output": 0.4
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 0,
+            "context_length": 0
+        },
+        {
+            "model_id": "gpt-5-pro",
+            "desc": "GPT-5 pro uses more compute to think harder and provide consistently better answers.\n\nGPT-5 pro is available in the Responses API only to enable support for multi-turn model interactions before responding to API requests, and other advanced API features in the future. Since GPT-5 pro is designed to tackle tough problems, some requests may take several minutes to finish. To avoid timeouts, try using background mode. As our most advanced reasoning model, GPT-5 pro defaults to (and only supports) reasoning.effort: high. GPT-5 pro does not support code interpreter.",
+            "pricing": {
+                "input": 15,
+                "output": 120
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 0,
+            "context_length": 0
+        }
+    ],
+    "message": "",
+    "success": true
 }
 ```
 
@@ -175,31 +213,11 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 ### 模型对象字段说明
 
 <ResponseField name="model_id" type="string">
-  模型唯一标识符（格式：`provider/model-name`）
+  模型唯一标识符
 </ResponseField>
 
 <ResponseField name="desc" type="string">
   模型功能描述（英文）
-</ResponseField>
-
-<ResponseField name="pricing" type="object">
-  价格信息对象
-</ResponseField>
-
-<ResponseField name="pricing.input" type="number">
-  输入Token价格（每1K Token，美元）
-</ResponseField>
-
-<ResponseField name="pricing.output" type="number">
-  输出Token价格（每1K Token，美元）
-</ResponseField>
-
-<ResponseField name="pricing.cache_read" type="number">
-  缓存读取价格（每1K Token，美元，可选字段）
-</ResponseField>
-
-<ResponseField name="pricing.cache_write" type="number">
-  缓存写入价格（每1K Token，美元，可选字段）
 </ResponseField>
 
 <ResponseField name="types" type="string">
@@ -220,6 +238,26 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 
 <ResponseField name="context_length" type="string">
   上下文窗口大小（最大输入Token数量）
+</ResponseField>
+
+<ResponseField name="pricing" type="object">
+  价格信息对象
+</ResponseField>
+
+<ResponseField name="pricing.input" type="number">
+  输入Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.output" type="number">
+  输出Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.cache_read" type="number">
+  缓存读取价格（每1K Token，美元，可选字段）
+</ResponseField>
+
+<ResponseField name="pricing.cache_write" type="number">
+  缓存写入价格（每1K Token，美元，可选字段）
 </ResponseField>
 
 #### 使用场景示例
