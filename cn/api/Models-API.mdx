@@ -262,33 +262,27 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
 
 #### 使用场景示例
 
-<CodeGroup>
+点击代码块右上角「Copy」可复制请求命令，部分环境支持「Try it out」直接发起请求（需提前配置 OpenAPI 规范）。
 
-```bash 获取所有大语言模型
-GET https://aihubmix.com/api/v1/models?type=llm
-```
+<OpenAPISnippet method="GET" url="https://aihubmix.com/api/v1/models?type=llm">
+  获取所有大语言模型
+</OpenAPISnippet>
 
+<OpenAPISnippet method="GET" url="https://aihubmix.com/api/v1/models?sort_by=coding&sort_order=desc">
+  获取适合编程的模型，按上下文长度排序
+</OpenAPISnippet>
 
-```bash 获取适合编程的模型，按上下文长度排序
-GET https://aihubmix.com/api/v1/models?tag=coding&sort_by=context_length&sort_order=desc
-```
+<OpenAPISnippet method="GET" url="https://aihubmix.com/api/v1/models?model=gpt-5">
+  搜索特定模型（GPT-5）
+</OpenAPISnippet>
 
+<OpenAPISnippet method="GET" url="https://aihubmix.com/api/v1/models?type=llm&modalities=text,image&features=function_calling&sort_by=model_ratio&sort_order=asc">
+  复合条件筛选（LLM+图文模态+函数调用+高性价比）
+</OpenAPISnippet>
 
-```bash 搜索特定模型
-GET https://aihubmix.com/api/v1/models?model=gpt-5
-```
-
-
-```bash 复合条件筛选
-GET https://aihubmix.com/api/v1/models?type=llm&modalities=text,image&features=function_calling&sort_by=model_ratio&sort_order=asc
-```
-
-
-```bash 编程模型智能排序
-GET https://aihubmix.com/api/v1/models?sort_by=coding
-```
-
-</CodeGroup>
+<OpenAPISnippet method="GET" url="https://aihubmix.com/api/v1/models?sort_by=coding">
+  编程模型智能排序（优先展示编程友好型模型）
+</OpenAPISnippet>
 
 > **说明**：在使用编程模型智能排序时，系统会优先展示包含 `coding` 标签的模型，其他模型按默认顺序排列。
 
