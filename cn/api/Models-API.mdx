@@ -22,75 +22,6 @@ icon: "circle-info"
 
 #### 请求示例
 
-<Columns cols={2}>
-  <Column>
-### 响应字段说明
-
-<ResponseField name="success" type="boolean">
-  请求执行状态：`true`表示成功，`false`表示失败
-</ResponseField>
-
-<ResponseField name="message" type="string">
-  响应消息，成功时通常为空字符串
-</ResponseField>
-
-<ResponseField name="data" type="array">
-  模型信息列表数组
-</ResponseField>
-
-### 模型对象字段说明
-
-<ResponseField name="model_id" type="string">
-  模型唯一标识符
-</ResponseField>
-
-<ResponseField name="desc" type="string">
-  模型功能描述（英文）
-</ResponseField>
-
-<ResponseField name="types" type="string">
-  模型类型，多个类型用逗号分隔
-</ResponseField>
-
-<ResponseField name="features" type="string">
-  支持的功能特性，多个特性用逗号分隔
-</ResponseField>
-
-<ResponseField name="input_modalities" type="string">
-  支持的输入模态，多个模态用逗号分隔
-</ResponseField>
-
-<ResponseField name="max_output" type="string">
-  最大输出Token数量
-</ResponseField>
-
-<ResponseField name="context_length" type="string">
-  上下文窗口大小（最大输入Token数量）
-</ResponseField>
-
-<ResponseField name="pricing" type="object">
-  价格信息对象
-</ResponseField>
-
-<ResponseField name="pricing.input" type="number">
-  输入Token价格（每1K Token，美元）
-</ResponseField>
-
-<ResponseField name="pricing.output" type="number">
-  输出Token价格（每1K Token，美元）
-</ResponseField>
-
-<ResponseField name="pricing.cache_read" type="number">
-  缓存读取价格（每1K Token，美元，可选字段）
-</ResponseField>
-
-<ResponseField name="pricing.cache_write" type="number">
-  缓存写入价格（每1K Token，美元，可选字段）
-</ResponseField>
-
-</Column>
-
-  <Column>
 <CodeGroup>
 
 ```python Python
@@ -148,9 +79,6 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
 ```
 
 </CodeGroup>
-</Column>
-</Columns>
-
 
 ### 请求参数
 
@@ -268,6 +196,69 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
 }
 ```
 
+### 响应字段说明
+
+<ResponseField name="success" type="boolean">
+  请求执行状态：`true`表示成功，`false`表示失败
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  响应消息，成功时通常为空字符串
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  模型信息列表数组
+</ResponseField>
+
+### 模型对象字段说明
+
+<ResponseField name="model_id" type="string">
+  模型唯一标识符
+</ResponseField>
+
+<ResponseField name="desc" type="string">
+  模型功能描述（英文）
+</ResponseField>
+
+<ResponseField name="types" type="string">
+  模型类型，多个类型用逗号分隔
+</ResponseField>
+
+<ResponseField name="features" type="string">
+  支持的功能特性，多个特性用逗号分隔
+</ResponseField>
+
+<ResponseField name="input_modalities" type="string">
+  支持的输入模态，多个模态用逗号分隔
+</ResponseField>
+
+<ResponseField name="max_output" type="string">
+  最大输出Token数量
+</ResponseField>
+
+<ResponseField name="context_length" type="string">
+  上下文窗口大小（最大输入Token数量）
+</ResponseField>
+
+<ResponseField name="pricing" type="object">
+  价格信息对象
+</ResponseField>
+
+<ResponseField name="pricing.input" type="number">
+  输入Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.output" type="number">
+  输出Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.cache_read" type="number">
+  缓存读取价格（每1K Token，美元，可选字段）
+</ResponseField>
+
+<ResponseField name="pricing.cache_write" type="number">
+  缓存写入价格（每1K Token，美元，可选字段）
+</ResponseField>
 
 #### 使用场景示例
 
