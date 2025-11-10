@@ -121,9 +121,7 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
 
 ### 响应成功示例
 
-<ResponseExample>
-
-```json successs
+```json
 {
   "success": true,
   "message": "",
@@ -158,8 +156,6 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&tag=coding&sort_by=cont
   ]
 }
 ```
-
-</ResponseExample>
 
 ### 响应字段说明
 
@@ -277,7 +273,7 @@ curl -H "If-None-Match: \"abc123...\"" \
 
 ### 错误处理
 
-<ResponseExample>
+<CodeGroup>
 
 ```json 400 请求参数错误
 {
@@ -294,7 +290,7 @@ curl -H "If-None-Match: \"abc123...\"" \
 }
 ```
 
-</ResponseExample>
+</CodeGroup>
 
 ### 重要说明
 
