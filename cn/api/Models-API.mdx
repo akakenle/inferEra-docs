@@ -2,6 +2,7 @@
 title: "模型管理API"
 description: "本API文档提供了对模型管理接口的详细说明，包括新版本和旧版本接口的功能、请求示例、参数说明及响应格式。"
 icon: "circle-info"
+playground: true
 ---
 
 ## 新版本接口
@@ -19,6 +20,20 @@ icon: "circle-info"
 - **灵活筛选**：支持按类型、标签、功能等多维度筛选
 - **智能排序**：支持多种排序策略
 - **缓存优化**：支持HTTP缓存机制，提升访问效率
+
+<Request
+  method="GET"
+  url="https://aihubmix.com/api/v1/models"
+  auth="none"
+  params={[
+    { name: "type", type: "string", example: "llm", description: "模型类型（llm、image_generation、video、tts、stt、embedding、rerank）" },
+    { name: "modalities", type: "string", example: "text,image", description: "输入模态筛选（text、image、audio、video、pdf）" },
+    { name: "model", type: "string", example: "gpt-5", description: "模型名称模糊搜索" },
+    { name: "features", type: "string", example: "thinking,function_calling", description: "功能特性（thinking、tools、structured_outputs等）" },
+    { name: "sort_by", type: "string", example: "context_length", description: "排序字段（model_ratio/context_length/coding/order）" },
+    { name: "sort_order", type: "string", example: "desc", description: "排序方向（asc/desc）" }
+  ]}
+/>
 
 #### 请求示例
 
