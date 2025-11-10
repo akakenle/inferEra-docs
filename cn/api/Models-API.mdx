@@ -246,7 +246,7 @@ GET https://aihubmix.com/api/v1/models?type=llm&modalities=text,image&features=f
 
 
 ```bash 编程模型智能排序
-GET /call/mdl_info_platform?sort_by=coding
+GET https://aihubmix.com/api/v1/models?sort_by=coding
 ```
 
 </CodeGroup>
@@ -266,7 +266,7 @@ GET /call/mdl_info_platform?sort_by=coding
 ```bash
 # 使用ETag进行条件请求
 curl -H "If-None-Match: \"abc123...\"" \
-     https://your-domain.com/call/mdl_info_platform
+     https://aihubmix.com/api/v1/models
 ```
 
 > 如果内容未更新，服务器返回 `304 Not Modified` 状态码。
