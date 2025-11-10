@@ -47,7 +47,7 @@ print(response.json())
 
 ```javascript JavaScript
 // 基础请求
-fetch('https://your-domain.com/call/mdl_info_platform')
+fetch('https://aihubmix.com/api/v1/models')
   .then(response => response.json())
   .then(data => console.log(data));
 
@@ -59,7 +59,7 @@ const params = new URLSearchParams({
   sort_order: 'desc'
 });
 
-fetch(`https://your-domain.com/call/mdl_info_platform?${params}`)
+fetch(`https://aihubmix.com/api/v1/models?${params}`)
   .then(response => response.json())
   .then(data => console.log(data));
 ```
