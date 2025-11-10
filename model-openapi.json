@@ -1,17 +1,188 @@
 {
   "openapi": "3.0.1",
   "info": {
+  "title": "模型管理API",
+  "description": "本API文档提供了对模型管理接口的详细说明，包括新版本和旧版本接口的功能、请求示例、参数说明及响应格式。",
+  "version": "1.0.0"
+},
     "title": "模型管理API",
     "description": "本API文档提供了对模型管理接口的详细说明，包括新版本和旧版本接口的功能、请求示例、参数说明及响应格式。",
     "version": "1.0.0"
   },
   "servers": [
+  {
+    "url": "https://aihubmix.com/v1",
+    "description": "生产环境服务器"
+  }
+],
     {
       "url": "https://aihubmix.com/v1",
       "description": "生产环境服务器"
     }
   ],
   "paths": {
+  "/api/v1/models": {
+    "get": {
+      "summary": "获取模型信息平台",
+      "description": "获取所有可用模型的详细信息，支持多种筛选和排序方式。",
+      "parameters": [
+        {
+          "name": "type",
+          "in": "query",
+          "required": false,
+          "description": "模型类型筛选。支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "modalities",
+          "in": "query",
+          "required": false,
+          "description": "输入模态筛选。支持值：`text`、`image`、`audio` 、`video`、`pdf`，支持多模态查询（逗号分隔）",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "model",
+          "in": "query",
+          "required": false,
+          "description": "模型名称模糊搜索（支持部分匹配）",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "features",
+          "in": "query",
+          "required": false,
+          "description": "功能特性筛选。支持值：`thinking`、`tools`、`function_calling`、`web`、`deepsearch`、`long_context`、`structured_outputs`，支持多功能查询（逗号分隔）",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort_by",
+          "in": "query",
+          "required": false,
+          "description": "排序字段。支持值：`model_ratio`、`context_length`、`coding`、`order`",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sort_order",
+          "in": "query",
+          "required": false,
+          "description": "排序方向。支持值：`asc`（升序）、`desc`（降序）",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "成功获取模型信息",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "model_id": {
+                          "type": "string"
+                        },
+                        "desc": {
+                          "type": "string"
+                        },
+                        "types": {
+                          "type": "string"
+                        },
+                        "features": {
+                          "type": "string"
+                        },
+                        "input_modalities": {
+                          "type": "string"
+                        },
+                        "max_output": {
+                          "type": "integer"
+                        },
+                        "context_length": {
+                          "type": "integer"
+                        },
+                        "pricing": {
+                          "type": "object",
+                          "properties": {
+                            "input": {
+                              "type": "number"
+                            },
+                            "output": {
+                              "type": "number"
+                            },
+                            "cache_read": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "请求参数错误",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "服务器内部错误",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+},
     "/api/v1/models": {
       "get": {
         "summary": "获取模型信息平台",
@@ -175,6 +346,14 @@
     }
   },
   "components": {
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "description": "Bearer 认证，需要在请求头中添加 Authorization: Bearer AIHUBMIX_API_KEY，可在 [这里](https://aihubmix.com/token/add) 获取 API 密钥"
+    }
+  }
+}
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
