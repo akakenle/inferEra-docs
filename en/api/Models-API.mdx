@@ -1,15 +1,296 @@
 ---
-title: "Models Management API"
-description: "Get model list and detailed model information"
-icon: 'circle-info'
+title: "Model Management API"
+description: "This API documentation provides a detailed description of the model management interface, including the features, request examples, parameter descriptions, and response formats for both the new and legacy API versions."
+icon: "circle-info"
 ---
 
-## Get Model List
+## New API Version
 
-Endpoint: `GET /v1/models`
+### Get Model Information
 
-- When user is logged in, get the available list under the user group; when user is not logged in, get the available list under the default group.
-- If there is an Authorization field in the header, query the model list configured under the token corresponding to the key.
+**Endpoint**: `GET https://aihubmix.com/api/v1/models`
+
+**Description**: Fetches detailed information for all available models.
+
+### Model Object Field Descriptions
+
+<ResponseField name="data" type="array">
+  An array of model information objects.
+</ResponseField>
+
+<ResponseField name="model_id" type="string">
+  The unique identifier for the model.
+</ResponseField>
+
+<ResponseField name="desc" type="string">
+  A description of the model's functionality (in English).
+</ResponseField>
+
+<ResponseField name="types" type="string">
+  Model type. Supported values: `llm` (Large Language Model), `image_generation`, `video`, `tts` (Text-to-Speech), `stt` (Speech-to-Text), `embedding`, `rerank`.
+</ResponseField>
+
+<ResponseField name="features" type="string">
+  Supported features. Supported values: `thinking` (reasoning), `tools` (tool use), `function_calling`, `web` (web search), `deepsearch`, `long_context`, `structured_outputs`.
+</ResponseField>
+
+<ResponseField name="input_modalities" type="string">
+  Supported input modalities. Supported values: `text`, `image`, `audio`, `video`, `pdf`.
+</ResponseField>
+
+<ResponseField name="max_output" type="string">
+  Maximum number of output tokens.
+</ResponseField>
+
+<ResponseField name="context_length" type="string">
+  Context window size (maximum number of input tokens).
+</ResponseField>
+
+<ResponseField name="pricing" type="object">
+  Pricing information object.
+</ResponseField>
+
+<ResponseField name="pricing.input" type="number">
+  Input token price (per 1K tokens, in USD).
+</ResponseField>
+
+<ResponseField name="pricing.output" type="number">
+  Output token price (per 1K tokens, in USD).
+</ResponseField>
+
+<ResponseField name="pricing.cache_read" type="number">
+  Cache read price (per 1K tokens, in USD, optional field).
+</ResponseField>
+
+<ResponseField name="pricing.cache_write" type="number">
+  Cache write price (per 1K tokens, in USD, optional field).
+</ResponseField>
+
+### Request Examples
+
+<CodeGroup>
+
+```python Python
+import requests
+
+# API Endpoint
+url = "https://aihubmix.com/api/v1/models"
+
+response = requests.get(url)
+print(response.json())
+
+# Example with parameters
+params = {
+    "type": "llm",                   
+	"modalities": "text",
+	"model": "gpt-5",
+	"features": "thinking",
+    "sort_by": "context_length",
+    "sort_order": "desc"    
+}
+response = requests.get(url, params=params)
+print(response.json())
+```
+
+
+```javascript JavaScript
+fetch('https://aihubmix.com/api/v1/models')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Example with parameters
+const params = new URLSearchParams({
+  type: 'llm',
+  modalities: 'text',
+  model: 'gpt-5',
+  features: 'thinking',
+  sort_by: 'context_length',
+  sort_order: 'desc' 
+});
+
+fetch(`https://aihubmix.com/api/v1/models?${params}`)
+  .then(response => response.json())
+  .then(data => console.log(data));
+```
+
+
+```bash cURL
+# Get all models
+curl -X GET "https://aihubmix.com/api/v1/models"
+
+# Get models with specific filters
+curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=gpt-5&features=thinking&sort_by=context_length&sort_order=desc"
+```
+
+</CodeGroup>
+
+### Request Parameter Descriptions (for Filtering)
+
+<ParamField query="type" path="string" type="string">
+  Model type. Supported values: `llm` (Large Language Model), `image_generation`, `video`, `tts` (Text-to-Speech), `stt` (Speech-to-Text), `embedding`, `rerank`.
+</ParamField>
+
+<ParamField query="modalities" path="param" type="string">
+  Input modalities. Supported values: `text`, `image`, `audio`, `video`, `pdf`. Supports multi-modality queries (comma-separated).
+</ParamField>
+
+<ParamField query="model" path="param" type="string">
+  Fuzzy search for model name (supports partial matching).
+</ParamField>
+
+<ParamField query="features" path="param" type="string">
+  Model features. Supported values: `thinking` (reasoning), `tools` (tool use), `function_calling`, `web` (web search), `deepsearch`, `long_context`, `structured_outputs`. Supports multi-feature queries (comma-separated).
+</ParamField>
+
+<ParamField query="sort_by" path="string" type="string">
+  Sort by field. Supported values:
+
+  - `model_ratio`: Sort by cost-effectiveness.
+  - `context_length`: Sort by context length.
+  - `coding`: Prioritize coding models.
+  - `order`: Sort by default order.
+</ParamField>
+
+<ParamField query="sort_order" path="string" type="string">
+  Sort order. Supported values:
+
+  - `asc` (ascending)
+  - `desc` (descending)
+</ParamField>
+
+### Successful Response Example
+
+```json
+{
+    "data": [
+        {
+            "model_id": "gpt-5",
+            "desc": "GPT-5 is OpenAI's flagship model for coding, reasoning, and agentic tasks across domains.",
+            "pricing": {
+                "cache_read": 0.125,
+                "input": 1.25,
+                "output": 10
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 128000,
+            "context_length": 400000
+        },
+        {
+            "model_id": "gpt-5-codex",
+            "desc": "GPT-5-Codex is a version of GPT-5 optimized for autonomous coding tasks in Codex or similar environments. It is only available in the Responses API, and the underlying model snapshots will be updated regularly. https://docs.aihubmix.com/en/api/Responses-API You can also use it in codex-cll; see https://docs.aihubmix.com/en/api/Codex-CLI for using codex-cll through Aihubmix.",
+            "pricing": {
+                "cache_read": 0.125,
+                "input": 1.25,
+                "output": 10
+            },
+            "types": "llm",
+            "features": "thinking,tools,function_calling,structured_outputs",
+            "input_modalities": "text,image",
+            "max_output": 128000,
+            "context_length": 400000
+        }
+    ],
+    "message": "",
+    "success": true
+}
+```
+
+### Usage Scenario Examples
+
+<CodeGroup>
+
+```bash Get all large language models
+GET https://aihubmix.com/api/v1/models?type=llm
+```
+
+
+```bash Get models suitable for coding, sorted by context length
+GET https://aihubmix.com/api/v1/models?tag=coding&sort_by=context_length&sort_order=desc
+```
+
+
+```bash Search for a specific model
+GET https://aihubmix.com/api/v1/models?model=gpt-5
+```
+
+
+```bash Compound query
+GET https://aihubmix.com/api/v1/models?type=llm&modalities=text,image&features=function_calling&sort_by=model_ratio&sort_order=asc
+```
+
+
+```bash Smart sort for coding models
+GET https://aihubmix.com/api/v1/models?sort_by=coding
+```
+
+</CodeGroup>
+
+> **Note**: When using smart sort for coding models, the system will prioritize models tagged with `coding`, and other models will be listed in the default order.
+
+### Performance Optimization
+
+#### Caching Mechanism
+
+- **Cache Policy**: HTTP caching, cache duration 300 seconds (5 minutes).
+- **Cache Control**: `Cache-Control: public, max-age=300, stale-while-revalidate=300`
+- **Content Validation**: Supports ETag content hash validation.
+
+#### Cache Usage Example
+
+```bash
+# Conditional request using ETag
+curl -H "If-None-Match: \"abc123...\"" \
+     https://aihubmix.com/api/v1/models
+```
+
+> If the content has not been updated, the server returns a `304 Not Modified` status code.
+
+### Error Handling
+
+<CodeGroup>
+
+```json 400 Bad Request (Invalid Parameters)
+{
+  "success": false,
+  "message": "Invalid request parameter format"
+}
+```
+
+
+```json 500 Internal Server Error
+{
+  "success": false,
+  "message": "Internal server error, please try again later"
+}
+```
+
+</CodeGroup>
+
+### Important Notes
+
+1. **Data Integrity**: This endpoint returns all models that meet the criteria, without pagination.
+2. **Type Compatibility**: Supports automatic mapping between new and old type identifiers:
+   - `t2t` ↔ `llm`
+   - `t2i` ↔ `image_generation`
+   - `t2v` ↔ `video`
+   - `reranking` ↔ `rerank`
+3. **Filtering Logic**: Multiple filter conditions are combined with a logical AND.
+4. **Sorting Rule**: When no sorting method is specified, models are arranged in the system's default order.
+
+---
+
+## Legacy API Version
+
+> ⚠️ **Note**: The following are legacy API endpoints. It is recommended to use the new API version for better performance and features.
+
+### Get Model List
+
+**Endpoint**: `GET /v1/models`
+
+- If a user is logged in, it retrieves the list of available models for the user's group. If no user is logged in, it retrieves the list for the `default` group.
+- If the header contains an `Authorization` field, it queries the list of models configured for the corresponding token.
 
 **Response Example:**
 
@@ -44,48 +325,48 @@ Endpoint: `GET /v1/models`
 }
 ```
 
-### Response Results
+### Response
 
-|Status Code | Status Code Meaning | Description | Data Model|
-|---|---|---|---|
-|200|OK|none|Inline|
+| Status Code | Meaning | Description | Data Model |
+| ----------- | ------- | ----------- | ---------- |
+| 200         | OK      | none        | Inline     |
 
 ### Response Data Structure
 
-Status Code **200**
+**Status Code 200**
 
-|Name | Type | Required | Constraint | Chinese Name | Description|
-|---|---|---|---|---|---|
-|» data|[object]|true|none||none|
-|»» id|string|true|none|Model ID|none|
-|»» object|string|true|none|model|none|
-|»» created|integer|true|none|Creation Time|none|
-|»» owned_by|string|true|none|Developer|none|
-|»» permission|[object]¦null|true|none||none|
-|»»» id|string|true|none||none|
-|»»» object|string|true|none||none|
-|»»» created|integer|true|none||none|
-|»»» allow_create_engine|boolean|true|none||none|
-|»»» allow_sampling|boolean|true|none||none|
-|»»» allow_logprobs|boolean|true|none||none|
-|»»» allow_search_indices|boolean|true|none||none|
-|»»» allow_view|boolean|true|none||none|
-|»»» allow_fine_tuning|boolean|true|none||none|
-|»»» organization|string|true|none||none|
-|»»» group|null|true|none||none|
-|»»» is_blocking|boolean|true|none||none|
-|»» root|string|true|none|Model Name|none|
-|»» parent|null|true|none|Parent Node|none|
+| Name                     | Type          | Required | Description           |
+| ------------------------ | ------------- | -------- | --------------------- |
+| » data                   | [object]      | true     | none                  |
+| »» id                    | string        | true     | Model ID              |
+| »» object                | string        | true     | `model`               |
+| »» created               | integer       | true     | Timestamp of creation |
+| »» owned_by              | string        | true     | Developer             |
+| »» permission            | [object]¦null | true     | none                  |
+| »»» id                   | string        | true     | none                  |
+| »»» object               | string        | true     | none                  |
+| »»» created              | integer       | true     | none                  |
+| »»» allow_create_engine  | boolean       | true     | none                  |
+| »»» allow_sampling       | boolean       | true     | none                  |
+| »»» allow_logprobs       | boolean       | true     | none                  |
+| »»» allow_search_indices | boolean       | true     | none                  |
+| »»» allow_view           | boolean       | true     | none                  |
+| »»» allow_fine_tuning    | boolean       | true     | none                  |
+| »»» organization         | string        | true     | none                  |
+| »»» group                | null          | true     | none                  |
+| »»» is_blocking          | boolean       | true     | none                  |
+| »» root                  | string        | true     | Root model name       |
+| »» parent                | null          | true     | Parent model          |
 
-## Get Model Information
+### Get Model Information
 
-Endpoint: `GET /v1/models/:model`
+**Endpoint**: `GET /v1/models/:model`
 
 ### Request Parameters
 
-|Name | Location | Type | Required | Description|
-|---|---|---|---|---|
-|model|path|string| Yes |Model ID|
+| Name  | In   | Type   | Required | Description |
+| ----- | ---- | ------ | -------- | ----------- |
+| model | path | string | true     | Model ID    |
 
 **Response Example:**
 
@@ -120,34 +401,34 @@ Endpoint: `GET /v1/models/:model`
 }
 ```
 
-### Response Results
+### Response
 
-|Status Code | Status Code Meaning | Description | Data Model|
-|---|---|---|---|
-|200|OK|none|Inline|
+| Status Code | Meaning | Description | Data Model |
+| ----------- | ------- | ----------- | ---------- |
+| 200         | OK      | none        | Inline     |
 
 ### Response Data Structure
 
-Status Code **200**
+**Status Code 200**
 
-|Name | Type | Required | Constraint | Chinese Name | Description|
-|---|---|---|---|---|---|
-|id|string|true|none|Model ID|none|
-|object|string|true|none|model|none|
-|created|integer|true|none|Creation Time|none|
-|owned_by|string|true|none|Developer|none|
-|permission|[object]|true|none||none|
-|» id|string|false|none||none|
-|» object|string|false|none||none|
-|» created|integer|false|none||none|
-|» allow_create_engine|boolean|false|none||none|
-|» allow_sampling|boolean|false|none||none|
-|» allow_logprobs|boolean|false|none||none|
-|» allow_search_indices|boolean|false|none||none|
-|» allow_view|boolean|false|none||none|
-|» allow_fine_tuning|boolean|false|none||none|
-|» organization|string|false|none||none|
-|» group|null|false|none||none|
-|» is_blocking|boolean|false|none||none|
-|root|string|true|none|Model Name|none|
-|parent|null|true|none|Parent Node|none|
+| Name                   | Type     | Required | Description           |
+| ---------------------- | -------- | -------- | --------------------- |
+| id                     | string   | true     | Model ID              |
+| object                 | string   | true     | `model`               |
+| created                | integer  | true     | Timestamp of creation |
+| owned_by               | string   | true     | Developer             |
+| permission             | [object] | true     | none                  |
+| » id                   | string   | false    | none                  |
+| » object               | string   | false    | none                  |
+| » created              | integer  | false    | none                  |
+| » allow_create_engine  | boolean  | false    | none                  |
+| » allow_sampling       | boolean  | false    | none                  |
+| » allow_logprobs       | boolean  | false    | none                  |
+| » allow_search_indices | boolean  | false    | none                  |
+| » allow_view           | boolean  | false    | none                  |
+| » allow_fine_tuning    | boolean  | false    | none                  |
+| » organization         | string   | false    | none                  |
+| » group                | null     | false    | none                  |
+| » is_blocking          | boolean  | false    | none                  |
+| root                   | string   | true     | Root model name       |
+| parent                 | null     | true     | Parent model          |
