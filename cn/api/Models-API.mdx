@@ -27,7 +27,7 @@ icon: "circle-info"
 </ResponseField>
 
 <ResponseField name="types" type="string">
-  模型类型，支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`
+  模型类型，支持值：`llm`（大语言模型）、`image_generation`（图片生成模型）、`video`（视频生成模型）、`tts`（语音合成模型）、`stt`(语音转文本模型)、`embedding`（嵌入模型）、`rerank`（排序模型）
 </ResponseField>
 
 <ResponseField name="features" type="string">
@@ -35,7 +35,7 @@ icon: "circle-info"
 </ResponseField>
 
 <ResponseField name="input_modalities" type="string">
-  支持的输入模态，支持值：`text`、`image`、`audio` 、`video`、`pdf`
+  支持的输入模态，支持值：`text`（文本）、`image`（图像）、`audio`（音频） 、`video`（视频）、`pdf`
 </ResponseField>
 
 <ResponseField name="max_output" type="string">
@@ -120,14 +120,14 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
 
 </CodeGroup>
 
-### 请求参数说明
+### 请求参数说明（可用于筛选）
 
 <ParamField query="type" path="string" type="string">
-  模型类型。支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`
+  模型类型。支持值：`llm`（大语言模型）、`image_generation`（图片生成模型）、`video`（视频生成模型）、`tts`（语音合成模型）、`stt`(语音转文本模型)、`embedding`（嵌入模型）、`rerank`（排序模型）
 </ParamField>
 
 <ParamField query="modalities" path="param" type="string">
-  输入模态。支持值：`text`、`image`、`audio` 、`video`、`pdf`，支持多模态查询（逗号分隔）
+  输入模态。支持值：`text`(文本)、`image`（图像）、`audio` （音频）、`video`（视频）、`pdf`，支持多模态查询（逗号分隔）
 </ParamField>
 
 <ParamField query="model" path="param" type="string">
