@@ -12,53 +12,37 @@ icon: "circle-info"
 
 **功能描述**：获取所有可用模型的详细信息，支持多种筛选和排序方式。
 
-### 模型对象字段说明
+### 请求参数说明
 
-<ResponseField name="data" type="array">
-  模型信息列表数组
+<ParamField query="type" path="string" type="string">
+  模型类型筛选。支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`
+</ParamField>
 
-  <Expandable title="8个属性">
-    <ResponseField name="model_id" type="string">
-      模型唯一标识符
-    </ResponseField>
-    <ResponseField name="desc" type="string">
-      模型功能描述（英文）
-    </ResponseField>
-    <ResponseField name="types" type="string">
-      模型类型，多个类型用逗号分隔（支持）
-    </ResponseField>
-    <ResponseField name="features" type="string">
-      支持的功能特性，多个特性用逗号分隔
-    </ResponseField>
-    <ResponseField name="input_modalities" type="string">
-      支持的输入模态，多个模态用逗号分隔
-    </ResponseField>
-    <ResponseField name="max_output" type="string">
-      最大输出Token数量
-    </ResponseField>
-    <ResponseField name="context_length" type="string">
-      上下文窗口大小（最大输入Token数量）
-    </ResponseField>
-    <ResponseField name="pricing" type="object">
-      价格信息对象
-    </ResponseField>
-    <Expandable title="4个属性">
-      <ResponseField name="pricing.input" type="number">
-        输入Token价格（每1K Token，美元）
-      </ResponseField>
-      <ResponseField name="pricing.output" type="number">
-        输出Token价格（每1K Token，美元）
-      </ResponseField>
-      <ResponseField name="pricing.cache_read" type="number">
-        缓存读取价格（每1K Token，美元，可选字段）
-      </ResponseField>
-      <ResponseField name="pricing.cache_write" type="number">
-        缓存写入价格（每1K Token，美元，可选字段）
-      </ResponseField>
-    </Expandable>
-    ### 
-  </Expandable>
-</ResponseField>
+<ParamField query="modalities" path="param" type="string">
+  输入模态筛选。支持值：`text`、`image`、`audio` 、`video`、`pdf`，支持多模态查询（逗号分隔）
+</ParamField>
+
+<ParamField query="model" path="param" type="string">
+  模型名称模糊搜索（支持部分匹配）
+</ParamField>
+
+<ParamField query="features" path="param" type="string">
+  功能特性筛选。支持值：`thinking`（支持思考推理）、`tools`（支持工具调用）、`function_calling`（支持函数调用）、`web`（支持搜索）、`deepsearch`（支持深度搜索）、`long_context`（长上下文模型）、`structured_outputs`（结构化输出），支持多功能查询（逗号分隔）
+</ParamField>
+
+<ParamField query="sort_by" path="string" type="string">
+  排序字段。支持值：\
+  • `model_ratio`：按性价比排序\
+  • `context_length`：按上下文长度排序\
+  • `coding`：编程模型优先排序\
+  • `order`：按默认顺序排序
+</ParamField>
+
+<ParamField query="sort_order" path="string" type="string">
+  排序方向。支持值：\
+  • `asc`（升序） \
+  • `desc`（降序）
+</ParamField>
 
 ### 请求示例
 
@@ -119,33 +103,6 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
 ```
 
 </CodeGroup>
-
-<Expandable title="请求参数">
-  <ParamField query="type" path="string" type="string">
-    模型类型筛选。支持值：`llm`、`image_generation`、`video`、`tts`、`stt`、`embedding`、`rerank`
-  </ParamField>
-  <ParamField query="modalities" path="param" type="string">
-    输入模态筛选。支持值：`text`、`image`、`audio` 、`video`、`pdf`，支持多模态查询（逗号分隔）
-  </ParamField>
-  <ParamField query="model" path="param" type="string">
-    模型名称模糊搜索（支持部分匹配）
-  </ParamField>
-  <ParamField query="features" path="param" type="string">
-    功能特性筛选。支持值：`thinking`（支持思考推理）、`tools`（支持工具调用）、`function_calling`（支持函数调用）、`web`（支持搜索）、`deepsearch`（支持深度搜索）、`long_context`（长上下文模型）、`structured_outputs`（结构化输出），支持多功能查询（逗号分隔）
-  </ParamField>
-  <ParamField query="sort_by" path="string" type="string">
-    排序字段。支持值：\
-    • `model_ratio`：按性价比排序\
-    • `context_length`：按上下文长度排序\
-    • `coding`：编程模型优先排序\
-    • `order`：按默认顺序排序
-  </ParamField>
-  <ParamField query="sort_order" path="string" type="string">
-    排序方向。支持值：\
-    • `asc`（升序） \
-    • `desc`（降序）
-  </ParamField>
-</Expandable>
 
 ### 响应成功示例
 
@@ -226,6 +183,60 @@ curl -X GET "https://aihubmix.com/api/v1/models?type=llm&modalities=text&model=g
     "success": true
 }
 ```
+
+### 模型对象字段说明
+
+<ResponseField name="data" type="array">
+  模型信息列表数组
+</ResponseField>
+
+<ResponseField name="model_id" type="string">
+  模型唯一标识符
+</ResponseField>
+
+<ResponseField name="desc" type="string">
+  模型功能描述（英文）
+</ResponseField>
+
+<ResponseField name="types" type="string">
+  模型类型，多个类型用逗号分隔（支持）
+</ResponseField>
+
+<ResponseField name="features" type="string">
+  支持的功能特性，多个特性用逗号分隔
+</ResponseField>
+
+<ResponseField name="input_modalities" type="string">
+  支持的输入模态，多个模态用逗号分隔
+</ResponseField>
+
+<ResponseField name="max_output" type="string">
+  最大输出Token数量
+</ResponseField>
+
+<ResponseField name="context_length" type="string">
+  上下文窗口大小（最大输入Token数量）
+</ResponseField>
+
+<ResponseField name="pricing" type="object">
+  价格信息对象
+</ResponseField>
+
+<ResponseField name="pricing.input" type="number">
+  输入Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.output" type="number">
+  输出Token价格（每1K Token，美元）
+</ResponseField>
+
+<ResponseField name="pricing.cache_read" type="number">
+  缓存读取价格（每1K Token，美元，可选字段）
+</ResponseField>
+
+<ResponseField name="pricing.cache_write" type="number">
+  缓存写入价格（每1K Token，美元，可选字段）
+</ResponseField>
 
 ### 使用场景示例
 
