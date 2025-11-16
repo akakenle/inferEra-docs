@@ -73,6 +73,7 @@
             "tab": "开发工具",
             "pages": [
               "cn/api/Claude-Code",
+              "cn/api/Cline",
               "cn/api/Gemini-Cli",
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
