@@ -6,10 +6,11 @@ icon: "palette"
 
 ## 接口说明
 
-为了方便开发者调用不同的视频生成模型，AiHubMix 提供了统一的视频接口，支持以下多种主流模型：
+为了方便开发者调用不同的视频生成模型，AIHubMix 提供了统一的视频接口，支持以下多种主流模型：
 
-- [Google Veo 系列](https://docs.aihubmix.com/cn/api/Image-Gen#Veo)
-- [OpenAI 系列](https://docs.aihubmix.com/cn/api/Image-Gen#openai)
+- Google Veo 系列
+- OpenAI 系列
+- 万相（Wan）系列
 
 **接口规格：**
 
@@ -27,66 +28,137 @@ curl -X POST "https://aihubmix.com/v1/videos" \
 
 - `https://aihubmix.com/v1/videos` 为固定前缀
 - `<model_path>` 为模型路径，支持：
-  - veo-3.1-generate-preview
-  - veo-3.0-generate-preview
-  - sora-2
-  - sora-2-pro
-- `sk-***` 为你在 AiHubMix 生成的 API Key
+  - [veo-3.1-generate-preview](https://aihubmix.com/model/veo-3.1-generate-preview)
+  - [veo-3.0-generate-preview](https://aihubmix.com/model/veo-3.0-generate-preview)
+  - [sora-2](https://aihubmix.com/model/sora-2)
+  - [sora-2-pro](https://aihubmix.com/model/sora-2-pro)
+  - [wan2.2-i2v-plus](https://aihubmix.com/model/wan2.2-i2v-plus)
+  - [wan2.2-t2v-plus](https://aihubmix.com/model/wan2.2-t2v-plus)
+  - [wan2.5-i2v-preview](https://aihubmix.com/model/wan2.5-i2v-preview)
+  - [wan2.5-t2v-preview](https://aihubmix.com/model/wan2.5-t2v-preview)
+- `sk-***` 为你在 AIHubMix 生成的 API Key
 
 ---
 
-下面是各个模型的调用方法。
+## 支持的参数
 
-## Veo
+<ResponseField name="prompt" type="String" required>
+  提示词。需要使用自然语言描述镜头，包括镜头类型、主体、动作、场景、光线以及任何所需的镜头运动，以减少歧义。为确保最佳效果，请保持描述内容单一。
+</ResponseField>
 
-### 支持的模型：
+<ResponseField name="model" type="String">
+  模型。支持 veo-3.1-generate-preview，veo-3.0-generate-preview，sora-2，sora-2-pro，wan2.2-i2v-plus，wan2.2-t2v-plus，wan2.5-i2v-preview，wan2.5-t2v-preview。
+</ResponseField>
 
-- Veo-3.1-generate-preview
-- Veo-3.0-generate-preview
+<ResponseField name="size" type="String">
+  尺寸（图像分辨率，宽度x高度），可以通过调整该参数修改生成视频比例。
 
+  - sora 系列支持：720×1280（默认）、1280×720
+  - veo 系列支持：720P（默认），1080P
+  - wan 系列支持：480P（832x480、480x832、624x624），720P（1088x832、832x1088、960x960、1280x720、720x1280）和 1080P（1248x1632、1632x1248、1440x1440、1080x1920、1920x1080）。
+</ResponseField>
 
-- 视频的宽高比`aspectRatio`支持16：9 或 9：16
-- 视频的分辨率`resolution`默认 720p
-- 更多细节参考：[Veo API Reference](https://ai.google.dev/gemini-api/docs/video?hl=zh-cn&example=dialogue)
+<ResponseField name="seconds" type="String">
+  生成视频长度。
 
-### 调用方法：
+  - sora 系列支持：4s（默认），8s，12s
+  - veo 系列支持：4s，6s，8s（默认）
+  - wan 系列支持：5s，10s（仅 wan2.5-t2v-preview 支持）
+</ResponseField>
 
-```bash
-curl -X POST "https://aihubmix.com/v1/videos" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
-  -d '{
-    "model": "Veo-3.1-generate-preview",
-    "prompt": "一只戴红色围巾的兔子在雪地里蹦跳，背景有飘落的雪花和松树，伴有轻微的风声",
-    "negativePrompt": "灰色兔子、晴天、汽车",
-    "aspectRatio": "16:9",
-    "resolution": "720p",
-    "durationSeconds": 6
-  }'
-```
+<ResponseField name="input_reference" type="File">
+  参考图像，用于引导视频生成，该图像将作为视频的第一帧。支持的文件格式包括`image/jpeg` `image/pbg` `image/webp` 。
+</ResponseField>
 
-## OpenAI
+> 更多细节可以参考：[Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
 
-### 支持的模型：
+### 调用方法
 
-- sora-2
-- sora-2-pro
+#### 默认生成（无引导图片）
 
+<CodeGroup>
 
-- 视频长度支持4 / 8 / 12s，默认为4s
-- 更多细节参考：[Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
-
-### 调用方法：
-
-```bash
+```bash cURL
 curl -X POST "https://aihubmix.com/v1/videos" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
     "model": "sora-2-pro",
     "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
-    "size": "1792x1024",
-    "seconds": 8,
-    "negative_prompt": "blurry, low resolution, text, watermark"
+    "size": "720x1280",
+    "seconds": "4"
   }'
 ```
+
+
+```python Python
+import requests
+import json
+
+url = "https://aihubmix.com/v1/videos"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer sk-***"
+}
+
+payload = {
+    "model": "sora-2",
+    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
+    "size": "720x1280",
+    "seconds": '4',
+}
+
+response = requests.post(url, headers=headers, json=payload)
+
+print("Status Code:", response.status_code)
+print("Response:", response.text)
+```
+
+</CodeGroup>
+
+#### 使用引导图片
+
+<CodeGroup>
+
+```bash cURL
+curl --location --request POST 'https://aihubmix.com/v1/videos' \
+--header 'Authorization: Bearer sk-***' \
+--form 'prompt="The kitten is taking a nap under the tree."' \
+--form 'model="sora-2"' \
+--form 'size="1280x720"' \
+--form 'seconds="4"' \
+--form 'input_reference=@"xxx=/cat.jpeg"'
+```
+
+
+```python Python
+import requests
+
+url = "https://aihubmix.com/v1/videos"
+
+headers = {
+    "Authorization": "Bearer sk-***"
+}
+
+
+# Prepare the multipart/form-data payload
+files = {
+    "prompt": (None, "The kitten is taking a nap under the tree."),
+    "model": (None, "sora-2-pro"),
+    "size": (None, "1280x720"),
+    "seconds": (None, "4"),
+
+    "input_reference": (
+        "cat.jpeg",
+        open("cat.jpeg", "rb"),
+        "image/jpeg"
+    )
+}
+
+response = requests.post(url, headers=headers, files=files)
+
+print("Status:", response.status_code)
+print("Response:", response.text)
+```
+
+</CodeGroup>

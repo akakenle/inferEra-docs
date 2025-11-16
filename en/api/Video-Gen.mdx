@@ -4,14 +4,13 @@ description: "Description of your new file."
 icon: "palette"
 ---
 
-## Overview
+AIHubMix provides a unified video-generation API that allows developers to access multiple mainstream models, including:
 
-To make it easier for developers to integrate different video generation models, **AiHubMix** provides a unified video API that supports several mainstream models:
+- veo series
+- sora series
+- wan seris
 
-- [Google Veo Series](https://docs.aihubmix.com/en/api/Image-Gen#Veo)
-- [OpenAI Series](https://docs.aihubmix.com/en/api/Image-Gen#openai)
-
-**API Specification:**
+### **Request Example**
 
 ```bash
 curl -X POST "https://aihubmix.com/v1/videos" \
@@ -23,66 +22,141 @@ curl -X POST "https://aihubmix.com/v1/videos" \
   }'
 ```
 
-**Where:**
+### Model Paths
 
-- `https://aihubmix.com/v1/videos` is the fixed endpoint
-- `<model_path>` is the model path. Supported values:
-  - veo-3.1-generate-preview
-  - veo-3.0-generate-preview
-  - sora-2
-  - sora-2-pro
-- `sk-***` is your API Key generated in AiHubMix
+Supported values for `model`:
+
+- [veo-3.1-generate-preview](https://aihubmix.com/model/veo-3.1-generate-preview)
+- [veo-3.0-generate-preview](https://aihubmix.com/model/veo-3.0-generate-preview)
+- [sora-2](https://aihubmix.com/model/sora-2)
+- [sora-2-pro](https://aihubmix.com/model/sora-2-pro)
+- [wan2.2-i2v-plus](https://aihubmix.com/model/wan2.2-i2v-plus)
+- [wan2.2-t2v-plus](https://aihubmix.com/model/wan2.2-t2v-plus)
+- [wan2.5-i2v-preview](https://aihubmix.com/model/wan2.5-i2v-preview)
+- [wan2.5-t2v-preview](https://aihubmix.com/model/wan2.5-t2v-preview)
+- `sk-***` 为你在 AIHubMix 生成的 API Key
 
 ---
 
-Below are the usage examples for each model.
+## Parameters
 
-## Veo
+<ResponseField name="prompt" type="String" required>
+  Natural language description of the desired video. Include camera type, subject, actions, environment, lighting, and camera movement.
+</ResponseField>
 
-### Supported Models:
+<ResponseField name="model" type="String">
+  One of the supported model identifiers listed above.
+</ResponseField>
 
-- Veo-3.1-generate-preview
-- Veo-3.0-generate-preview
-- The `aspectRatio` supports 16:9 or 9:16
-- The `resolution` defaults to 720p
-- For more details, see: [Veo API Reference](https://ai.google.dev/gemini-api/docs/video?hl=zh-cn&example=dialogue)
+<ResponseField name="size" type="String">
+  Output resolution in `width x height` format.
 
-### Usage：
+  - sora：720×1280（默认）、1280×720
+  - veo：720P（默认），1080P
+  - wan：480P（832x480、480x832、624x624），720P（1088x832、832x1088、960x960、1280x720、720x1280）和 1080P（1248x1632、1632x1248、1440x1440、1080x1920、1920x1080）。
+</ResponseField>
 
-```bash
-curl -X POST "https://aihubmix.com/v1/videos" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
-  -d '{
-    "model": "Veo-3.1-generate-preview",
-    "prompt": "A rabbit wearing a red scarf hopping through the snow, with falling snowflakes, pine trees, and a gentle breeze.",
-    "negativePrompt": "gray rabbit, sunny day, car",
-    "aspectRatio": "16:9",
-    "resolution": "720p",
-    "durationSeconds": 6
-  }'
-```
+<ResponseField name="seconds" type="String">
+  Duration of generated video.
 
-## OpenAI
+  - sora：4s（default），8s，12s
+  - veo：4s，6s，8s（default）
+  - wan：5s，10s（0s only supported by wan2.5-t2v-preview）
+</ResponseField>
 
-### Supported Models:
+<ResponseField name="input_reference" type="File">
+  Reference image used as the first frame. Supported formats:`image/jpeg`,`image/pbg` ,`image/webp` 。
+</ResponseField>
 
-- sora-2
-- sora-2-pro
-- Supported video lengths: 4 / 8 / 12 seconds (default: 4s)
-- For more details, see: [Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
+> More details：[Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
 
-### Usage：
+### Usage Examples
 
-```bash
+#### Generate Without a Reference Image
+
+<CodeGroup>
+
+```bash cURL
 curl -X POST "https://aihubmix.com/v1/videos" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
     "model": "sora-2-pro",
-    "prompt": "An astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement.",
-    "size": "1792x1024",
-    "seconds": 8,
-    "negative_prompt": "blurry, low resolution, text, watermark"
+    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
+    "size": "720x1280",
+    "seconds": "4"
   }'
 ```
+
+
+```python Python
+import requests
+import json
+
+url = "https://aihubmix.com/v1/videos"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer sk-***"
+}
+
+payload = {
+    "model": "sora-2",
+    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
+    "size": "720x1280",
+    "seconds": '4',
+}
+
+response = requests.post(url, headers=headers, json=payload)
+
+print("Status Code:", response.status_code)
+print("Response:", response.text)
+```
+
+</CodeGroup>
+
+#### Generate With a Reference Image
+
+<CodeGroup>
+
+```bash cURL
+curl --location --request POST 'https://aihubmix.com/v1/videos' \
+--header 'Authorization: Bearer sk-***' \
+--form 'prompt="The kitten is taking a nap under the tree."' \
+--form 'model="sora-2"' \
+--form 'size="1280x720"' \
+--form 'seconds="4"' \
+--form 'input_reference=@"xxx=/cat.jpeg"'
+```
+
+
+```python Python
+import requests
+
+url = "https://aihubmix.com/v1/videos"
+
+headers = {
+    "Authorization": "Bearer sk-***"
+}
+
+
+# Prepare the multipart/form-data payload
+files = {
+    "prompt": (None, "The kitten is taking a nap under the tree."),
+    "model": (None, "sora-2-pro"),
+    "size": (None, "1280x720"),
+    "seconds": (None, "4"),
+
+    "input_reference": (
+        "cat.jpeg",
+        open("cat.jpeg", "rb"),
+        "image/jpeg"
+    )
+}
+
+response = requests.post(url, headers=headers, files=files)
+
+print("Status:", response.status_code)
+print("Response:", response.text)
+```
+
+</CodeGroup>
