@@ -199,6 +199,7 @@
             "tab": "AI CLI",
             "pages": [
               "en/api/Claude-Code",
+              "en/api/Cline",
               "en/api/Gemini-Cli",
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
