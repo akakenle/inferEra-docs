@@ -21,7 +21,7 @@
                 "pages": [
                   "cn/index",
                   "cn/quick-start",
-                  "cn/api-playground/inferUsages",
+                  "cn/api/Video-Gen",
                   "cn/api/CC-any",
                   "cn/api/AISDK",
                   "cn/api/Dify-plugin"
@@ -147,7 +147,7 @@
                 "pages": [
                   "en/index",
                   "en/quick-start",
-                  "en/api-playground/inferUsages",
+                  "en/api/Video-Gen",
                   "en/api/CC-any",
                   "en/api/AISDK",
                   "en/api/Dify-plugin"
