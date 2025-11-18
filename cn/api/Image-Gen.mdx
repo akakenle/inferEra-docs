@@ -14,7 +14,6 @@ icon: "palette"
 - [Qwen 系列](#qwen)
 - [doubao-seedream-4-0-250828](#doubao-seedream-4-0-250828)
 - [Ideogram V3](#ideogram-v3)
-- [Stability SD 3.5 Large](#stability)
 - [百度系列](#百度系列)
 
 **接口规格：**
@@ -49,7 +48,6 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
   - Qwen-Image-Edit
   - doubao-seedream-4-0-250828
   - ideogram/V3
-  - stability/Stable-Diffusion-3-5-Large
   - irag-1.0
   - ernie-irag-edit
 - `sk-***` 为你在 Aihubmix 生成的 API Key
@@ -340,30 +338,6 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace, in the style of Pixar 3D",
     "rendering_speed": "QUALITY",
     "aspect_ratio": "2x1"
-  }
-}'
-```
-
-</CodeGroup>
-
-## Stability
-
-### 支持的模型：
-
-- Stable-Diffusion-3-5-Large
-
-### 调用方法：
-
-<CodeGroup>
-
-```shell Curl
-curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "n": 1
   }
 }'
 ```
