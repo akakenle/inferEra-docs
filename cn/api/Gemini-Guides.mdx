@@ -34,12 +34,184 @@ client = OpenAI(
 
 相关的详细调用可以参考下文的代码示例。
 
+## **Gemini 3 Pro** Image Preview 说明
+
+Gemini 3 Pro Image Preview（Nano Banana Pro 预览版）专为专业素材资源制作和复杂指令而设计。该模型具有以下特点：
+
+- 使用Google 搜索实时获取世界知识
+- 默认“思考”过程（在生成之前优化构图）
+- 能够生成分辨率高达 **4K** 的图像
+
+**Python 调用参考如下：**
+
+<CodeGroup>
+
+```python 文生图
+import os
+from google import genai
+from google.genai import types
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"  
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"},  
+)
+
+prompt = (
+    "Da Vinci style anatomical sketch of a dissected Monarch butterfly. "
+    "Detailed drawings of the head, wings, and legs on textured parchment with notes in English."
+)
+
+# 可选参数
+aspect_ratio = "1:1"   # 支持: "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
+resolution   = "4K"    # 默认1K，支持: "1K", "2K", "4K"，注意：必须是大写“K”
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=prompt,   
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=resolution,
+        ),
+    ),
+)
+
+# 保存图片 & 输出文本
+for part in response.parts:
+    if part.text:
+        print(part.text)  
+    elif image := part.as_image():
+        image.save("butterfly.png")
+        print("Image saved: butterfly.png")
+```
+
+
+```python 图生图
+from google import genai
+from PIL import Image
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+prompt = (
+    "Create a picture of my cat eating a nano-banana "
+    "in a fancy restaurant under the Gemini constellation."
+)
+
+image = Image.open("cat_image.jpg")
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash-image",
+    contents=[prompt, image],
+)
+
+# 保存图片 & 输出文本
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif part.inline_data is not None:
+        image = part.as_image()
+        image.save("generated_image.png")
+```
+
+
+```python 多图参考
+from google import genai
+from google.genai import types
+from PIL import Image
+
+API_KEY = "<YOUR AIHUBMIX_API_KEY>"
+
+prompt = "An office group photo of these people, they are making funny faces."
+aspect_ratio = "5:4"
+resolution = "2K"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=[
+        prompt,
+        Image.open('person1.png'),
+        Image.open('person2.png'),
+        Image.open('person3.png'),
+        Image.open('person4.png'),
+        Image.open('person5.png'),
+    ],
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=resolution,
+        ),
+    )
+)
+
+# 保存图片 & 输出文本
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif image := part.as_image():
+        image.save("office.png")
+```
+
+
+```python Google Search
+from google import genai
+from google.genai import types
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"
+
+prompt = (
+    "Visualize the current weather forecast for the next 5 days in Shanghai "
+    "as a clean, modern weather chart. Add a visual on what I should wear each day."
+) # 将上海近五日天气以天气图表形式呈现出来
+
+aspect_ratio = "16:9"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+        ),
+        tools=[{"google_search": {}}]
+    )
+)
+
+# 保存图片 & 输出文本
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif image := part.as_image():
+        image.save("weather.png")
+```
+
+</CodeGroup>
+
 ## Gemini 2.5 系列的「推理」说明
 
 1. 2.5 系列都是推理模型。
 2. 2.5 flash 是混合模型，类似 claude sonnet 3.7，可以通过用 `thinking_budget` 控制推理预算来达到最佳效果。
 3. 2.5 pro 是纯粹的推理模型，因此不能关闭 thinking、也不显式传递推理预算。
-4.  温度值支持范围 0 \<= `temprature` \<= 2
+4. 温度值支持范围 0 \<= `temprature` \<= 2
 
 **Python 调用参考如下：**
 
@@ -689,7 +861,7 @@ CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, compl
 - prompt_token_count: 输入 token 数
 - candidates_token_count: 输出 token 数
 - thoughts_token_count: 推理使用的 token 数，性质上也是输出 token
-- total_token_count: 总 token 使用量（输入\+输出）
+- total_token_count: 总 token 使用量（输入+输出）
 
 2. 对于 OpenAI 兼容格式，则采用 `.usage` 来追踪，字段对应如下：
 

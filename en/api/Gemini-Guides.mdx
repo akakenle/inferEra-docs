@@ -34,6 +34,178 @@ client = OpenAI(
 
 You can refer to the code examples below for detailed usage.
 
+## **Gemini 3 Pro** Image Preview Instructions
+
+Gemini 3 Pro Image Preview (Nano Banana Pro Preview) is designed for professional asset creation and complex instructions. This model offers the following features:
+
+- Uses Google Search to retrieve real-time world knowledge
+- Built-in “thinking” process (optimizes composition before generation)
+- Can generate images with resolutions up to **4K**
+
+**Python usage examples:**
+
+<CodeGroup>
+
+```python Text-to-Image
+import os
+from google import genai
+from google.genai import types
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"  
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"},  
+)
+
+prompt = (
+    "Da Vinci style anatomical sketch of a dissected Monarch butterfly. "
+    "Detailed drawings of the head, wings, and legs on textured parchment with notes in English."
+)
+
+# Optional parameters
+aspect_ratio = "1:1"   # Supported: "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
+resolution   = "4K"    # Default: 1K. Supported: "1K", "2K", "4K". Note: “K” must be uppercase.
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=prompt,   
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=resolution,
+        ),
+    ),
+)
+
+# Save image & print text
+for part in response.parts:
+    if part.text:
+        print(part.text)  
+    elif image := part.as_image():
+        image.save("butterfly.png")
+        print("Image saved: butterfly.png")
+```
+
+
+```python Image-to-Image
+from google import genai
+from PIL import Image
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+prompt = (
+    "Create a picture of my cat eating a nano-banana "
+    "in a fancy restaurant under the Gemini constellation."
+)
+
+image = Image.open("cat_image.jpg")
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash-image",
+    contents=[prompt, image],
+)
+
+# Save image & print text
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif part.inline_data is not None:
+        image = part.as_image()
+        image.save("generated_image.png")
+```
+
+
+```python Multiple Imag
+from google import genai
+from google.genai import types
+from PIL import Image
+
+API_KEY = "<YOUR AIHUBMIX_API_KEY>"
+
+prompt = "An office group photo of these people, they are making funny faces."
+aspect_ratio = "5:4"
+resolution = "2K"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=[
+        prompt,
+        Image.open('person1.png'),
+        Image.open('person2.png'),
+        Image.open('person3.png'),
+        Image.open('person4.png'),
+        Image.open('person5.png'),
+    ],
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=resolution,
+        ),
+    )
+)
+
+# Save image & print text
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif image := part.as_image():
+        image.save("office.png")
+```
+
+
+```python Google Search
+from google import genai
+from google.genai import types
+
+API_KEY = "<YOUR AIHUBMIX API KEY>"
+
+prompt = (
+    "Visualize the current weather forecast for the next 5 days in Shanghai "
+    "as a clean, modern weather chart. Add a visual showing what I should wear each day."
+) # Display Shanghai’s five-day weather in a chart format
+
+aspect_ratio = "16:9"
+
+client = genai.Client(
+    api_key=API_KEY,
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+        ),
+        tools=[{"google_search": {}}]
+    )
+)
+
+# Save image & print text
+for part in response.parts:
+    if part.text is not None:
+        print(part.text)
+    elif image := part.as_image():
+        image.save("weather.png")
+```
+
+</CodeGroup>
+
 ## About Gemini 2.5 Inference Models
 
 1. The entire 2.5 series consists of **inference models**.
@@ -330,8 +502,7 @@ curl https://aihubmix.com/v1/chat/completions \
 
 ## Media Understanding
 
-Aihubmix currently supports uploading multimedia files (images, audio, and video) **up to 20MB** via `inline_data`.
-For files exceeding 20MB, a File API will be required. This functionality is not yet available; progress tracking and upload_url retrieval are under development.
+Aihubmix currently supports uploading multimedia files (images, audio, and video) **up to 20MB** via `inline_data`. For files exceeding 20MB, a File API will be required. This functionality is not yet available; progress tracking and upload_url retrieval are under development.
 
 <Tip>
   By adding the `EDIARESOLUTION_MEDIUM` parameter, you can adjust the image resolution, which significantly reduces input costs and minimizes the risk of errors with large images.
@@ -676,7 +847,7 @@ CompletionUsage(completion_tokens=28, prompt_tokens=111, total_tokens=139, compl
    - `prompt_token_count`: number of input tokens
    - `candidates_token_count`: number of output tokens
    - `thoughts_token_count`: tokens used during reasoning (also counted as output)
-   - `total_token_count`: total tokens used (input \+ output)
+   - `total_token_count`: total tokens used (input + output)
 
    For more details, check out their [official docs](https://ai.google.dev/gemini-api/docs/tokens?lang=python).
 2. For APIs using the **OpenAI-compatible format**, token usage is tracked under `.usage` with the following fields:
