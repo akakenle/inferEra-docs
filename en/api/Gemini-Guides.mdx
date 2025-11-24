@@ -42,6 +42,13 @@ Gemini 3 Pro Image Preview (Nano Banana Pro Preview) is designed for professiona
 - Built-in “thinking” process (optimizes composition before generation)
 - Can generate images with resolutions up to **4K**
 
+<Tip>
+  <strong>Streaming Mode (`stream=True`)</strong> → reasoning stage only  
+  <strong>Non-Streaming Mode (`stream=False`)</strong> → final image generation
+
+  Generated images are <strong>not included in streaming responses</strong> and must be retrieved using a <strong>non-streaming request</strong>.
+</Tip>
+
 **Python usage examples:**
 
 <CodeGroup>
