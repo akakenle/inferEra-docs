@@ -161,3 +161,26 @@ print("Response:", response.text)
 ```
 
 </CodeGroup>
+
+### 下载 MP4 文件
+
+```bash
+
+curl -L "https://aihubmix.com/v1/videos/{video_id}/content" \
+  -H "Authorization: Bearer sk-***" \
+  --output video.mp4
+```
+
+### 下载略缩图和精灵图
+
+```bash
+# 下载略缩图
+curl -L "https://aihubmix.com/v1/videos/{video_id}/content?variant=thumbnail" \
+  -H "Authorization: Bearer sk-***" \
+  --output thumbnail.webp
+
+# 下载精灵图
+curl -L "https://aihubmix.com/v1/videos/{video_id}/content?variant=spritesheet" \
+  -H "Authorization: Bearer sk-***" \
+  --output spritesheet.jpg
+```
