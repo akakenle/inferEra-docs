@@ -55,6 +55,14 @@ This is a known LLM hallucination, where the model inaccurately describes its ow
 - Asking the model directly via API may produce random or inaccurate answers because it lacks self-awareness.
 
 ---
+### What Should I Do If Calls to Some Models (like Gemini-3-Pro) Frequently Time Out?
+
+Try increasing the timeout duration. Gemini-3-Pro is a large model, and its inference process often requires a longer reasoning time—especially for complex tasks where the response may take more than 30 seconds. As a result, the default 30-second timeout can easily lead to errors.
+
+- If you must use Gemini-3-Pro, be sure to extend the timeout appropriately.
+- If fast response time is essential, consider switching to a lighter model such as Gemini 2.0, which works better with shorter timeout settings.
+
+---
 
 ### Why did sending just “Hello” consume so many Tokens?
 
