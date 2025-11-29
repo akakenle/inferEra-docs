@@ -24,8 +24,18 @@ If you prompt GPT-5 or “o” series models to “show reasoning steps,” “d
 **Explanation:**
 
 - Official safety policies for GPT-5 and “o” series models are stricter; normal use will not trigger a ban.
-- If your account is mistakenly flagged or you see abnormal messages, contact support via \*\*email: \*\*[**feedback@aihubmix.com**](mailto:feedback@aihubmix.com) for assistance.
+- If your account is mistakenly flagged or you see abnormal messages, contact support via email: [**feedback@aihubmix.com**](mailto:feedback@aihubmix.com) for assistance.
 - To view model reasoning summaries, use the Response API instead of asking the model directly in the prompt, to avoid triggering safety policies.
+
+---
+
+### How to resolve an account suspension?
+
+If your account has been suspended, you can request reactivation by contacting our online support team or emailing [feedback@aihubmix.com](mailto:feedback@aihubmix.com) . In most cases, suspensions occur when OpenAI’s **GPT-5 series models** (e.g., gpt-5-nano) are used within immersive translation workflows. These models are designed for advanced reasoning and structured content generation, which makes them unsuitable for high-frequency, real-time translation tasks. Frequent calls in such scenarios may trigger risk control mechanisms, leading to temporary restrictions or suspension of your account.
+
+Within OpenAI’s security framework, the GPT-5 series is classified as high-sensitivity models. While normal usage will not result in suspension, repeated use in translation workflows—even without explicitly requesting reasoning outputs—may still be flagged as abnormal activity. To maintain stable account usage, we strongly recommend using non-reasoning models for translation tasks, such as gpt-4.1-mini or gpt-4o-mini, which are better suited for high-frequency requests and carry lower risk of triggering system restrictions.
+
+If a suspension appears to be accidental or unusual, please contact support or email us for assistance. However, please note that **multiple suspension records may result in permanent deactivation, and recovery may no longer be possible.** To minimize risk and ensure continuous access, we recommend avoiding the use of GPT-5 reasoning models in translation workflows.
 
 ---
 
@@ -55,6 +65,7 @@ This is a known LLM hallucination, where the model inaccurately describes its ow
 - Asking the model directly via API may produce random or inaccurate answers because it lacks self-awareness.
 
 ---
+
 ### What Should I Do If Calls to Some Models (like Gemini-3-Pro) Frequently Time Out?
 
 Try increasing the timeout duration. Gemini-3-Pro is a large model, and its inference process often requires a longer reasoning time—especially for complex tasks where the response may take more than 30 seconds. As a result, the default 30-second timeout can easily lead to errors.
