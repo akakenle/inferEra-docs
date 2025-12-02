@@ -6,6 +6,19 @@ icon: "square-question"
 
 ## 1. Model Usage & Safety
 
+### **Does AIHubMix store user API request data?**
+
+By default, AIHubMix does **not** store any of the request content you send through our API, nor do we log the responses returned by model providers. AIHubMix acts solely as a proxy, securely forwarding your request to the appropriate model provider and returning their response to you without modification.
+
+---
+
+### **The only exception**
+
+If you proactively report an issue, submit an error ticket, or request assistance with debugging, AIHubMix may temporarily store technical error-related information (such as stack traces, invocation metadata, or endpoint status) to help us diagnose and resolve the problem.\
+These logs **do not** include your business data, prompt content, or the full request/response payload.
+
+---
+
 ### Why do official products like Claude or GPT return different results than the API?
 
 The underlying model is the same; the difference comes from additional engineering optimizations on the web version.
