@@ -132,7 +132,7 @@
           {
             "tab": "更新",
             "pages": [
-              "cn/changelog/News"
+              "cn/update/News"
             ]
           }
         ]
@@ -259,7 +259,7 @@
           {
             "tab": "Updates",
             "pages": [
-              "en/changelog/News"
+              "en/update/News"
             ]
           }
         ]
