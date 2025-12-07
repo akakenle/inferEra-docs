@@ -1,35 +1,532 @@
 ---
-title: "Feature Updates"
+title: "Changelog"
 icon: "map"
+mode: "center"
 ---
 
-<Update label="2025-11-25" description="New Login System">
-  - Added support for GitHub, Google, and username + password login methods
-  - Supports account re-binding
-  - Allows updating username, avatar, and other profile information
+## 2025
+
+<Update label="Sep 22">
+- Added support for [Qwen series, Doubao Seedream 4, and Baidu image generation models](/cn/api/Image-Gen)
 </Update>
 
-<Update label="2025-08-10" description="Image Generation MCP">
-  - Integrated major image-generation APIs and unified them via MCP, enabling users to trigger image generation directly through natural language
+<Update label="Aug 10">
+- Released the [Aihubmix Image Generation MCP](/cn/clients/AHM-mcp), making it easier for developers to integrate image generation services
 </Update>
 
-<Update label="2025-07-29" description="AI SDK with MCP Support">
-  - Added AI SDK support, allowing access to a wide range of models with a single API key
+<Update label="Aug 1">
+- Use [any large language model on the AiHubMix platform](/cn/api/CC-any) directly in Claude Code
 </Update>
 
-<Update label="2025-06-23" description="APP-Code">
-  - Released the APP-Code, offering developers a 10% discount on all models
+<Update label="Jul 29">
+- Added support for the [AI SDK](/cn/clients/AISDK): access a massive number of models with a single API key
 </Update>
 
-<Update label="2025-04-26" description="API Updates">
-  - The OpenAI `/gpt-image-1/` image-generation API is now available, supporting both text-to-image and image-to-image
-  - Added native Gemini API integration capabilities
+<Update label="Jul 26">
+- Added support for the [Flux image generation API](/cn/api/Image-Gen), enabling high-quality images in seconds
 </Update>
 
-<Update label="2025-04-20" description="API Updates">
-  - Added support for the OpenAI Responses API endpoint
+<Update label="Jul 23">
+- Added support for [Qwen Code](/cn/api/Qwen-code), leveraging all large language models available on the Aihubmix platform
 </Update>
 
-<Update label="2025-04-09" description="Claude Caching">
-  - Added support for Claude Prompt Caching, reducing costs by up to 76% for frequently reused prompts
+<Update label="Jul 4">
+- Added support for [llms.txt](/en/llms): get standardized model navigation with one click so your LLM assistant can quickly understand the entire model ecosystem
+</Update>
+
+<Update label="Jun 29">
+- Added forwarding support for [Gemini CLI](/cn/api/Gemini-Cli), with multiple flexible usage modes  
+- Added code interpreter and Remote MCP invocation to the OpenAI Responses API
+</Update>
+
+<Update label="Jun 26">
+- Added a [Unified Image Generation API](/cn/api/Image-Gen), supporting major models including OpenAI, Ideogram, Stability, and Google Imagen
+</Update>
+
+<Update label="Jun 23">
+- Launched [APP-Code](/cn/api/App-code), offering developers a 10% discount across all models
+</Update>
+
+<Update label="Jun 18">
+- Added [HTTP Status Code](/cn/FAQs/HTTP-Codes) documentation to help users better understand error messages
+</Update>
+
+<Update label="Jun 15">
+- Added reverse-engineered Veo 3.0 access, with a total cost of only $0.41 per video generation
+</Update>
+
+<Update label="Jun 13">
+- Added support for Veo 3.0 video generation to expand creative formats
+</Update>
+
+<Update label="Jun 12">
+- Integrated Claude Code for stable usage within mainland China
+</Update>
+
+<Update label="Jun 9">
+- Added support for OpenAI Reasoning Summaries in the Responses API
+</Update>
+
+<Update label="Jun 5">
+- Added implicit caching for Gemini, with automatic cache hits and hit feedback  
+  Developers can use `usage_metadata` to determine cache hits  
+  Cost savings are not guaranteed and depend on request structure and usage scenarios
+</Update>
+
+<Update label="May 31">
+  Full Support for New Claude 4 Features
+
+- ⏳ **New cache TTL**: 1-hour cache support <sup>Beta</sup>  
+- 🎉 **New text editing tools**: Claude 4 now supports `text_editor_20250429` and `str_replace_based_edit_tool`  
+- 🚫 **New refusal stop reason** for safety-based rejections  
+- 🧠 **Extended Thinking**: Claude 4 now returns full summaries of its reasoning process  
+- 🔄 **Interleaved Thinking**: Tool usage can now interleave with extended thinking for more natural conversations (Beta)  
+- ⚠️ **Deprecated Features**:
+  - `undo_edit` is no longer supported
+  - `token-efficient-tools-2025-02-19` removed (Claude 3.7 only)
+  - `output-128k-2025-02-19` removed (Claude 3.7 only)
+- 📚 Full migration guides and code examples have been updated to help users smoothly transition from Claude 3.7 to Claude 4
+</Update>
+
+<Update label="May 22">
+- Added support for the Dify plugin, enabling seamless integration of Aihubmix models into Dify  
+  Extend and manage over 200 models with a single API key
+</Update>
+
+<Update label="May 17">
+- Added support for `codex-mini-latest`, optimized for programming tasks, accessible via the Responses API or Codex CLI  
+- Added support for Google Imagen 3.0 image generation and Veo 2.0 video generation  
+- `gemini-2.0-flash-exp` upgraded to the official preview version `gemini-2.0-flash-preview-image-generation`
+</Update>
+
+<Update label="May 9">
+- Added the [Ideogram AI V3](/cn/api/IdeogramAI) API — Ideogram’s most advanced image generation model
+</Update>
+
+<Update label="May 6">
+- Added [Utility Management Scripts](/cn/api/Cli) for managing API keys, viewing accounts, and listing available models via CLI
+</Update>
+
+<Update label="Apr 26">
+1. The highly anticipated OpenAI image generation API `gpt-image-1` is now live, supporting both text-to-image and image-to-image
+2. Added native Gemini API support with precise reasoning budget control for Flash 2.5
+</Update>
+
+<Update label="Apr 24">
+- Integrated three core Jina AI APIs to help build powerful agents: Embeddings, Rerank, and DeepSearch
+</Update>
+
+<Update label="Apr 22">
+- Early access (reverse-engineered) to the GPT-4o image generation API
+</Update>
+
+<Update label="Apr 20">
+- Added support for the OpenAI Responses API endpoint with expanded tool capabilities
+</Update>
+
+<Update label="Apr 17">
+- Added OpenAI [CodeX CLI support](/cn/api/Codex-CLI): program with natural language directly in the terminal
+</Update>
+
+<Update label="Apr 12">
+- By appending `:surfing` to a model ID, [any model can gain search capabilities (Beta)](/cn/api/LLM-Search)
+</Update>
+
+<Update label="Apr 9">
+- Added Claude prompt caching, saving up to 76% in cost for repeated high-frequency prompts
+</Update>
+
+<Update label="Apr 7">
+- Added Ideogram AI image generation support with strong text rendering, hybrid generation, local edits, and upscaling
+</Update>
+
+<Update label="Apr 5">
+- Brand-new documentation experience launched
+</Update>
+
+<Update label="Mar 30">
+- Added support for the Claude Text Edit Tool
+</Update>
+
+<Update label="Mar 24">
+- Launched the brand-new Trident logo
+</Update>
+
+<Update label="Mar 16">
+- Added native search support for OpenAI and Google Gemini models  
+- Third-party search integration will be added in future updates
+</Update>
+
+<Update label="Mar 15">
+- Added models: `gpt-4o-mini-search-preview` and `gpt-4o-search-preview`
+</Update>
+
+<Update label="Mar 7">
+- Prices for o1 and o3-mini reduced by 10%, in line with official pricing
+</Update>
+
+<Update label="Mar 6">
+- Due to a 7× upstream price increase from Microsoft, the price of `aihubmix-DeepSeek-R1` also increased 7×  
+  Recommended alternative: Volcano Engine’s DeepSeek-R1 (more stable and cost-effective)  
+  Added models: `qwen-qwq-32b` and `qwen2.5-vl-72b-instruct`
+</Update>
+
+<Update label="Feb 28">
+- All Claude models received a 15% price reduction  
+- Added model `gpt-4.5-preview` (extremely expensive — use with caution)
+</Update>
+
+<Update label="Feb 26">
+- Improved DeepSeek stability  
+- ByteDance versions of DeepSeek are currently the most stable  
+  Recommended models: `DeepSeek-R1` and `DeepSeek-V3`
+</Update>
+
+<Update label="Feb 25">
+- Added model `claude-3-7-sonnet-20250219`
+</Update>
+
+<Update label="Feb 24">
+- The gpt-4o model may occasionally respond very slowly due to upstream provider issues  
+  It is recommended to temporarily switch to `gpt-4o-2024-11-20`
+- The Perplexity API is temporarily offline  
+  Due to Perplexity’s complex billing model and higher costs than this platform’s pricing structure, the service will be relaunched after pricing adjustments
+- The temporary ByteDance official discount has ended and prices have returned to normal  
+  The price of `DeepSeek-R1` has been increased accordingly
+- Added a new model details page with full parameter information
+</Update>
+
+<Update label="Feb 23">
+- The temporary ByteDance official discount has ended and prices have returned to normal  
+  The price of `DeepSeek-V3` has been increased  
+  ByteDance’s R1 model is also expected to return to normal pricing soon, and this platform will同步 adjust prices accordingly
+</Update>
+
+<Update label="Feb 18">
+- Added model: `kimi-latest`  
+  (Official billing is tiered by input length at 8k, 32k, and 128k.  
+  This platform does not support tiered pricing and uses the mid-tier 32k as the pricing standard.  
+  If you are price-sensitive, use with caution.)
+- Optimized overall website layout
+- Merged the Changelog page into the Usage Statistics page
+- Moved Announcements to the Model Marketplace page
+- Moved Settings under the user avatar menu
+- Reduced the price of `aihubmix-DeepSeek-R1` by 50%
+- Added models:  
+  `gemini-2.0-pro-exp-02-05-search`, `gemini-2.0-flash-exp-search`  
+  (Integrated with Google’s official online search)
+- Added models:  
+  `gemini-2.0-flash`, `gemini-2.0-pro-exp-02-05`, `gemini-2.0-flash-lite-preview-02-05`
+- Added models:  
+  `o3-mini`, `o1`  
+  (These two models are billed about 10% higher than official pricing due to limited account resources)
+</Update>
+
+<Update label="Feb 4">
+- The `o1` model does not support the `stream` parameter in the official OpenAI API
+- The `o3-mini` model does not support the `temperature` parameter  
+  A new parameter `reasoning_effort` is available with values: `"low"`, `"medium"`, `"high"`  
+  Default is `"medium"` if not specified
+</Update>
+
+<Update label="Feb 1">
+Feature Update:
+- Added support for OpenAI audio model input and output  
+  The `api.aihubmix.com` preview server is now available  
+  After one week of stable operation, the main site will be updated  
+  Backend billing is fully consistent with official pricing  
+  Currently, usage logs only display text token usage  
+  Audio token usage is not yet shown in logs but does not affect normal usage
+
+New Models Added:
+
+- `o3-mini`, `o1`  
+  (Billed about 10% higher than official pricing due to limited account availability)
+- `aihubmix-DeepSeek-R1` (recommended, highly stable)
+- `qwen-max-0125` (Qwen2.5-Max), `sonar-reasoning`
+- `deepseek-ai/DeepSeek-R1-Zero`, `deepseek-ai/DeepSeek-R1`, `deepseek-r1-distill-llama-70b`
+- `aihub-Phi-4`
+- `Doubao-1.5-pro-256k`, `Doubao-1.5-pro-32k`,  
+  `Doubao-1.5-lite-32k`, `Doubao-1.5-vision-pro-32k`
+- `sonar`, `sonar-pro` (latest from Perplexity AI)
+- `gemini-2.0-flash-thinking-exp-01-21`
+- `deepseek-reasoner` (aka DeepSeek-R1)
+- `MiniMax-Text-01`
+- `codestral-latest` (Mistral’s new code model — Codestral 25.01)
+</Update>
+
+<Update label="Jan 23">
+New Models Added:
+
+- `aihub-Phi-4`
+- `Doubao-1.5-pro-256k`, `Doubao-1.5-pro-32k`,  
+  `Doubao-1.5-lite-32k`, `Doubao-1.5-vision-pro-32k`
+- `sonar`, `sonar-pro` (latest from Perplexity AI)
+- `gemini-2.0-flash-thinking-exp-01-21`
+- `deepseek-reasoner` (aka DeepSeek-R1)
+</Update>
+
+<Update label="Jan 19">
+- Added Perplexity AI API models  
+  Currently supported only on the preview server `api.aihubmix.com`  
+  After stable testing, it will be rolled out to the main server `aihubmix.com`
+- `api.aihubmix.com` is the preview server  
+  New features will be deployed there first and promoted to the main server after ~1 week of stability testing
+
+New Models Added:
+
+- `MiniMax-Text-01`
+- `codestral-latest` (Mistral Codestral 25.01)
+- `gpt-4o-zh`  
+  Automatically translates any input language to English before inference,  
+  and automatically translates the model output back to Chinese  
+  (This feature is in testing and only supports `gpt-4o`; high concurrency is not supported)
+</Update>
+
+<Update label="Jan 6">
+- Added `gemini-2.0-flash-exp-search`, supporting native Google online search  
+  The official Gemini 2.0 Flash model requires additional parameters for online search  
+  Aihubmix has integrated this functionality — simply append `search` to the model name
+- Added model: `deepseek-ai/DeepSeek-V3`
+</Update>
+
+<Update label="Jan 1">
+- Launched the new Model Marketplace page to replace the old Model & Pricing page
+</Update>
+
+## 2024
+
+<Update label="Dec 30">
+- Fixed the issue where `gemini-2.0-flash-thinking-exp-1219` only returned reasoning without final answers
+- Fixed the issue of balance reminder emails not being delivered
+</Update>
+
+<Update label="Dec 22">
+- Added Usage Statistics page
+- Added Recharge History page
+- Added Doubao series models:  
+  `Doubao-lite-128k`, `Doubao-lite-32k`, `Doubao-lite-4k`,  
+  `Doubao-pro-128k`, `Doubao-pro-256k`, `Doubao-pro-32k`, `Doubao-pro-4k`
+- Added model: `gemini-2.0-flash-thinking-exp-1219`
+- Added models:  
+  `gemini-2.0-flash-exp`, `aihubmix-Mistral-Large-2411`,  
+  `aihubmix-Llama-3-3-70B-Instruct`, `grok-2-1212`, `grok-2-vision-1212`
+- Added models:  
+  `gemini-exp-1206`, `llama-3.3-70b-versatile`, `learnlm-1.5-pro-experimental`
+</Update>
+
+<Update label="Dec 14">
+- Added models:  
+  `gemini-2.0-flash-exp`, `aihubmix-Mistral-Large-2411`,  
+  `aihubmix-Llama-3-3-70B-Instruct`
+</Update>
+
+<Update label="Dec 8">
+- Added models:  
+  `gemini-exp-1206`, `llama-3.3-70b-versatile`, `learnlm-1.5-pro-experimental`
+- Added Usage Statistics page
+</Update>
+
+<Update label="Nov 21">
+- Recently added models:  
+  `gpt-4o-2024-11-20`, `step-2-16k`, `grok-vision-beta`
+- Qwen 2.5 Turbo million-context model:  
+  `qwen-turbo-2024-11-01`
+</Update>
+
+<Update label="Nov 7">
+- Added compatibility with the native Claude SDK  
+  The `v1/messages` endpoint is now live
+- Native Claude prompt caching and computer use features are not yet supported  
+  These will be completed within the next two weeks
+</Update>
+
+<Update label="Nov 5">
+- Added model: `claude-3-5-haiku-20241022`
+- Added Elon Musk’s xAI latest model: `grok-beta`
+</Update>
+
+<Update label="Oct 23">
+- Added model: `claude-3-5-sonnet-20241022`
+</Update>
+
+<Update label="Oct 10">
+- OpenAI’s latest caching feature is now live  
+  Currently supported models:
+
+  - GPT-4o  
+  - GPT-4o-mini  
+  - o1-preview  
+  - o1-mini  
+
+- Note: `gpt-4o-2024-05-13` is not included in the official supported list  
+- Cache hit tokens will be visible in backend logs when a request hits the cache  
+- For full details and usage rules, refer to the OpenAI official documentation
+</Update>
+
+<Update label="Oct 3">
+- Backend billing for `gpt-4o` has been reduced to match official pricing
+- Added models:  
+  `aihubmix-Llama-3-2-90B-Vision`, `aihubmix-Llama-3-70B-Instruct`
+- Added Cohere latest models:  
+  `aihubmix-command-r-08-2024`, `aihubmix-command-r-plus-08-2024`
+</Update>
+
+<Update label="Sep 19">
+- Added models: `whisper-large-v3` and `distil-whisper-large-v3-en`
+- Note: Whisper model billing is based on input seconds  
+  The current pricing display on the site is incorrect and will be fixed  
+  Backend billing for `whisper-1` fully matches OpenAI official pricing
+</Update>
+
+<Update label="Sep 13">
+- Added models: `o1-mini` and `o1-preview`  
+  Note: These models require updated parameters  
+  Some client shells may throw errors if defaults are not updated
+
+Test results show that the `o1` model does NOT support:
+
+- `system` field → 400 error  
+- `tools` field → 400 error  
+- Image input → 400 error  
+- `json_object` output → 500 error  
+- `structured` output → 400 error  
+- `logprobs` output → 403 error  
+- `stream` output → 400 error  
+
+Rate limits and fixed parameters:
+
+- o1 series: 20 RPM, 150,000,000 TPM — extremely low, frequent 429 errors possible  
+- `temperature`, `top_p`, and `n` are fixed at 1  
+- `presence_penalty` and `frequency_penalty` are fixed at 0
+</Update>
+
+<Update label="Sep 10">
+- Added model: `mattshumer/Reflection-Llama-3.1-70B`  
+  (Reported to be one of the strongest fine-tuned versions of LLaMA 3.1 70B)
+- Claude-3 model prices increased  
+  To ensure stable supply, calls through this platform are currently ~10% more expensive than direct official usage  
+- Increased concurrency capacity for OpenAI models  
+  The system now theoretically supports near-unlimited concurrency
+</Update>
+
+<Update label="Aug 11">
+- Added models:  
+  `Phi3medium128k`, `ahm-Phi-3-medium-4k`, `ahm-Phi-3-small-128k`
+- Improved stability for LLaMA-related models
+- Further optimized compatibility for Claude models
+</Update>
+
+<Update label="Aug 7">
+- Added OpenAI’s newly released `gpt-4o-2024-08-06`  
+  See: https://platform.openai.com/docs/guides/structured-outputs
+- Added Google’s latest model: `gemini-1.5-pro-exp-0801`
+</Update>
+
+<Update label="Aug 4">
+- Added direct online payment for account top-ups
+- Fixed Claude multi-turn conversation format error:  
+  `messages: roles must alternate between "user" and "assistant", but found multiple "user" roles in a row`
+- Optimized index handling when using function calling with Claude models
+- The backup server `https://orisound.cn` will be fully decommissioned on Sep 7  
+  Please migrate to the main server `https://aihubmix.com` or backup server `https://api.aihubmix.com`
+</Update>
+
+<Update label="Jul 27">
+- Added support for Mistral Large 2  
+  Model name: `Mistral-large-2407` or `aihubmix-Mistral-large-2407`
+- System optimizations
+</Update>
+
+<Update label="Jul 24">
+- Added latest LLaMA 3.1 models:  
+  `llama-3.1-405b-instruct`, `llama-3.1-70b-versatile`, `llama-3.1-8b-instant`
+</Update>
+
+<Update label="Jul 20">
+- Fixed pricing calculation issues for the `gpt-4o-mini` model  
+  - Text input pricing: 1/33 of GPT-4o officially  
+  - Image input pricing: equal to GPT-4o  
+- To align with official pricing, image token counts for `gpt-4o-mini` are multiplied by 33 during billing
+- Refer to OpenAI official pricing for details
+</Update>
+
+<Update label="Jul 19">
+- Added support for the `gpt-4o-mini` model  
+  Backend billing is fully aligned with official pricing
+</Update>
+
+<Update label="Jul 15 Announcement">
+- Added support for the official `include_usage` API parameter  
+  This allows returning usage data in stream mode  
+  See the official documentation for details
+</Update>
+
+<Update label="Jul 14 Announcement">
+- The new version of NextWeb now supports calling non-OpenAI models through this platform
+- Added backend billing support for Alibaba Qwen models  
+  Calls through this platform cost ~10% more than direct Alibaba Cloud usage
+- Improved Azure OpenAI output compatibility with the standard OpenAI API
+- Added tool calling support for Claude-3
+- Added many new models (see Settings → Available Models)
+</Update>
+
+<Update label="Jul 3">
+- Overall backend UI optimization
+- Each log entry now displays the model unit price at the time of the request
+- Added the Model & Pricing page
+</Update>
+
+<Update label="Jun 20">
+- The latest `claude-3-5-sonnet-20240620` is now supported  
+  See the guide for calling non-OpenAI models on this platform
+</Update>
+
+<Update label="Jun 18">
+- Backend logs now support downloading historical request records
+</Update>
+
+<Update label="Jun 16">
+- The probability of randomly routing requests to Azure OpenAI has been significantly reduced
+</Update>
+
+<Update label="Jun 13">
+- Reduced backend costs for Claude-3 models  
+  (`Claude 3 Haiku`, `Claude 3 Sonnet`, `Claude 3 Opus`)  
+  Backend billing now matches official pricing  
+  As a result, the effective retail API cost on this site is equivalent to ~86% of official pricing
+</Update>
+
+<Update label="Jun 10">
+- Completed a major infrastructure upgrade  
+  All servers and data have been migrated to Microsoft Azure
+- Future development will be based on the open-source OneAPI project with deep secondary optimization  
+  (A commercial license was already obtained via sponsorship)
+- Due to extremely large log volume (over 100 million records), historical logs were not migrated  
+  Please contact support if you need access to legacy logs
+- Optimized GPT-4o token billing  
+  Tokenizer changed from `cl100k_base` to `o200k_base`  
+  As a result, streaming token counts for Chinese, Korean, and Japanese are lower than before
+</Update>
+
+<Update label="Jun 8">
+- Added Alibaba’s latest open-source Qinwen 2 models:
+  - `alibaba/Qwen2-7B-Instruct`
+  - `alibaba/Qwen2-57B-A14B-Instruct`
+  - `alibaba/Qwen2-72B-Instruct`
+</Update>
+
+<Update label="May 20">
+- Added model: `gemini-1.5-flash`
+- Added model: `gpt-4o`
+- Users in Jiangsu may encounter errors on the recharge page due to telecom DNS hijacking  
+  Please contact customer support for assistance
+- Added models:  
+  `llama3-70b-8192`, `llama3-8b-8192`,  
+  `gemini-1.5-pro`, `command-r`, `command-r-plus`
+- Claude-3 model supply has been restored  
+  Endpoints are currently deployed across AWS and Google Cloud
+- To cover infrastructure and operational costs, Claude-3 backend billing is ~10% higher than official pricing  
+  With increased usage, this will be gradually reduced to ~5% or lower
+- Concurrency limits are currently under testing and will be increased as demand grows
 </Update>
