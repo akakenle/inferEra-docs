@@ -6,7 +6,7 @@ icon: "palette"
 
 ## 接口说明
 
-为了方便开发者调用不同的图像生成模型，Aihubmix 提供了统一的图形接口，支持以下多种主流模型：
+为了方便开发者调用不同的图像生成模型，AIHubMix 提供了统一的图形接口，支持以下多种主流模型：
 
 - [OpenAI 系列](#openai)
 - [Google Imagen 系列](#google-imagen)
@@ -50,7 +50,6 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
   - ideogram/V3
   - irag-1.0
   - ernie-irag-edit
-- `sk-***` 为你在 Aihubmix 生成的 API Key
 
 ---
 
@@ -71,7 +70,7 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 
 <CodeGroup>
 
-```shell Curl gpt-image-1
+```bash gpt-image-1
 curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -88,7 +87,7 @@ curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
 ```
 
 
-```shell Curl dall-e-3
+```bash dall-e-3
 curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
