@@ -683,106 +683,60 @@ print(response.text)
 
 ### Files API
 
-当多媒体文件 **大于 20MB**，或需要在多次请求中 **复用同一文件** 时，需要使用 Files API。Files API 会将文件上传并存储在服务端，文件处理完成后进入 `ACTIVE` 状态，即可作为模型输入使用。
+Gemini 可以同时处理各种类型的输入数据，包括文本、图片和音频。当总请求大小（包括文件、文本提示、系统指令等）超过 **20 MB** 时，请务必使用 Files API。
 
 <Tip>
-  Files API 适用于以下场景：
-
-  - PDF / 长文档分析
-  - 长音频转写
-  - 大视频理解
-  - 多次调用同一文件以降低 token 成本
+  - 不支持列出已上传的文件
+  - 文件会在 48 小时后自动删除，也可以手动删除已上传的文件
 </Tip>
 
-**调用参考：**
+**调用参考**
 
-```python
+<CodeGroup>
+
+```python 上传文件
 from google import genai
-import os
-import time
 
 client = genai.Client(
-    api_key="AIHUBMIX_API_KEY",
-    http_options={"base_url": "https://aihubmix.com/gemini"}
+    api_key="sk-****",   
+    http_options={"base_url": "https://aihubmix.com/gemini"},
 )
 
-# MODE 说明：
-# upload   - 上传新文件并使用
-# existing - 使用已上传的文件
-# both     - 同时使用已上传文件和新上传文件
-# delete   - 删除已上传的文件
-MODE = "upload"
-
-FILES_TO_UPLOAD = [
-    "/Users/Documents/test/***.pdf",
-    "/Users/Documents/test/***.mp3",
-]
-
-EXISTING_FILE_NAMES = [
-    "d62sa9l1bwctchannel826",
-    "0xvmveycfzj2channel826",
-]
-
-PROMPT = "请描述这些文件的内容"
-
-MAX_WAIT_TIME = 300
-CHECK_INTERVAL = 5
-
-
-def wait_until_active(name):
-    start = time.time()
-    while time.time() - start < MAX_WAIT_TIME:
-        f = client.files.get(name=name)
-        if f.state == "ACTIVE":
-            return f
-        if f.state == "FAILED":
-            return None
-        time.sleep(CHECK_INTERVAL)
-    return None
-
-
-def get_active_file(name):
-    f = client.files.get(name=name)
-    if f.state == "ACTIVE":
-        return f
-    return wait_until_active(name)
-
-
-if MODE == "delete":
-    for name in EXISTING_FILE_NAMES:
-        client.files.delete(name=name)
-    raise SystemExit
-
-
-files = []
-
-if MODE in ("upload", "both"):
-    for path in FILES_TO_UPLOAD:
-        if not os.path.exists(path):
-            continue
-        f = client.files.upload(file=path)
-        if f.state != "ACTIVE":
-            f = wait_until_active(f.name)
-        if f:
-            files.append(f)
-
-if MODE in ("existing", "both"):
-    for name in EXISTING_FILE_NAMES:
-        f = get_active_file(name)
-        if f:
-            files.append(f)
-
-if not files:
-    raise RuntimeError("no active files")
-
+myfile = client.files.upload(file="path/to/sample.mp3")
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=[PROMPT, *files]
+    model="gemini-2.5-flash", contents=["Describe this audio clip", myfile]
 )
 
 print(response.text)
 ```
+
+
+```python 获取文件的元数据
+from google import genai
+
+client = genai.Client(
+    api_key="sk-****",   
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+myfile = client.files.upload(file='path/to/sample.mp3')
+file_name = myfile.name
+myfile = client.files.get(name=file_name)
+print(myfile)
+```
+
+
+```python 删除已上传的文件
+from google import genai
+
+client = genai.Client()
+
+myfile = client.files.upload(file='path/to/sample.mp3')
+client.files.delete(name=myfile.name)
+```
+
+</CodeGroup>
 
 ## Code Execution
 

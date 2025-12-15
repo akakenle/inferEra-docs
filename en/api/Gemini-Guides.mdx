@@ -531,7 +531,7 @@ curl https://aihubmix.com/v1/chat/completions \
   | MEDIA_RESOLUTION_HIGH        | Media resolution set to high (zoomed reframing with 256 tokens). |
 </Tip>
 
-**Reference Examples**
+**Python usage examples:**
 
 <CodeGroup>
 
@@ -678,102 +678,60 @@ print(response.text)
 
 ### Files API
 
-When a multimedia file is **larger than 20MB**, or when you need to **reuse the same file across multiple requests**, you should use the Files API. Files uploaded via the Files API are stored on the server. Once processing is complete and the file enters the `ACTIVE` state, it can be used as model input.
+Gemini can handle various types of input data simultaneously, including text, images, and audio. When the total request size (including files, text hints, system commands, etc.) exceeds **20 MB**, be sure to use the Files API.
 
-- PDF and long document analysis
-- Long-form audio transcription
-- Large video understanding
-- Reusing the same file across multiple requests to reduce token cost
+<Tip>
+  - Listing uploaded files is not supported.
+  - Files will be automatically deleted after 48 hours, or you can manually delete uploaded files.
+</Tip>
 
-**Reference Examples**
+**Python usage examples:**
 
-```python
+<CodeGroup>
+
+```python Upload a file
 from google import genai
-import os
-import time
 
 client = genai.Client(
-    api_key=os.getenv("AIHUBMIX_API_KEY"),
-    http_options={"base_url": "https://aihubmix.com/gemini"}
+    api_key="sk-****",   
+    http_options={"base_url": "https://aihubmix.com/gemini"},
 )
 
-# MODE options:
-# upload - upload new files and use them
-# existing - use previously uploaded files
-# both - use both newly uploaded files and existing ones
-# delete - delete previously uploaded files
-MODE = "upload"
-
-FILES_TO_UPLOAD = [
-    "/Users/Documents/test/***.pdf",
-    "/Users/Documents/test/***.mp3",
-]
-
-EXISTING_FILE_NAMES = [
-    "d62sa9l1bwctchannel826",
-    "0xvmveycfzj2channel826",
-]
-
-PROMPT = "Please describe the contents of these files"
-
-MAX_WAIT_TIME = 300
-CHECK_INTERVAL = 5
-
-
-def wait_until_active(name):
-    start = time.time()
-    while time.time() - start < MAX_WAIT_TIME:
-        f = client.files.get(name=name)
-        if f.state == "ACTIVE":
-            return f
-        if f.state == "FAILED":
-            return None
-        time.sleep(CHECK_INTERVAL)
-    return None
-
-
-def get_active_file(name):
-    f = client.files.get(name=name)
-    if f.state == "ACTIVE":
-        return f
-    return wait_until_active(name)
-
-
-if MODE == "delete":
-    for name in EXISTING_FILE_NAMES:
-        client.files.delete(name=name)
-    raise SystemExit
-
-
-files = []
-
-if MODE in ("upload", "both"):
-    for path in FILES_TO_UPLOAD:
-        if not os.path.exists(path):
-            continue
-        f = client.files.upload(file=path)
-        if f.state != "ACTIVE":
-            f = wait_until_active(f.name)
-        if f:
-            files.append(f)
-
-if MODE in ("existing", "both"):
-    for name in EXISTING_FILE_NAMES:
-        f = get_active_file(name)
-        if f:
-            files.append(f)
-
-if not files:
-    raise RuntimeError("no active files")
-
+myfile = client.files.upload(file="path/to/sample.mp3")
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=[PROMPT, *files]
+    model="gemini-2.5-flash", contents=["Describe this audio clip", myfile]
 )
 
 print(response.text)
 ```
+
+
+```python Get metadata for a file
+from google import genai
+
+client = genai.Client(
+    api_key="sk-****",   
+    http_options={"base_url": "https://aihubmix.com/gemini"},
+)
+
+myfile = client.files.upload(file='path/to/sample.mp3')
+file_name = myfile.name
+myfile = client.files.get(name=file_name)
+print(myfile)
+```
+
+
+```python Delete uploaded files
+from google import genai
+
+client = genai.Client()
+
+myfile = client.files.upload(file='path/to/sample.mp3')
+client.files.delete(name=myfile.name)
+```
+
+</CodeGroup>
 
 ## Code Execution
 
