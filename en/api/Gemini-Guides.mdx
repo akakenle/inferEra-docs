@@ -516,7 +516,7 @@ curl https://aihubmix.com/v1/chat/completions \
 - For multimedia files **under 20MB** (images, audio, video), upload them using `inline_data`.
 - When a multimedia file is **larger than 20MB**, you must use the Files API.
 
-#### Files Under 20MB
+### Files Under 20MB
 
 <Tip>
   By adding the `EDIARESOLUTION_MEDIUM` parameter, you can adjust the image resolution, which significantly reduces input costs and minimizes the risk of errors with large images.
@@ -676,7 +676,7 @@ print(response.text)
 
 </CodeGroup>
 
-#### Files API
+### Files API
 
 When a multimedia file is **larger than 20MB**, or when you need to **reuse the same file across multiple requests**, you should use the Files API. Files uploaded via the Files API are stored on the server. Once processing is complete and the file enters the `ACTIVE` state, it can be used as model input.
 

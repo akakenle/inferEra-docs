@@ -517,7 +517,7 @@ curl https://aihubmix.com/v1/chat/completions \
 - 对于 **20MB** 以下的多媒体文件（图片、音频、视频），用 `inline_data` 上传。
 - 当多媒体文件大于 20M 时，需要用 Files API。
 
-#### 20M 以下文件
+### 20M 以下文件
 
 <Tip>
   你可以增加 `EDIARESOLUTION_MEDIUM` 参数来约束图片的精度，从而大幅节省输入的费用以及减少大图报错的可能性。
@@ -681,7 +681,7 @@ print(response.text)
 
 </CodeGroup>
 
-#### Files API
+### Files API
 
 当多媒体文件 **大于 20MB**，或需要在多次请求中 **复用同一文件** 时，需要使用 Files API。Files API 会将文件上传并存储在服务端，文件处理完成后进入 `ACTIVE` 状态，即可作为模型输入使用。
 
