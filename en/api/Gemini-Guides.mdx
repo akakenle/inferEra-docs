@@ -43,10 +43,14 @@ Gemini 3 Pro Image Preview (Nano Banana Pro Preview) is designed for professiona
 - Can generate images with resolutions up to **4K**
 
 <Tip>
-  <strong>Streaming Mode (`stream=True`)</strong> → reasoning stage only  
-  <strong>Non-Streaming Mode (`stream=False`)</strong> → final image generation
+  <strong>Streaming Mode (`stream=True`)</strong>
+   → reasoning stage only\
+  <strong>Non-Streaming Mode (`stream=False`)</strong>
+   → final image generation
 
-  Generated images are <strong>not included in streaming responses</strong> and must be retrieved using a <strong>non-streaming request</strong>.
+  Generated images are <strong>not included in streaming responses</strong>
+   and must be retrieved using a <strong>non-streaming request</strong>
+   .
 </Tip>
 
 **Python usage examples:**
@@ -509,7 +513,10 @@ curl https://aihubmix.com/v1/chat/completions \
 
 ## Media Understanding
 
-Aihubmix currently supports uploading multimedia files (images, audio, and video) **up to 20MB** via `inline_data`. For files exceeding 20MB, a File API will be required. This functionality is not yet available; progress tracking and upload_url retrieval are under development.
+- For multimedia files **under 20MB** (images, audio, video), upload them using `inline_data`.
+- When a multimedia file is **larger than 20MB**, you must use the Files API.
+
+#### Files Under 20MB
 
 <Tip>
   By adding the `EDIARESOLUTION_MEDIUM` parameter, you can adjust the image resolution, which significantly reduces input costs and minimizes the risk of errors with large images.
@@ -523,6 +530,8 @@ Aihubmix currently supports uploading multimedia files (images, audio, and video
   | MEDIA_RESOLUTION_MEDIUM      | Media resolution set to medium (256 tokens).                     |
   | MEDIA_RESOLUTION_HIGH        | Media resolution set to high (zoomed reframing with 256 tokens). |
 </Tip>
+
+**Reference Examples**
 
 <CodeGroup>
 
@@ -666,6 +675,105 @@ print(response.text)
 ```
 
 </CodeGroup>
+
+#### Files API
+
+When a multimedia file is **larger than 20MB**, or when you need to **reuse the same file across multiple requests**, you should use the Files API. Files uploaded via the Files API are stored on the server. Once processing is complete and the file enters the `ACTIVE` state, it can be used as model input.
+
+- PDF and long document analysis
+- Long-form audio transcription
+- Large video understanding
+- Reusing the same file across multiple requests to reduce token cost
+
+**Reference Examples**
+
+```python
+from google import genai
+import os
+import time
+
+client = genai.Client(
+    api_key=os.getenv("AIHUBMIX_API_KEY"),
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+# MODE options:
+# upload - upload new files and use them
+# existing - use previously uploaded files
+# both - use both newly uploaded files and existing ones
+# delete - delete previously uploaded files
+MODE = "upload"
+
+FILES_TO_UPLOAD = [
+    "/Users/Documents/test/***.pdf",
+    "/Users/Documents/test/***.mp3",
+]
+
+EXISTING_FILE_NAMES = [
+    "d62sa9l1bwctchannel826",
+    "0xvmveycfzj2channel826",
+]
+
+PROMPT = "Please describe the contents of these files"
+
+MAX_WAIT_TIME = 300
+CHECK_INTERVAL = 5
+
+
+def wait_until_active(name):
+    start = time.time()
+    while time.time() - start < MAX_WAIT_TIME:
+        f = client.files.get(name=name)
+        if f.state == "ACTIVE":
+            return f
+        if f.state == "FAILED":
+            return None
+        time.sleep(CHECK_INTERVAL)
+    return None
+
+
+def get_active_file(name):
+    f = client.files.get(name=name)
+    if f.state == "ACTIVE":
+        return f
+    return wait_until_active(name)
+
+
+if MODE == "delete":
+    for name in EXISTING_FILE_NAMES:
+        client.files.delete(name=name)
+    raise SystemExit
+
+
+files = []
+
+if MODE in ("upload", "both"):
+    for path in FILES_TO_UPLOAD:
+        if not os.path.exists(path):
+            continue
+        f = client.files.upload(file=path)
+        if f.state != "ACTIVE":
+            f = wait_until_active(f.name)
+        if f:
+            files.append(f)
+
+if MODE in ("existing", "both"):
+    for name in EXISTING_FILE_NAMES:
+        f = get_active_file(name)
+        if f:
+            files.append(f)
+
+if not files:
+    raise RuntimeError("no active files")
+
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=[PROMPT, *files]
+)
+
+print(response.text)
+```
 
 ## Code Execution
 

@@ -1,6 +1,6 @@
 ---
 title: "Gemini 指南"
-description: "双子星漫游指南：关于本站的 Gemini 调用细节，在此汇总。"
+description: "Gemini 漫游指南：关于本站的 Gemini 调用细节，在此汇总。"
 icon: "google"
 ---
 
@@ -514,8 +514,10 @@ curl https://aihubmix.com/v1/chat/completions \
 
 ## 多媒体文件
 
-Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、视频），用 `inline_data` 上传。\
-大于 20M 的多媒体需要用 File API（尚未支持），待完善状态跟踪，返回 `upload_url`。
+- 对于 **20MB** 以下的多媒体文件（图片、音频、视频），用 `inline_data` 上传。
+- 当多媒体文件大于 20M 时，需要用 Files API。
+
+#### 20M 以下文件
 
 <Tip>
   你可以增加 `EDIARESOLUTION_MEDIUM` 参数来约束图片的精度，从而大幅节省输入的费用以及减少大图报错的可能性。
@@ -529,6 +531,8 @@ Aihubmix 目前只支持**小于 20MB** 的多媒体文件（图片、音频、�
   | MEDIA_RESOLUTION_MEDIUM      | 媒体分辨率设为 medium (256 tokens).                     |
   | MEDIA_RESOLUTION_HIGH        | 媒体分辨率设为 high (zoomed reframing with 256 tokens). |
 </Tip>
+
+**调用参考：**
 
 <CodeGroup>
 
@@ -676,6 +680,109 @@ print(response.text)
 ```
 
 </CodeGroup>
+
+#### Files API
+
+当多媒体文件 **大于 20MB**，或需要在多次请求中 **复用同一文件** 时，需要使用 Files API。Files API 会将文件上传并存储在服务端，文件处理完成后进入 `ACTIVE` 状态，即可作为模型输入使用。
+
+<Tip>
+  Files API 适用于以下场景：
+
+  - PDF / 长文档分析
+  - 长音频转写
+  - 大视频理解
+  - 多次调用同一文件以降低 token 成本
+</Tip>
+
+**调用参考：**
+
+```python
+from google import genai
+import os
+import time
+
+client = genai.Client(
+    api_key="AIHUBMIX_API_KEY",
+    http_options={"base_url": "https://aihubmix.com/gemini"}
+)
+
+# MODE 说明：
+# upload   - 上传新文件并使用
+# existing - 使用已上传的文件
+# both     - 同时使用已上传文件和新上传文件
+# delete   - 删除已上传的文件
+MODE = "upload"
+
+FILES_TO_UPLOAD = [
+    "/Users/Documents/test/***.pdf",
+    "/Users/Documents/test/***.mp3",
+]
+
+EXISTING_FILE_NAMES = [
+    "d62sa9l1bwctchannel826",
+    "0xvmveycfzj2channel826",
+]
+
+PROMPT = "请描述这些文件的内容"
+
+MAX_WAIT_TIME = 300
+CHECK_INTERVAL = 5
+
+
+def wait_until_active(name):
+    start = time.time()
+    while time.time() - start < MAX_WAIT_TIME:
+        f = client.files.get(name=name)
+        if f.state == "ACTIVE":
+            return f
+        if f.state == "FAILED":
+            return None
+        time.sleep(CHECK_INTERVAL)
+    return None
+
+
+def get_active_file(name):
+    f = client.files.get(name=name)
+    if f.state == "ACTIVE":
+        return f
+    return wait_until_active(name)
+
+
+if MODE == "delete":
+    for name in EXISTING_FILE_NAMES:
+        client.files.delete(name=name)
+    raise SystemExit
+
+
+files = []
+
+if MODE in ("upload", "both"):
+    for path in FILES_TO_UPLOAD:
+        if not os.path.exists(path):
+            continue
+        f = client.files.upload(file=path)
+        if f.state != "ACTIVE":
+            f = wait_until_active(f.name)
+        if f:
+            files.append(f)
+
+if MODE in ("existing", "both"):
+    for name in EXISTING_FILE_NAMES:
+        f = get_active_file(name)
+        if f:
+            files.append(f)
+
+if not files:
+    raise RuntimeError("no active files")
+
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=[PROMPT, *files]
+)
+
+print(response.text)
+```
 
 ## Code Execution
 
