@@ -33,7 +33,9 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 
 - `https://aihubmix.com/v1/models/` 为固定前缀
 - `<model_path>` 为模型路径，支持：
+  - openai/gpt-iamge-1.5
   - openai/gpt-image-1
+  - openai/gpt-image-1-mini
   - openai/dall-e-3
   - imagen-4.0-ultra-generate-001
   - imagen-4.0-generate-001
@@ -59,7 +61,9 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 
 ### 支持的模型：
 
+- gpt-image-1.5
 - gpt-image-1
+- gpt-image-1-mini
 - dall-e-3
 
 <Note>
@@ -70,8 +74,8 @@ curl https://aihubmix.com/v1/models/<model_path>/predictions \
 
 <CodeGroup>
 
-```bash gpt-image-1
-curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
+```bash gpt-image-1.5
+curl https://aihubmix.com/v1/models/opanai/gpt-image-1.5/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
     -d '{
@@ -96,6 +100,23 @@ curl https://aihubmix.com/v1/models/opanai/dall-e-3/predictions \
     "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
     "size": "1024x1024", 
     "n": 1
+  }
+}'
+```
+
+
+```bash gpt-image-1
+curl https://aihubmix.com/v1/models/opanai/gpt-image-1/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "size": "1024x1024", 
+    "n": 1,
+    "quality": "high",
+    "moderation": "low",
+    "background": "auto"
   }
 }'
 ```
