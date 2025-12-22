@@ -112,7 +112,8 @@
               "cn/clients/Immersive-Translate",
               "cn/clients/On-CS",
               "cn/clients/Oulu",
-              "cn/clients/FeelFish"
+              "cn/clients/FeelFish",
+              "cn/clients/GCMP"
             ]
           },
           {
@@ -239,7 +240,8 @@
               "en/clients/Immersive-Translate",
               "en/clients/On-CS",
               "en/clients/Oulu",
-              "en/clients/FeelFish"
+              "en/clients/FeelFish",
+              "en/clients/GCMP"
             ]
           },
           {
