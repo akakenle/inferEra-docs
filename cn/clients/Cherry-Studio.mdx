@@ -18,7 +18,9 @@ title: "在 Cherry Studio 中使用"
 
    ![图片](../../public/cn/CS3.png)
 
-## 如果遇到模型看不到图片的问题
+## 常见问题
+
+### 模型提示看不到图片
 
 一些新模型可能遇到输入图片后模型看不到的问题。需要在设置页面手动勾选图像选项。
 
@@ -29,3 +31,9 @@ title: "在 Cherry Studio 中使用"
 
   ![图片](../../public/cn/CS5.png)
 </Tip>
+
+### 调用 Claude 模型返回错误 AI_APICallError
+
+需要检查报错信息中的请求路径是否为`https://aihubmix.com/anthropic/v1/messages`，若是，则在设置中将 Anthropic API Host 修改为`https://aihubmix.com`
+
+![图片](../../public/cn/CS6.png)
