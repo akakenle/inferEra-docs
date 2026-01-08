@@ -74,12 +74,12 @@
             "pages": [
               "cn/api/Claude-Code",
               "cn/api/Cline",
+              "cn/api/Opencode",
               "cn/api/Gemini-Cli",
               "cn/api/Codex-CLI",
               "cn/api/Qwen-code",
               "cn/api/AISDK",
-              "cn/api/Crush",
-              "cn/api/Opencode"
+              "cn/api/Crush"
             ]
           },
           {
@@ -203,12 +203,12 @@
             "pages": [
               "en/api/Claude-Code",
               "en/api/Cline",
+              "en/api/Opencode",
               "en/api/Gemini-Cli",
               "en/api/Codex-CLI",
               "en/api/Qwen-code",
               "en/api/AISDK",
-              "en/api/Crush",
-              "en/api/Opencode"
+              "en/api/Crush"
             ]
           },
           {

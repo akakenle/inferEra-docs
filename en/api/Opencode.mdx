@@ -1,42 +1,39 @@
 ---
 title: "Using AiHubMix in OpenCode"
-description: "OpenCode now supports AiHubMix as a new model provider. You can use your AiHubMix API key within OpenCode to access its model services."
+description: "OpenCode has officially integrated AiHubMix as a new model provider. Users can directly use an AiHubMix API Key to access its model services within OpenCode."
 icon: "terminal"
 ---
 
-OpenCode now supports AiHubMix as a new model provider. You can use your AiHubMix API key within OpenCode to access its model services.
+OpenCode now supports major model families such as GPT, Claude, DeepSeek, Gemini, and Qwen. For OpenCode usage scenarios, the following models are recommended:
 
-AiHubMix currently supports major model families, including GPT, Claude, DeepSeek, Gemini, and Qwen.  For optimal performance in OpenCode, the following models are recommended:
-
+- `coding-minimax-m2.1-free`
+- `coding-glm-4.7-free`
 - `claude-sonnet-4-5`
-- `glm-4.6`
 - `gpt-5`
 - `gpt-5-codex`
 
-This guide provides step-by-step instructions for installing, configuring, and launching OpenCode across different operating systems, as well as connecting it to the AiHubMix API.
+This document explains how to install, configure, and launch OpenCode on different operating systems, and how to integrate the AiHubMix API.
 
 ---
 
-## System Requirements
+Before installation, ensure that your system meets the following requirements:
 
-Before installation, ensure your system meets the following requirements:
-
-- Node.js ≥ 18.0.0
-- Package manager (optional, depending on OS):
+- **Node.js ≥ 18.0.0**
+- Optional package managers for your operating system:
   - macOS / Linux: `brew`
   - Arch Linux: `paru`
   - Windows: `choco`, `winget`, or `scoop`
 
 ---
 
-1. Installing OpenCode
+## 1. Installing OpenCode
 
-You can install OpenCode using any of the following methods:
+Choose any of the following installation methods based on your operating system and tooling preferences.
 
-**Using Node.js**
+### 1. Install via Node.js
 
-```
-# Using CURL 
+```bash
+# Quick install using a CURL script
 curl -fsSL https://opencode.ai/install | bash
 
 # Using NPM
@@ -52,93 +49,98 @@ pnpm install -g opencode-ai
 yarn global add opencode-ai
 ```
 
----
+### 2. Install via Homebrew (macOS / Linux)
 
-**Using Homebrew (macOS / Linux)**
-
-```
+```bash
 brew install sst/tap/opencode
 ```
 
----
+### 3. Install via Paru (Arch Linux)
 
-**Using Paru (Arch Linux)**
-
-```
+```bash
 paru -S opencode-bin
 ```
 
----
+### 4. Windows Installation
 
-**On Windows**
-
-```
-# Using Chocolatey
+```bash
+# Chocolatey
 choco install opencode
 
-# Using WinGet
+# WinGet
 winget install opencode
 
-# Using Scoop
+# Scoop
 scoop bucket add extras
 scoop install extras/opencode
 
-# Using NPM (requires Node.js and admin privileges)
+# Or install via NPM (Node.js required)
+# Note: Administrator privileges are required
 npm install -g opencode-ai
 ```
 
----
+## 2. Launching and Logging in to OpenCode
 
-2. Launching and Logging into OpenCode
+After installation, follow the steps below to complete authentication and configuration.
 
-After installation, follow these steps to log in and configure OpenCode.
-
-### Step 1. Log In
+### 1. Log in to OpenCode
 
 Run the following command in your terminal:
 
-```
+```bash
 opencode auth login
 ```
 
----
+### 2. Select the AI Provider
 
-### Step 2. Select an AI Provider
+On the login screen, select **AiHubMix** as the model provider.
 
-In the login interface, choose AiHubMix as your model provider.
+![Opencode 1](/public/en/opencode-1.jpg)
 
-![图片](../../public/en/oc1.png)
+### 3. API Key Authorization
 
----
+Enter your AiHubMix API Key on the OpenCode login page to complete authorization.
 
-### Step 3. Authorize with API Key
-
-Log in to your AiHubMix account to obtain your API key.  Enter it on the OpenCode login screen to complete authorization.
-
-![图片](../../public/en/oc2.png)
-
-![图片](../../public/en/oc3.png)
+![Opencode 2](/public/en/opencode-2.jpg)
 
 ---
 
-3. Verify the Installation
+## 3. Using Models
 
-To confirm that OpenCode has been installed and configured successfully, run:
+### 1. Installation Verification
 
-```
+Run the following command to verify that OpenCode is installed and configured correctly:
+
+```bash
 opencode
 ```
 
-![图片](../../public/en/oc4.png)  
-
-If the console returns a valid model response, the setup is complete.
-
-![图片](../../public/en/oc5.png)
+![Opencode 3](/public/en/opencode-3.jpg)
 
 ---
 
-4. Issues & Tips
+### 2. Select a Model
 
-- If your API key fails validation, reauthenticate with AiHubMix and verify the key’s status.
-- View in-app help:`opencode` -\> `/help`
-- Official documentation: https://opencode.ai/docs/
+Type `/models`, search for `aihubmix`, and select the desired model.
+
+![Opencode 4](/public/en/opencode-4.jpg)
+
+---
+
+## 4. Using AiHubMix in the OpenCode Desktop Client
+
+1. Download the OpenCode desktop application: https://opencode.ai/download .
+2. Open OpenCode and follow the steps:`/model` → `Connect provider` → search for `aihubmix` → enter your API Key → `Submit`.
+
+   ![Opencode 5](/public/en/opencode-5.jpg)
+3. In the model selection panel, search for `aihubmix` and select the model you want to use.
+
+   ![Opencode 6](/public/en/opencode-6.jpg)
+
+---
+
+## 5. FAQ and Tips
+
+- If the API Key fails validation, log back into the AiHubMix Console and verify that the key is valid: https://console.aihubmix.com/token
+- View the built-in help documentation: `opencode` → `/help`
+- OpenCode official documentation: https://opencode.ai/docs/
