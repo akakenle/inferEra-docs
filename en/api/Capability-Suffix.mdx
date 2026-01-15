@@ -1,0 +1,58 @@
+---
+title: "Model Suffix Capabilities"
+description: "To reduce integration complexity while improving controllability, the platform introduces capability suffixes to selected model names. Simply choose the appropriate model name to enable the corresponding capability—no additional parameters required."
+---
+
+## Claude Thinking Models
+
+Claude models with the `-think` suffix enable enhanced reasoning capabilities, suitable for complex reasoning, planning, and multi-step analysis.
+
+### Supported Models
+
+- [claude-sonnet-4-5-think](https://aihubmix.com/model/claude-sonnet-4-5-think)
+- [claude-opus-4-5-think](https://aihubmix.com/model/claude-opus-4-5-think)
+
+### Notes
+
+1. Thinking capability is explicitly selected via the model name  
+2. Claude thinking models use the platform’s default context and token configuration  
+   - Sonnet series: default `max_tokens = 32k`  
+   - Opus series: default `max_tokens = 64k`  
+3. No additional parameters are required; invocation is identical to standard models  
+
+---
+
+## GPT Reasoning Models
+
+GPT models support different reasoning intensities via suffixes, allowing a balance between output quality, latency, and cost.
+
+### Supported Models
+
+- [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+
+### Notes
+
+1. `-high` indicates high-intensity reasoning, suitable for complex tasks requiring higher accuracy  
+2. Reasoning intensity is determined by the model name; no extra fields are required  
+
+---
+
+## Google Search–Enhanced Models
+
+Selected Gemini models integrate **Google’s official search capability**.  
+By choosing the appropriate model name, search is automatically enabled during generation—no additional parameters required.
+
+### Supported Models
+
+- [gemini-3-pro-preview-search](https://aihubmix.com/model/gemini-3-pro-preview-search)
+- [gemini-3-flash-preview-search](https://aihubmix.com/model/gemini-3-flash-preview-search)
+
+### Notes
+
+1. Models with the `-search` suffix include Google’s official search integration and are suitable for real-time information retrieval, external fact-checking, and up-to-date references  
+2. Search incurs additional costs, which are recorded as a separate usage log and included in the total charges  
+   - Detailed search cost breakdowns are not currently displayed and will be added in a future update  
+3. Only **OpenAI-compatible API formats** are supported  
+   - Gemini native SDK is not supported for these models  
+   - If using the Gemini official SDK, please refer to the corresponding non-search model examples and configure search using Google’s official parameters  
+

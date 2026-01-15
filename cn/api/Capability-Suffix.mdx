@@ -1,0 +1,57 @@
+---
+title: "模型后缀能力说明"
+description: "为降低调用复杂度，同时提升模型能力的可控性，平台在部分模型名称中引入能力后缀。仅需在调用模型时选择对应名称，即可自动启用相关能力，无需额外参数配置。"
+---
+
+## Claude 思考模型
+
+带 `-think` 后缀的 Claude 模型将启用思考能力，适用于复杂推理、规划、多步分析等场景。
+
+### 已支持的模型
+
+- [claude-sonnet-4-5-think](https://aihubmix.com/model/claude-sonnet-4-5-think)
+- [claude-opus-4-5-think](https://aihubmix.com/model/claude-opus-4-5-think)
+
+### 说明
+
+1. 思考能力通过模型名称显式选择
+2. Claude 思考模型使用平台默认的上下文与 token 配置
+   - Sonnet 系列默认 `max_tokens = 32k`
+   - Opus 系列默认 `max_tokens = 64k`
+3. 无需额外参数，调用方式与普通模型一致
+
+---
+
+## GPT 思考模型
+
+GPT 系列模型支持通过后缀选择不同的推理强度，以在效果、延迟与成本之间取得平衡。
+
+### 已支持的模型
+
+- [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+
+### 说明
+
+1. `-high` 表示高强度推理，适合复杂问题与高准确性需求
+2. 推理强度通过模型名称确定，无需传入额外字段
+
+---
+
+## Google 搜索增强模型
+
+部分 Gemini 模型集成 **Google 官方搜索能力**。\
+通过模型名称选择，即可在生成过程中自动启用搜索，无需额外参数。
+
+### 已支持的模型
+
+- [gemini-3-pro-preview-search](https://aihubmix.com/model/gemini-3-pro-preview-search)
+- [gemini-3-flash-preview-search](https://aihubmix.com/model/gemini-3-flash-preview-search)
+
+### 说明
+
+1. 带 `-search` 后缀的模型已集成 Google 官方搜索能力，适用于需要实时信息、外部事实校验、最新数据参考等场景
+2. 搜索能力会产生额外费用，该费用将以独立日志形式计入总费用
+   - 当前版本暂不展示搜索费用的明细日志，后续将补充
+3. 仅支持 **OpenAI 兼容格式** 调用
+   - 不支持 Gemini 原生 SDK
+   - 如使用 Gemini 官方 SDK，请参考对应版本非思考模型接口调用示例
