@@ -1,11 +1,13 @@
 ---
-title: "Model Suffix Capabilities"
-description: "To reduce integration complexity while improving controllability, the platform introduces capability suffixes to selected model names. Simply choose the appropriate model name to enable the corresponding capability—no additional parameters required."
+title: "Model Suffix Capability Overview"
+icon: "badge-percent"
 ---
 
-## Claude Thinking Models
+## Claude Reasoning Models
 
-Claude models with the `-think` suffix enable enhanced reasoning capabilities, suitable for complex reasoning, planning, and multi-step analysis.
+Claude models do **not** enable reasoning mode by default. To access their deep reasoning capabilities, users typically need to invoke the Claude native API.
+
+To make this capability available directly through an **OpenAI-compatible API**, we provide Claude models with the `-think` suffix. These models have reasoning mode **pre-enabled**, allowing users to leverage advanced reasoning without changing the invocation pattern.
 
 ### Supported Models
 
@@ -14,17 +16,17 @@ Claude models with the `-think` suffix enable enhanced reasoning capabilities, s
 
 ### Notes
 
-1. Thinking capability is explicitly selected via the model name  
-2. Claude thinking models use the platform’s default context and token configuration  
-   - Sonnet series: default `max_tokens = 32k`  
-   - Opus series: default `max_tokens = 64k`  
-3. No additional parameters are required; invocation is identical to standard models  
+1. Reasoning capability is explicitly selected via the **model name**
+2. Claude reasoning models use the platform’s default context window and token limits:
+   - Sonnet series: `max_tokens = 32k` by default
+   - Opus series: `max_tokens = 64k` by default
+3. No additional parameters are required; invocation is identical to standard models
 
 ---
 
 ## GPT Reasoning Models
 
-GPT models support different reasoning intensities via suffixes, allowing a balance between output quality, latency, and cost.
+GPT-series models support different **reasoning intensity levels** via model suffixes, enabling a balance between output quality, latency, and cost.
 
 ### Supported Models
 
@@ -32,15 +34,15 @@ GPT models support different reasoning intensities via suffixes, allowing a bala
 
 ### Notes
 
-1. `-high` indicates high-intensity reasoning, suitable for complex tasks requiring higher accuracy  
-2. Reasoning intensity is determined by the model name; no extra fields are required  
+1. The `-high` suffix indicates **high-intensity reasoning**, suitable for complex tasks and scenarios requiring high accuracy
+2. Reasoning intensity is determined solely by the model name; no additional fields are required in the request
 
 ---
 
-## Google Search–Enhanced Models
+## Google Search–Augmented Models
 
-Selected Gemini models integrate **Google’s official search capability**.  
-By choosing the appropriate model name, search is automatically enabled during generation—no additional parameters required.
+Some Gemini models integrate **official Google Search capabilities**.  
+By selecting a model with the appropriate suffix, search is automatically enabled during generation, with no additional parameters required.
 
 ### Supported Models
 
@@ -49,10 +51,12 @@ By choosing the appropriate model name, search is automatically enabled during g
 
 ### Notes
 
-1. Models with the `-search` suffix include Google’s official search integration and are suitable for real-time information retrieval, external fact-checking, and up-to-date references  
-2. Search incurs additional costs, which are recorded as a separate usage log and included in the total charges  
-   - Detailed search cost breakdowns are not currently displayed and will be added in a future update  
-3. Only **OpenAI-compatible API formats** are supported  
-   - Gemini native SDK is not supported for these models  
-   - If using the Gemini official SDK, please refer to the corresponding non-search model examples and configure search using Google’s official parameters  
-
+1. Models with the `-search` suffix include built-in official Google Search capabilities and are suitable for:
+   - Real-time information retrieval
+   - External fact verification
+   - Referencing the latest data
+2. Search usage incurs **additional costs**, which are billed separately and recorded in independent usage logs
+   - Detailed search cost breakdowns are not yet available in the current version and will be added in a future update
+3. Only **OpenAI-compatible API formats** are supported:
+   - Gemini native SDK is **not supported**
+   - If using the official Gemini SDK, please refer to the non-reasoning model examples for the corresponding version
