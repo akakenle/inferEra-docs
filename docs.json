@@ -40,6 +40,7 @@
                   "cn/api/EBD",
                   "cn/api/Rerank",
                   "cn/api/FIM",
+                  "cn/api/Anthropic-Compatible",
                   "cn/api/Claude-Native",
                   "cn/api/Claude-Cache",
                   "cn/api/Gemini-Guides",
