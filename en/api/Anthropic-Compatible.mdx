@@ -1,0 +1,171 @@
+---
+title: "Anthropic API Compatibility (Beta)"
+icon: "c"
+---
+
+## Overview
+
+To meet developers’ needs for leveraging the Anthropic API ecosystem, our API now supports accessing **all models via the Anthropic API interface**.\
+It supports **200+ LLMs**, including **7 free models**.
+
+## Quick Start
+
+### Install the Anthropic SDK
+
+<CodeGroup>
+
+```shellscript Python
+pip install -U anthropic
+```
+
+
+```shellscript Node.js
+npm install @anthropic-ai/sdk
+```
+
+</CodeGroup>
+
+### API Usage
+
+**Endpoint:** `https://aihubmix.com/v1/messages`
+
+<CodeGroup>
+
+```shellscript Curl
+curl https://aihubmix.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <AIHUBMIX_API_KEY>" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "minimax-m2.1",
+    "max_tokens": 16000,
+    "thinking": {
+      "type": "enabled",
+      "budget_tokens": 10000
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Are there an infinite number of prime numbers such that n mod 4 == 3?"
+      }
+    ]
+  }'
+```
+
+
+```python Python
+from anthropic import Anthropic
+
+client = Anthropic(
+  api_key="<AIHUBMIX_API_KEY>",
+  base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+  model="glm-4.7",
+  max_tokens=16000,
+  thinking={
+      "type": "enabled",
+      "budget_tokens": 10000
+  },
+  messages=[
+      {
+          "role": "user",
+          "content": "Are there an infinite number of prime numbers such that n mod 4 == 3?"
+      }
+  ]
+)
+
+# The response contains summarized thinking blocks and text blocks
+for block in response.content:
+    if block.type == "thinking":
+        print(f"\nThinking summary: {block.thinking}")
+    elif block.type == "text":
+        print(f"\nResponse: {block.text}")
+```
+
+</CodeGroup>
+
+## Compatibility Notes
+
+### Supported Parameters
+
+When integrating via the Anthropic API, the following input parameters are supported:
+
+| Parameter     | Type                              | Required | Description                                                                    |
+| ------------- | --------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `model`       | string                            | Yes      | Supported models can be found in the [Model List](https://aihubmix.com/models) |
+| `messages`    | array of MessageParam             | Yes      | Input messages                                                                 |
+| `max_tokens`  | number                            | No       | Maximum number of tokens to generate                                           |
+| `stream`      | boolean                           | No       | Enable streaming responses                                                     |
+| `system`      | string or array of TextBlockParam | Yes      | System prompt                                                                  |
+| `temperature` | number                            | No       | Range: (0.0, 1.0]. Controls output randomness; recommended value is 1          |
+| `top_p`       | number                            | No       | Nucleus sampling parameter                                                     |
+| `thinking`    | ThinkingConfigParam               | No       | Reasoning configuration                                                        |
+
+### Supported Message Types
+
+| Type                 | Description            |
+| -------------------- | ---------------------- |
+| `type="text"`        | Text message           |
+| `type="tool_use"`    | Tool invocation        |
+| `type="tool_result"` | Tool invocation result |
+| `type="thinking"`    | Model reasoning output |
+
+## Usage Example
+
+### Using GPT-5.2 in Claude Code
+
+Although any supported model can be used via AIHubMix, for the best experience we recommend high-capability models such as **gpt-5.2** or **glm-4.7**.
+
+#### 1. Install and Configure Claude Code
+
+Refer to the Claude Code installation guide: https://docs.aihubmix.com/cn/api/Claude-Code
+
+#### 2. Connect Claude Code to AIHubMix
+
+**Claude configuration file:** `.claude/settings.json`
+
+```json
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://aihubmix.com",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
+    "ANTHROPIC_MODEL": "gpt-5.2"
+  },
+  "includeCoAuthoredBy": false
+}
+```
+
+Replace `AIHUBMIX_API_KEY` with your actual AIHubMix API key.
+
+<Tip>
+  The native Claude Code installer cannot read standard `.env` files. Do not place these settings in a `.env` file.
+</Tip>
+
+#### 3. Start a Conversation
+
+Navigate to your project directory and launch Claude Code:
+
+```bash
+$ cd /path/to/your-project
+> claude
+```
+
+Once connected successfully, all prompts you send will be routed through AIHubMix.
+
+#### 4. Verification
+
+You can verify the connection by running the `/status` command in Claude Code:
+
+```bash
+> /status
+
+ API key: ANTHROPIC_API_KEY
+ Anthropic base URL: https://aihubmix.com
+
+ Model: gpt-5.2
+```

@@ -171,6 +171,7 @@
                   "en/api/EBD",
                   "en/api/Rerank",
                   "en/api/FIM",
+                  "en/api/Anthropic-Compatible",
                   "en/api/Claude-Native",
                   "en/api/Claude-Cache",
                   "en/api/Gemini-Guides",
