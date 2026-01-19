@@ -1,8 +1,11 @@
 ---
 title: "Anthropic API 兼容（Beta）"
-description: "为了满足开发者对 Anthropic API 生态的使用需求，我们的 API 现支持通过 Anthropic API 调用所有的模型。"
 icon: "c"
 ---
+
+## 说明
+
+为了满足开发者对 Anthropic API 生态的使用需求，我们的 API 现支持通过  Anthropic API 调用所有的模型。支持 200+ LLMs，包括 7个免费模型。
 
 ## 快速开始
 
@@ -33,7 +36,7 @@ curl https://aihubmix.com/v1/messages \
   -H "x-api-key: <AIHUBMIX_API_KEY>" \
   -H "anthropic-version: 2023-06-01" \
   -d '{
-    "model": "<modelName>",
+    "model": "minimax-m2.1",
     "max_tokens": 16000,
     "thinking": {
       "type": "enabled",
@@ -58,7 +61,7 @@ client = Anthropic(
 )
 
 response = client.messages.create(
-  model="<modelName>",
+  model="glm-4.7",
   max_tokens=16000,
     thinking={
         "type": "enabled",
@@ -88,16 +91,16 @@ for block in response.content:
 
 在使用 Anthropic API 接入时，我们支持以下输入参数：
 
-| 参数            | 类型                                   | 是否必需 | 说明                                         |
-| ------------- | ------------------------------------ | ---- | ------------------------------------------ |
-| `model`       | string                               | 是    | 支持模型请查询[模型列表](https://aihubmix.com/models) |
-| `messages`    | array of MessageParam  content, role | 是    | 输入信息                                       |
-| `max_toknes`  | number                               | 否    | 最大生成 token 数                               |
-| `stream`      | boolean                              | 否    | 流式响应                                       |
-| `system`      | string or array of TextBlockParam    | 是    | 系统提示词                                      |
-| `temperature` | number                               | 否    | 取值范围 (0.0, 1.0]，控制输出随机性，建议取值 1             |
-| `top_p`       | number                               | 否    | 核采样参数                                      |
-| `thinking`    | ThinkingConfigParam                  | 否    | 推理内容                                       |
+| 参数            | 类型                                | 是否必需 | 说明                                         |
+| ------------- | --------------------------------- | ---- | ------------------------------------------ |
+| `model`       | string                            | 是    | 支持模型请查询[模型列表](https://aihubmix.com/models) |
+| `messages`    | array of MessageParam             | 是    | 输入信息                                       |
+| `max_toknes`  | number                            | 否    | 最大生成 token 数                               |
+| `stream`      | boolean                           | 否    | 流式响应                                       |
+| `system`      | string or array of TextBlockParam | 是    | 系统提示词                                      |
+| `temperature` | number                            | 否    | 取值范围 (0.0, 1.0]，控制输出随机性，建议取值 1             |
+| `top_p`       | number                            | 否    | 核采样参数                                      |
+| `thinking`    | ThinkingConfigParam               | 否    | 推理内容                                       |
 
 ### Messages 字段支持
 
@@ -107,3 +110,61 @@ for block in response.content:
 | `type="tool_use"`    | 工具调用   |
 | `type="tool_result"` | 工具调用结果 |
 | `type="thinking"`    | 推理的内容  |
+
+## 使用示例
+
+### 在 Claude Code 中使用 GPT-5.2
+
+虽然您可以通过 AIHubMix 使用任何模型，但为了获得最佳体验，我们建议您使用功能强大的模型，例如 gpt-5.2、glm-4.7  等。
+
+#### 1. 安装配置 Claude Code
+
+Claude Code 安装请参考：https://docs.aihubmix.com/cn/api/Claude-Code
+
+#### 2. 将 Claude Code 连接到AIHubMix
+
+\*\*Claude 配置文件 \*\*`.claude/settings.json`
+
+```bash
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://aihubmix.com",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
+    "ANTHROPIC_MODEL": "gpt-5.2"
+  },
+  "includeCoAuthoredBy": false
+}
+```
+
+请替换 `AIHUBMIX_API_KEY` 为实际的 AIHUBMIX API 密钥。
+
+<Tip>
+  Claude Code 原生安装程序无法读取标准 `.env` 文件，因此请勿将这些内容放置在 `.env` 文件中。
+</Tip>
+
+#### 3. 开始对话
+
+导航到您的项目目录并启动 Claude Code：
+
+```bash
+$ cd /path/your-project
+> claude
+```
+
+连接成功后，您发送的任何提示都将通过 AIHubMix 路由。
+
+#### 4. 验证
+
+您可以通过在 Claude Code 中输入 `/status`  命令来确认您的连接。
+
+```bash
+> /status
+
+ API key: ANTHROPIC_API_KEY
+ Anthropic base URL: https://aihubmix.com
+
+ Model: gpt-5.2 
+```
