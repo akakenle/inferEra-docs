@@ -45,31 +45,31 @@ The Text-to-Speech (TTS) API is based on advanced generative AI models that can 
 
 ### Request URL
 
-```
+```shellscript
 POST https://aihubmix.com/v1/audio/speech
 ```
 
 ### Request Headers
 
-```
+```shellscript
 Authorization: Bearer $AIHUBMIX_API_KEY
 Content-Type: application/json
 ```
 
 ### Request Parameters
 
-#### Standard TTS Parameters 
+#### Standard TTS Parameters
 
 The standard parameters applicable to the following TTS models: tts-1, tts-1-hd, gpt-4o-mini-tts, gemini-2.5-flash-preview-tts, and gemini-2.5-pro-preview-tts.
 
-| Parameter       | Type   | Required | Description                                                                                                                                                                                                             |
-| :-------------- | :----- | :------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| model           | string | Yes      | The model ID to be used. Optional values: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`, `gemini-2.5-flash-preview-tts`, `gemini-2.5-pro-preview-tts`                                                                          |
-| input           | string | Yes      | The text to generate audio from, with a maximum length of 4096 characters                                                                                                                                               |
-| voice           | string | Yes      | The voice used for synthesis. See the voice list below.                                                                                                                                                                 |
-| response_format | string | No       | Audio output format. Supported audio formats include: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`, default is `mp3`. ******`Note: Gemini models only support wav and pcm formats.`******                                 |
-| speed           | number | No       | The speed of the generated audio. Range from 0.25 to 4.0, default is 1.0. **Note: gpt-4o-mini-tts and Gemini models do not support this parameter, but speed can be controlled through natural language descriptions.** |
-| instructions    | string | No       | Voice generation instructions, which can specify voice style, intonation, and emotional characteristics in detail, applicable only for `gpt-4o-mini-tts` and Gemini models.                                             |
+| Parameter       | Type   | Required | Description                                                                                                                                                                                                         |
+| :-------------- | :----- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| model           | string | Yes      | The model ID to be used. Optional values: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`, `gemini-2.5-flash-preview-tts`, `gemini-2.5-pro-preview-tts`                                                                      |
+| input           | string | Yes      | The text to generate audio from, with a maximum length of 4096 characters                                                                                                                                           |
+| voice           | string | Yes      | The voice used for synthesis. See the voice list below.                                                                                                                                                             |
+| response_format | string | No       | Audio output format. Supported audio formats include: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`, default is `mp3`. `Note: Gemini models only support wav and pcm formats.`                                         |
+| speed           | number | No       | The speed of the generated audio. Range from 0.25 to 4.0, default is 1.0. Note: gpt-4o-mini-tts and Gemini models do not support this parameter, but speed can be controlled through natural language descriptions. |
+| instructions    | string | No       | Voice generation instructions, which can specify voice style, intonation, and emotional characteristics in detail, applicable only for `gpt-4o-mini-tts` and Gemini models.                                         |
 
 #### gpt-4o-audio-preview Parameters
 
