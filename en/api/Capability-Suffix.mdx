@@ -1,12 +1,22 @@
 ---
 title: "Model Suffix Capability Overview"
 icon: "badge-percent"
-description: "By using the model suffix, some advanced capabilities of the models are pre-configured, and users can use them directly through the unified OpenAI/Chat interface."
+description: "Through model suffixes, advanced capabilities of certain models have been preconfigured, allowing users to access them directly via the unified OpenAI / Chat interface."
 ---
+
+## Supported Models
+
+- [claude-sonnet-4-5-think](https://aihubmix.com/model/claude-sonnet-4-5-think)
+- [claude-opus-4-5-think](https://aihubmix.com/model/claude-opus-4-5-think)
+- [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+- [gpt-5.2-low](https://aihubmix.com/model/gpt-5.2-low)
+- [gemini-3-pro-preview-search](https://aihubmix.com/model/gemini-3-pro-preview-search)
+- [gemini-3-flash-preview-search](https://aihubmix.com/model/gemini-3-flash-preview-search)
+
 
 ## Claude Thinking Model
 
-The Claude model does not enable thinking mode by default. To utilize its deep reasoning capabilities, it typically requires calling through the native Claude interface. To facilitate users in accessing this capability directly under the OpenAI compatible interface, we now offer the claude `-think` model, which has thinking mode pre-activated.
+The Claude model does not enable thinking mode by default. To utilize its deep reasoning capabilities, it typically requires invocation through the Claude native interface. To facilitate users in accessing this capability directly via the OpenAI-compatible interface, the claude `-think` model is provided, which has thinking mode pre-enabled.
 
 ### Supported Models
 
@@ -15,32 +25,33 @@ The Claude model does not enable thinking mode by default. To utilize its deep r
 
 ### Notes
 
-1. The thinking capability is explicitly selected through the model name.
-2. The Claude thinking model uses the platform's default context and token configuration.
+1. The thinking capability is explicitly selected by the model name.
+2. The Claude thinking model uses the platform's default context and token configurations.
    - Sonnet series default `max_tokens = 32k`
    - Opus series default `max_tokens = 64k`
-3. No additional parameters are needed; the calling method is the same as for regular models.
+3. No additional parameters are required; invocation is consistent with regular models.
 
 ---
 
 ## GPT Thinking Model
 
-The reasoning intensity of GPT-5.2 can only be configured through the `/responses` interface. To maintain compatibility with the unified OpenAI `/Chat` interface, the platform provides the `GPT-5.2-*` series of pre-configured models that fix different levels of reasoning intensity at the model layer, allowing users to call them directly.
+The reasoning intensity of GPT-5.2 can only be configured through the `/responses` interface. To ensure compatibility with the unified OpenAI `/Chat` interface, the platform offers preconfigured models in the `GPT-5.2-*` series, which fix different levels of reasoning intensity at the model layer, allowing users to invoke them directly.
 
 ### Supported Models
 
 - [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+- [gpt-5.2-low](https://aihubmix.com/model/gpt-5.2-low)
 
 ### Notes
 
-1. `-high` indicates high-intensity reasoning, suitable for complex problems and high accuracy requirements.
-2. The reasoning intensity is determined by the model name, with no additional fields required.
+1. -low/high indicates the reasoning intensity.
+2. The reasoning intensity is determined by the model name; no additional fields need to be passed.
 
 ---
 
-## Google Search Enhanced Model
+## Google Search Enhanced Models
 
-The Gemini model does not enable Google Search by default. To activate it, the native Gemini interface must be used. To facilitate users in accessing this capability directly under the OpenAI compatible interface, some Gemini models have integrated Google official search capability. By selecting the corresponding model name, search will be automatically enabled during generation, with no additional parameters needed.
+The Gemini model does not enable Google Search by default. To enable it, you must use the Gemini native interface. To facilitate users in accessing this capability directly via the OpenAI-compatible interface, some Gemini models have integrated Google’s official search capabilities. By selecting the corresponding model name, search will be automatically enabled during generation without the need for additional parameters.
 
 ### Supported Models
 
@@ -49,9 +60,9 @@ The Gemini model does not enable Google Search by default. To activate it, the n
 
 ### Notes
 
-1. Models with the `-search` suffix have integrated Google official search capability, suitable for scenarios requiring real-time information, external fact-checking, and the latest data reference.
-2. The search capability incurs additional costs, which will be logged separately in the total expenses.
+1. Models with the `-search` suffix have integrated Google’s official search capabilities, suitable for scenarios requiring real-time information, external fact verification, and the latest data references.
+2. The search capability incurs additional costs, which will be accounted for in a separate log as part of the total fees.
    - The current version does not display detailed logs of search costs; this will be added in future updates.
-3. Only **OpenAI compatible format** calls are supported.
-   - Native Gemini SDK is not supported.
-   - If using the Gemini official SDK, please refer to the corresponding version's non-thinking model interface call examples.
+3. Only **OpenAI-compatible format** calls are supported.
+   - Gemini native SDK is not supported.
+   - If using the Gemini official SDK, please refer to the interface call examples for the corresponding version of non-thinking models.

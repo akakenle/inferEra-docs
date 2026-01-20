@@ -4,6 +4,16 @@ icon: "badge-percent"
 description: "通过模型后缀，部分模型的高级能力已预先配置，用户可在统一的 OpenAI / Chat 接口下直接使用。"
 ---
 
+## 已支持的模型
+
+- [claude-sonnet-4-5-think](https://aihubmix.com/model/claude-sonnet-4-5-think)
+- [claude-opus-4-5-think](https://aihubmix.com/model/claude-opus-4-5-think)
+- [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+- [gpt-5.2-low](https://aihubmix.com/model/gpt-5.2-low)
+- [gemini-3-pro-preview-search](https://aihubmix.com/model/gemini-3-pro-preview-search)
+- [gemini-3-flash-preview-search](https://aihubmix.com/model/gemini-3-flash-preview-search)
+
+
 ## Claude 思考模型
 
 Claude 模型默认不启用思考模式，若需使用其深度推理能力，通常需要通过 Claude 原生接口调用。为方便用户在 OpenAI 兼容接口下直接使用该能力，现提供 claude `-think` 模型，该模型已预先开启思考模式。
@@ -30,10 +40,11 @@ GPT-5.2 的推理强度仅支持在 `/responses` 接口中进行配置。为兼�
 ### 已支持的模型
 
 - [gpt-5.2-high](https://aihubmix.com/model/gpt-5.2-high)
+- [gpt-5.2-low](https://aihubmix.com/model/gpt-5.2-low)
 
 ### 说明
 
-1. `-high` 表示高强度推理，适合复杂问题与高准确性需求
+1. -low/high 表示推理强度
 2. 推理强度通过模型名称确定，无需传入额外字段
 
 ---
