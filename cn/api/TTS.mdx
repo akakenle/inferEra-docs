@@ -58,7 +58,9 @@ Content-Type: application/json
 
 ### 请求参数
 
-#### 标准 TTS 参数（适用于 tts-1, tts-1-hd, gpt-4o-mini-tts, gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts）
+#### 标准 TTS 参数
+
+标准参数适用于 tts-1, tts-1-hd, gpt-4o-mini-tts, gemini-2.5-flash-preview-tts 以及 gemini-2.5-pro-preview-tts。
 
 | 参数              | 类型     | 必填 | 说明                                                                                                                                |
 | :-------------- | :----- | :-- | :-------------------------------------------------------------------------------------------------------------------------------- |
@@ -349,7 +351,7 @@ TTS API 按字符数计费：
 
 ### Q: Gemini TTS 和 OpenAI TTS 有什么区别？
 
--  **Gemini TTS**: 支持通过自然语言提示词控制语音风格，支持多说话人，但仅支持 WAV/PCM 格式
+- **Gemini TTS**: 支持通过自然语言提示词控制语音风格，支持多说话人，但仅支持 WAV/PCM 格式
 - **OpenAI TTS**: 支持多种音频格式，有固定的语音选项，速度可通过参数控制
 
 ### Q: 如何实现多说话人对话？
