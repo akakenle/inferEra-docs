@@ -68,8 +68,8 @@ Content-Type: application/json
 | input           | string | 是  | 要生成音频的文本，最大长度为 4096 个字符                                                                                        |
 | voice           | string | 是  | 用于合成的语音。见下方语音列表                                                                                                |
 | response_format | string | 否  | 音频输出格式。支持的音频格式包括： `mp3`、 `opus`、 `aac` 、 `flac`、 `wav`、 `pcm`，默认使用  `mp3` 格式。注意：Gemini 模型仅支持 `wav`和 `pcm` 格式。  |
-| speed           | number | 否  | 生成音频的语速。取值范围 0.25 到 4.0，默认为1.0。注意：gpt-4o-mini-tts 和 Gemini 模型不支持此参数，但可以通过自然语言描述来控制语速。                          |
-| instructions    | string | 否  | 语音生成指令，可以详细指定语音风格、语调和情感等特性，仅适用于 `gpt-4o-mini-tts` 和 Gemini 模型。                                                 |
+| speed           | number | 否  | 生成音频的语速。取值范围 0.25 到 4.0，默认为1.0。注意：   `gpt-4o-mini-tts` 和 `Gemini` 模型不支持此参数，但可以通过自然语言描述来控制语速。                   |
+| instructions    | string | 否  | 语音生成指令，可以详细指定语音风格、语调和情感等特性，仅适用于 `gpt-4o-mini-tts` 和 `Gemini` 模型。                                               |
 
 #### gpt-4o-audio-preview 参数
 
