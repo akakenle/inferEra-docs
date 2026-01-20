@@ -1,181 +1,369 @@
 ---
-title: "Text to Speech"
-description: "Use AI models to convert text into natural speech, supporting multiple speech styles and output formats"
-icon: 'monitor-waveform'
+title: "TTS"
+description: "Convert text to natural speech using AI models, supporting various voice styles and output formats"
+icon: "monitor-waveform"
 ---
 
 ## Introduction
 
-Text to Speech (TTS) API is based on advanced generative AI models that can convert input text into realistic speech audio. It supports multiple uses:
+The Text-to-Speech (TTS) API is based on advanced generative AI models that can convert input text into realistic speech audio. It supports a variety of use cases:
 
-- Voice blog articles
-- Generate speech audio in multiple languages
-- Provide real-time audio output stream
+- Narrating written blog articles
+- Generating speech audio in multiple languages
+- Providing real-time audio output streams
 
-**Available model list:**
-- **gpt-4o-audio-preview** - The latest audio generation model from OpenAI, supports conversational audio generation
-- **gpt-4o-mini-tts** - The preferred model for smart real-time applications, supports advanced voice control, and can control multiple voice characteristics through prompts:
-  - Accent
-  - Emotional range
-  - Intonation
-  - Impressions
-  - Speed of speech
-  - Tone
-  - Whispering
-- **tts-1-hd** - High-quality TTS model
-- **tts-1** - Standard TTS model, balance quality and speed
+## Available Models
 
-<Tip>
-**Performance suggestions:** For the fastest response time, it is recommended to use `wav` or `pcm` as the response format. For high-quality audio, it is recommended to use `tts-1-hd`; for faster generation speed, use `tts-1`; for smart voice applications, it is recommended to use `gpt-4o-mini-tts`.
+### OpenAI Models
 
-**Voice preview:** You can listen to different voice effects on [OpenAI.fm](https://www.openai.fm/).
-</Tip>
+- [gpt-4o-audio-preview](https://aihubmix.com/model/gpt-4o-audio-preview) — OpenAI's latest audio generation model, supporting conversational audio generation
+- [**gpt-4o-mini-tts**](https://aihubmix.com/model/gpt-4o-mini-tts) — The preferred model for smart real-time applications, supporting advanced voice control and allowing various voice characteristics to be controlled via prompts:
+  1. Accent
+  2. Emotional range
+  3. Intonation
+  4. Impressions/Style
+  5. Speed of speech
+  6. Tone
+  7. Whispering
+- [**tts-1-hd**](https://aihubmix.com/model/tts-1-hd) — The previous generation TTS model with high-definition audio quality
+- [**tts-1**](https://aihubmix.com/model/tts-1) — Standard TTS model, balancing quality and speed
 
-## Model calling method
+### Gemini Models
 
-### Standard TTS model (tts-1, tts-1-hd)
-Use the `/v1/audio/speech` endpoint, and call the `client.audio.speech.create()` method.
+- [**gemini-2.5-flash-preview-tts**](https://aihubmix.com/model/gemini-2.5-flash-preview-tts) — Gemini fast TTS model, supporting single and multiple speaker audio generation
+- [**gemini-2.5-pro-preview-tts**](https://aihubmix.com/model/gemini-2.5-pro-preview-tts) — Gemini professional TTS model, supporting single and multiple speaker audio generation
 
-### gpt-4o-mini-tts
-Use the `/v1/audio/speech` endpoint, and support the `instructions` parameter for advanced voice control.
+**Performance Recommendations:**
 
-### gpt-4o-audio-preview
-Use the `/v1/chat/completions` endpoint, and set the `modalities: ["text", "audio"]` and `audio` configuration.
+1. For the fastest response time, it's recommended to use `wav` or `pcm` as the response format
+2. For high-quality audio, use `tts-1-hd`
+3. For faster generation speed, use `tts-1`
+4. For smart voice applications, `gpt-4o-mini-tts` is recommended
+5. For scenarios requiring multi-speaker dialogues, the Gemini TTS models are recommended
 
-### Request parameters
+## API Endpoint
 
-#### Standard TTS parameters 
+### Request URL
 
-applicable to tts-1, tts-1-hd, gpt-4o-mini-tts
+```
+POST https://aihubmix.com/v1/audio/speech
+```
 
-<ParamField body="model" type="string" required>
-  The model ID to use. Optional values: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`
-</ParamField>
+### Request Headers
 
-<ParamField body="input" type="string" required>
-  The text to generate audio, with a maximum length of 4096 characters
-</ParamField>
+```
+Authorization: Bearer $AIHUBMIX_API_KEY
+Content-Type: application/json
+```
 
-<ParamField body="voice" type="string" required>
-  The voice to use for synthesis. Optional values: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`
-</ParamField>
+### Request Parameters
 
-<ParamField body="response_format" type="string" optional>
-  The audio output format. Supported formats: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`. Default is `mp3`
-</ParamField>
+#### Standard TTS Parameters (Applicable for tts-1, tts-1-hd, gpt-4o-mini-tts, gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts)
 
-<ParamField body="speed" type="number" optional>
-  The speed of generating audio. The range is 0.25 to 4.0. Default is 1.0. **Note: `gpt-4o-mini-tts` does not support this parameter, but you can control the speed through natural language description**
-</ParamField>
+| Parameter       | Type   | Required | Description                                                                                                                                                                                                             |
+| :-------------- | :----- | :------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| model           | string | Yes      | The model ID to be used. Optional values: `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`, `gemini-2.5-flash-preview-tts`, `gemini-2.5-pro-preview-tts`                                                                          |
+| input           | string | Yes      | The text to generate audio from, with a maximum length of 4096 characters                                                                                                                                               |
+| voice           | string | Yes      | The voice used for synthesis. See the voice list below.                                                                                                                                                                 |
+| response_format | string | No       | Audio output format. Supported audio formats include: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm`, default is `mp3`. ******``Note: Gemini models only support wav and pcm formats.``******                               |
+| speed           | number | No       | The speed of the generated audio. Range from 0.25 to 4.0, default is 1.0. **Note: gpt-4o-mini-tts and Gemini models do not support this parameter, but speed can be controlled through natural language descriptions.** |
+| instructions    | string | No       | Voice generation instructions, which can specify voice style, intonation, and emotional characteristics in detail, applicable only for `gpt-4o-mini-tts` and Gemini models.                                             |
 
-<ParamField body="instructions" type="string" optional>
-  Voice generation instructions (only applicable to `gpt-4o-mini-tts` model), can specify voice style, tone, emotion, etc.
-</ParamField>
+#### gpt-4o-audio-preview Parameters
 
-#### gpt-4o-audio-preview parameters
+| Parameter  | Type   | Required | Description                                                       |
+| :--------- | :----- | :------- | :---------------------------------------------------------------- |
+| model      | string | Yes      | Set to `gpt-4o-audio-preview`                                     |
+| modalities | array  | Yes      | Set to `["text", "audio"]` to enable audio output                 |
+| audio      | object | Yes      | Audio configuration object containing `voice` and `format` fields |
+| messages   | array  | Yes      | Array of chat messages, similar to standard chat format           |
 
-<ParamField body="model" type="string" required>
-  Set to `gpt-4o-audio-preview`
-</ParamField>
+## Voice List
 
-<ParamField body="modalities" type="array" required>
-  Set to `["text", "audio"]` to enable audio output
-</ParamField>
+### OpenAI Voices
 
-<ParamField body="audio" type="object" required>
-  Audio configuration object, containing `voice` and `format` fields
-</ParamField>
+Supports the following voice options:
 
-<ParamField body="messages" type="array" required>
-  Chat message array, same as standard chat format
-</ParamField>
+- **alloy** - Neutral, balanced
+- **ash** - Clear, professional
+- **ballad** - Warm, narrative
+- **coral** - Friendly, approachable
+- **echo** - Clear, bright
+- **fable** - Expressive, dramatic
+- **onyx** - Deep, authoritative
+- **nova** - Lively, energetic
+- **sage** - Mature, knowledgeable
+- **shimmer** - Soft, soothing
+- **verse** - Clear, versatile
+- **marin** - Natural, friendly
+- **cedar** - Stable, reliable
 
-## Usage
+### Gemini Voices
 
-<CodeGroup>
+Supports the following 30 voice options:
 
-```shell Curl
+| Voice Name    | Style        | Voice Name        | Style           | Voice Name       | Style         |
+| :------------ | :----------- | :---------------- | :-------------- | :--------------- | :------------ |
+| **Zephyr**    | _Bright_     | **Puck**          | _Upbeat_        | **Charon**       | _Informative_ |
+| **Kore**      | _Firm_       | **Fenrir**        | _Excitable_     | **Leda**         | _Youthful_    |
+| **Orus**      | _Firm_       | **Aoede**         | _Breezy_        | **Callirrhoe**   | _Easy-going_  |
+| **Autonoe**   | _Bright_     | **Enceladus**     | _Breathy_       | **Iapetus**      | _Clear_       |
+| **Umbriel**   | _Easy-going_ | **Algieba**       | _Smooth_        | **Despina**      | _Smooth_      |
+| **Erinome**   | _Clear_      | **Algenib**       | _Gravelly_      | **Rasalgethi**   | _Informative_ |
+| **Laomedeia** | _Upbeat_     | **Achernar**      | _Soft_          | **Alnilam**      | _Firm_        |
+| **Schedar**   | _Even_       | **Gacrux**        | _Mature_        | **Pulcherrima**  | _Forward_     |
+| **Achird**    | _Friendly_   | **Zubenelgenubi** | _Casual_        | **Vindemiatrix** | _Gentle_      |
+| **Sadachbia** | _Lively_     | **Sadaltager**    | _Knowledgeable_ | **Sulafat**      | _Warm_        |
+
+#### Voice Mapping
+
+When using Gemini models, if an OpenAI voice name is provided, the system will automatically map it to the corresponding Gemini voice:
+
+| OpenAI Voice | Gemini Voice | OpenAI Voice | Gemini Voice |
+| :----------- | :----------- | :----------- | :----------- |
+| alloy        | Kore         | ash          | Fenrir       |
+| ballad       | Aoede        | coral        | Leda         |
+| echo         | Puck         | fable        | Zephyr       |
+| onyx         | Charon       | nova         | Orus         |
+| sage         | Algieba      | shimmer      | Callirrhoe   |
+| verse        | Enceladus    | marin        | Despina      |
+| cedar        | Iapetus      |              |              |
+
+## Usage Examples
+
+### Standard TTS Model (OpenAI)
+
+```curl
 curl https://aihubmix.com/v1/audio/speech \
   -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "tts-1",
-    "input": "The quick brown 🦊 jumped over the lazy dog.",
+    "input": "The quick brown fox jumped over the lazy dog.",
     "voice": "alloy"
   }' \
   --output speech.mp3
 ```
 
-```py gpt-4o-audio-preview
-import base64
-from openai import OpenAI
-import os
+### Gemini TTS Model (Single Speaker)
 
-client = OpenAI(
-  api_key=os.getenv("AIHUBMIX_API_KEY"),
-  base_url="https://aihubmix.com/v1"
-)
-
-completion = client.chat.completions.create(
-    model="gpt-4o-audio-preview",
-    modalities=["text", "audio"],
-    audio={"voice": "alloy", "format": "wav"},
-    messages=[
-        {
-            "role": "user",
-            "content": "The quick brown 🦊 jumped over the lazy dog."
-        }
-    ]
-)
-
-print(completion.choices[0])
-
-wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
-with open("output.wav", "wb") as f:
-    f.write(wav_bytes)
+```curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-2.5-flash-preview-tts",
+    "input": "Say cheerfully: Have a wonderful day!",
+    "voice": "Kore",
+    "response_format": "wav"
+  }' \
+  --output speech.wav
 ```
 
-```py gpt-4o-mini-tts
-from pathlib import Path
-from openai import OpenAI
-import os
+### Gemini TTS Model (Multi-Speaker - Controlled by Prompts)
 
-# aihubmix forwarding
-client = OpenAI(
-  api_key="sk-***", # Replace with your AiHubMix API key
-  base_url="https://aihubmix.com/v1"
-)
-
-speech_file_path = Path(__file__).parent / "speech.mp3"
-with client.audio.speech.with_streaming_response.create(
-  model="gpt-4o-mini-tts",
-  voice="alloy", # Best balanced voice, clear pronunciation
-  instructions="""Play as a Patient Teacher""",
-  input="The quick brown 🦊 jumped over the lazy dog."
-) as response:
-  response.stream_to_file(speech_file_path)
+```curl
+curl https://aihubmix.com/v1/audio/speech \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemini-2.5-flash-preview-tts",
+    "input": "TTS the following conversation between Joe and Jane:\nJoe: How'\''s it going today Jane?\nJane: Not too bad, how about you?",
+    "voice": "Kore",
+    "response_format": "wav",
+    "instructions": "Joe should sound firm and professional, Jane should sound upbeat and friendly"
+  }' \
+  --output conversation.wav
 ```
 
-```py Standard TTS model
-from pathlib import Path
+### Python Example (OpenAI SDK)
+
+```python
 from openai import OpenAI
-import os
 
 client = OpenAI(
-  api_key="sk-***", # Replace with your AiHubMix API key
-  base_url="https://aihubmix.com/v1"
+    api_key="your-aihubmix-api-key",
+    base_url="https://aihubmix.com/v1"
 )
 
-speech_file_path = Path(__file__).parent / "speech.mp3"
 response = client.audio.speech.create(
-  model="tts-1-hd",
-  voice="alloy",
-  input="The quick brown 🦊 jumped over the lazy dog.",
-  response_format="mp3",
-  speed=1.0
+    model="tts-1",
+    voice="alloy",
+    input="The quick brown fox jumped over the lazy dog."
 )
 
-response.stream_to_file(speech_file_path)
+response.stream_to_file("speech.mp3")
 ```
 
-</CodeGroup>
+### Python Example (Gemini TTS)
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="your-aihubmix-api-key",
+    base_url="https://aihubmix.com/v1"
+)
+
+# Single Speaker
+response = client.audio.speech.create(
+    model="gemini-2.5-flash-preview-tts",
+    voice="Kore",
+    input="Say cheerfully: Have a wonderful day!",
+    extra_body={
+        "response_format": "wav"
+    }
+)
+
+response.stream_to_file("speech.wav")
+
+# Multi-Speaker Dialogue
+conversation_response = client.audio.speech.create(
+    model="gemini-2.5-flash-preview-tts",
+    voice="Kore",
+    input="""TTS the following conversation between Joe and Jane:
+    Joe: How's it going today Jane?
+    Jane: Not too bad, how about you?""",
+    extra_body={
+        "response_format": "wav",
+        "instructions": "Joe should sound firm, Jane should sound upbeat"
+    }
+)
+
+conversation_response.stream_to_file("conversation.wav")
+```
+
+## Controlling Voice Style (Gemini Models)
+
+Gemini TTS models support controlling voice style, tone, accent, and speed through natural language prompts. You can provide guidance in the `input` or `instructions` parameters.
+
+### Single Speaker Style Control
+
+```json
+{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Say in a spooky whisper: By the pricking of my thumbs... Something wicked this way comes",
+  "voice": "Enceladus",
+  "response_format": "wav"
+}
+```
+
+### Multi-Speaker Style Control
+
+```json
+{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Speaker1: So... what's on the agenda today?\nSpeaker2: You're never going to guess!",
+  "voice": "Kore",
+  "response_format": "wav",
+  "instructions": "Make Speaker1 sound tired and bored, and Speaker2 sound excited and happy"
+}
+```
+
+### Prompt Structure Recommendations
+
+For best results, you can use the following structured prompt format:
+
+```json
+{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Your transcript here",
+  "voice": "Kore",
+  "instructions": "# AUDIO PROFILE: Character Name\n## Role Description\n\n## THE SCENE: Scene Name\nDescribe the environment and mood\n\n### DIRECTOR'S NOTES\nStyle: Describe the style\nPacing: Describe the pacing\nAccent: Specify the accent"
+}
+```
+
+## Supported Languages
+
+The TTS models automatically detect the input language. The following 24 languages are supported:
+
+| Language               | BCP-47 Code   | Language             | BCP-47 Code |
+| :--------------------- | :------------ | :------------------- | :---------- |
+| Arabic (Egypt)         | ar-EG         | German (Germany)     | de-DE       |
+| English (US)           | en-US         | Spanish (US)         | es-US       |
+| French (France)        | fr-FR         | Hindi (India)        | hi-IN       |
+| Indonesian (Indonesia) | id-ID         | Italian (Italy)      | it-IT       |
+| Japanese (Japan)       | ja-JP         | Korean (South Korea) | ko-KR       |
+| Portuguese (Brazil)    | pt-BR         | Russian (Russia)     | ru-RU       |
+| Dutch (Netherlands)    | nl-NL         | Polish (Poland)      | pl-PL       |
+| Thai (Thailand)        | th-TH         | Turkish (Turkey)     | tr-TR       |
+| Vietnamese (Vietnam)   | vi-VN         | Romanian (Romania)   | ro-RO       |
+| Ukrainian (Ukraine)    | uk-UA         | Bengali (Bangladesh) | bn-BD       |
+| English (India)        | en-IN & hi-IN | Marathi (India)      | mr-IN       |
+| Tamil (India)          | ta-IN         | Telugu (India)       | te-IN       |
+
+## Response Formats
+
+### Audio Formats
+
+| Format | Content-Type | Description                         | Model Support |
+| :----- | :----------- | :---------------------------------- | :------------ |
+| mp3    | audio/mpeg   | Default format, widely compatible   | OpenAI Models |
+| opus   | audio/opus   | Suitable for internet streaming     | OpenAI Models |
+| aac    | audio/aac    | Digital audio compression           | OpenAI Models |
+| flac   | audio/flac   | Lossless audio compression          | OpenAI Models |
+| wav    | audio/wav    | Uncompressed WAV audio              | All Models    |
+| pcm    | audio/pcm    | Raw PCM audio (24kHz, mono, 16-bit) | All Models    |
+
+**Note:** The Gemini model natively returns PCM format (24kHz, mono, 16-bit), and the system will automatically convert it to WAV format. For other formats, it's recommended to use OpenAI models.
+
+### Response Body
+
+On success, an audio stream (binary data) is returned, and Content-Type is set according to the `response_format` parameter.
+
+On failure, a JSON error message is returned:
+
+```json
+{
+  "error": {
+    "message": "Error description",
+    "type": "error_type",
+    "code": "error_code"
+  }
+}
+```
+
+## Billing Information
+
+The TTS API is billed based on the number of characters:
+
+- The character count of the input text is the billing unit
+- Different models have different price multipliers
+- Maximum input length: 4096 characters
+
+## Limitations
+
+- Maximum input length: 4096 characters
+- Gemini TTS models only support `wav` and `pcm` output formats
+- Gemini TTS models do not support the `speed` parameter (controlled through prompts)
+- Context window limit: 32k tokens (Gemini models)
+
+## Frequently Asked Questions
+
+### Q: How do I choose the right model?
+
+- Need quick generation → `tts-1` or `gemini-2.5-flash-preview-tts`
+- Need high-quality audio → `tts-1-hd`
+- Need intelligent voice control → `gpt-4o-mini-tts` or Gemini TTS models
+- Need multi-speaker dialogues → Gemini TTS models
+
+### Q: What are the differences between Gemini TTS and OpenAI TTS?
+
+- **Gemini TTS**: Supports controlling voice style through natural language prompts, supports multiple speakers, but only WAV/PCM formats
+- **OpenAI TTS**: Supports multiple audio formats, has fixed voice options, and speed can be controlled via parameters
+
+### Q: How do I implement multi-speaker dialogues?
+
+Use the Gemini TTS model, format the `input` as a dialogue, and specify the style for each speaker in the `instructions`:
+
+```json
+{
+  "model": "gemini-2.5-flash-preview-tts",
+  "input": "Speaker1: Hello!\nSpeaker2: Hi there!",
+  "instructions": "Speaker1 should sound professional, Speaker2 should sound casual"
+}
+```
+
+### Q: Is streaming output supported?
+
+Currently, the TTS API returns complete audio files and does not support streaming output.
