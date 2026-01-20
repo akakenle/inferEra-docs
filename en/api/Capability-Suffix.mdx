@@ -1,13 +1,12 @@
 ---
 title: "Model Suffix Capability Overview"
 icon: "badge-percent"
+description: "To reduce the cost of multi-model capability usage and interface adaptation, the platform provides advanced capabilities of certain models through a suffix configuration, allowing users to access them directly under a unified OpenAI / Chat interface."
 ---
 
-## Claude Reasoning Models
+## Claude Thinking Model
 
-Claude models do **not** enable reasoning mode by default. To access their deep reasoning capabilities, users typically need to invoke the Claude native API.
-
-To make this capability available directly through an **OpenAI-compatible API**, we provide Claude models with the `-think` suffix. These models have reasoning mode **pre-enabled**, allowing users to leverage advanced reasoning without changing the invocation pattern.
+The Claude model does not enable thinking mode by default. To utilize its deep reasoning capabilities, it typically requires calling through the native Claude interface. To facilitate users in accessing this capability directly under the OpenAI compatible interface, we now offer the claude `-think` model, which has thinking mode pre-activated.
 
 ### Supported Models
 
@@ -16,17 +15,17 @@ To make this capability available directly through an **OpenAI-compatible API**,
 
 ### Notes
 
-1. Reasoning capability is explicitly selected via the **model name**
-2. Claude reasoning models use the platform’s default context window and token limits:
-   - Sonnet series: `max_tokens = 32k` by default
-   - Opus series: `max_tokens = 64k` by default
-3. No additional parameters are required; invocation is identical to standard models
+1. The thinking capability is explicitly selected through the model name.
+2. The Claude thinking model uses the platform's default context and token configuration.
+   - Sonnet series default `max_tokens = 32k`
+   - Opus series default `max_tokens = 64k`
+3. No additional parameters are needed; the calling method is the same as for regular models.
 
 ---
 
-## GPT Reasoning Models
+## GPT Thinking Model
 
-GPT-5.2 supports configurable reasoning effort only through the `/responses` endpoint. The GPT-5.2- series* provides preconfigured variants for the `/Chat` endpoint, allowing different levels of reasoning capability to be used directly.
+The reasoning intensity of GPT-5.2 can only be configured through the `/responses` interface. To maintain compatibility with the unified OpenAI `/Chat` interface, the platform provides the `GPT-5.2-*` series of pre-configured models that fix different levels of reasoning intensity at the model layer, allowing users to call them directly.
 
 ### Supported Models
 
@@ -34,15 +33,14 @@ GPT-5.2 supports configurable reasoning effort only through the `/responses` end
 
 ### Notes
 
-1. The `-high` suffix indicates **high-intensity reasoning**, suitable for complex tasks and scenarios requiring high accuracy
-2. Reasoning intensity is determined solely by the model name; no additional fields are required in the request
+1. `-high` indicates high-intensity reasoning, suitable for complex problems and high accuracy requirements.
+2. The reasoning intensity is determined by the model name, with no additional fields required.
 
 ---
 
-## Google Search–Augmented Models
+## Google Search Enhanced Model
 
-Some Gemini models integrate **official Google Search capabilities**.  
-By selecting a model with the appropriate suffix, search is automatically enabled during generation, with no additional parameters required.
+The Gemini model does not enable Google Search by default. To activate it, the native Gemini interface must be used. To facilitate users in accessing this capability directly under the OpenAI compatible interface, some Gemini models have integrated Google official search capability. By selecting the corresponding model name, search will be automatically enabled during generation, with no additional parameters needed.
 
 ### Supported Models
 
@@ -51,12 +49,9 @@ By selecting a model with the appropriate suffix, search is automatically enable
 
 ### Notes
 
-1. Models with the `-search` suffix include built-in official Google Search capabilities and are suitable for:
-   - Real-time information retrieval
-   - External fact verification
-   - Referencing the latest data
-2. Search usage incurs **additional costs**, which are billed separately and recorded in independent usage logs
-   - Detailed search cost breakdowns are not yet available in the current version and will be added in a future update
-3. Only **OpenAI-compatible API formats** are supported:
-   - Gemini native SDK is **not supported**
-   - If using the official Gemini SDK, please refer to the non-reasoning model examples for the corresponding version
+1. Models with the `-search` suffix have integrated Google official search capability, suitable for scenarios requiring real-time information, external fact-checking, and the latest data reference.
+2. The search capability incurs additional costs, which will be logged separately in the total expenses.
+   - The current version does not display detailed logs of search costs; this will be added in future updates.
+3. Only **OpenAI compatible format** calls are supported.
+   - Native Gemini SDK is not supported.
+   - If using the Gemini official SDK, please refer to the corresponding version's non-thinking model interface call examples.
