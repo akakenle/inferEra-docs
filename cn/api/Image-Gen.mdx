@@ -54,7 +54,7 @@ icon: "palette"
 
 ### 请求地址
 
-```curl
+```shellscript
 
 POST https://aihubmix.com/v1/models/<model_path>/predictions
 ```
@@ -65,7 +65,7 @@ POST https://aihubmix.com/v1/models/<model_path>/predictions
 
 ### 请求头
 
-```curl
+```shellscript
 Authorization: Bearer $AIHUBMIX_API_KEY
 Content-Type: application/json
 ```
@@ -180,12 +180,11 @@ curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predicti
 
 </CodeGroup>
 
-
 ### Qwen
 
 <CodeGroup>
 
-```bash Qwen-Image
+```shellscript Qwen-Image
 curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -201,7 +200,7 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
 ```
 
 
-```bash Qwen-Image-Edit
+```shellscript Qwen-Image-Edit
 curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -224,7 +223,7 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
 <CodeGroup>
 
 ```shellscript 文生图
-curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0/predictions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
