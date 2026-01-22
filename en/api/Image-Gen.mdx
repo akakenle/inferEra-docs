@@ -1,132 +1,23 @@
 ---
 title: "Image Generation API"
-description: "Unified API for multiple image generation models"
+description: "To facilitate developers in calling different image generation models, AIHubMix provides a unified image generation API."
 icon: "palette"
 ---
 
-## API Overview
+## Available Model List
 
-To simplify the integration of different image generation models, Aihubmix provides a unified image API that supports the following mainstream models:
+<Tip>
+  Gemini series is not supported. For Gemini series, please refer to: https://docs.aihubmix.com/en/api/Gemini-Guides
+</Tip>
 
-- [OpenAI Series](#openai)
-- [Google Imagen Series](#google-imagen)
-- [Flux Series](#flux)
-- [Qwen Series](#qwen)
-- [doubao-seedream-4-0-250828](#doubao-seedream-4-0-250828)
-- [Ideogram V3](#ideogram-v3)
-- [Stability SD 3.5 Large](#stability)
-- [Baidu Series](#baidu)
+### OpenAI Models
 
-**API Specification:**
+- [gpt-image-1.5](https://aihubmix.com/model/gpt-image-1.5) - OpenAI's latest image generation model, featuring improved instruction adherence and prompt execution capabilities.
+- [gpt-image-1](https://aihubmix.com/model/gpt-image-1) - A multimodal language model that accepts text and image inputs, generating image outputs.
+- [gpt-image-1-mini](https://aihubmix.com/model/gpt-image-1-mini) - An economical version of gpt-image-1.
+- [dall-e-3](https://aihubmix.com/model/dall-e-3) - Capable of creating realistic images and artworks based on natural language descriptions, supporting the creation of new images in specified dimensions based on prompts.
 
-```shell Curl
-curl https://aihubmix.com/v1/models/<model_path>/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "your prompt"
-  }
-}'
-```
-
-**Where:**
-
-- `https://aihubmix.com/v1/models/` is the fixed prefix
-- `<model_path>` is the model path, available models:
-  - openai/gpt-image-1.5
-  - openai/gpt-image-1
-  - openai/gpt-image-1-mini
-  - openai/dall-e-3
-  - imagen-4.0-ultra-generate-001
-  - imagen-4.0-generate-001
-  - imagen-4.0-fast-generate-001
-  - imagen-4.0-fast-generate-preview-06-06
-  - imagen-3.0-generate-002
-  - flux-kontext-max
-  - flux-kontext-pro
-  - FLUX.1-Kontext-pro
-  - FLUX-1.1-pro
-  - Qwen-Image
-  - Qwen-Image-Edit
-  - doubao-seedream-4-0-250828
-  - ideogram/V3
-  - stability/Stable-Diffusion-3-5-Large
-  - irag-1.0
-  - ernie-irag-edit
-- `sk-***` is your API Key generated in Aihubmix
-
----
-
-Below are the calling methods for each model.
-
-## OpenAI
-
-### Supported Models:
-
-- gpt-image-1.5
-- gpt-image-1
-- dall-e-3
-
-<Note>
-  The 2 reverse-engineered models `gpt-4o-image-vip` and `gpt-4o-image` are not supported
-</Note>
-
-### Usage:
-
-<CodeGroup>
-
-```shell gpt-image-1.5
-curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "size": "1024x1024", 
-    "n": 1,
-    "quality": "high",
-    "moderation": "low",
-    "background": "auto"
-  }
-}'
-```
-
-```bash gpt-image-1
-curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "size": "1024x1024", 
-    "n": 1,
-    "quality": "high",
-    "moderation": "low",
-    "background": "auto"
-  }
-}'
-```
-
-
-```shell Curl dall-e-3
-curl https://aihubmix.com/v1/models/openai/dall-e-3/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "size": "1024x1024", 
-    "n": 1
-  }
-}'
-```
-
-</CodeGroup>
-
-## Google Imagen
-
-### Supported Models:
+### Imagen Models
 
 - imagen-4.0-ultra-generate-001
 - imagen-4.0-generate-001
@@ -134,11 +25,143 @@ curl https://aihubmix.com/v1/models/openai/dall-e-3/predictions \
 - imagen-4.0-fast-generate-preview-06-06
 - imagen-3.0-generate-002
 
-<Note>
-  Gemini series models are not supported
-</Note>
+### Qwen Models
 
-### Usage:
+- [qwen-image](https://aihubmix.com/model/qwen-image) - A foundational image generation model in the Qwen series that has made significant progress in complex text rendering and precise image editing.
+- [qwen-image-edit](https://aihubmix.com/model/qwen-image-edit) - Qwen image editing model.
+
+### Doubao Models
+
+- [doubao-seedream-4-5](https://aihubmix.com/model/doubao-seedream-4-5) - ByteDance's latest multimodal image model, integrating capabilities for text-to-image, image-to-image, and composite image outputs.
+- [doubao-seedream-4-0](https://aihubmix.com/model/doubao-seedream-4-0) - ByteDance's SOTA multimodal image creation model, supporting diverse functionalities such as multi-image fusion creation, image editing, and composite image generation.
+
+### Flux Models
+
+- [flux-2-flex](https://aihubmix.com/model/flux-2-flex) - Designed for real-world creative production workflows, generating high-quality images while maintaining character and style consistency among multiple references.
+- [flux-2-pro](https://aihubmix.com/model/flux-2-flex) - An image generation and editing model developed by Black Forest Labs, supporting complex text reading and writing.
+- [FLUX.1-Kontext-pro](FLUX.1-Kontext-pro) - A multimodal flow matching model developed by Black Forest Labs, supporting both text-to-image generation and image editing in context.
+
+### iRAG Models
+
+- [irag-1.0](https://aihubmix.com/model/irag-1.0) - Baidu's self-developed image generation model capable of producing ultra-realistic images.
+- [ernie-irag-edit](https://aihubmix.com/model/ernie-irag-edit) - Baidu's self-developed image editing model, supporting operations like erase, repaint, and variation based on images.
+
+### Ideogram Models
+
+- [V3](https://aihubmix.com/model/V3) - Ideogram AI's image generation model, capable of quickly generating images.
+
+## API Interface
+
+### Request URL
+
+```shellscript
+POST https://aihubmix.com/v1/models/<model_path>/predictions
+```
+
+<Tip>
+  \<model_path\> is \<provider/model_id\>, for example, \<openai/gpt-image-1.5\>, \<qianfan/qwen-image\>.
+</Tip>
+
+### Request Headers
+
+```shellscript
+Authorization: Bearer $AIHUBMIX_API_KEY
+Content-Type: application/json
+```
+
+### Request Parameters
+
+#### General Parameters
+
+| Parameter | Type    | Required | Description                                                                                                                                                                                          |
+| --------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| prompt    | string  | Yes      | Prompt words                                                                                                                                                                                         |
+| size      | string  | No       | Image size, supports `1K` (not supported in Doubao-4-5 series), `2K`, `4K`, `auto` (default). Qwen series supports: `512*1024`, `768*512`, `768*1024`, `1024*576`, `576*1024`, `1024*1024` (default) |
+| image     | string  | No       | Reference image path                                                                                                                                                                                 |
+| n         | integer | No       | Number of images to generate, supports 1-10, default is 1                                                                                                                                            |
+| quality   | string  | No       | Rendering quality, supports `low`, `medium`, and `high`; higher quality takes longer time                                                                                                            |
+
+#### OpenAI Model Parameters
+
+| Parameter      | Type   | Required | Description                                                                                                                                   |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| input_fidelity | string | No       | Fidelity, supports `high` and `low` (default)                                                                                                 |
+| moderation     | string | No       | Content moderation strictness, supports `auto` (default, standard filtering) and `low` (less filtering), not supported in image-to-image mode |
+| output_format  | string | No       | Output image format, supports `png`, `jpeg`                                                                                                   |
+
+#### Flux Model Parameters
+
+| Parameter        | Type    | Required | Description                                                                                 |
+| ---------------- | ------- | -------- | ------------------------------------------------------------------------------------------- |
+| safety_tolerance | integer | No       | Audit leniency, higher values indicate more leniency. Range `0<=x<=5`, default value is `2` |
+| aspect_ratio     | string  | No       | Desired aspect ratio for the image, supports `16:9` (default), `1:1`, `4:3`                 |
+| seed             | integer | No       | Random number seed                                                                          |
+| raw              | boolean | No       | Whether to enable raw mode for a more natural visual effect, default `false`                |
+
+#### Qwen Model Parameters
+
+| Parameter | Type    | Required | Description                                                                              |
+| --------- | ------- | -------- | ---------------------------------------------------------------------------------------- |
+| watermark | boolean | No       | Whether to add a watermark to the generated image, supports `true` (default) and `false` |
+| seed      | integer | No       | Random number seed, range `[0,2147483647]`                                               |
+
+#### Doubao Model Parameters
+
+| Parameter                           | Type    | Required | Description                                                                                                                                                     |
+| ----------------------------------- | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| sequential_image_generation         | string  | No       | Control whether to disable composite image functionality                                                                                                        |
+| sequential_image_generation_options | object  | No       | Composite image configuration, effective only when `sequential_image_generation` is `auto`. Currently supports `max_images`, range [1, 15], default value is 15 |
+| watermark                           | boolean | No       | Whether to add a watermark to the generated image, supports `true` (default) and `false`                                                                        |
+| seed                                | integer | No       | Random number seed, range [-1, 2147483647], default value is -1                                                                                                 |
+| response_format                     | string  | No       | Return format for the generated image, supports `url` (link valid for 24 hours after image generation, please download promptly) or `base64_json`               |
+
+<Tip>
+  The actual number of images that can be generated is influenced not only by `max_images` but also by the number of reference images provided. The number of input reference images + the final number of generated images ≤ 15.
+</Tip>
+
+## Usage Examples
+
+### OpenAI
+
+<CodeGroup>
+
+```shellscript Text-to-Image
+curl https://aihubmix.com/v1/models/openai/gpt-image-1.5/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "size": "1024x1024", 
+    "n": 1,
+    "quality": "high",
+    "moderation": "low",
+    "background": "auto"
+  }
+}'
+```
+
+
+```shellscript Image-to-Image
+curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "Keep the model's pose and the flowing shape of the liquid clothing unchanged. Change the clothing material from silver metal to completely transparent clear water (or glass). Through the liquid flow, the model's skin details can be seen. The light and shadow change from reflection to refraction.",
+    "image": "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imageToimage.png",
+    "size": "1024x1024", 
+    "n": 1,
+    "quality": "high",
+    "moderation": "low",
+    "background": "auto"
+  }
+}'
+```
+
+</CodeGroup>
+
+### Google Imagen
 
 <CodeGroup>
 
@@ -156,50 +179,148 @@ curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predicti
 
 </CodeGroup>
 
-## Flux
-
-### Supported Models:
-
-- flux-kontext-max
-- flux-kontext-pro
-- FLUX.1-Kontext-pro
-- FLUX-1.1-pro
-
-<Note>
-  - `flux-kontext-max` and `flux-kontext-pro` use asynchronous endpoints and require a **2-step request process**.
-  - `FLUX.1-Kontext-pro` and `FLUX-1.1-pro` use unified endpoints that supports one-step generation.
-  - Lightning fast responses—almost instant.
-  - `flux-kontext-max` supports both text-to-image and image-to-image generation; `flux-Kontext-pro` only supports text-to-image.
-  - The supported `aspect_ratio` range is from `21:9` to `9:21`.
-  - The `safety_tolerance` parameter ranges from `0` (strictest) to `6` (most lenient). For image-to-image tasks, the max allowed is `2`.
-  - Reference images can be provided via URL or Base64—URL is recommended.
-  - For more details, see: [FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
-</Note>
-
-### Usage:
-
-**FLUX One-step generation：** for `FLUX.1-Kontext-pro` and `FLUX-1.1-pro`
+### Qwen
 
 <CodeGroup>
 
-```shell Curl extract base64 data as image
-curl 'https://aihubmix.com/v1/images/generations' \
-  -H 'accept: */*' \
-  -H 'accept-language: zh-CN' \
-  -H 'authorization: Bearer sk-***' \
-  -H 'content-type: application/json' \
-  --data-raw '{"prompt":"a cat in the garden, cute cartoon","model":"FLUX.1-Kontext-pro","safety_tolerance":6}' \
-| jq -r '.data[0].b64_json' \
-| base64 -D > "$HOME/Desktop/image_extract.png"
+```shellscript Qwen-Image
+curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+      "prompt": "A beautiful sunset over a calm ocean",
+      "refer_image": "",
+      "n": 1,
+      "size": "1024x1024",
+      "watermark": false
+    }
+  }'
+```
+
+
+```shellscript Qwen-Image-Edit
+curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "Put this bear sitting under the moon (represented by a light gray crescent outline on a white background), holding a guitar, with small stars and speech bubbles like 'Be Kind' floating around.",
+    "image": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/4766809571/p999719.png",
+    "n": 1,
+    "size": "1024x1024",
+    "watermark": false,
+    "seed": 0
+  }
+}'
 ```
 
 </CodeGroup>
 
-**flux-Step 1: Submit an Image Generation Request**
+### Doubao
 
 <CodeGroup>
 
-```shell Curl flux-kontext-max Text-to-Image
+```shellscript Text-to-Image
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+      "prompt": "Interstellar, black hole, a vintage train bursting out of a black hole, vying for visual impact, cinematic blockbuster, apocalyptic feel, dynamic, contrasting colors, oc rendering, ray tracing, motion blur, depth of field, surrealism, deep blue, the scene is shaped by delicate rich color layers creating the subject and scene, realistic texture, the lighting effects of a dark background create an atmosphere, combining artistic fantasy, exaggerated wide-angle perspective, glare, reflection, extreme light and shadow, strong gravity, devouring",
+      "size": "2K",
+      "sequential_image_generation": "disabled",
+      "stream": false,
+      "response_format": "url",
+      "watermark": true
+    }
+  }'
+```
+
+
+```shellscript Image-to-Image
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "Keep the model's pose and the flowing shape of the liquid clothing unchanged. Change the clothing material from silver metal to completely transparent clear water (or glass). Through the liquid flow, the model's skin details can be seen. The light and shadow change from reflection to refraction.",
+        "image": "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imageToimage.png",
+        "size": "2K",
+        "watermark": false
+    }
+  }'
+```
+
+
+```shellscript Multi-Image Fusion
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "Change the clothing in image 1 to the clothing in image 2",
+        "image": ["https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimage_1.png", "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imagesToimage_2.png"],
+        "sequential_image_generation": "disabled",
+        "size": "2K",
+        "watermark": false
+    }
+  }'
+```
+
+
+```shellscript Multiple Reference Image Generation
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "Generate 3 images of a girl and a cow toy happily riding a roller coaster in an amusement park, covering morning, noon, and evening",
+        "image": ["https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_1.png", "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_2.png"],
+        "sequential_image_generation": "auto",
+        "sequential_image_generation_options": {
+            "max_images": 3
+        },
+        "size": "2K",
+        "watermark": false
+    }
+  }'
+```
+
+</CodeGroup>
+
+### Flux
+
+<Note>
+  - `flux-2-flex` and `flux-2-pro` are asynchronous endpoints, requiring a two-step request. This series is extremely fast, almost instantaneous.
+  - `FLUX.1-Kontext-pro` uses a general interface, providing a one-step process.
+</Note>
+
+#### **FLUX One-Step Drawing**
+
+```shellscript
+curl https://aihubmix.com/v1/images/generations \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "model": "FLUX.1-Kontext-pro",
+  "prompt": "a cat in the garden, cute cartoon",
+  "safety_tolerance": 6
+}' \
+| jq -r '.data[0].b64_json' \
+| base64 -D > "$HOME/Desktop/image_extract.png"
+```
+
+#### **Flux Asynchronous Drawing**
+
+**Step 1: Send Drawing Request**
+
+<CodeGroup>
+
+```shell Text-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -213,7 +334,7 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 ```
 
 
-```shell Curl flux-kontext-max Imgae-to-Image
+```shell Image-to-Image
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -227,127 +348,35 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-
-```shell Curl flux-kontext-pro Text-to-Image
-curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. ghibli anime",
-    "width": 768,
-    "height": 1280,
-    "safety_tolerance": 6
-  }
-}'
-```
-
 </CodeGroup>
 
-Sample Output:
+Output result example:
 
 ```shell
-{"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
+{
+  "output": [
+    {
+      "taskId": "api.us1.***",
+      "polling_url": "https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76"
+    }
+  ]
+}
 ```
 
-**flux-Step 2: Retrieve the Generated Image Link**
-
-Replace the string after `tasks/` with the taskId from Step 1:
+**Step 2: Get Generated Image Link**
 
 ```shell Get Image
-curl https://api.aihubmix.com/v1/tasks/api.us1.bfl.*** \
+curl https://api.aihubmix.com/v1/tasks/<taskId> \
     -H "Authorization: Bearer sk-***" \
     -X GET
 ```
 
-## Qwen
-
-### Supported Models：
-
-- Qwen-Image
-- Qwen-Image-Edit
-
-### Usage：
-
-<CodeGroup>
-
-```bash Qwen-Image
-curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-  -d '{
-    "input": {
-      "prompt": "A beautiful sunset over a calm ocean",
-      "refer_image": "",
-      "n": 1,
-      "size": "1024x1024",
-      "guidance": 7.5,
-      "watermark": false
-    }
-  }'
-```
-
-
-```bash Qwen-Image-Edit
-curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "Add a flying pig.",
-    "image": "http://***"
-  }
-}'
-```
-
-</CodeGroup>
-
-## doubao-seedream-4-0-250828
-
-### Supported Models：
-
-- doubao-seedream-4-0-250828
-
-### Usage：
-
-<CodeGroup>
-
-```bash Curl
-curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0-250828/predictions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
-  -d '{
-    "input": {
-      "prompt": "Interstellar, black hole, a vintage train bursting out of the black hole, grabbing visual impact, blockbuster movie, apocalyptic vibe, dynamic, contrasting colors, OC rendering, ray tracing, motion blur, depth of field, surrealism, deep blue, the image shapes the subject and scene through delicate and rich color layers with realistic texture, dark-themed lighting effects creating atmosphere, overall combining artistic fantasy, exaggerated wide-angle perspective, glare, reflections, ultimate lighting and shadows, strong gravity, engulfing.",
-      "size": "2K",
-      "sequential_image_generation": "disabled",
-      "stream": false,
-      "response_format": "url",
-      "watermark": true
-    }
-  }'
-```
-
-</CodeGroup>
-
-Sample Output:
-
-```shell
-{"output":[{"url":"https://ark-content-generation-v2-cn-beijing.tos-cn-beijing.volces.com/doubao-seedream-4-0/021758***"}]}     
-```
-
-## Ideogram V3
-
-### Supported Models:
-
-- V3
+### Ideogram V3
 
 <Note>
-  1. Versions below V3 (V_2, V_1, etc.) use the legacy API and are currently not supported
-  2. The returned links require a proxy network to access
+  1. Versions below V3 (V_2, V_1, etc.) are old interfaces and are not supported.
+  2. The returned links require a proxy network to access.
 </Note>
-
-### Usage:
 
 <CodeGroup>
 
@@ -366,38 +395,7 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
 
 </CodeGroup>
 
-## Stability
-
-### Supported Models:
-
-- Stable-Diffusion-3-5-Large
-
-### Usage:
-
-<CodeGroup>
-
-```shell Curl
-curl https://aihubmix.com/v1/models/stability/Stable-Diffusion-3-5-Large/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "n": 1
-  }
-}'
-```
-
-</CodeGroup>
-
-## Baidu
-
-### Supported Models：
-
-- ERNIE iRAG
-- ERNIE iRAG Edit
-
-### Usage：
+### Baidu Series
 
 <CodeGroup>
 
@@ -424,7 +422,7 @@ curl https://aihubmix.com/v1/models/qianfan/ernie-irag-edit/predictions \
     -H "Authorization: Bearer sk-***" \
     -d '{
   "input": {
-    "prompt": "Add a flying pig.",
+    "prompt": "Add a flying pig",
     "image": "http://***"
   }
 }'
