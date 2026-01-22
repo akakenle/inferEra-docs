@@ -25,12 +25,6 @@ icon: "palette"
 - imagen-4.0-fast-generate-preview-06-06
 - imagen-3.0-generate-002
 
-### Flux 模型
-
-- [flux-2-flex ](https://aihubmix.com/model/flux-2-flex)—— 专为真实世界的创意生产工作流打造，在生成高质量图像的同时，能够保持多参考图之间的角色与风格一致性。
-- [flux-2-pro ](https://aihubmix.com/model/flux-2-flex)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
-- [FLUX.1-Kontext-pro](FLUX.1-Kontext-pro) ——  黑森林实验室研发的多模态流匹配模型，既支持文本到图像的生成，又支持在上下文中进行图像编辑。
-
 ### Qwen 模型
 
 - [qwen-image](https://aihubmix.com/model/qwen-image) —— Qwen 系列中的一个图像生成基础模型，在复杂文本渲染和精确图像编辑方面取得了显著进展。
@@ -40,6 +34,12 @@ icon: "palette"
 
 - [doubao-seedream-4-5](https://aihubmix.com/model/doubao-seedream-4-5) —— 字节跳动最新推出的图像多模态模型，整合了文生图、图生图、组图输出等能力。
 - [doubao-seedream-4-0](https://aihubmix.com/model/doubao-seedream-4-0) —— 字节跳动SOTA级多模态图像创作模型，支持多图融合创作、图像编辑、组图生成等多样玩法。
+
+### Flux 模型
+
+- [flux-2-flex ](https://aihubmix.com/model/flux-2-flex)—— 专为真实世界的创意生产工作流打造，在生成高质量图像的同时，能够保持多参考图之间的角色与风格一致性。
+- [flux-2-pro ](https://aihubmix.com/model/flux-2-flex)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
+- [FLUX.1-Kontext-pro](FLUX.1-Kontext-pro) ——  黑森林实验室研发的多模态流匹配模型，既支持文本到图像的生成，又支持在上下文中进行图像编辑。
 
 ### iRAG 模型
 
@@ -180,99 +180,6 @@ curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predicti
 
 </CodeGroup>
 
-### Flux
-
-<Note>
-  - `flux-2-flex` 和 `flux-2-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
-  - `FLUX.1-Kontext-pro` 使用通用接口，一步到位
-</Note>
-
-#### **FLUX 一步绘图**
-
-```shellscript
-curl https://aihubmix.com/v1/images/generations \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "model": "FLUX.1-Kontext-pro",
-  "prompt": "a cat in the garden, cute cartoon",
-  "safety_tolerance": 6
-}' \
-| jq -r '.data[0].b64_json' \
-| base64 -D > "$HOME/Desktop/image_extract.png"
-```
-
-#### **Flux 异步绘图**
-
-**第一步：发出绘图请求**
-
-<CodeGroup>
-
-```shell Curl flux-kontext-max 文生图
-curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
-    "aspect_ratio": "2:3",
-    "safety_tolerance": 6
-  }
-}'
-```
-
-
-```shell Curl flux-kontext-max 图生图
-curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
-    "aspect_ratio": "2:3",
-    "safety_tolerance": 2,
-    "input_image": "https://www.resource.nestsound.cn/docs/ghibli.png"
-  }
-}'
-```
-
-
-```shell Curl flux-kontext-pro 文生图
-curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. ghibli anime",
-    "width": 768,
-    "height": 1280,
-    "safety_tolerance": 6
-  }
-}'
-```
-
-</CodeGroup>
-
-输出结果示例：
-
-```shell
-{
-  "output": [
-    {
-      "taskId": "api.us1.***",
-      "polling_url": "https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76"
-    }
-  ]
-}
-```
-
-**第二步：获取生成的图片链接**
-
-```shell 获取图片
-curl https://api.aihubmix.com/v1/tasks/<taskId> \
-    -H "Authorization: Bearer sk-***" \
-    -X GET
-```
 
 ### Qwen
 
@@ -386,6 +293,85 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
 ```
 
 </CodeGroup>
+
+### Flux
+
+<Note>
+  - `flux-2-flex` 和 `flux-2-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
+  - `FLUX.1-Kontext-pro` 使用通用接口，一步到位
+</Note>
+
+#### **FLUX 一步绘图**
+
+```shellscript
+curl https://aihubmix.com/v1/images/generations \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "model": "FLUX.1-Kontext-pro",
+  "prompt": "a cat in the garden, cute cartoon",
+  "safety_tolerance": 6
+}' \
+| jq -r '.data[0].b64_json' \
+| base64 -D > "$HOME/Desktop/image_extract.png"
+```
+
+#### **Flux 异步绘图**
+
+**第一步：发出绘图请求**
+
+<CodeGroup>
+
+```shell 文生图
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 6
+  }
+}'
+```
+
+
+```shell 图生图
+curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace. reference style as the given image:",
+    "aspect_ratio": "2:3",
+    "safety_tolerance": 2,
+    "input_image": "https://www.resource.nestsound.cn/docs/ghibli.png"
+  }
+}'
+```
+
+</CodeGroup>
+
+输出结果示例：
+
+```shell
+{
+  "output": [
+    {
+      "taskId": "api.us1.***",
+      "polling_url": "https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76"
+    }
+  ]
+}
+```
+
+**第二步：获取生成的图片链接**
+
+```shell 获取图片
+curl https://api.aihubmix.com/v1/tasks/<taskId> \
+    -H "Authorization: Bearer sk-***" \
+    -X GET
+```
 
 ### Ideogram V3
 
