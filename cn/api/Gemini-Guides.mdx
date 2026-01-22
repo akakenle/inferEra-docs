@@ -9,7 +9,7 @@ icon: "google"
 对于 Gemini 系列，我们提供原生调用和 Openai 兼容这 2 种调用方式。\
 使用前运行 `pip install google-genai` 或 `pip install -U google-genai`，安装（更新）原生依赖。
 
-1️⃣ 对于原生调用，我们的 Gemini 调用支持 AI Studio 和 VertexAI 自动路由。转发方法主要是在内部传入 AiHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例：
+1️⃣ 对于原生调用，我们的 Gemini 调用支持 AI Studio 和 VertexAI 自动路由。转发方法主要是在内部传入 AIHubMix 密钥和请求链接。需要注意的是，这个链接和常规的 `base_url` 写法不同，请参考示例：
 
 ```py
 client = genai.Client(
