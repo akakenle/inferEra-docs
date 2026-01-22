@@ -1,80 +1,132 @@
 ---
 title: "图片生成接口"
-description: " "
+description: " 为了方便开发者调用不同的图像生成模型，AIHubMix 提供了统一的图片生成接口"
 icon: "palette"
 ---
 
-## 接口说明
+## 可用模型列表
 
-为了方便开发者调用不同的图像生成模型，AIHubMix 提供了统一的图形接口，支持以下多种主流模型：
+<Tip>
+  不支持 Gemini 系列，Gemini系列请参考：https://docs.aihubmix.com/cn/api/Gemini-Guides
+</Tip>
 
-- [OpenAI 系列](#openai)
-- [Google Imagen 系列](#google-imagen)
-- [Flux 系列](#flux)
-- [Qwen 系列](#qwen)
-- [doubao-seedream-4-0-250828](#doubao-seedream-4-0-250828)
-- [Ideogram V3](#ideogram-v3)
-- [百度系列](#百度系列)
+### OpenAI 模型
 
-**接口规格：**
+- [gpt-image-1.5 ](https://aihubmix.com/model/gpt-image-1.5)—— OpenAI 最新的图像生成模型，它具有更好的指令遵循性和对提示的执行能力。
+- [gpt-image-1](https://aihubmix.com/model/gpt-image-1) —— 多模态语言模型，它接受文本和图像输入，并生成图像输出。
+- [gpt-image-1-mini](https://aihubmix.com/model/gpt-image-1-mini) —— gpt-image-1 的经济型版本。
+- [dall-e-3](https://aihubmix.com/model/dall-e-3) —— 能够根据自然语言描述创建逼真的图像和艺术作品,支持根据提示创建指定尺寸的新图像。
 
-```shell Curl
-curl https://aihubmix.com/v1/models/<model_path>/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "your prompt"
-  }
-}'
+### Imagen 模型
+
+- imagen-4.0-ultra-generate-001
+- imagen-4.0-generate-001
+- imagen-4.0-fast-generate-001
+- imagen-4.0-fast-generate-preview-06-06
+- imagen-3.0-generate-002
+
+### Flux 模型
+
+- [flux-2-flex ](https://aihubmix.com/model/flux-2-flex)—— 专为真实世界的创意生产工作流打造，在生成高质量图像的同时，能够保持多参考图之间的角色与风格一致性。
+- [flux-2-pro ](https://aihubmix.com/model/flux-2-flex)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
+- [FLUX.1-Kontext-pro](FLUX.1-Kontext-pro) ——  黑森林实验室研发的多模态流匹配模型，既支持文本到图像的生成，又支持在上下文中进行图像编辑。
+
+### Qwen 模型
+
+- [qwen-image](https://aihubmix.com/model/qwen-image) —— Qwen 系列中的一个图像生成基础模型，在复杂文本渲染和精确图像编辑方面取得了显著进展。
+- [qwen-image-edit](https://aihubmix.com/model/qwen-image-edit) —— Qwen 图像编辑模型。
+
+### Doubao 模型
+
+- [doubao-seedream-4-5](https://aihubmix.com/model/doubao-seedream-4-5) —— 字节跳动最新推出的图像多模态模型，整合了文生图、图生图、组图输出等能力。
+- [doubao-seedream-4-0](https://aihubmix.com/model/doubao-seedream-4-0) —— 字节跳动SOTA级多模态图像创作模型，支持多图融合创作、图像编辑、组图生成等多样玩法。
+
+### iRAG 模型
+
+- [irag-1.0](https://aihubmix.com/model/irag-1.0) —— 百度自研生图模型，能够生成超真实图片。
+- [ernie-irag-edit](https://aihubmix.com/model/ernie-irag-edit) —— 百度自研的图像编辑模型，支持基于图片进行 erase、repaint、variation 等操作。
+
+### Ideogram 模型
+
+- [V3](https://aihubmix.com/model/V3) —— Ideogram AI 生图模型，能够快速生成图片。
+
+## API 接口
+
+### 请求地址
+
+```curl
+
+POST https://aihubmix.com/v1/models/<model_path>/predictions
 ```
 
-**其中：**
+<Tip>
+  \<model_path\> 为\<供应商/模型id\>，如\<openai/gpt-image-1.5\>，\<qianfan/qwen-image\>。
+</Tip>
 
-- `https://aihubmix.com/v1/models/` 为固定前缀
-- `<model_path>` 为模型路径，支持：
-  - openai/gpt-iamge-1.5
-  - openai/gpt-image-1
-  - openai/gpt-image-1-mini
-  - openai/dall-e-3
-  - imagen-4.0-ultra-generate-001
-  - imagen-4.0-generate-001
-  - imagen-4.0-fast-generate-001
-  - imagen-4.0-fast-generate-preview-06-06
-  - imagen-3.0-generate-002
-  - flux-kontext-max
-  - flux-kontext-pro
-  - FLUX.1-Kontext-pro
-  - FLUX-1.1-pro
-  - Qwen-Image
-  - Qwen-Image-Edit
-  - doubao-seedream-4-0-250828
-  - ideogram/V3
-  - irag-1.0
-  - ernie-irag-edit
+### 请求头
 
----
+```curl
+Authorization: Bearer $AIHUBMIX_API_KEY
+Content-Type: application/json
+```
 
-下面是各个模型的调用方法。
+### 请求参数
 
-## OpenAI
+#### 通用参数
 
-### 支持的模型：
+| 参数      | 类型      | 必填 | 说明                                                                                                                                      |
+| ------- | ------- | --- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| prompt  | string  | 是  | 提示词                                                                                                                                     |
+| size    | string  | 否  | 图像尺寸，支持`1K`(Doubao-4-5系列不支持)、`2K`、`4K`、`auto` (默认)。Qwen系列支持参数：`512*1024`、`768*512`、 `768*1024`、 `1024*576`、 `576*1024`、 `1024*1024`（默认） |
+| image   | string  | 否  | 参考图片路径                                                                                                                                  |
+| n       | integer | 否  | 生成图像数量，支持1-10，默认为 1                                                                                                                     |
+| quality | string  | 否  | 渲染质量，支持 `low` 、`medium` 和`high`，质量越高，耗时越长                                                                                               |
 
-- gpt-image-1.5
-- gpt-image-1
-- gpt-image-1-mini
-- dall-e-3
+#### OpenAI 模型参数
 
-<Note>
-  不支持 2 个逆向模型 `gpt-4o-image-vip` 和 `gpt-4o-image`
-</Note>
+| 参数             | 类型     | 必填 | 说明                                                    |
+| -------------- | ------ | --- | ----------------------------------------------------- |
+| input_fidelity | string | 否  | 保真度，支`high`和 `low`（默认）                                |
+| moderation     | string | 否  | 内容审核严格程度，支持 `auto` （默认，标准过滤）和 `low`（过滤限制较少），图生图模式下不支持 |
+| output_format  | string | 否  | 输出图片格式，支持 `png` 、 `jpeg`                              |
 
-### 调用方法：
+#### Flux 模型参数
+
+| 参数               | 类型      | 必填 | 说明                                     |
+| ---------------- | ------- | --- | -------------------------------------- |
+| safety_tolerance | integer | 否  | 审核宽松度，数值越大越宽松。支持范围 `0<=x<=5` ，默认值为 `2` |
+| aspect_ratio     | string  | 否  | 图像所需的宽高比，支持`16:9`（默认）， `1:1` 、`4:3`    |
+| seed             | integer | 否  | 随机数种子                                  |
+| raw              | boolean | 否  | 是否启用原始模式，获得更自然的视觉效果，默认`false`          |
+
+#### Qwen 模型参数
+
+| 参数        | 类型      | 必填 | 说明                                    |
+| --------- | ------- | --- | ------------------------------------- |
+| watermark | boolean | 否  | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |
+| seed      | integer | 否  | 随机数种子，取值范围`[0,2147483647]`            |
+
+#### Doubao 模型参数
+
+| 参数                                  | 类型      | 必填 | 说明                                                                                       | |
+| ----------------------------------- | ------- | --- | ---------------------------------------------------------------------------------------- | --- |
+| sequential_image_generation         | string  | 否  | 控制是否关闭组图功能                                                                               | |
+| sequential_image_generation_options | object  | 否  | 组图功能配置，仅当 `sequential_image_generation` 为 `auto` 时生效。目前支`max_images`，取值范围[1, 15]，默认值为 15 | |
+| watermark                           | boolean | 否  | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false`                                                    | |
+| seed                                | integer | 否  | 随机数种子，取值范围为 [-1, 2147483647]，默认值为 -1                                                     | |
+| response_format                     | string  | 否  | 生成图像的返回格式，支`url`（链接在图片生成后24小时内有效，请及时下载图片）`base64_json`                                   | |
+
+<Tip>
+  实际可生成的图片数量，除受到 `max_images` 影响外，还受到输入的参考图数量影响。输入的参考图数量+最终生成的图片数量 ≤ 15 张。
+</Tip>
+
+## 使用示例
+
+### OpenAI
 
 <CodeGroup>
 
-```bash gpt-image-1.5
+```shellscript 文生图
 curl https://aihubmix.com/v1/models/openai/gpt-image-1.5/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
@@ -91,14 +143,15 @@ curl https://aihubmix.com/v1/models/openai/gpt-image-1.5/predictions \
 ```
 
 
-```bash gpt-image-1
+```shellscript 图生图
 curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer sk-***" \
     -d '{
   "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "size": "1024x1024", 
+    "prompt": "保持模特姿势和液态服装的流动形状不变。将服装材质从银色金属改为完全透明的清水（或玻璃）。透过液态水流，可以看到模特的皮肤细节。光影从反射变为折射。",
+    "image": "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imageToimage.png"
+	"size": "1024x1024", 
     "n": 1,
     "quality": "high",
     "moderation": "low",
@@ -107,37 +160,9 @@ curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
 }'
 ```
 
-
-```bash dall-e-3
-curl https://aihubmix.com/v1/models/openai/dall-e-3/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
-    "size": "1024x1024", 
-    "n": 1
-  }
-}'
-```
-
 </CodeGroup>
 
-## Google Imagen
-
-### 支持的模型：
-
-- imagen-4.0-ultra-generate-001
-- imagen-4.0-generate-001
-- imagen-4.0-fast-generate-001
-- imagen-4.0-fast-generate-preview-06-06
-- imagen-3.0-generate-002
-
-<Note>
-  不支持 gemini 系列
-</Note>
-
-### 调用方法：
+### Google Imagen
 
 <CodeGroup>
 
@@ -155,45 +180,31 @@ curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predicti
 
 </CodeGroup>
 
-## Flux
-
-### 支持的模型：
-
-- flux-kontext-max
-- flux-kontext-pro
-- FLUX.1-Kontext-pro
-- FLUX-1.1-pro
+### Flux
 
 <Note>
-  - `flux-kontext-max` 和 `flux-kontext-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
-  - `FLUX.1-Kontext-pro` 和 `FLUX-1.1-pro` 使用通用接口，一步到位
-  - `flux-Kontext-max` 支持文生图和参考图生图，`flux-kontext-pro` 端口只支持文生图
-  - 画幅比例 `aspect_ratio` 支持的范围是：`21:9` 到 `9:21`
-  - 审核宽松度参数 `safety_tolerance` 范围在 `0` 到 `6` 之间`0` 表示最严格`6` 表示最宽松。使用参考图时限制为 `2`。
-  - 参考图支持 URL 或 Base64 格式，推荐采用前者
-  - 更多细节参考：[FLUX API Reference](https://docs.bfl.ai/api-reference/tasks/edit-or-create-an-image-with-flux-kontext-max)
+  - `flux-2-flex` 和 `flux-2-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
+  - `FLUX.1-Kontext-pro` 使用通用接口，一步到位
 </Note>
 
-### 调用方法：
+#### **FLUX 一步绘图**
 
-**FLUX 一步绘图：** 支持 `FLUX.1-Kontext-pro` 和 `FLUX-1.1-pro`
-
-<CodeGroup>
-
-```shell Curl 直接提取 base64 结果为图片
-curl 'https://aihubmix.com/v1/images/generations' \
-  -H 'accept: */*' \
-  -H 'accept-language: zh-CN' \
-  -H 'authorization: Bearer sk-***' \
-  -H 'content-type: application/json' \
-  --data-raw '{"prompt":"a cat in the garden, cute cartoon","model":"FLUX.1-Kontext-pro","safety_tolerance":6}' \
+```shellscript
+curl https://aihubmix.com/v1/images/generations \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "model": "FLUX.1-Kontext-pro",
+  "prompt": "a cat in the garden, cute cartoon",
+  "safety_tolerance": 6
+}' \
 | jq -r '.data[0].b64_json' \
 | base64 -D > "$HOME/Desktop/image_extract.png"
 ```
 
-</CodeGroup>
+#### **Flux 异步绘图**
 
-**flux 异步类型第一步：发出绘图请求**
+**第一步：发出绘图请求**
 
 <CodeGroup>
 
@@ -245,27 +256,25 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-pro/predictions \
 输出结果示例：
 
 ```shell
-{"output":[{"polling_url":"https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76","taskId":"api.us1.***"}]}%      
+{
+  "output": [
+    {
+      "taskId": "api.us1.***",
+      "polling_url": "https://api.us1.bfl.ai/v1/get_result?id=f9821dbf-f134-41c2-aaa8-5405fb665c76"
+    }
+  ]
+}
 ```
 
-**flux 异步类型第二步：获取生成的图片链接**
-
-`tasks/` 后面的字符串替换成第一步获取的 taskId：
+**第二步：获取生成的图片链接**
 
 ```shell 获取图片
-curl https://api.aihubmix.com/v1/tasks/api.us1.bfl.*** \
+curl https://api.aihubmix.com/v1/tasks/<taskId> \
     -H "Authorization: Bearer sk-***" \
     -X GET
 ```
 
-## Qwen
-
-### 支持的模型：
-
-- Qwen-Image
-- Qwen-Image-Edit
-
-### 调用方法：
+### Qwen
 
 <CodeGroup>
 
@@ -279,7 +288,6 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
       "refer_image": "",
       "n": 1,
       "size": "1024x1024",
-      "guidance": 7.5,
       "watermark": false
     }
   }'
@@ -292,26 +300,24 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
     -H "Authorization: Bearer sk-***" \
     -d '{
   "input": {
-    "prompt": "加一个会飞的猪",
-    "image": "http://***"
+    "prompt": "让这只熊坐在月亮下（用白色背景上的浅灰弯月轮廓表示），抱着吉他，周围漂浮着小星星和诗句气泡，如“Be Kind”。",
+    "image": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/4766809571/p999719.png"，
+    "n": 1,
+    "size": "1024x1024",
+    "watermark": false,
+    "seed":0
   }
 }'
 ```
 
 </CodeGroup>
 
-## doubao-seedream-4-0-250828
-
-### 支持的模型：
-
-- doubao-seedream-4-0-250828
-
-### 调用方法：
+### Doubao
 
 <CodeGroup>
 
-```bash Curl
-curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0-250828/predictions \
+```shellscript 文生图
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-***" \
   -d '{
@@ -326,26 +332,67 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0-250828/prediction
   }'
 ```
 
-</CodeGroup>
 
-输出结果示例：
-
-```shell
-{"output":[{"url":"https://ark-content-generation-v2-cn-beijing.tos-cn-beijing.volces.com/doubao-seedream-4-0/021758***"}]}     
+```shellscript 图生图
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "保持模特姿势和液态服装的流动形状不变。将服装材质从银色金属改为完全透明的清水（或玻璃）。透过液态水流，可以看到模特的皮肤细节。光影从反射变为折射。",
+        "image": "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imageToimage.png",
+        "size": "2K",
+        "watermark": false
+    }
+  }'
 ```
 
-## Ideogram V3
 
-### 支持的模型：
+```shellscript 多图融合
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "将图1的服装换为图2的服装",
+        "image": ["https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimage_1.png", "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_5_imagesToimage_2.png"],
+        "sequential_image_generation": "disabled",
+        "size": "2K",
+        "watermark": false
+    }
+  }'
+```
 
-- V3
+
+```shellscript 多参考图生组图
+curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+        "model": "doubao-seedream-4-5",
+        "prompt": "生成3张女孩和奶牛玩偶在游乐园开心地坐过山车的图片，涵盖早晨、中午、晚上",
+        "image": ["https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_1.png", "https://ark-project.tos-cn-beijing.volces.com/doc_image/seedream4_imagesToimages_2.png"],
+        "sequential_image_generation": "auto",
+        "sequential_image_generation_options": {
+            "max_images": 3
+        },
+        "size": "2K",
+        "watermark": false
+    }
+  }'
+```
+
+</CodeGroup>
+
+### Ideogram V3
 
 <Note>
   1. V3 以下版本（V_2、V_1 等）为旧接口，暂不支持
   2. 返回的链接需要打开代理网络才能获取
 </Note>
-
-### 调用方法：
 
 <CodeGroup>
 
@@ -364,14 +411,7 @@ curl https://aihubmix.com/v1/models/ideogram/V3/predictions \
 
 </CodeGroup>
 
-## 百度系列
-
-### 支持的模型：
-
-- ERNIE iRAG
-- ERNIE iRAG Edit
-
-### 调用方法：
+### 百度系列
 
 <CodeGroup>
 
