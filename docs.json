@@ -31,6 +31,7 @@
                 "group": "API",
                 "pages": [
                   "cn/api/Aihubmix-Integration",
+                  "cn/api/vision",
                   "cn/api/Responses-API",
                   "cn/api/LLM-Search",
                   "cn/api/Image-Gen",
@@ -86,7 +87,7 @@
           },
           {
             "tab": "使用场景",
-            "pages": [ 
+            "pages": [
               "cn/clients/AHM-mcp",
               "cn/clients/Cherry-Studio",
               "cn/clients/Lobe-Chat",
@@ -162,6 +163,7 @@
                 "group": "API",
                 "pages": [
                   "en/api/Aihubmix-Integration",
+                  "en/api/vision",
                   "en/api/Responses-API",
                   "en/api/LLM-Search",
                   "en/api/Image-Gen",
@@ -217,7 +219,7 @@
           },
           {
             "tab": "Use Cases",
-            "pages": [ 
+            "pages": [
               "en/clients/AHM-mcp",
               "en/clients/Cherry-Studio",
               "en/clients/AnythingLLM",
@@ -464,7 +466,7 @@
           },
           {
             "tab": "사용 사례",
-            "pages": [      
+            "pages": [
               "ko/clients/AHM-mcp",
               "ko/clients/Cherry-Studio",
               "ko/clients/Lobe-Chat",

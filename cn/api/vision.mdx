@@ -1,0 +1,174 @@
+---
+title: "图像理解"
+description: "了解如何使用视觉功能来理解图像。"
+---
+
+## 能力概述
+
+视觉理解（Vision）能力支持模型同时理解图像与文本，并基于图像内容进行分析、描述、判断与问答。开发者可以在一次请求中向模型传入一张或多张图片，并配合自然语言指令，完成多模态理解任务。典型能力包括：
+
+- 图像内容描述（物体、场景、行为）
+- 图像问答（针对图片提出问题）
+- 多图对比与综合分析
+- 图像 + 文本的联合推理
+
+## 快速开始
+
+```
+from openai import OpenAI
+
+client = OpenAI(
+  api_key="<AIHUBMIX_API_KEY>",
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.chat.completions.create(
+  model="gpt-4o",
+  messages=[
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What’s in this image?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+ 			"detail": "auto"
+          },
+        },
+      ],
+    }
+  ],
+  max_tokens=300,
+)
+
+print(response.choices[0])
+```
+
+## 支持的输入形式
+
+图像可以通过两种主要方式提供给模型：传递图像的链接或将基础64编码的图像直接包含在请求中。图像可以在 `user`、`system` 和 `assistant` 消息中提供。目前，不支持在第一个 `system` 消息中使用图像
+
+### 图像 URL 输入（推荐）
+
+通过公网可访问的图片 URL 直接传入，适合线上业务场景。
+
+```json
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "https://example.com/demo.jpg"
+  }
+}
+```
+
+<Tip>
+  **注意事项：**
+
+  - URL 必须可被模型访问
+  - 图片格式需为 PNG / JPEG / WEBP / 非 GIF
+  - 单张图片大小不超过 20MB
+</Tip>
+
+### Base64 编码图像输入
+
+适用于本地文件或私有图片场景。
+
+**流程说明：**
+
+1. 本地读取图片文件
+2. 转换为 base64 字符串
+3. 作为 image 内容传入请求
+
+```json
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "data:image/png;base64,<BASE64_DATA>"
+  }
+}
+```
+
+## 消息结构示例
+
+图像通常与文本指令一起发送，用于明确模型的理解目标。
+
+```
+{
+  "role": "user",
+  "content": [
+    { "type": "text", "text": "请描述这张图片的主要内容" },
+    {
+      "type": "image_url",
+      "image_url": {
+        "url": "https://example.com/photo.jpg"
+      }
+    }
+  ]
+}
+```
+
+## 多图像输入
+
+一次请求中可以传入**多张图片**，模型会综合所有图像进行理解。
+
+```
+{
+  "role": "user",
+  "content": [
+    { "type": "text", "text": "比较这两张图片的不同之处" },
+    { "type": "image_url", "image_url": { "url": "https://example.com/a.jpg" } },
+    { "type": "image_url", "image_url": { "url": "https://example.com/b.jpg" } }
+  ]
+}
+```
+
+---
+
+## 图像清晰度控制（detail 参数）
+
+可通过 `detail` 参数控制模型处理图像的精细程度：
+
+| 参数值    | 说明                   |
+| :----- | :------------------- |
+| `low`  | 低分辨率，速度快、Token 消耗低   |
+| `high` | 高分辨率，细节更丰富、Token 消耗高 |
+| `auto` | 自动选择（默认）             |
+
+```
+{
+  "image_url": {
+    "url": "https://example.com/photo.jpg",
+    "detail": "high"
+  }
+}
+```
+
+**建议策略：**
+
+- 内容理解 / 场景判断：`auto` 或 `low`
+- 需要细节观察（文字、局部）：`high`
+
+---
+
+## 计费与 Token 说明
+
+视觉输入会消耗额外 Token，需在成本评估中考虑：
+
+- `low` 模式：每张图像固定消耗 **85 Token**
+- `high` 模式：根据图像尺寸切片，Token 随清晰度提升
+
+**建议：**
+
+- 默认使用 `auto`
+- 在批量或高并发场景下避免不必要的 `high`
+
+## 使用建议
+
+- 始终明确文本指令，不要只发图片
+- 控制图片数量与分辨率，避免不必要成本
+- 对关键业务结果做二次校验
+- 将视觉理解作为辅助能力，而非唯一判断依据

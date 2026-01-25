@@ -1,0 +1,174 @@
+---
+title: "Vision"
+description: "Learn how to use visual capabilities to understand images."
+---
+
+## Capability Overview
+
+The Vision capability supports the model in understanding both images and text simultaneously, allowing for analysis, description, judgment, and question-answering based on image content. Developers can send one or more images to the model in a single request, along with natural language instructions, to complete multimodal understanding tasks. Typical capabilities include:
+
+- Image content description (objects, scenes, actions)
+- Image question answering (asking questions about the image)
+- Comparative analysis and synthesis of multiple images
+- Joint reasoning with images + text
+
+## Quick Start
+
+```
+from openai import OpenAI
+
+client = OpenAI(
+  api_key="<AIHUBMIX_API_KEY>",
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.chat.completions.create(
+  model="gpt-4o",
+  messages=[
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What’s in this image?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+            "detail": "auto"
+          },
+        },
+      ],
+    }
+  ],
+  max_tokens=300,
+)
+
+print(response.choices[0])
+```
+
+## Supported Input Formats
+
+Images can be provided to the model in two main ways: by passing the image link or by directly including a base64-encoded image in the request. Images can be included in `user`, `system`, and `assistant` messages. Currently, images are not supported in the first `system` message.
+
+### Image URL Input (Recommended)
+
+Directly pass an image URL accessible from the public internet, suitable for online business scenarios.
+
+```json
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "https://example.com/demo.jpg"
+  }
+}
+```
+
+<Tip>
+  **Notes:**
+
+  - The URL must be accessible to the model.
+  - The image format should be PNG / JPEG / WEBP / non-GIF.
+  - The size of a single image must not exceed 20MB.
+</Tip>
+
+### Base64 Encoded Image Input
+
+Suitable for local files or private image scenarios.
+
+**Process Description:**
+
+1. Read the image file locally.
+2. Convert it to a base64 string.
+3. Pass it as image content in the request.
+
+```json
+{
+  "type": "image_url",
+  "image_url": {
+    "url": "data:image/png;base64,<BASE64_DATA>"
+  }
+}
+```
+
+## Message Structure Example
+
+Images are typically sent alongside text instructions to clarify the model's understanding objectives.
+
+```
+{
+  "role": "user",
+  "content": [
+    { "type": "text", "text": "Please describe the main content of this image" },
+    {
+      "type": "image_url",
+      "image_url": {
+        "url": "https://example.com/photo.jpg"
+      }
+    }
+  ]
+}
+```
+
+## Multiple Image Input
+
+Multiple images can be submitted in a single request, allowing the model to integrate understanding from all images.
+
+```
+{
+  "role": "user",
+  "content": [
+    { "type": "text", "text": "Compare the differences between these two images" },
+    { "type": "image_url", "image_url": { "url": "https://example.com/a.jpg" } },
+    { "type": "image_url", "image_url": { "url": "https://example.com/b.jpg" } }
+  ]
+}
+```
+
+---
+
+## Image Clarity Control (detail Parameter)
+
+The `detail` parameter can be used to control the level of detail the model applies when processing images:
+
+| Parameter Value | Description                         |
+| :-------------- | :--------------------------------- |
+| `low`           | Low resolution, fast speed, low token consumption  |
+| `high`          | High resolution, richer details, high token consumption |
+| `auto`          | Automatically selects (default)   |
+
+```
+{
+  "image_url": {
+    "url": "https://example.com/photo.jpg",
+    "detail": "high"
+  }
+}
+```
+
+**Recommended Strategy:**
+
+- Content understanding / scene judgment: `auto` or `low`
+- When detail observation is needed (text, specific parts): `high`
+
+---
+
+## Billing and Token Explanation
+
+Visual input will consume additional tokens, which should be considered in cost assessments:
+
+- `low` mode: Each image consumes a fixed **85 tokens**
+- `high` mode: Token consumption increases based on image size and resolution
+
+**Recommendations:**
+
+- Default to using `auto`
+- Avoid unnecessary `high` in bulk or high-concurrency scenarios
+
+## Usage Recommendations
+
+- Always provide clear text instructions; do not send images alone.
+- Control the number and resolution of images to avoid unnecessary costs.
+- Conduct secondary validation for critical business outcomes.
+- Use visual understanding as a supplementary capability, not the sole basis for judgment.
