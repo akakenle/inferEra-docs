@@ -15,7 +15,7 @@ icon: "image"
 
 ## 快速开始
 
-```
+```python
 from openai import OpenAI
 
 client = OpenAI(
@@ -97,7 +97,7 @@ print(response.choices[0])
 
 图像通常与文本指令一起发送，用于明确模型的理解目标。
 
-```
+```json
 {
   "role": "user",
   "content": [
@@ -116,7 +116,7 @@ print(response.choices[0])
 
 一次请求中可以传入**多张图片**，模型会综合所有图像进行理解。
 
-```
+```json
 {
   "role": "user",
   "content": [
@@ -139,7 +139,7 @@ print(response.choices[0])
 | `high` | 高分辨率，细节更丰富、Token 消耗高 |
 | `auto` | 自动选择（默认）             |
 
-```
+```json
 {
   "image_url": {
     "url": "https://example.com/photo.jpg",

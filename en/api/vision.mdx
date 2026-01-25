@@ -15,7 +15,7 @@ The Vision capability supports the model in understanding both images and text s
 
 ## Quick Start
 
-```
+```python
 from openai import OpenAI
 
 client = OpenAI(
@@ -97,7 +97,7 @@ Suitable for local files or private image scenarios.
 
 Images are typically sent alongside text instructions to clarify the model's understanding objectives.
 
-```
+```json
 {
   "role": "user",
   "content": [
@@ -116,7 +116,7 @@ Images are typically sent alongside text instructions to clarify the model's und
 
 Multiple images can be submitted in a single request, allowing the model to integrate understanding from all images.
 
-```
+```json
 {
   "role": "user",
   "content": [
@@ -133,13 +133,13 @@ Multiple images can be submitted in a single request, allowing the model to inte
 
 The `detail` parameter can be used to control the level of detail the model applies when processing images:
 
-| Parameter Value | Description                         |
-| :-------------- | :--------------------------------- |
-| `low`           | Low resolution, fast speed, low token consumption  |
+| Parameter Value | Description                                             |
+| :-------------- | :------------------------------------------------------ |
+| `low`           | Low resolution, fast speed, low token consumption       |
 | `high`          | High resolution, richer details, high token consumption |
-| `auto`          | Automatically selects (default)   |
+| `auto`          | Automatically selects (default)                         |
 
-```
+```json
 {
   "image_url": {
     "url": "https://example.com/photo.jpg",
