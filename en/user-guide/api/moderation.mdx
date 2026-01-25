@@ -1,0 +1,174 @@
+---
+title: "Moderation"
+description: "Provides a content moderation API fully compliant with OpenAI standards, allowing developers to use this interface to automatically identify harmful content (such as hate speech, violence, illicit activities, etc.) in text or images using multimodal moderation models, ensuring application compliance."
+icon:"circle-check"
+---
+
+## API Information
+
+- **Endpoint**: `https://api.aihubmix.com/v1/moderations`
+- **Request Method**: `POST`
+- **Authentication**: `Authorization: Bearer <AIHUBMIX_API_KEY>`
+- **Content-Type**: `application/json`
+- This endpoint supports two models:
+
+  `1. omni-moderation-latest`: This model and all snapshots support more classification options and multimodal input.
+
+  `2. text-moderation-latest`: Supports only text input, with fewer classification options.
+
+## Quick Start
+
+### Usage Example
+
+<CodeGroup>
+
+```python Text Input
+import openai
+
+client = openai.OpenAI(
+  api_key="AIHUBMIX_API_KEY",  
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.moderations.create(
+    model="text-moderation-latest",
+    input="The Yangtze River rolls eastward, its waves washing away heroes. Right and wrong, success and failure, all seem empty; the green hills remain, though the sun sets many times. The white-haired fisherman and woodcutter on the riverbank, accustomed to watching the autumn moon and spring breeze. A pot of turbid wine brings joy in meeting, how many events through time are all laughed off.",
+)
+
+print(response)
+```
+
+
+```python Image and Text Input
+import openai
+
+client = openai.OpenAI(
+  api_key="AIHUBMIX_API_KEY", 
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.moderations.create(
+    model="omni-moderation-latest",
+    input=[
+        {"type": "text", "text": "The image depicts a male, with his arms raised, body tense, head tilted back, mouth open, showing extreme agitation or anger."},
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": "https://thumbs.dreamstime.com/b/violent-man-furious-straining-arms-looking-up-concept-person-35012557.jpg",
+                # can also use base64 encoded image URLs
+                # "url": "data:image/jpeg;base64,abcdefg..."
+            }
+        },
+    ],
+)
+
+print(response)
+```
+
+</CodeGroup>
+
+### Output Example
+
+Here is a complete output example, where the model correctly predicts self-harm and violence elements in the image.
+
+```json
+{
+  "id": "modr-5175",
+  "model": "omni-moderation-latest",
+  "results": [
+    {
+      "flagged": true,
+
+      "categories": {
+        "harassment": false,
+        "harassment_threatening": false,
+        "hate": false,
+        "hate_threatening": false,
+        "illicit": false,
+        "illicit_violent": false,
+
+        "self_harm": true,
+        "self_harm_instructions": false,
+        "self_harm_intent": false,
+
+        "sexual": false,
+        "sexual_minors": false,
+
+        "violence": true,
+        "violence_graphic": true
+      },
+
+      "category_applied_input_types": {
+        "harassment": ["text"],
+        "harassment_threatening": ["text"],
+        "hate": ["text"],
+        "hate_threatening": ["text"],
+        "illicit": ["text"],
+        "illicit_violent": ["text"],
+
+        "self_harm": ["text", "image"],
+        "self_harm_instructions": ["text", "image"],
+        "self_harm_intent": ["text", "image"],
+
+        "sexual": ["text", "image"],
+        "sexual_minors": ["text"],
+
+        "violence": ["text", "image"],
+        "violence_graphic": ["text", "image"]
+      },
+
+      "category_scores": {
+        "harassment": 0.00507676338091392,
+        "harassment_threatening": 0.0008967480822931635,
+        "hate": 8.830458477845481e-05,
+        "hate_threatening": 1.0720880092159908e-05,
+        "illicit": 3.740956047302422e-05,
+        "illicit_violent": 2.868540823874629e-05,
+
+        "self_harm": 0.6967791744783793,
+        "self_harm_instructions": 0.00027978227581033677,
+        "self_harm_intent": 0.0003781080988395418,
+
+        "sexual": 0.0007007652612809208,
+        "sexual_minors": 2.5071593847983196e-06,
+
+        "violence": 0.5236158587905301,
+        "violence_graphic": 0.4213528687243541
+      }
+    }
+  ]
+}
+```
+
+The output result includes several categories in the JSON response, which inform you about the types of content present in the input (if any) and the extent to which the model believes they are present.
+
+| **Output Category**               | **Description**                                                                                                                      |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| `flagged`                      | Set to `true` if the model classifies the content as potentially harmful; set to `false` otherwise.                                                                            |
+| `categories`                   | Contains a dictionary listing the violation flags for each category. For each category, the value indicates `true` if the model flags that category as a violation and `false` otherwise.                                                            |
+| `category_scores`              | Contains a dictionary of scores by category output by the model, indicating the model's confidence that the input violates OpenAI's policy for that category. The value ranges from 0 to 1, with higher values indicating higher confidence.                                                          |
+| `category_applied_input_types` | This property contains information about which input types were flagged in the response, categorized accordingly. For instance, if both image and text inputs were flagged as “violence/graphic,” the `violence/graphic` property would be set to `true` with `["image", "text"]`. This feature is only applicable to the omni model. |
+
+## Content Categories
+
+The table below describes the types of content that the moderation API can detect, along with the models and input types supported for each category.
+
+<Tip>
+  Categories labeled “text-only” do not support image input. If you send only images to the model (without text) using `omni-moderation-latest`, the model will return a score of 0 for these unsupported categories.
+</Tip>
+
+| **Category**                 | **Description**                                                                 | **Model**  | **Input** |
+| :----------------------- | :----------------------------------------------------------------------- | :------ | :----- |
+| `harassment`             | Content that expresses, incites, or promotes harassing language against any target.                                                 | All      | Text only    |
+| `harassment/threatening` | Content that includes harassment that threatens violence or serious harm to any target.                                                   | All      | Text only    |
+| `hate`                   | Content that expresses, incites, or promotes hatred based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste. Hate content against non-protected groups (e.g., chess players) constitutes harassment. | All      | Text only    |
+| `hate/threatening`       | Hate content that threatens violence or serious harm against targeted groups based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.                     | All      | Text only    |
+| `illicit`                | Content that provides advice or guidance on how to engage in illegal activities. For example, "How to shoplift" falls into this category.                                    | Omni only | Text only    |
+| `illicit/violent`        | Similar to the content type marked `illicit`, but also includes mentions of violence or acquiring weapons.                                    | Omni only | Text only    |
+| `self-harm`              | Content that promotes, encourages, or depicts self-harm behaviors (e.g., suicide, cutting, and eating disorders).                                           | All      | Text and Images  |
+| `self-harm/intent`       | Content where the speaker expresses that they are currently engaging in or intend to engage in self-harm behavior, such as suicide, cutting, and eating disorders.                                    | All      | Text and Images  |
+| `self-harm/instructions` | Content that encourages self-harm behaviors (like suicide, cutting, eating disorders) or provides advice or instructions on how to engage in such behaviors.                          | All      | Text and Images  |
+| `sexual`                 | Content intended to elicit sexual arousal, such as descriptions of sexual acts or advertisements for sexual services (excluding sex education and health).                               | All      | Text and Images  |
+| `sexual/minors`          | Sexual content involving individuals under the age of 18.                                                         | All      | Text only    |
+| `violence`               | Content that includes death, violence, or physical harm.                                                         | All      | Text and Images  |
+| `violence/graphic`       | Content that includes graphic descriptions of death, violence, or physical harm.                                                  | All      | Text and Images  |

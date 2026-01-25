@@ -1,0 +1,174 @@
+---
+title: "内容审查接口"
+description: "提供与 OpenAI 标准完全兼容的内容审查 API，开发者可以通过此接口，利用多模态审核模型自动识别文本或图片中的有害内容（如仇恨言论、暴力、违禁活动等），确保应用合规性。"
+icon:"circle-check"
+---
+
+## 接口信息
+
+- **Endpoint (API 地址)**: `https://api.aihubmix.com/v1/moderations`
+- **请求方式**: `POST`
+- **认证方式**: `Authorization: Bearer <AIHUBMIX_API_KEY>`
+- **Content-Type**: `application/json`
+- 此端点可以使用两种模型：
+
+  `1. omni-moderation-latest`：该模型和所有快照均支持更多分类选项和多模态输入
+
+  `2. text-moderation-latest`： 仅支持文本输入，且输入分类较少
+
+## 快速入门
+
+### 使用示例
+
+<CodeGroup>
+
+```python 文本输入
+import openai
+
+client = openai.OpenAI(
+  api_key="AIHUBMIX_API_KEY",  
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.moderations.create(
+    model="text-moderation-latest",
+    input="滚滚长江东逝水，浪花淘尽英雄。是非成败转头空，青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢，古今多少事，都付笑谈中。",
+)
+
+print(response)
+```
+
+
+```python 图片和文字输入
+import openai
+
+client = openai.OpenAI(
+  api_key="AIHUBMIX_API_KEY", 
+  base_url="https://aihubmix.com/v1"
+)
+
+response = client.moderations.create(
+    model="omni-moderation-latest",
+    input=[
+        {"type": "text", "text": "图中为一位男性，他双臂用力上举、身体紧绷，头部仰起、张着嘴，表情极度激动或者愤怒。"},
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": "https://thumbs.dreamstime.com/b/violent-man-furious-straining-arms-looking-up-concept-person-35012557.jpg",
+                # can also use base64 encoded image URLs
+                # "url": "data:image/jpeg;base64,abcdefg..."
+            }
+        },
+    ],
+)
+
+print(response)
+```
+
+</CodeGroup>
+
+### 输出示例
+
+以下是一个完整的输出示例，该模型能够正确预测图像中的自残和暴力元素。
+
+```json
+{
+  "id": "modr-5175",
+  "model": "omni-moderation-latest",
+  "results": [
+    {
+      "flagged": true,
+
+      "categories": {
+        "harassment": false,
+        "harassment_threatening": false,
+        "hate": false,
+        "hate_threatening": false,
+        "illicit": false,
+        "illicit_violent": false,
+
+        "self_harm": true,
+        "self_harm_instructions": false,
+        "self_harm_intent": false,
+
+        "sexual": false,
+        "sexual_minors": false,
+
+        "violence": true,
+        "violence_graphic": true
+      },
+
+      "category_applied_input_types": {
+        "harassment": ["text"],
+        "harassment_threatening": ["text"],
+        "hate": ["text"],
+        "hate_threatening": ["text"],
+        "illicit": ["text"],
+        "illicit_violent": ["text"],
+
+        "self_harm": ["text", "image"],
+        "self_harm_instructions": ["text", "image"],
+        "self_harm_intent": ["text", "image"],
+
+        "sexual": ["text", "image"],
+        "sexual_minors": ["text"],
+
+        "violence": ["text", "image"],
+        "violence_graphic": ["text", "image"]
+      },
+
+      "category_scores": {
+        "harassment": 0.00507676338091392,
+        "harassment_threatening": 0.0008967480822931635,
+        "hate": 8.830458477845481e-05,
+        "hate_threatening": 1.0720880092159908e-05,
+        "illicit": 3.740956047302422e-05,
+        "illicit_violent": 2.868540823874629e-05,
+
+        "self_harm": 0.6967791744783793,
+        "self_harm_instructions": 0.00027978227581033677,
+        "self_harm_intent": 0.0003781080988395418,
+
+        "sexual": 0.0007007652612809208,
+        "sexual_minors": 2.5071593847983196e-06,
+
+        "violence": 0.5236158587905301,
+        "violence_graphic": 0.4213528687243541
+      }
+    }
+  ]
+}
+```
+
+输出结果在 JSON 响应中包含几个类别，这些类别会告诉你输入中存在哪些（如果有的话）内容类别，以及模型认为它们存在的程度。
+
+| **输出类别**                       | **描述**                                                                                                                          |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| `flagged`                      | `true`如果模型将内容分类为潜在有害内容，则设置为 true；`false`否则设置为 false。                                                                            |
+| `categories`                   | 包含一个字典，其中列出了每个类别对应的违规标志。对于每个类别，该值表示`true`模型是否将相应类别标记为违规，`false`否则为空。                                                            |
+| `category_scores`              | 包含模型输出的按类别划分的分数字典，表示模型对输入违反 OpenAI 该类别策略的置信度。该值介于 0 和 1 之间，值越高表示置信度越高。                                                          |
+| `category_applied_input_types` | 此属性包含有关响应中标记了哪些输入类型的信息，并按类别进行划分。例如，如果模型中的图像和文本输入都被标记为“暴力/画面”，则此`violence/graphic`属性将被设置为 true `["image", "text"]`。此功能仅适用于全渠道模型。 |
+
+## 内容分类
+
+下表描述了审核 API 可以检测到的内容类型，以及每个类别支持的模型和输入类型。
+
+<Tip>
+  标记为“仅限文本”的类别不支持图像输入。如果您仅向模型发送图像（不包含文本）`omni-moderation-latest`，则对于这些不支持的类别，模型将返回 0 分。
+</Tip>
+
+| **类别**                   | **描述**                                                                   | **模型**  | **输入** |
+| :----------------------- | :----------------------------------------------------------------------- | :------ | :----- |
+| `harassment`             | 表达、煽动或宣扬针对任何目标的骚扰性语言的内容。                                                 | 全部      | 纯文本    |
+| `harassment/threatening` | 包含暴力或对任何目标造成严重伤害的骚扰内容。                                                   | 全部      | 纯文本    |
+| `hate`                   | 表达、煽动或宣扬基于种族、性别、民族、宗教、国籍、性取向、残疾状况或种姓的仇恨的内容。针对非受保护群体（例如，国际象棋棋手）的仇恨内容构成骚扰。 | 全部      | 纯文本    |
+| `hate/threatening`       | 仇恨内容，包括基于种族、性别、民族、宗教、国籍、性取向、残疾状况或种姓而对目标群体实施的暴力或严重伤害。                     | 全部      | 纯文本    |
+| `illicit`                | 提供如何实施非法行为的建议或指导的内容。例如，“如何入店行窃”就属于此类。                                    | 仅限 Omni | 纯文本    |
+| `illicit/violent`        | 与该类别标记的内容类型相同`illicit`，但还包括提及暴力或获取武器。                                    | 仅限 Omni | 纯文本    |
+| `self-harm`              | 宣扬、鼓励或描绘自残行为（例如自杀、割伤和饮食失调）的内容。                                           | 全部      | 文字和图片  |
+| `self-harm/intent`       | 内容中，说话者表达了他们正在或打算进行自残行为，例如自杀、割伤和饮食失调。                                    | 全部      | 文字和图片  |
+| `self-harm/instructions` | 鼓励实施自残行为（如自杀、割伤、饮食失调）的内容，或者提供如何实施此类行为的指导或建议的内容。                          | 全部      | 文字和图片  |
+| `sexual`                 | 旨在引起性兴奋的内容，例如对性行为的描述，或宣传性服务的内容（不包括性教育和健康）。                               | 全部      | 文字和图片  |
+| `sexual/minors`          | 包含未满 18 岁人士的性内容。                                                         | 全部      | 纯文本    |
+| `violence`               | 包含死亡、暴力或身体伤害的内容。                                                         | 全部      | 文字和图片  |
+| `violence/graphic`       | 包含对死亡、暴力或身体伤害进行详细描述的内容。                                                  | 全部      | 文字和图片  |
