@@ -1,68 +1,103 @@
 ---
 title: "产品介绍"
-description: "AIHubMix 由美国 AIHubMix, LLC 主体运营，是获得微软 Azure、AWS、GCP 官方授权的合规模型聚合平台。公司依托正规云服务额度和专业技术团队，长期为众多知名应用提供高并发、稳定、可信赖的 AI API 服务，深受开发者和企业信任。
-
-平台基于统一的 OpenAI API 标准，聚合了 OpenAI 官方全系列模型与 Claude、Gemini、DeepSeek、阿里 Qwen 等主流大模型。开发者只需更改模型参数即可一键切换，无缝对接多家厂商，极大降低接入与运维成本。"
+description: "AIHubMix 提供统一的 API，让您通过单个接口访问数百个模型。只需几行代码，即可使用您首选的 SDK 或框架快速上手。"
 icon: "face-smile-wink"
 ---
 
-## 我们致力于为 AI 应用打造一站式解决方案
+<Danger>
+  请注意：不要请求暴力、政治、色情等敏感内容。若账号频繁触发内容过滤，我们将进行统计并与您联系核实。
+</Danger>
+
+## 概述
 
 - **统一接口，极简迁移**：兼容 OpenAI SDK，代码零改动即可平滑切换。
-- **多云聚合路由，企业级稳定性**：支持 OpenAI、Azure OpenAI 智能分流与内容审核。
-- **一站式模型能力**：文本、图片生成、向量嵌入、TTS 等主流模型全覆盖，满足多场景需求。
+- **多接口兼容**：支持 OpenAI、Google Gemini、Anthropic多种兼容格式接口
+- **一站式模型能力**：文本、图片/视频生成、向量嵌入、TTS 等主流模型全覆盖，满足多场景需求。
 - **灵活计费，按量付费**：无会员、无包月，成本与业务同步增长。
 
-## 多端点支持说明
+<Card title="快速入门指南" icon="rocket" color="#000" href="https://docs.aihubmix.com/cn/quick-start">
+  入门简单快捷——几分钟内即可发出您的第一个API
+</Card>
 
-- **OpenAI \+ Azure 双端点**
-  - AIHubMix 会同时链接 OpenAI 官方和微软 Azure OpenAI 两个端点，并随机路由请求至 Azure 进行内容审核
-  - 相比 OpenAI 官方端，Azure OpenAI 自带自动内容过滤，所以响应速度可能略慢
+## 文档结构
 
-<Warning>
-  **请注意合规**：不要请求暴力、政治、色情等敏感内容。若账号频繁触发内容过滤，我们将进行统计并与您联系核实。
-</Warning>
+### 核心 API 参考
 
-## 快速上手
+<Columns cols={2}>
+  <Card title="模型调用" icon="sparkles" color="#000">
+    支持文本、图片生成、TTS等主流模型
+  </Card>
+  <Card title="文件" icon="files" color="#000" href="https://docs.aihubmix.com/cn/api/Gemini-Guides#%E5%A4%9A%E5%AA%92%E4%BD%93%E6%96%87%E4%BB%B6">
+    上传和管理任务附件文件
+  </Card>
+</Columns>
 
-1. **充值**
-   - 进入[「充值」页面](https://aihubmix.com/topup)完成充值，确保账户余额 \> 0
-2. **创建 API Key**
-   - 打开[「Keys」页面](https://aihubmix.com/token)，创建并复制自己的 Key，新手建议只填 `Key 名称`
-3. **获取中转信息**
-   - 稳定中转接口地址：`https://aihubmix.com`
-   - 中转 API Key（不要硬编码在项目中）：`sk-***`
-   - 备用服务器地址（新功能测试专用）：`https://api.aihubmix.com`
-4. **替换 API 地址**
-   - 如果你是开发者，请参考 [OpenAI 官方文档](https://platform.openai.com)
-   - 开发时，将文档中的 `https://api.openai.com` 替换为 `https://aihubmix.com` 即可
-   - Claude 模型也支持原生 `v1/messages` 接口，详情请参考 [Claude 原生接口调用](/cn/api/Claude-Native)
+<Columns cols={2}>
+  <Card title="审查" icon="check" iconType="regular" color="#000" href="https://docs.aihubmix.com/cn/api/moderation">
+    识别文本或图片中的有害信息
+  </Card>
+  <Card title="Jina AI 集成" icon="smile" color="#000" href="https://docs.aihubmix.com/cn/api/Jina-AI">
+    通过Jina AI 构建功能强大的智能体
+  </Card>
+</Columns>
 
-<Tip>
-  **提示**：
-  在一些第三方软件或平台输入自定义 URL 时，可能需要追加 `/v1` 或 `/v1/chat/completions`
-</Tip>
+### 集成与扩展
 
-如：
+<Columns cols={2}>
+  <Card title="OpenAI 兼容格式" icon="link" color="#000">
+    通过 OpenAI 兼容接口调用所有的模型
+  </Card>
+  <Card title="Claude 兼容（Beta）" icon="brain" color="#000">
+    通过 Anthropic API 调用所有的模型
+  </Card>
+  <Card title="Gemini 原生接口" icon="Google" color="#000" href="https://docs.aihubmix.com/cn/api/Gemini-Guides">
+    对于 Gemini 模型提供原生调用方式
+  </Card>
+  <Card title="AI SDK" icon="code" color="#000" href="https://docs.aihubmix.com/cn/api/AISDK">
+    使用 AI SDK 接入大量模型
+  </Card>
+</Columns>
 
-- `https://aihubmix.com`
-- `https://aihubmix.com/v1`（目前最常见）
-- `https://aihubmix.com/v1/chat/completions`
+### 指南与最佳实践
+
+<Columns cols={2}>
+  <Card title="第三方接入指南" icon="book" color="#000" href="https://docs.aihubmix.com/cn/api/Auth">
+    在三方应用中集成 AIHUBMIX API
+  </Card>
+  <Card title="FAQs" icon="search" color="#000" href="https://docs.aihubmix.com/cn/FAQs/Faq">
+    高频问题指南
+  </Card>
+</Columns>
 
 ## 常用功能与场景
 
-- **基于模型 API 的应用软件**
-  - 例如 Lobe-chat、OpenAI Translator、Cursor、ChatX、Cherry Studio、ChatBox、Sider、ChatGPT Next Web、欧陆翻译、沉浸式翻译等
-- **产品开发**
-  - 完整支持 Langchain、LlamaIndex 等库的调用
-  - 安装配置与 OpenAI 官方一致，仅需替换 API 地址和 Key
-- **服务特点**
-  - **稳定**：用于强大的技术服务团队不断迭代优化系统
-  - **方便**：和 OpenAI 官方 API 完全兼容，无缝切换
-  - **快速**：持续优化线路，保障访问与响应速度
-  - **省心**：无包月、无会员，用多少买多少
+- **开发工具：** 在 [Claude Code](https://docs.aihubmix.com/cn/api/Claude-Code)、[OpenCode](https://docs.aihubmix.com/cn/api/Opencode)、[Cline](https://docs.aihubmix.com/cn/api/Cline)、[Gemini Cli ](https://docs.aihubmix.com/cn/api/Cline)等开发工具中使用
+- **应用软件：**[Lobe-chat](https://docs.aihubmix.com/cn/clients/Lobe-Chat)、[OpenAI Translator](https://docs.aihubmix.com/cn/clients/OpenAI-Translator)、[Cursor](https://docs.aihubmix.com/cn/clients/Cursor)、[Cherry Studio](https://docs.aihubmix.com/cn/clients/Cherry-Studio)、[ChatBox](https://docs.aihubmix.com/cn/clients/ChatBox) 等软件中使用
 
-## 联系我们
+## 快速导航
 
-- **商务合作**：[business@aihubmix.com](mailto:business@aihubmix.com)
-- **意见反馈**：[feedback@aihubmix.com](mailto:feedback@aihubmix.com)
+<AccordionGroup>
+  <Accordion title="入门">
+    - [概述](https://docs.aihubmix.com/cn)- 本页
+    - [快速入门](https://docs.aihubmix.com/cn/quick-start)- 进行首次 API 调用
+  </Accordion>
+  <Accordion title="核心 API">
+    - [图像理解](https://docs.aihubmix.com/cn/api/vision)- 使用视觉功能来理解图像
+    - [图片生成](https://docs.aihubmix.com/cn/api/Image-Gen)- 调用模型生成/编辑图像
+    - [视频生成](https://docs.aihubmix.com/cn/api/Video-Gen)- 调用模型生成视频
+    - [TTS文本转语音](https://docs.aihubmix.com/cn/api/TTS)- 调用模型将文本转换为自然语音
+  </Accordion>
+  <Accordion title="开发工具集成">
+    - [在 Claude Code 中使用](https://docs.aihubmix.com/cn/api/Claude-Code)
+    - [在 OpenCode 中使用](https://docs.aihubmix.com/cn/api/Opencode)
+    - [在 Cline 中使用](https://docs.aihubmix.com/cn/api/Cline)
+  </Accordion>
+  <Accordion title="常见问题">
+    - [FAQs](https://docs.aihubmix.com/cn/FAQs/Faq)
+  </Accordion>
+  <Accordion title="联系我们">
+    - 商务合作：[business@aihubmix.com](mailto:business@aihubmix.com)
+    - 意见反馈：[feedback@aihubmix.com](mailto:feedback@aihubmix.com)
+    - [人工客服](https://docs.aihubmix.com/cn/FAQs/Human-Customer-Support)
+  </Accordion>
+</AccordionGroup>
