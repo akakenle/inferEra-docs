@@ -42,13 +42,28 @@ If you prompt GPT-5 or “o” series models to “show reasoning steps,” “d
 
 ---
 
-### How to resolve an account suspension?
+### What to Do When Your Account is Disabled?
 
-If your account has been suspended, you can request reactivation by contacting our online support team or emailing [feedback@aihubmix.com](mailto:feedback@aihubmix.com) . In most cases, suspensions occur when OpenAI’s **GPT-5 series models** (e.g., gpt-5-nano) are used within immersive translation workflows. These models are designed for advanced reasoning and structured content generation, which makes them unsuitable for high-frequency, real-time translation tasks. Frequent calls in such scenarios may trigger risk control mechanisms, leading to temporary restrictions or suspension of your account.
+If your account has been disabled, you can contact online customer service or send an email to [**feedback@aihubmix.com**](mailto:feedback@aihubmix.com) to request assistance or account reinstatement.
 
-Within OpenAI’s security framework, the GPT-5 series is classified as high-sensitivity models. While normal usage will not result in suspension, repeated use in translation workflows—even without explicitly requesting reasoning outputs—may still be flagged as abnormal activity. To maintain stable account usage, we strongly recommend using non-reasoning models for translation tasks, such as gpt-4.1-mini or gpt-4o-mini, which are better suited for high-frequency requests and carry lower risk of triggering system restrictions.
+Account suspensions are usually triggered automatically by the system's risk control mechanisms. Common reasons fall into the following two categories:
 
-If a suspension appears to be accidental or unusual, please contact support or email us for assistance. However, please note that **multiple suspension records may result in permanent deactivation, and recovery may no longer be possible.** To minimize risk and ensure continuous access, we recommend avoiding the use of GPT-5 reasoning models in translation workflows.
+1. **Using GPT-5 Series Models in Immersive Translation Scenarios**
+
+   This series of models is designed for complex reasoning and structured content generation, making it unsuitable for high-frequency, real-time translation tasks. Frequent calls in such scenarios may trigger the system's risk control policies, leading to temporary restrictions or account suspension. To ensure stable account operation, please prioritize using non-reasoning models for translation tasks, such as:
+   - `gpt-4.1-mini`
+   - `gpt-4o-mini`
+
+2. **Sending Violating Content While Using the Grok Model**
+
+   During the use of the Grok model, if the requested content is deemed by the system to violate usage norms (e.g., involving violence, gore, pornography, etc.), it will directly trigger the suspension mechanism. Please ensure that your request content complies with the platform and model's usage guidelines to avoid sending illegal or inappropriate content.
+
+If you encounter a wrongful suspension or unusual restrictions, you can submit an appeal through customer service or email. However, please note that **if your account triggers suspension records multiple times, it may not be possible to reinstate it again**.
+
+<Tip>
+  If you are a developer, you can use AIHUBMIX's [Moderation API](https://docs.aihubmix.com/cn/api/moderation) to conduct compliance checks on input content before making requests, thereby reducing the risk of violations. This step is optional, but it is strongly recommended in scenarios where content is open or user input is uncontrollable.
+</Tip>
+
 
 ---
 
