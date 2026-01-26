@@ -1,89 +1,154 @@
 ---
 title: "Claude Code"
-description: " "
+description: "Using Claude Code in AIHubMix"
 icon: "terminal"
 ---
 
-Power Claude Code with Aihubmix and leave behind the headaches of unstable connections and hard-to-get quotas. Aihubmix’s relay service is built on official channels—fully compliant and secure—so there’s no need to worry about account risks or hidden restrictions.
+## Quick Start
 
-<Warning>
-  Due to Claude Code’s multi-agent nature, credit consumption can be quite high. It’s recommended to set a limit for your key to avoid unexpected charges.
-</Warning>
+This guide will help you get started with Claude Code provided by AIHubMix in just a few minutes.
 
-## Quick Setup Guide:
+### 1. Install Claude Code
 
-### 1️⃣ Install the npm Package Globally
+#### Quick Installation with a Script (Recommended for First-Time Users)
 
-Run the following command in your terminal:
+Run the following commands in your terminal or IDE to download a shell script that automatically configures environment variables for you. Just execute it.
+
+<CodeGroup>
+
+```shellscript MacOS
+curl -LO https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.sh
+
+chmod +x claude_code_prod.sh
+
+./claude_code_prod.sh
+```
+
+
+```powershell Windows
+$scriptUrl = "https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.ps1"
+$localPath = Join-Path $env:TEMP "claude_code_install_windows.ps1"
+
+$ProgressPreference = 'SilentlyContinue'
+
+Invoke-WebRequest `
+  -Uri $scriptUrl `
+  -OutFile $localPath `
+  -UseBasicParsing
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+& $localPath
+```
+
+</CodeGroup>
+
+#### Local Installation
+
+**macOS, Linux, WSL:**
+
+```shellscript
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+**Windows PowerShell:**
 
 ```shell
+irm https://claude.ai/install.ps1 | iex
+```
+
+#### npm
+
+Requires [**<u>Node.js version 18 or higher</u>**](https://nodejs.org/en/download/)
+
+```shellscript
 npm install -g @anthropic-ai/claude-code
 ```
 
-Example image:
+### 2. Connect Claude to AIHubMix
 
-![install](../../public/en/aihubmix-claude-code-npm.png)
+Set environment variables to connect Claude Code to AIHubMix. Note: Do not use Anthropic login directly.
 
-### 2️⃣ Configure Environment Variables
+Requirements:
 
-Go to Aihubmix [Keys page](https://aihubmix.com/token) to generate your API key, then add this key and the forwarding URL to your system environment variables.
+1. Use `https://aihubmix.com` as base_url
+2. Provide the [AiHubMix API Key](https://aihubmix.com/token) as the authentication token
+3. **Tip: Make sure to remove the Anthropic API Key to avoid conflicts.**
 
-For example, add the following lines to your ~/.zshrc file:
+**Claude Configuration File:** `.claude/settings.json`
 
-```shell
-export ANTHROPIC_API_KEY="sk-***"
-export ANTHROPIC_BASE_URL="https://aihubmix.com"
+```bash
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://aihubmix.com",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
+    "ANTHROPIC_MODEL": "gpt-5.2"
+  },
+  "includeCoAuthoredBy": false
+}
 ```
+
+Please replace `AIHUBMIX_API_KEY` with the actual AIHUBMIX API key.
 
 <Tip>
-  For Mac users, you can reveal the hidden .zshrc file in your home directory by pressing `⌘ + ⇧ + .`. Open it with the system’s “TextEdit” app and add the above lines.
+  The native installer for Claude Code cannot read standard `.env` files, so do not place this content in a `.env` file.
 </Tip>
 
-> Skip manual environment variable configuration – use the graphical tool for quick setup: [Configuration via CC-Switch](https://docs.aihubmix.com/en/api/Claude-Code#configuration-via-cc-switch).
+### 3. Start a Conversation
 
-### 3️⃣ Apply the Configuration
+Navigate to your project directory and start Claude Code:
 
-After adding the configuration, run `source ~/.zshrc` in your terminal and press Enter to apply the changes.
-
-### 4️⃣ Launch in Terminal
-
-Navigate to your project directory, for example `cd ~/Desktop/my-project`\
-Then type `claude` to start and begin using Claude Code.
-
-## Initialization Configuration
-
-### Authorization
-
-If you see an authorization page, click to jump to the Claude website for confirmation. After successful authorization, return to the terminal to continue.
-
-![auth](../../public/en/claude-auth.png)
-
-If you’d like to skip the verification step and route requests through Aihubmix directly, just open the .claude.json file in your user directory and add this line:
-
-```
-  "hasCompletedOnboarding": true,
+```bash
+$ cd /path/your-project
+> claude
 ```
 
-### Launch
+Once connected, any prompts you send will be routed through AIHubMix.
 
-After launching, Claude Code will display the current configuration details, including your API Key and API Base URL.\
-Confirm the prompts by selecting Yes and pressing Enter to complete the setup.
+### 4. Verification
 
-![initialization](../../public/en/aihubmix-claude-code.png)
+You can confirm your connection by entering the `/status` command in Claude Code.
 
-For example: Claude detects a custom KEY in the system environment variables — select `Yes`.
+```bash
+> /status
 
+ API key: ANTHROPIC_API_KEY
+ Anthropic base URL: https://aihubmix.com
+
+ Model: claude-sonnet-4-5
 ```
-Detected a custom API key in your environment
 
-ANTHROPIC_API_KEY: sk-***
-Do you want to use this API key?
+> Don’t want to configure environment variables manually? Use a graphical tool for quick setup: [Configure via CC-Switch](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE).
 
-> 1. Yes
-2. No(recommended)
+## Switch Models
 
-Enter to confirm .Esc to cancel
+### Override Default Model
+
+<Tip>
+  For quickly modifying the default model, we recommend using [CC-Switch](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE).
+</Tip>
+
+You can override the default model aliases through environment variables, configuring Claude Code to use **any model** on AIHubMix (including OpenAI, Gemini, or GLM models).
+
+For example, to replace the default alias "Sonnet" with gpt-5.2-codex:
+
+```shellscript
+export ANTHROPIC_DEFAULT_SONNET_MODEL="gpt-5.2-codex"
 ```
+
+You can also override other levels:
+
+```shellscript
+export ANTHROPIC_DEFAULT_OPUS_MODEL="gemini-3-flash-preview-search"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7"
+```
+
+<Info>
+  While you can use any model through AIHubMix, we recommend using powerful models (such as Claude Opus 4.5, GPT 5.2, etc.) for the best experience.
+</Info>
 
 ### Switch Model
 
@@ -93,159 +158,41 @@ Use the Claude Code command:
 /model [model id]
 ```
 
-The default model is `Sonnet 4`, but you can switch to a more powerful one like `Opus 4`:
+## Configure via CC-Switch
 
-```shell opus
-/model opus
-```
+1. Run CC-Switch and click on "Add Provider".
 
-Or, switch to another Claude model:
+![install](../../public/cn/cc-1.png)
 
-<CodeGroup>
+2. Select "AiHubMix" from the preset list.
 
-```shell sonnet 4.5
-/model claude-sonnet-4-5
-```
+![install](../../public/cn/cc-2.png)
 
+3. Enter your key in the "API Key" field.
 
-```shell haiku 4.5
-/model claude-haiku-4-5
-```
+![install](../../public/cn/cc-3.png)
 
-</CodeGroup>
+4. Once configured, click "Add" to save the settings.
 
-### Zhipu AI Support
+![install](../../public/cn/cc-4.png)
 
-```shell
-/model <model id>
-```
+5. Return to the homepage, select "AiHubMix" from the provider list, and click "Start" to use it.
 
-model id list:
+![install](../../public/cn/cc-5.png)
 
-- cc-glm-4.6
-- cc-glm-4.5-air
-- cc-kimi-k2-instruct
-- cc-deepseek-v3.1
-- cc-deepseek-v3
-- cc-kimi-k2-instruct-0905
-- cc-kimi-dev-72b
-- cc-minimax-m2
-- cc-ernie-4.5-300b-a47b
+## Frequently Asked Questions
 
-## Use Any LLM on the AiHubMix Platform
+### Q: Using Claude Code, I see the prompt "401, No token provided...."
 
-### 1️⃣ Install @aihubmix/claude-code globally
+Open the Claude terminal, type `/config`, find the `Use custom API key` option, and check if the Token is correctly configured.
 
-```shell
-npm install -g @aihubmix/claude-code
-```
+![install](../../public/cn/cc-6.png)
 
-### 2️⃣ Set system environment variables (recommended)
+## More Resources
 
-```shell
-export AIHUBMIX_API_KEY="your-aihubmix-api-key"
-export HOST="127.0.0.1"  # Optional
-export PORT="3456"       # Optional
-export LOG="true"        # Optional
-export API_TIMEOUT_MS="30000"  # Optional
-```
+- [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
+- [npm Package](https://www.npmjs.com/package/@aihubmix/claude-code)
+- [Official Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [Official Configuration Guide](https://docs.anthropic.com/en/docs/claude-code/settings#settings-files)
 
-### 3️⃣ Generate a configuration file
-
-Note: Replace sk-\*\*\* with the key you generated on AiHubMix. Configuration options beyond the model itself will be overridden by system environment variables if present.
-
-```shell
-mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
-{
-  "API_KEY": "sk-***",
-  "HOST": "127.0.0.1",
-  "PORT": 3456,
-  "LOG": true,
-  "API_TIMEOUT_MS": 30000,
-  "Router": {
-    "default": "claude-sonnet-4-20250514",
-    "background": "claude-3-5-haiku-20241022",
-    "think": "claude-sonnet-4-20250514",
-    "longContext": "gpt-4.1",
-    "longContextThreshold": 60000,
-    "webSearch": "gemini-2.0-flash-search"
-  }
-}
-EOF
-```
-
-### 4️⃣ Usage
-
-<CodeGroup>
-
-```shell Start service
-acc start
-```
-
-
-```shell
-acc stop
-```
-
-
-```shell Run
-acc code
-```
-
-
-```shell Restart
-acc restart
-```
-
-
-```shell Check status
-acc status
-```
-
-
-```shell Show help
-acc help
-```
-
-
-```shell Show version
-acc version
-```
-
-</CodeGroup>
-
-## Configuration via CC-Switch
-
-1. Run CC-Switch and click "Add Provider."
-
-![install](../../public/en/cc-1.png)
-
-2. From the preset list, select "AiHubMix."
-
-![install](../../public/en/cc-2.png)
-
-3. Enter your API key in the "API Key" field.
-
-![install](../../public/en/cc-3.png)
-
-4. Once the configuration is complete, click "Add" to save the settings.
-
-![install](../../public/en/cc-4.png)
-
-5. Return to the home page, select "AiHubMix" from the vendor list, and click "Start" to begin using it.
-
-![install](../../public/en/cc-5.png)
-
--[Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md) -[npm package](https://www.npmjs.com/package/@aihubmix/claude-code)
-
-Enjoy coding with Claude!
-
----
-
-## FAQs
-
-### Q: When using Claude Code, I get the error “401, No token provided...”
-
-Open the Claude terminal and enter `/config`. Locate the `Use custom API key` option and verify that the token has been configured correctly.
-
-![Cc 6](/public/en/cc-6.png)
+Happy coding!

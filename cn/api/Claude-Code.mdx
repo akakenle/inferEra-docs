@@ -1,88 +1,154 @@
 ---
 title: "Claude Code"
-description: " "
+description: " 在 AIHubMix 中使用 Claude Code"
 icon: "terminal"
 ---
 
-用 Aihubmix 为 Claude Code 提供强劲动力，彻底告别连接不稳定和额度难买的烦恼。Aihubmix 的转发服务基于官方渠道，合规安全，无需担心账号风险或隐性限制。
+## 快速入门
 
-<Warning>
-  由于 Claude Code 的多智能体属性，额度消耗会比较夸张，建议为你的 Key 设置有限额度，防止账单刺客。
-</Warning>
+本指南将帮助您在几分钟内使用由 AIHubMix 提供的 Claude Code.
 
-## 快速配置指引：
+### 1. 安装Claude Code
 
-### 1️⃣ 全局安装 npm 包
+#### 使用脚本快速安装（首次使用推荐）
 
-终端运行
+在你的终端或 IDE 中运行以下命令，下载一个帮你自动配置环境变量的 shell 脚本，运行即可。
+
+<CodeGroup>
+
+```shellscript MacOS
+curl -LO https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.sh
+
+chmod +x claude_code_prod.sh
+
+./claude_code_prod.sh
+```
+
+
+```powershell Windows
+$scriptUrl = "https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.ps1"
+$localPath = Join-Path $env:TEMP "claude_code_install_windows.ps1"
+
+$ProgressPreference = 'SilentlyContinue'
+
+Invoke-WebRequest `
+  -Uri $scriptUrl `
+  -OutFile $localPath `
+  -UseBasicParsing
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+& $localPath
+```
+
+</CodeGroup>
+
+#### 本地安装
+
+**macOS、Linux、WSL:**
+
+```shellscript
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+**Windows PowerShell：**
 
 ```shell
+irm https://claude.ai/install.ps1 | iex
+```
+
+#### npm
+
+需要 [**<u>Node.js 18 或更高版本</u>**](https://nodejs.org/en/download/)
+
+```shellscript
 npm install -g @anthropic-ai/claude-code
 ```
 
-示例图：
+### 2. 将 Claude 连接到 AIHubMix
 
-![install](../../public/cn/aihubmix-claude-code-npm.png)
+设置环境变量，将 Claude Code 连接到 AIHubMix。注意：不要直接使用 Anthropic 登录。
 
-### 2️⃣ 环境变量配置
+要求：
 
-到 Aihubmix[「Keys」页面](https://aihubmix.com/token) 生成密钥，在系统环境变量中填入这个密钥和转发地址。
+1. 使用 `https://aihubmix.com` 作为base_url
+2. 请提供 [AiHubMix API Key](https://aihubmix.com/token) 作为身份验证令牌
+3. **提示：请明确删除 Anthropic API Key，以避免冲突。**
 
-比如在 ~/.zshrc 中添加：
+**Claude 配置文件：**`.claude/settings.json`
 
-```shell
-export ANTHROPIC_API_KEY="sk-***"
-export ANTHROPIC_BASE_URL="https://aihubmix.com"
+```bash
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://aihubmix.com",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
+    "ANTHROPIC_MODEL": "gpt-5.2"
+  },
+  "includeCoAuthoredBy": false
+}
 ```
 
+请替换 `AIHUBMIX_API_KEY` 为实际的 AIHUBMIX API 密钥。
+
 <Tip>
-  对于 Mac 用户，你可以在`用户名`目录通过快捷键 `⌘ + ⇧ + .` 显示隐藏的 .zshrc 文件，用系统的「文本编辑」APP 打开并添加上述内容。
+  Claude Code 原生安装程序无法读取标准 `.env` 文件，因此请勿将这些内容放置在 `.env` 文件中。
 </Tip>
+
+### 3. 开始对话
+
+导航到您的项目目录并启动 Claude Code：
+
+```bash
+$ cd /path/your-project
+> claude
+```
+
+连接成功后，您发送的任何提示都将通过 AIHubMix 路由。
+
+### 4. 验证
+
+您可以通过在 Claude Code 中输入 `/status`  命令来确认您的连接。
+
+```bash
+> /status
+
+ API key: ANTHROPIC_API_KEY
+ Anthropic base URL: https://aihubmix.com
+
+ Model: claude-sonnet-4-5
+```
 
 > 不想手动配置环境变量？可使用图形化工具快速设置：[通过 CC-Switch 可视化配置](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE)。
 
-### 3️⃣ 使配置生效
+## 切换模型
 
-添加配置之后，终端执行 `source ~/.zshrc`，回车即可。
+### 覆盖默认模型
 
-### 4️⃣ 终端启动
+<Tip>
+  如需快速修改默认模型，推荐使用 [CC- Switch](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE) 。
+</Tip>
 
-定位到目标项目目录，比如 `cd ~/Desktop/my-project`\
-输入 `claude` 启动，即可使用。
+你可以通过环境变量覆盖默认模型别名，将 Claude Code 配置为使用 AIHubMix 上的**任何模型**（包括 OpenAI、Gemini 或 GLM 模型）。
 
-## 初始化配置
+例如，要将默认别名“Sonnet”替换为 gpt-5.2-codex：
 
-### 授权
-
-如弹出授权页面，点击跳转到 Claude 官网进行确认，授权成功后，返回终端继续。认证不需要付费账号，随便注册有一个免费的 claude 账号就行；
-
-![auth](../../public/cn/claude-auth.png)
-
-如果你想绕过验证，直接使用 Aihubmix 的转发，只需要在用户名目录下的 .claude.json 中增加一行配置：
-
-```json
-  "hasCompletedOnboarding": true,
+```shellscript
+export ANTHROPIC_DEFAULT_SONNET_MODEL="gpt-5.2-codex"
 ```
 
-### 启动
+也可以覆盖其他层级：
 
-启动后，Claude Code 会显示当前配置信息，包括 API Key 和 API Base URL。 需要确认的地方，选择 Yes 回车确认，即可完成所有设置。
-
-![initialization](../../public/cn/aihubmix-claude-code.png)
-
-比如：Claude 检测到系统环境变量有自定义 KEY，选 `Yes`
-
+```shellscript
+export ANTHROPIC_DEFAULT_OPUS_MODEL="gemini-3-flash-preview-search"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7"
 ```
-Detected a custom API key in your environment
 
-ANTHROPIC_API_KEY: sk-***
-Do you want to use this API key?
-
-> 1. Yes
-2. No(recommended)
-
-Enter to confirm .Esc to cancel
-```
+<Info>
+  虽然您可以通过 AIHubMix 使用任何模型，但为了获得最佳体验，我们建议您使用功能强大的模型（例如 Claude Opus 4.5、GPT 5.2 等）
+</Info>
 
 ### 切换模型
 
@@ -91,129 +157,6 @@ Enter to confirm .Esc to cancel
 ```shell
 /model [model id]
 ```
-
-默认模型为 `Sonnet 4`，你可以用效果更好的 `Opus 4`：
-
-```shell opus
-/model opus
-```
-
-或者，换成其他 claude 模型：
-
-<CodeGroup>
-
-```shell sonnet 4.5
-/model claude-sonnet-4-5
-```
-
-
-```shell haiku 4.5
-/model claude-haiku-4-5
-```
-
-</CodeGroup>
-
-### 智谱支持
-
-启动 Claude Code 之后，只需要运行指令
-
-```shell
-/model <model-id>
-```
-
-支持的model-id：
-
-- cc-glm-4.6
-- cc-glm-4.5-air
-- cc-kimi-k2-instruct
-- cc-deepseek-v3.1
-- cc-deepseek-v3
-- cc-kimi-k2-instruct-0905
-- cc-kimi-dev-72b
-- cc-minimax-m2
-- cc-ernie-4.5-300b-a47b
-
-## 使用 AiHubMix 平台的任何大模型
-
-### 1️⃣ 全局安装 @aihubmix/claude-code
-
-```shell
-npm install -g @aihubmix/claude-code
-```
-
-### 2️⃣ 设置系统环境变量（推荐）
-
-```
-export AIHUBMIX_API_KEY="your-aihubmix-api-key"
-export HOST="127.0.0.1"  # Optional
-export PORT="3456"        # Optional
-export LOG="true"         # Optional
-export API_TIMEOUT_MS="30000"  # Optional
-```
-
-### 3️⃣ 生成配置文件
-
-注意 `sk-***` 要换成你在 AiHubMix 生成的密钥，模型以外的配置项会以系统环境变量优先的顺序处理。
-
-```shell 终端运行
-mkdir -p ~/.aihubmix-claude-code && cat > ~/.aihubmix-claude-code/config.json <<EOF
-{
-  "API_KEY": "sk-***",
-  "HOST": "127.0.0.1",
-  "PORT": 3456,
-  "LOG": true,
-  "API_TIMEOUT_MS": 30000,
-  "Router": {
-    "default": "claude-sonnet-4-20250514",
-    "background": "claude-3-5-haiku-20241022",
-    "think": "claude-sonnet-4-20250514",
-    "longContext": "gpt-4.1",
-    "longContextThreshold": 60000,
-    "webSearch": "gemini-2.0-flash-search"
-  }
-}
-EOF
-```
-
-### 4️⃣ 使用
-
-<CodeGroup>
-
-```shell 启动服务
-acc start
-```
-
-
-```shell 停止服务
-acc stop
-```
-
-
-```shell 运行 CC
-acc code
-```
-
-
-```shell 重启服务（修改配置需要用的）
-acc restart
-```
-
-
-```shell 状态检测
-acc status
-```
-
-
-```shell 显示帮助
-acc help
-```
-
-
-```shell 查看版本
-acc version
-```
-
-</CodeGroup>
 
 ## 通过 cc-switch 配置
 

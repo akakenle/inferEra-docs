@@ -22,7 +22,7 @@
                   "cn/index",
                   "cn/quick-start",
                   "cn/api/Cline",
-                  "cn/api/CC-any",
+                  "cn/api/Claude-Code",
                   "cn/api/AISDK",
                   "cn/api/Dify-plugin"
                 ]
@@ -154,7 +154,7 @@
                 "pages": [
                   "en/index",
                   "en/quick-start",
-                  "en/api/Cline",
+                  "en/api/Claude-Code",
                   "en/api/CC-any",
                   "en/api/AISDK",
                   "en/api/Dify-plugin"
