@@ -1,18 +1,19 @@
 ---
 title: "快速开始"
-description: ""
-"icon": "rocket-launch"
+icon: "rocket-launch"
+description: "生成 API 密钥并进行首次调用"
 ---
 
-## 1️⃣ 直接调用 AIHubMix API
+## 直接调用 AIHubMix API
 
 <Tip>
-其中 `<AIHUBMIX_API_KEY>` 替换为 [AIhubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和额度限制。
+  其中 `<AIHUBMIX_API_KEY>` 替换为 [AIhubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和额度限制。
 </Tip>
 
 可使用的 `model` 列表，可查阅 [模型广场](https://aihubmix.com/models) ，复制模型名称替换即可。
 
 <CodeGroup>
+
 ```py Python
 import requests
 import json
@@ -33,8 +34,8 @@ response = requests.post(
     ]
   })
 )
-
 ```
+
 
 ```typescript Javascript
 // 请在 https://aihubmix.com 域名下尝试，否则有浏览器跨域问题
@@ -56,6 +57,7 @@ fetch('https://aihubmix.com/v1/chat/completions', {
 })
 ```
 
+
 ```Shell Curl
 curl 'https://aihubmix.com/v1/chat/completions'
 -H 'Authorization: Bearer <AIHUBMIX_API_KEY>'
@@ -70,16 +72,17 @@ curl 'https://aihubmix.com/v1/chat/completions'
    ]
 }'
 ```
+
 </CodeGroup>
 
 支持流式调用，只需要增加参数 `stream: true`
 
-## 2️⃣ 使用 OpenAI SDK
+## 使用 OpenAI SDK
 
-其中 `<AIHUBMIX_API_KEY>` 替换为 [Aihubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和额度限制。
-可使用的 `model` 列表，可查阅 [模型广场](https://aihubmix.com/models) ，复制模型名称替换即可。
+其中 `<AIHUBMIX_API_KEY>` 替换为 [AIhubmix Key](https://aihubmix.com/token)，注意 `key` 的有效期和额度限制。 可使用的 `model` 列表，可查阅 [模型广场](https://aihubmix.com/models) ，复制模型名称替换即可。
 
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -111,6 +114,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+
 ```js Javascript
 import OpenAI from 'openai';
 
@@ -134,19 +138,22 @@ async function main() {
 }
 
 main();
-
 ```
+
 </CodeGroup>
 
 对于支持搜索的模型，可以追加下方参数来支持：
+
 ```Python
   web_search_options={}, # 搜索参数
 ```
-可用模型：`gpt-4o-search-preview`、`gpt-4o-mini-search-preview`。  
+
+可用模型：`gpt-4o-search-preview`、`gpt-4o-mini-search-preview`。
+
 <Info>
-注意搜索模型暂不支持 ```temperature``` 等细节参数。
+  注意搜索模型暂不支持 `temperature` 等细节参数。
 </Info>
 
-## 3️⃣ 通过第三方客户端发起请求
+## 通过第三方客户端发起请求
 
 参考 [场景示例](/cn/clients/AnythingLLM)

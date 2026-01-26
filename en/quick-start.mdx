@@ -1,18 +1,19 @@
 ---
 title: "Quick Start"
-description: ""
-"icon": "rocket-launch"
+description: "Generate an API key and make your first call"
+icon: "rocket-launch"
 ---
 
-## 1️⃣ Direct API Call to AiHubMix
+## Direct API Call to AIHubMix
 
 <Tip>
-Replace `<AIHUBMIX_API_KEY>` with your [Aihubmix Key](https://aihubmix.com/token). Please note the key's validity period and usage limits.
+  Replace `<AIHUBMIX_API_KEY>` with your [AIHubMix Key](https://aihubmix.com/token). Please note the key's validity period and usage limits.
 </Tip>
 
 For available `model` options, please check the [Model Gallery](https://aihubmix.com/models). Simply copy and paste the model name to use it.
 
 <CodeGroup>
+
 ```py Python
 import requests
 import json
@@ -35,6 +36,7 @@ response = requests.post(
 )
 ```
 
+
 ```typescript Javascript
 // Try this under https://aihubmix.com domain to avoid browser CORS issues
 fetch('https://aihubmix.com/v1/chat/completions', {
@@ -55,6 +57,7 @@ fetch('https://aihubmix.com/v1/chat/completions', {
 })
 ```
 
+
 ```Shell Curl
 curl 'https://aihubmix.com/v1/chat/completions'
 -H 'Authorization: Bearer <AIHUBMIX_API_KEY>'
@@ -69,16 +72,17 @@ curl 'https://aihubmix.com/v1/chat/completions'
    ]
 }'
 ```
+
 </CodeGroup>
 
 For streaming responses, simply add the parameter `stream: true`
 
-## 2️⃣ Using OpenAI SDK
+## Using OpenAI SDK
 
-Replace `<AIHUBMIX_API_KEY>` with your [Aihubmix Key](https://aihubmix.com/token). Please note the key's validity period and usage limits.
-For available `model` options, please check the [Model Gallery](https://aihubmix.com/models). Simply copy and paste the model name to use it.
+Replace `<AIHUBMIX_API_KEY>` with your [AIHubMix Key](https://aihubmix.com/token). Please note the key's validity period and usage limits. For available `model` options, please check the [Model Gallery](https://aihubmix.com/models). Simply copy and paste the model name to use it.
 
 <CodeGroup>
+
 ```py Python
 from openai import OpenAI
 
@@ -110,6 +114,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+
 ```js Javascript
 import OpenAI from 'openai';
 
@@ -134,17 +139,21 @@ async function main() {
 
 main();
 ```
+
 </CodeGroup>
 
 For models that support web search, you can add the following parameter:
+
 ```Python
   web_search_options={}, # search parameters
 ```
+
 Available models: `gpt-4o-search-preview`, `gpt-4o-mini-search-preview`.
+
 <Info>
-Please note that search models currently do not support parameters like `temperature`.
+  Please note that search models currently do not support parameters like `temperature`.
 </Info>
 
-## 3️⃣ Making Requests via Third-party Clients
+## Making Requests via Third-party Clients
 
 Refer to [Use Cases](/en/clients/AnythingLLM)
