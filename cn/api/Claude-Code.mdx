@@ -47,7 +47,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 <CodeGroup>
 
-```shellscript macOS、Linux、WSL
+```shellscript MacOS
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
@@ -66,15 +66,18 @@ irm https://claude.ai/install.ps1 | iex
 npm install -g @anthropic-ai/claude-code
 ```
 
-### 2. 将 Claude 连接到 AIHubMix
+### 2. 将 Claude Code 连接到 AIHubMix
 
-设置环境变量，将 Claude Code 连接到 AIHubMix。注意：不要直接使用 Anthropic 登录。
+设置环境变量，将 Claude Code 连接到 AIHubMix。
+
+<Warning>
+  不要直接使用 Anthropic 登录。
+</Warning>
 
 要求：
 
-1. 使用 `https://aihubmix.com` 作为 base_url
-2. 请提供 [AiHubMix API Key](https://aihubmix.com/token) 作为身份验证令牌
-3. **提示：请明确删除 Anthropic API Key，以避免冲突。**
+1. 使用 `https://aihubmix.com` 作`ANTHROPIC_BASE_URL`
+2. 请提供 [AiHubMix API Key](https://aihubmix.com/token) 作为`ANTHROPIC_API_KEY`
 
 **Claude 配置文件：**`.claude/settings.json`
 
@@ -114,13 +117,11 @@ $ cd /path/your-project
 ```bash
 > /status
 
- API key: ANTHROPIC_API_KEY
+ API key: sk-**** #AIHUBMIX_API_KEY
  Anthropic base URL: https://aihubmix.com
 
  Model: claude-sonnet-4-5
 ```
-
-> 不想手动配置环境变量？可使用图形化工具快速设置：[通过 CC-Switch 可视化配置](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE)。
 
 ## 切换模型
 
