@@ -45,17 +45,18 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 #### 本地安装
 
-**macOS、Linux、WSL:**
+<CodeGroup>
 
-```shellscript
+```shellscript macOS、Linux、WSL
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-**Windows PowerShell：**
 
-```shell
+```shellscript Windows
 irm https://claude.ai/install.ps1 | iex
 ```
+
+</CodeGroup>
 
 #### npm
 
@@ -82,12 +83,10 @@ npm install -g @anthropic-ai/claude-code
   "env": {
     "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
     "ANTHROPIC_BASE_URL": "https://aihubmix.com",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
-    "ANTHROPIC_MODEL": "gpt-5.2"
-  },
-  "includeCoAuthoredBy": false
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5",
+  }
 }
 ```
 
@@ -97,7 +96,7 @@ npm install -g @anthropic-ai/claude-code
   Claude Code 原生安装程序无法读取标准 `.env` 文件，因此请勿将这些内容放置在 `.env` 文件中。
 </Tip>
 
-### 3. 开始对话
+### 3. 开始使用
 
 导航到您的项目目录并启动 Claude Code：
 
