@@ -7,6 +7,9 @@
     "light": "#7298FF",
     "dark": "#2563EB"
   },
+  "contextual": {
+    "options": ["copy"]
+  },
   "favicon": "/favicon.svg",
   "navigation": {
     "languages": [
