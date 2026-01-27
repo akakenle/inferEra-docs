@@ -10,7 +10,7 @@ This guide will help you get started with Claude Code provided by AIHubMix in ju
 
 ### 1. Install Claude Code
 
-#### Quick Installation with a Script (Recommended for First-Time Users)
+#### Quick Installation with a Script
 
 Run the following commands in your terminal or IDE to download a shell script that automatically configures environment variables for you. Just execute it.
 
@@ -45,19 +45,20 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 
 #### Local Installation
 
-**macOS, Linux, WSL:**
+<CodeGroup>
 
-```shellscript
+```shellscript MacOS
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-**Windows PowerShell:**
 
-```shell
+```shellscript Windows
 irm https://claude.ai/install.ps1 | iex
 ```
 
-#### npm
+</CodeGroup>
+
+#### Install using npm
 
 Requires [Node.js version 18 or higher](https://nodejs.org/en/download/)
 
@@ -65,15 +66,18 @@ Requires [Node.js version 18 or higher](https://nodejs.org/en/download/)
 npm install -g @anthropic-ai/claude-code
 ```
 
-### 2. Connect Claude to AIHubMix
+### 2. Connect Claude Code to AIHubMix
 
-Set environment variables to connect Claude Code to AIHubMix. Note: Do not use Anthropic login directly.
+Set environment variables to connect Claude Code to AIHubMix.
+
+<Warning>
+  Note: Do not use Anthropic login directly.
+</Warning>
 
 Requirements:
 
-1. Use `https://aihubmix.com` as base_url
-2. Provide the [AiHubMix API Key](https://aihubmix.com/token) as the authentication token
-3. **Tip: Make sure to remove the Anthropic API Key to avoid conflicts.**
+1. Use `https://aihubmix.com` as `ANTHROPIC_BASE_URL`
+2. Provide the [AIHubMix API Key](https://aihubmix.com/token) as the `ANTHROPIC_API_KEY`
 
 **Claude Configuration File:** `.claude/settings.json`
 
@@ -82,12 +86,10 @@ Requirements:
   "env": {
     "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
     "ANTHROPIC_BASE_URL": "https://aihubmix.com",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5.2",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.2",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "gpt-5.2",
-    "ANTHROPIC_MODEL": "gpt-5.2"
-  },
-  "includeCoAuthoredBy": false
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5",
+  }
 }
 ```
 
@@ -97,7 +99,7 @@ Please replace `AIHUBMIX_API_KEY` with the actual AIHUBMIX API key.
   The native installer for Claude Code cannot read standard `.env` files, so do not place this content in a `.env` file.
 </Tip>
 
-### 3. Start a Conversation
+### 3. Start
 
 Navigate to your project directory and start Claude Code:
 
@@ -115,13 +117,11 @@ You can confirm your connection by entering the `/status` command in Claude Code
 ```bash
 > /status
 
- API key: ANTHROPIC_API_KEY
+ API key: sk-**** #AIHUBMIX_API_KEY
  Anthropic base URL: https://aihubmix.com
 
  Model: claude-sonnet-4-5
 ```
-
-> Don’t want to configure environment variables manually? Use a graphical tool for quick setup: [Configure via CC-Switch](https://docs.aihubmix.com/en/api/Claude-Code#configure-via-cc-switch).
 
 ## Switch Models
 
