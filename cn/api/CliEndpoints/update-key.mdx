@@ -8,97 +8,72 @@ api: "PUT /api/token/"
 
 ### 请求头（headers）
 
-<ResponseField name="Authorization" type="string" required>
+<ParamField header="Authorization" type="string" required>
   请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
-</ResponseField>
+</ParamField>
 
-<ResponseField name="Content-Type" type="string">
+<ParamField header="Content-Type" type="string">
   请求内容类型。此参数必须设置为 application/json。
-</ResponseField>
+</ParamField>
 
 ### 请求体（Request Body）
 
-<ResponseField name="id" type="integer" required>
+<ParamField body="id" type="integer" required>
   Key ID。
-</ResponseField>
+</ParamField>
 
-<ResponseField name="name" type="string">
+<ParamField body="name" type="string">
   新 Key 的名称。
-</ResponseField>
+</ParamField>
 
-<ResponseField name="expired_time" type="integer">
-  过期时间。存储格式为 UNIX 时间戳，-1 表示永不过期。
-</ResponseField>
+<ParamField body="expired_time" type="integer">
+  过期时间（UNIX 时间戳），-1 表示永不过期。
+</ParamField>
 
-<ResponseField name="unlimited_quota" type="boolean">
-  是否限额。true 表示无限额；false 表示启用限额（需配合 remain_quota）。
-</ResponseField>
+<ParamField body="unlimited_quota" type="boolean">
+  是否无限额。true 表示无限额；false 表示启用限额（需配合 remain_quota）。
+</ParamField>
 
-<ResponseField name="remain_quota" type="integer">
+<ParamField body="remain_quota" type="integer">
   限额余量。remain_quota 为：期望限额 * 500000（例如期望限额 10，则传 5000000）。
   当 unlimited_quota 为 true 时建议传 -1。
-</ResponseField>
+</ParamField>
 
-<ResponseField name="status" type="integer">
+<ParamField body="status" type="integer">
   Key 状态。0 为未启用，1 为启用。
-</ResponseField>
+</ParamField>
 
-<ResponseField name="models" type="text">
+<ParamField body="models" type="text">
   限制当前 Key 可使用的模型（为空或不传表示不限制）。
-</ResponseField>
+</ParamField>
 
-<ResponseField name="subnet" type="text">
+<ParamField body="subnet" type="text">
   IP 限制（为空或不传表示不限制）。
-</ResponseField>
+</ParamField>
 
 ## 响应参数
 
-<ResponseField name="data" type="object">
-  用户更新后的 Key 相关信息（通常包含 id、name 等）。
-
-  <ResponseField name="id" type="integer">
-    Key ID。
-  </ResponseField>
-  <ResponseField name="user_id" type="integer">
-    用户 ID
-  </ResponseField>
-  <ResponseField name="status" type="integer">
-    Key 状态。0 为未启用，1 为启用。
-  </ResponseField>
-  <ResponseField name="name" type="string">
-    Key 名称。
-  </ResponseField>
-  <ResponseField name="created_time" type="integer">
-    Key 创建时间，保存格式为 UNIX 时间戳。
-  </ResponseField>
-  <ResponseField name="accessed_time" type="integer">
-    Key 获取时间，保存格式为 UNIX 时间戳。
-  </ResponseField>
-  <ResponseField name="expired_time" type="string">
-    Key 过期时间，-1 表示永不过期。
-  </ResponseField>
-  <ResponseField name="remain_quota" type="string">
-    限额余量，-1 表示无限额。
-  </ResponseField>
-  <ResponseField name="unlimited_quota" type="boolean">
-    是否限额。
-  </ResponseField>
-  <ResponseField name="used_quota" type="integer">
-    已使用额度为：used_quota / 500000
-  </ResponseField>
-  <ResponseField name="models" type="text">
-    限制当前 Key 使用的模型。
-  </ResponseField>
-  <ResponseField name="subnet" type="text">
-    IP 限制。
-  </ResponseField>
-
+<ResponseField name="success" type="boolean">
+  是否成功
 </ResponseField>
 
 <ResponseField name="message" type="string">
-  请求失败的详细信息。请求成功时不会返回此参数。
+  请求失败的详细信息。请求成功时可能为空或不返回。
 </ResponseField>
 
-<ResponseField name="success" type="boolean">
-  是否成功
+<ResponseField name="data" type="object">
+  更新后的 Key 对象。
+
+  <ResponseField name="id" type="integer" />
+  <ResponseField name="user_id" type="integer" />
+  <ResponseField name="status" type="integer" />
+  <ResponseField name="name" type="string" />
+  <ResponseField name="created_time" type="integer" />
+  <ResponseField name="accessed_time" type="integer" />
+  <ResponseField name="expired_time" type="integer" />
+  <ResponseField name="remain_quota" type="integer" />
+  <ResponseField name="unlimited_quota" type="boolean" />
+  <ResponseField name="used_quota" type="integer" />
+  <ResponseField name="models" type="text" />
+  <ResponseField name="subnet" type="text" />
 </ResponseField>
