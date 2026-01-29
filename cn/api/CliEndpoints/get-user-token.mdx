@@ -1,11 +1,35 @@
 ---
-title: '获取用户 KEY'
-description: '获取当前用户的 KEY（若接口返回 token 字段）'
-api: 'GET /api/user/token'
+title: "获取用户 KEY"
+description: "获取当前用户的 KEY 信息（若接口返回 token 字段）"
+api: "GET /api/user/token"
 ---
 
-<ResponseField name="success" type="boolean" />
-<ResponseField name="message" type="string" />
+## 请求参数
+
+### 请求头（headers）
+
+<ResponseField header="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  请求内容类型。此参数必须设置为 application/json。
+</ResponseField>
+
+## 响应参数
+
+<ResponseField name="success" type="boolean">
+  是否成功。
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  提示信息（可能为空）。请求失败时返回失败原因。
+</ResponseField>
+
 <ResponseField name="data" type="object">
-  通常包含 token 字段
+  当前用户的 KEY 信息对象（字段以实际返回为准）。
+
+  <ResponseField name="token" type="string">
+    用户 Token（如接口返回该字段）。
+  </ResponseField>
 </ResponseField>

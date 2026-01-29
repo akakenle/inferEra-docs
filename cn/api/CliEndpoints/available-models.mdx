@@ -1,11 +1,35 @@
 ---
-title: '获取当前用户可用模型列表'
-description: '返回当前用户允许使用的模型列表'
-api: 'GET /api/user/available_models'
+title: "获取当前用户可用模型列表"
+description: "返回当前用户允许使用的模型列表"
+api: "GET /api/user/available_models"
 ---
 
-<ResponseField name="success" type="boolean" />
-<ResponseField name="message" type="string" />
-<ResponseField name="data" type="string[]">
-  模型名称数组
+## 请求参数
+
+### 请求头（headers）
+
+<ResponseField header="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  请求内容类型。此参数必须设置为 application/json。
+</ResponseField>
+
+## 响应参数
+
+<ResponseField name="success" type="boolean">
+  是否成功。
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  提示信息（可能为空）。请求失败时返回失败原因。
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  模型名称数组（每个元素为模型标识字符串）。
+
+  <ResponseField name="*" type="string">
+    模型标识（示例：deepinfra-gemma-3-12b-it）。
+  </ResponseField>
 </ResponseField>
