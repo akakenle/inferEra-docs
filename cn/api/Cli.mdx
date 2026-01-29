@@ -10,8 +10,8 @@ AiHubMix CLI 是一个实用管理脚本集合，无需通过网页界面，就�
 
 在开始使用 AiHubMix CLI 前，你需要：
 
-1. 一个 [AiHubMix 账户](https://aihubmix.com)
-2. 从 [AiHubMix 设置页面](https://aihubmix.com/setting) 点击「生成系统访问令牌」生成访问令牌 (Access Token)；
+1. 一个 [AIHubMix 账户](https://aihubmix.com)
+2. 从 [AIHubMix 设置页面](https://aihubmix.com/setting) 点击「生成系统访问令牌」生成访问令牌 (Access Token)；
 3. 安装必要的 Python 依赖项：
 
 ```bash
@@ -24,20 +24,20 @@ pip install -U requests openai
 
 ## 功能列表
 
-AiHubMix CLI 提供以下主要功能：
+AIHubMix CLI 提供以下主要功能：
 
 ### API 端点一览表
 
 | 端点                           | HTTP 方法 | 描述                           |
 | ---------------------------- | ------- | ---------------------------- |
 | `/api/user/self`             | GET     | 获取当前用户信息和账户余额                |
-| `/api/token/`                | GET     | 获取所有 KEY 列表                  |
-| `/api/token/`                | POST    | 创建新的 API KEY                 |
-| `/api/token/`                | PUT     | 更新现有 API KEY                 |
-| `/api/token/{token_id}`      | GET     | 获取特定 KEY 的详细信息               |
-| `/api/token/{token_id}`      | DELETE  | 删除特定 KEY                     |
-| `/api/token/search`          | GET     | 搜索 KEY (使用 `?keyword=搜索关键词`) |
-| `/api/user/token`            | GET     | 获取用户 KEY                     |
+| `/api/token/`                | GET     | 获取所有 Key 列表                  |
+| `/api/token/`                | POST    | 创建新的 API Key                 |
+| `/api/token/`                | PUT     | 更新现有 API Key                 |
+| `/api/token/{token_id}`      | GET     | 获取特定 Key 的详细信息               |
+| `/api/token/{token_id}`      | DELETE  | 删除特定 Key                     |
+| `/api/token/search`          | GET     | 搜索 Key (使用 `?keyword=搜索关键词`) |
+| `/api/user/token`            | GET     | 获取用户 Key                     |
 | `/api/models`                | GET     | 获取所有可用模型列表                   |
 | `/api/user/available_models` | GET     | 获取当前用户可用的模型列表                |
 
@@ -46,6 +46,7 @@ AiHubMix CLI 提供以下主要功能：
 <CodeGroup>
 
 ```shell Curl 获取账户余额
+# 通过 curl 获取余额，余额为 quota /500000
 curl -X GET "https://aihubmix.com/api/user/self" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
@@ -95,25 +96,18 @@ curl 'https://aihubmix.com/dashboard/billing/remain' \
 
 </CodeGroup>
 
-Key 可用额度返回示例：
+### Key 管理
 
-```
-
-{"object":"list","total_usage":0.06495} 代表剩余额度 $0.06495
-
-{"object":"list","total_usage":-0.000002}   -0.000002 代表无限额度
-```
-
-### KEY 管理
+#### 创建新 Key
 
 <CodeGroup>
 
-```shell Curl 创建新 KEY
+```shell Curl
 curl -X POST "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "新KEY名称",
+    "name": "新Key名称",
     "expired_time": -1,
     "remain_quota": 500000,
     "unlimited_quota": false,
@@ -122,7 +116,7 @@ curl -X POST "https://aihubmix.com/api/token/" \
 ```
 
 
-```py Python 创建新 KEY
+```py Python
 import requests
 import json
 
@@ -134,9 +128,9 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 创建新 KEY
+# 创建新 Key
 payload = {
-    "name": "新KEY名称",
+    "name": "新Key名称",
     "expired_time": -1,  # 永不过期
     "remain_quota": 500000,
     "unlimited_quota": False,
@@ -148,31 +142,33 @@ if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         token_data = data.get("data", {})
-        print(f"新KEY: {token_data.get('key', '未知')}")
-        print(f"KEY ID: {token_data.get('id', '未知')}")
+        print(f"新Key: {token_data.get('key', '未知')}")
+        print(f"Key ID: {token_data.get('id', '未知')}")
     else:
-        print(f"创建KEY失败: {data.get('message', '未知错误')}")
+        print(f"创建Key失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 创建新 KEY
-python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "新KEY名称" --expires -1 --quota 500000
+```shell CLI
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "新Key名称" --expires -1 --quota 500000
 ```
 
 </CodeGroup>
 
+#### 获取 Key 列表
+
 <CodeGroup>
 
-```shell Curl 获取 KEY 列表
+```shell Curl
 curl -X GET "https://aihubmix.com/api/token/?num=20" \ #修改num参数可以调整输出的数据数量。
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 获取 KEY 列表
+```py Python
 import requests
 import json
 
@@ -184,41 +180,43 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 获取 KEY 列表
+# 获取 Key 列表
 response = requests.get(f"{api_url}/api/token/", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         tokens_data = data.get("data", [])
-        print(f"KEY列表 (共 {len(tokens_data)} 个):")
+        print(f"Key列表 (共 {len(tokens_data)} 个):")
         for token in tokens_data:
-            print(f"KEY ID: {token.get('id', '未知')}")
-            print(f"KEY 名称: {token.get('name', '未知')}")
-            print(f"KEY: {token.get('key', '未知')}")
+            print(f"Key ID: {token.get('id', '未知')}")
+            print(f"Key 名称: {token.get('name', '未知')}")
+            print(f"Key: {token.get('key', '未知')}")
             print("---")
     else:
-        print(f"获取KEY列表失败: {data.get('message', '未知错误')}")
+        print(f"获取Key列表失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 获取 KEY 列表
+```shell CLI
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
 ```
 
 </CodeGroup>
 
+#### 搜索 Key
+
 <CodeGroup>
 
-```shell Curl 搜索 KEY
+```shell Curl
 curl -X GET "https://aihubmix.com/api/token/search?keyword=搜索关键词" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 搜索 KEY
+```py Python
 import requests
 import json
 
@@ -233,7 +231,7 @@ headers = {
 # 搜索关键词
 query = "搜索关键词"
 
-# 搜索 KEY
+# 搜索 Key
 response = requests.get(f"{api_url}/api/token/search?keyword={query}", headers=headers)
 if response.status_code == 200:
     data = response.json()
@@ -241,31 +239,33 @@ if response.status_code == 200:
         tokens_data = data.get("data", [])
         print(f"搜索结果 (共 {len(tokens_data)} 个):")
         for token in tokens_data:
-            print(f"KEY ID: {token.get('id', '未知')}")
-            print(f"KEY 名称: {token.get('name', '未知')}")
-            print(f"KEY: {token.get('key', '未知')}")
+            print(f"Key ID: {token.get('id', '未知')}")
+            print(f"Key 名称: {token.get('name', '未知')}")
+            print(f"Key: {token.get('key', '未知')}")
             print("---")
     else:
-        print(f"搜索KEY失败: {data.get('message', '未知错误')}")
+        print(f"搜索Key失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 搜索 KEY
+```shell CLI
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "搜索关键词"
 ```
 
 </CodeGroup>
 
+#### 更新 Key
+
 <CodeGroup>
 
-```shell Curl 更新 KEY
+```shell Curl
 curl -X PUT "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "KEY_ID",
+    "id": "Key_ID",
     "name": "新名称",
     "expired_time": 86400,
     "remain_quota": 100000,
@@ -274,7 +274,7 @@ curl -X PUT "https://aihubmix.com/api/token/" \
 ```
 
 
-```py Python 更新 KEY
+```py Python
 import requests
 import json
 
@@ -286,8 +286,8 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 更新 KEY
-key_id = "KEY_ID"  # 替换为实际的KEY ID
+# 更新 Key
+key_id = "Key_ID"  # 替换为实际的Key ID
 payload = {
     "id": key_id,
     "name": "新名称",
@@ -300,34 +300,36 @@ response = requests.put(f"{api_url}/api/token/", headers=headers, json=payload)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
-        print(f"KEY更新成功")
+        print(f"Key更新成功")
         if "data" in data:
             token_data = data.get("data", {})
             print(f"名称: {token_data.get('name', '未知')}")
             print(f"过期时间: {token_data.get('expired_time', '未知')}")
     else:
-        print(f"更新KEY失败: {data.get('message', '未知错误')}")
+        print(f"更新Key失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 更新 KEY
-python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "新名称" --expires 86400 --quota 100000 --status 1
+```shell CLI
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "Key_ID" --name "新名称" --expires 86400 --quota 100000 --status 1
 ```
 
 </CodeGroup>
 
+#### 删除 Key
+
 <CodeGroup>
 
-```shell Curl 删除 KEY
-curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
+```shell Cur
+curl -X DELETE "https://aihubmix.com/api/token/Key_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 删除 KEY
+```py Python
 import requests
 import json
 
@@ -339,37 +341,39 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 删除 KEY
-key_id = "KEY_ID"  # 替换为实际的KEY ID
+# 删除 Key
+key_id = "Key_ID"  # 替换为实际的Key ID
 
 response = requests.delete(f"{api_url}/api/token/{key_id}", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
-        print(f"KEY删除成功")
+        print(f"Key删除成功")
     else:
-        print(f"删除KEY失败: {data.get('message', '未知错误')}")
+        print(f"删除Key失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 删除 KEY
-python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
+```shell CLI
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "Key_ID"
 ```
 
 </CodeGroup>
 
+#### 获取用户 Key
+
 <CodeGroup>
 
-```shell Curl 获取用户 KEY
+```shell Curl
 curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 获取用户 KEY
+```py Python
 import requests
 import json
 
@@ -381,21 +385,21 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 获取用户 KEY
+# 获取用户 Key
 response = requests.get(f"{api_url}/api/user/token", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         user_token = data.get("data", {}).get("token")
-        print(f"用户KEY: {user_token}")
+        print(f"用户Key: {user_token}")
     else:
-        print(f"获取用户KEY失败: {data.get('message', '未知错误')}")
+        print(f"获取用户Key失败: {data.get('message', '未知错误')}")
 else:
     print(f"请求失败，状态码: {response.status_code}")
 ```
 
 
-```shell CLI 获取用户 KEY
+```shell CLI
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
 
@@ -403,16 +407,18 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 
 ### 模型管理
 
+#### 获取所有可用模型
+
 <CodeGroup>
 
-```shell Curl 获取所有可用模型
+```shell Curl
 curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 获取所有可用模型
+```py Python
 import requests
 import json
 
@@ -449,22 +455,24 @@ else:
 ```
 
 
-```shell CLI 获取所有可用模型
+```shell CLI
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
 
 </CodeGroup>
 
+#### 获取用户可用模型
+
 <CodeGroup>
 
-```shell Curl 获取用户可用模型
+```shell Curl
 curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
 
-```py Python 获取用户可用模型
+```py Python
 import requests
 import json
 
@@ -492,7 +500,7 @@ else:
 ```
 
 
-```shell CLI 获取用户可用模型
+```shell CLI
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
 ```
 
@@ -515,11 +523,11 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
    ```bash
    python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
    ```
-2. **访问令牌无效**：确保提供的访问令牌是从 AiHubMix 网站获取的有效密钥。访问令牌格式通常是 `fd***` 这样的形式。
+2. **访问令牌无效**：确保提供的访问令牌是从 AIHubMix 网站获取的有效密钥。访问令牌格式通常是 `fd***` 这样的形式。
 3. **权限不足**：某些操作可能需要特定的权限，请确保您的账户有足够的权限。
 4. **请求失败**：检查网络连接，或尝试稍后再试。
 
 ## 注意事项
 
-- 访问令牌与用于访问 AI 模型的普通 API KEY 不同
+- 访问令牌与用于访问 AI 模型的普通 API Key 不同
 - 每个用户拥有自己的系统访问令牌，其访问级别由用户角色决定（普通用户、管理员或根用户）

@@ -1,64 +1,62 @@
 ---
-title: "Obtain account information via API"
-description: "Manage API keys, view account information, and access available models through the AiHubMix CLI utility scripts"
+title: "Retrieve Account Information via API"
+description: "Manage keys, view account information, and access available model lists through the AiHubMix CLI utility management script in the command line."
 icon: "terminal"
 ---
 
-AiHubMix CLI is a collection of utility management scripts that allows you to manage your AiHubMix API keys, query account information, and use AI services without needing to access the web interface. It essentially wraps API calls (curl or Python requests) for easier command-line usage.
+The AiHubMix CLI is a collection of utility management scripts that allow you to manage your AiHubMix API keys, query account information, and use AI services without going through a web interface. Essentially, it wraps API calls (curl or Python requests) for ease of use from the command line.
 
 ## Prerequisites
 
-Before using the AiHubMix CLI, you'll need:
+Before using the AiHubMix CLI, you need to:
 
-1. An [AiHubMix account](https://aihubmix.com)
-2. An Access Token generated from the [AiHubMix Settings page](https://aihubmix.com/setting) by clicking "Generate System Access Token"
-3. Required Python dependencies:
+1. An [AIHubMix account](https://aihubmix.com)
+2. Generate an access token by clicking "Generate System Access Token" on the [AIHubMix Settings page](https://aihubmix.com/setting);
+3. Install the necessary Python dependencies:
 
 ```bash
 pip install -U requests openai
 ```
 
 <Info>
-  The aihubmix_cli.py script can be [downloaded here](https://github.com/jerlinn/inferHub)
+  The `aihubmix_cli.py` script can be [obtained here](https://github.com/jerlinn/inferHub)
 </Info>
-
-## Model
 
 ## Feature List
 
-AiHubMix CLI provides the following main functions:
+The AIHubMix CLI provides the following main features:
 
 ### API Endpoints Overview
 
-| Endpoint                     | HTTP Method | Description                                        |
-| ---------------------------- | ----------- | -------------------------------------------------- |
-| `/api/user/self`             | GET         | Get current user information and account balance   |
-| `/api/token/`                | GET         | Get list of all API keys                           |
-| `/api/token/`                | POST        | Create a new API key                               |
-| `/api/token/`                | PUT         | Update an existing API key                         |
-| `/api/token/{token_id}`      | GET         | Get details of a specific API key                  |
-| `/api/token/{token_id}`      | DELETE      | Delete a specific API key                          |
-| `/api/token/search`          | GET         | Search for API keys (using `?keyword=search_term`) |
-| `/api/user/token`            | GET         | Get user API key                                   |
-| `/api/models`                | GET         | Get list of all available models                   |
-| `/api/user/available_models` | GET         | Get list of models available to the current user   |
+| Endpoint                         | HTTP Method | Description                       |
+| ------------------------------- | ----------- | --------------------------------- |
+| `/api/user/self`                | GET         | Retrieve current user information and account balance |
+| `/api/token/`                   | GET         | Retrieve all key lists            |
+| `/api/token/`                   | POST        | Create a new API key              |
+| `/api/token/`                   | PUT         | Update an existing API key        |
+| `/api/token/{token_id}`         | GET         | Retrieve details of a specific key |
+| `/api/token/{token_id}`         | DELETE      | Delete a specific key             |
+| `/api/token/search`             | GET         | Search for a key (use `?keyword=search_term`) |
+| `/api/user/token`               | GET         | Retrieve user keys                |
+| `/api/models`                   | GET         | Retrieve a list of all available models |
+| `/api/user/available_models`    | GET         | Retrieve the list of models available to the current user |
 
-### Get Balance
+### Retrieve Balance Information
 
 <CodeGroup>
 
-```shell Curl Get Account Balance
+```shell
+# Curl to get account balance; balance is quota / 500000
 curl -X GET "https://aihubmix.com/api/user/self" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Get Account Balance
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -66,7 +64,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Get account balance
+# Retrieve account balance
 response = requests.get(f"{api_url}/api/user/self", headers=headers)
 if response.status_code == 200:
     data = response.json()
@@ -75,8 +73,8 @@ if response.status_code == 200:
         quota = user_data.get('quota', 0)
         usd_balance = quota / 500000  # $1 equals 500,000 credits
         print(f"Username: {user_data.get('username', 'Unknown')}")
-        print(f"Display name: {user_data.get('display_name', 'Unknown')}")
-        print(f"Current quota: {quota}")
+        print(f"Display Name: {user_data.get('display_name', 'Unknown')}")
+        print(f"Current Quota: {quota}")
         print(f"Available USD: ${usd_balance:.2f}")
     else:
         print(f"Request failed: {data.get('message', 'Unknown error')}")
@@ -84,24 +82,24 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Get Account Balance
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
 ```
 
-
-```shell Key quota
+```shell
 curl 'https://aihubmix.com/dashboard/billing/remain' \
   -H 'authorization: Bearer sk-***' \
 ```
 
 </CodeGroup>
 
-### API Key Management
+### Key Management
+
+#### Create New Key
 
 <CodeGroup>
 
-```shell Curl Create New API Key
+```shell
 curl -X POST "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
@@ -114,12 +112,11 @@ curl -X POST "https://aihubmix.com/api/token/" \
   }'
 ```
 
-
-```py Python Create New API Key
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -127,7 +124,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Create new API key
+# Create new key
 payload = {
     "name": "New Key Name",
     "expired_time": -1,  # Never expires
@@ -141,7 +138,7 @@ if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         token_data = data.get("data", {})
-        print(f"New API key: {token_data.get('key', 'Unknown')}")
+        print(f"New Key: {token_data.get('key', 'Unknown')}")
         print(f"Key ID: {token_data.get('id', 'Unknown')}")
     else:
         print(f"Failed to create key: {data.get('message', 'Unknown error')}")
@@ -149,27 +146,27 @@ else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Create New API Key
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action create_token --name "New Key Name" --expires -1 --quota 500000
 ```
 
 </CodeGroup>
 
+#### Retrieve Key List
+
 <CodeGroup>
 
-```shell Curl Get API Key List
-curl -X GET "https://aihubmix.com/api/token/?num=20" \ #Modifying the num parameter can adjust the number of output data items.
+```shell
+curl -X GET "https://aihubmix.com/api/token/?num=20" \ # Adjusting num parameter can change the number of outputs.
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Get API Key List
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -177,45 +174,45 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Get API key list
+# Retrieve key list
 response = requests.get(f"{api_url}/api/token/", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         tokens_data = data.get("data", [])
-        print(f"API Key List (Total: {len(tokens_data)}):")
+        print(f"Key List (Total {len(tokens_data)}):")
         for token in tokens_data:
             print(f"Key ID: {token.get('id', 'Unknown')}")
             print(f"Key Name: {token.get('name', 'Unknown')}")
             print(f"Key: {token.get('key', 'Unknown')}")
             print("---")
     else:
-        print(f"Failed to get key list: {data.get('message', 'Unknown error')}")
+        print(f"Failed to retrieve key list: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Get API Key List
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_tokens
 ```
 
 </CodeGroup>
 
+#### Search Key
+
 <CodeGroup>
 
-```shell Curl Search API Keys
+```shell
 curl -X GET "https://aihubmix.com/api/token/search?keyword=search_term" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Search API Keys
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -223,42 +220,43 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Search term
+# Search keyword
 query = "search_term"
 
-# Search API keys
+# Search key
 response = requests.get(f"{api_url}/api/token/search?keyword={query}", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         tokens_data = data.get("data", [])
-        print(f"Search Results (Total: {len(tokens_data)}):")
+        print(f"Search Results (Total {len(tokens_data)}):")
         for token in tokens_data:
             print(f"Key ID: {token.get('id', 'Unknown')}")
             print(f"Key Name: {token.get('name', 'Unknown')}")
             print(f"Key: {token.get('key', 'Unknown')}")
             print("---")
     else:
-        print(f"Failed to search keys: {data.get('message', 'Unknown error')}")
+        print(f"Failed to search key: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Search API Keys
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action search_tokens --query "search_term"
 ```
 
 </CodeGroup>
 
+#### Update Key
+
 <CodeGroup>
 
-```shell Curl Update API Key
+```shell
 curl -X PUT "https://aihubmix.com/api/token/" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "KEY_ID",
+    "id": "Key_ID",
     "name": "New Name",
     "expired_time": 86400,
     "remain_quota": 100000,
@@ -266,12 +264,11 @@ curl -X PUT "https://aihubmix.com/api/token/" \
   }'
 ```
 
-
-```py Python Update API Key
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -279,52 +276,52 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Update API key
-key_id = "KEY_ID"  # Replace with actual KEY ID
+# Update key
+key_id = "Key_ID"  # Replace with actual Key ID
 payload = {
     "id": key_id,
     "name": "New Name",
     "expired_time": 86400,  # Expires in 24 hours
     "remain_quota": 100000,
-    "status": 1  # 1-Enabled, 0-Disabled
+    "status": 1  # 1 - Enabled, 0 - Disabled
 }
 
 response = requests.put(f"{api_url}/api/token/", headers=headers, json=payload)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
-        print(f"API key updated successfully")
+        print(f"Key updated successfully")
         if "data" in data:
             token_data = data.get("data", {})
             print(f"Name: {token_data.get('name', 'Unknown')}")
-            print(f"Expiration time: {token_data.get('expired_time', 'Unknown')}")
+            print(f"Expiration Time: {token_data.get('expired_time', 'Unknown')}")
     else:
         print(f"Failed to update key: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Update API Key
-python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "KEY_ID" --name "New Name" --expires 86400 --quota 100000 --status 1
+```shell
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action update_token --id "Key_ID" --name "New Name" --expires 86400 --quota 100000 --status 1
 ```
 
 </CodeGroup>
 
+#### Delete Key
+
 <CodeGroup>
 
-```shell Curl Delete API Key
-curl -X DELETE "https://aihubmix.com/api/token/KEY_ID" \
+```shell
+curl -X DELETE "https://aihubmix.com/api/token/Key_ID" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Delete API Key
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -332,41 +329,41 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Delete API key
-key_id = "KEY_ID"  # Replace with actual KEY ID
+# Delete key
+key_id = "Key_ID"  # Replace with actual Key ID
 
 response = requests.delete(f"{api_url}/api/token/{key_id}", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
-        print(f"API key deleted successfully")
+        print(f"Key deleted successfully")
     else:
         print(f"Failed to delete key: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Delete API Key
-python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "KEY_ID"
+```shell
+python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action delete_token --id "Key_ID"
 ```
 
 </CodeGroup>
 
+#### Retrieve User Key
+
 <CodeGroup>
 
-```shell Curl Get User API Key
+```shell
 curl -X GET "https://aihubmix.com/api/user/token" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Get User API Key
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -374,21 +371,20 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Get user API key
+# Retrieve user key
 response = requests.get(f"{api_url}/api/user/token", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         user_token = data.get("data", {}).get("token")
-        print(f"User API Key: {user_token}")
+        print(f"User Key: {user_token}")
     else:
-        print(f"Failed to get user API key: {data.get('message', 'Unknown error')}")
+        print(f"Failed to retrieve user key: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Get User API Key
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_user_token
 ```
 
@@ -396,20 +392,21 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 
 ### Model Management
 
+#### Retrieve All Available Models
+
 <CodeGroup>
 
-```shell Curl Get All Available Models
+```shell
 curl -X GET "https://aihubmix.com/api/models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Get All Available Models
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -417,7 +414,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Get all available models
+# Retrieve all available models
 response = requests.get(f"{api_url}/api/models", headers=headers)
 if response.status_code == 200:
     data = response.json()
@@ -432,36 +429,36 @@ if response.status_code == 200:
                     total_models.add(model)
         
         # Output model list
-        print(f"Available Models List (Total: {len(total_models)}):")
+        print(f"Available Model List (Total {len(total_models)}):")
         for i, model in enumerate(sorted(list(total_models)), 1):
             print(f"  {i}. {model}")
     else:
-        print(f"Failed to get model list: {data.get('message', 'Unknown error')}")
+        print(f"Failed to retrieve model list: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Get All Available Models
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_models
 ```
 
 </CodeGroup>
 
+#### Retrieve User Available Models
+
 <CodeGroup>
 
-```shell Curl Get User Available Models
+```shell
 curl -X GET "https://aihubmix.com/api/user/available_models" \
   -H "Authorization: YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
 
-
-```py Python Get User Available Models
+```py
 import requests
 import json
 
-# API configuration
+# API Configuration
 api_url = "https://aihubmix.com"
 access_token = "YOUR_ACCESS_TOKEN"
 headers = {
@@ -469,31 +466,30 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Get user available models
+# Retrieve user available models
 response = requests.get(f"{api_url}/api/user/available_models", headers=headers)
 if response.status_code == 200:
     data = response.json()
     if data.get("success", False):
         models_data = data.get("data", [])
-        print(f"User Available Models List (Total: {len(models_data)}):")
+        print(f"User Available Model List (Total {len(models_data)}):")
         for i, model in enumerate(models_data, 1):
             print(f"  {i}. {model}")
     else:
-        print(f"Failed to get user available models: {data.get('message', 'Unknown error')}")
+        print(f"Failed to retrieve user available models: {data.get('message', 'Unknown error')}")
 else:
     print(f"Request failed, status code: {response.status_code}")
 ```
 
-
-```shell CLI Get User Available Models
+```shell
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_available_models
 ```
 
 </CodeGroup>
 
-## JSON Format Output
+## Use JSON Format Output
 
-All CLI commands support outputting results in JSON format for programmatic processing:
+All CLI commands support outputting results in JSON format for easier programmatic processing:
 
 ```bash
 python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance --json
@@ -501,18 +497,18 @@ python aihubmix_cli.py --url "https://aihubmix.com" --token "YOUR_ACCESS_TOKEN" 
 
 ## Troubleshooting
 
-If you encounter issues, try the following solutions:
+If you encounter issues, you can try the following solutions:
 
-1. **Connection Problems**: If the main domain connection fails, try using the backup domain:
+1. **Connection Issues**: If the main domain fails to connect, try using an alternative domain:
 
    ```bash
    python aihubmix_cli.py --url "https://api.aihubmix.com" --token "YOUR_ACCESS_TOKEN" --action get_balance
    ```
-2. **Invalid Access Token**: Ensure the provided access token is a valid key obtained from the AiHubMix website. Access tokens typically have a format like `fd***`.
-3. **Insufficient Permissions**: Some operations may require specific permissions; ensure your account has sufficient privileges.
-4. **Request Failures**: Check your network connection or try again later.
+2. **Invalid Access Token**: Ensure the access token provided is a valid key obtained from the AIHubMix website. The format of the access token is usually something like `fd***`.
+3. **Insufficient Permissions**: Certain operations may require specific permissions. Ensure your account has sufficient privileges.
+4. **Request Failure**: Check your network connection, or try again later.
 
 ## Notes
 
-- The access token is different from the regular API keys used to access AI models
-- Each user has their own system access token, with access levels determined by the user role (regular user, administrator, or root user)
+- The access token is different from the standard API key used to access AI models.
+- Each user has their own system access token, and the access level is determined by the user role (regular user, administrator, or root user).
