@@ -6,8 +6,20 @@ api: "GET /api/token/{token_id}"
 
 ## 请求参数
 
-<ParamField path="token_id" type="string" required>
-  KEY 的 ID
+### 请求头（headers）
+
+<ParamField header="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+</ParamField>
+
+<ParamField header="Content-Type" type="string">
+  请求内容类型。此参数必须设置为 application/json。
+</ParamField>
+
+### 路径参数（Path）
+
+<ParamField path="token_id" type="integer" required>
+  KEY 的 ID。
 </ParamField>
 
 ## 响应参数
@@ -21,7 +33,7 @@ api: "GET /api/token/{token_id}"
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  Key 详情对象。请求失败时 data 可能为空对象。
+  Key 详情对象。请求失败时 data 可能为空对象 `{}`。
 
   <ResponseField name="id" type="integer">
     Key ID。
