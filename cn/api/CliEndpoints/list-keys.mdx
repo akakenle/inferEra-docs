@@ -4,12 +4,66 @@ description: '获取所有 KEY 列表，支持 num 参数控制数量'
 api: 'GET /api/token/'
 ---
 
-<ParamField query="num" type="number" default={20}>
-  返回数量（示例里用 num=20）
-</ParamField>
+## 请求参数
 
-<ResponseField name="success" type="boolean" />
-<ResponseField name="message" type="string" />
-<ResponseField name="data" type="object[]">
-  KEY 列表数组（每项通常包含 id/name/key 等）
+### 请求头（headers）
+
+<ResponseField name="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key进行身份认证。示例值：Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField name="Content-Type" type="string">
+  请求内容类型。此参数必须设置为application/json。
+</ResponseField>
+
+## 响应参数
+
+<ResponseField name="data" type="object">
+  用户 Key 相关信息（通常包含 id、name 等）。
+
+  <ResponseField name="id" type="integer">
+    Key ID。
+  </ResponseField>
+  <ResponseField name="user_id" type="integer">
+    用户 ID
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    Key 状态。0 为未启用，1 为启用。
+  </ResponseField>
+  <ResponseField name="name" type="string">
+    Key 名称。
+  </ResponseField>
+  <ResponseField name="created_time" type="integer">
+    Key 创建时间，保存格式为 UNIX 时间戳。
+  </ResponseField>
+  <ResponseField name="accessed_time" type="integer">
+    Key 获取时间，保存格式为 UNIX 时间戳。
+  </ResponseField>
+  <ResponseField name="expired_time" type="string">
+    Key 过期时间，-1 表示永不过期。
+  </ResponseField>
+  <ResponseField name="remain_quota" type="string">
+    限额余量，-1 表示无限额。
+  </ResponseField>
+  <ResponseField name="unlimited_quota" type="boolean">
+    是否限额。
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    已使用额度为：used_quota / 500000
+  </ResponseField>
+  <ResponseField name="models" type="text">
+    限制当前 Key 使用的模型。
+  </ResponseField>
+  <ResponseField name="subnet" type="text">
+    IP 限制。
+  </ResponseField>
+
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  请求失败的详细信息。请求成功时不会返回此参数。
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  是否成功
 </ResponseField>

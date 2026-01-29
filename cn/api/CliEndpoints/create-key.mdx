@@ -1,31 +1,43 @@
 ---
-title: '创建新 KEY'
-description: '创建一个新的 API KEY'
-api: 'POST /api/token/'
+title: "创建新 KEY"
+description: "创建一个新的 API KEY"
+api: "POST /api/token/"
 ---
 
-<ParamField body="name" type="string" required>
-  新 KEY 名称
-</ParamField>
+## 请求体
 
-<ParamField body="expired_time" type="number" default={-1}>
-  过期时间（-1 表示永不过期；也可传秒数）
-</ParamField>
+## 请求参数
 
-<ParamField body="remain_quota" type="number" default={500000}>
-  初始额度（示例：500000）
-</ParamField>
+### 请求头（headers）
 
-<ParamField body="unlimited_quota" type="boolean" default={false}>
-  是否无限额度
-</ParamField>
+<ResponseField name="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key进行身份认证。示例值：Bearer sk-xxxx
+</ResponseField>
 
-<ParamField body="subnet" type="string" default="">
-  子网限制（示例为空字符串）
-</ParamField>
+<ResponseField name="Content-Type" type="string">
+  请求内容类型。此参数必须设置为application/json。
+</ResponseField>
 
-<ResponseField name="success" type="boolean" />
-<ResponseField name="message" type="string" />
-<ResponseField name="data" type="object">
-  通常包含新 key 与 id
+### 请求体（Request Body）
+
+<ResponseField name="name" type="string" required>
+  新 Key 的名称。
+</ResponseField>
+
+<ResponseField name="expired_time" type="integer">
+  过期时间。存储格式为 UNIX 时间戳，-1 表示永不过期。
+</ResponseField>
+
+<ResponseField name="remain_quota" type="string" required>
+  新 Key 的名称。
+</ResponseField>
+
+## 响应参数
+
+<ResponseField name="message" type="string">
+  请求失败的详细信息。请求成功时不会返回此参数。
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  是否成功
 </ResponseField>
