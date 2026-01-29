@@ -1,0 +1,15 @@
+---
+title: '删除 KEY'
+description: '根据 token_id 删除一个 KEY'
+api: 'DELETE /api/token/{token_id}'
+---
+
+<ParamField path="token_id" type="string" required>
+  KEY 的 ID
+</ParamField>
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object">
+  删除结果（如接口返回）
+</ResponseField>

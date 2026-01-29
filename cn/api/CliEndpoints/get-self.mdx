@@ -1,0 +1,19 @@
+---
+title: '获取当前用户信息与余额'
+description: '获取当前用户信息与账户余额（quota）'
+api: 'GET /api/user/self'
+---
+
+用于查询当前登录用户的基本信息与余额额度。
+
+<ResponseField name="success" type="boolean">
+  是否成功
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  错误或提示信息（如有）
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  用户信息对象（通常包含 username、display_name、quota 等）
+</ResponseField>

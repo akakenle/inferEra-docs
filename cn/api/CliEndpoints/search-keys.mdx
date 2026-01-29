@@ -1,0 +1,15 @@
+---
+title: '搜索 KEY'
+description: '通过 keyword 搜索 KEY'
+api: 'GET /api/token/search'
+---
+
+<ParamField query="keyword" type="string" required>
+  搜索关键词
+</ParamField>
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object[]">
+  搜索结果列表
+</ResponseField>

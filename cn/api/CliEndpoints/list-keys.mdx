@@ -1,0 +1,15 @@
+---
+title: '获取 KEY 列表'
+description: '获取所有 KEY 列表，支持 num 参数控制数量'
+api: 'GET /api/token/'
+---
+
+<ParamField query="num" type="number" default={20}>
+  返回数量（示例里用 num=20）
+</ParamField>
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object[]">
+  KEY 列表数组（每项通常包含 id/name/key 等）
+</ResponseField>

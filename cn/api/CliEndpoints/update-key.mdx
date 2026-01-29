@@ -1,0 +1,31 @@
+---
+title: '更新 KEY'
+description: '更新现有 KEY 的名称、额度、状态等'
+api: 'PUT /api/token/'
+---
+
+<ParamField body="id" type="string" required>
+  KEY 的 ID
+</ParamField>
+
+<ParamField body="name" type="string">
+  新名称
+</ParamField>
+
+<ParamField body="expired_time" type="number">
+  过期时间（秒）
+</ParamField>
+
+<ParamField body="remain_quota" type="number">
+  剩余额度
+</ParamField>
+
+<ParamField body="status" type="number">
+  状态（示例：1 启用，0 禁用）
+</ParamField>
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object">
+  更新后的 KEY 对象（如接口返回）
+</ResponseField>

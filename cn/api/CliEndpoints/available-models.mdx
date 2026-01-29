@@ -1,0 +1,11 @@
+---
+title: '获取当前用户可用模型列表'
+description: '返回当前用户允许使用的模型列表'
+api: 'GET /api/user/available_models'
+---
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="string[]">
+  模型名称数组
+</ResponseField>

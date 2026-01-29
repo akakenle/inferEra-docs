@@ -64,7 +64,22 @@
                   "cn/api/App-code",
                   "cn/api/Auth",
                   "cn/api/Third-PartyIntegrationTechnicalGuide",
-                  "cn/api/Cli"
+                  {
+                    "group": "通过接口获取账户信息",
+                    "pages": [
+                      "cn/api/Cli",
+                      "cn/api/CliEndpoints/get-self",
+                      "cn/api/CliEndpoints/list-keys",
+                      "cn/api/CliEndpoints/create-key",
+                      "cn/api/CliEndpoints/update-key",
+                      "cn/api/CliEndpoints/get-key",
+                      "cn/api/CliEndpoints/delete-key",
+                      "cn/api/CliEndpoints/search-keys",
+                      "cn/api/CliEndpoints/get-user-token",
+                      "cn/api/CliEndpoints/list-models",
+                      "cn/api/CliEndpoints/available-models"
+                    ]
+                  }
                 ]
               },
               {
@@ -658,6 +673,9 @@
       "server": "https://aihubmix.com",
       "auth": {
         "method": "bearer"
+      },
+      "playground":{
+        "display": "interactive"
       }
     },
     "playground": {

@@ -1,0 +1,11 @@
+---
+title: '获取所有可用模型列表'
+description: '返回所有可用模型（可能按渠道/分组返回）'
+api: 'GET /api/models'
+---
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object">
+  模型集合（示例代码显示可能是 channel_id -> model[] 的结构）
+</ResponseField>

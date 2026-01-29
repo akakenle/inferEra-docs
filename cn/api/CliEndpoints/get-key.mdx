@@ -1,0 +1,15 @@
+---
+title: '获取单个 KEY 详情'
+description: '根据 token_id 获取 KEY 的详细信息'
+api: 'GET /api/token/{token_id}'
+---
+
+<ParamField path="token_id" type="string" required>
+  KEY 的 ID
+</ParamField>
+
+<ResponseField name="success" type="boolean" />
+<ResponseField name="message" type="string" />
+<ResponseField name="data" type="object">
+  KEY 详情对象
+</ResponseField>
