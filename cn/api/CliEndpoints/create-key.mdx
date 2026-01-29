@@ -28,8 +28,20 @@ api: "POST /api/token/"
   过期时间。存储格式为 UNIX 时间戳，-1 表示永不过期。
 </ResponseField>
 
-<ResponseField name="remain_quota" type="string" required>
-  新 Key 的名称。
+<ResponseField name="unlimited_quota" type="boolen">
+  是否限额。
+</ResponseField>
+
+<ResponseField name="remain_quota" type="integer">
+  remain_quota 为：期望限额*500000
+</ResponseField>
+
+<ResponseField name="models" type="text">
+  限制模型。
+</ResponseField>
+
+<ResponseField name="subnet" type="text">
+  限制 IP
 </ResponseField>
 
 ## 响应参数
