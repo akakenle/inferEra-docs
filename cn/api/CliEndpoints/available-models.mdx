@@ -18,6 +18,21 @@ api: "GET /api/user/available_models"
 
 ## 响应参数
 
+<ResponseField name="data" type="array">
+  模型列表。
+
+  <ResponseField name="model" type="string">
+    模型名称。
+  </ResponseField>
+  <ResponseField name="developer_id" type="integer">
+    模型开发者 ID。
+  </ResponseField>
+  <ResponseField name="order" type="integer">
+    模型顺序。
+  </ResponseField>
+  
+</ResponseField>
+
 <ResponseField name="success" type="boolean">
   是否成功。
 </ResponseField>
@@ -26,10 +41,3 @@ api: "GET /api/user/available_models"
   提示信息（可能为空）。请求失败时返回失败原因。
 </ResponseField>
 
-<ResponseField name="data" type="array">
-  模型名称数组（每个元素为模型标识字符串）。
-
-  <ResponseField name="*" type="string">
-    模型标识（示例：deepinfra-gemma-3-12b-it）。
-  </ResponseField>
-</ResponseField>
