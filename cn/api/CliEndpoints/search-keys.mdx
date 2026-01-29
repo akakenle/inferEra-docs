@@ -1,15 +1,89 @@
 ---
-title: '搜索 KEY'
-description: '通过 keyword 搜索 KEY'
-api: 'GET /api/token/search'
+title: "搜索 KEY"
+description: "通过 keyword 搜索 KEY"
+api: "GET /api/token/search"
 ---
 
+## 请求参数
+
+### 请求头（headers）
+
+<ResponseField header="Authorization" type="string" required>
+  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  请求内容类型。此参数必须设置为 application/json。
+</ResponseField>
+
+### 查询参数（Query）
+
 <ParamField query="keyword" type="string" required>
-  搜索关键词
+  搜索关键词（通常匹配 KEY 名称等字段）。
 </ParamField>
 
-<ResponseField name="success" type="boolean" />
-<ResponseField name="message" type="string" />
-<ResponseField name="data" type="object[]">
-  搜索结果列表
+## 响应参数
+
+<ResponseField name="success" type="boolean">
+  是否成功。
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  提示信息（可能为空）。请求失败时返回失败原因。
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  搜索结果列表。数组中每个元素为一个 KEY 对象。
+
+  <ResponseField name="id" type="integer">
+    Key ID。
+  </ResponseField>
+
+  <ResponseField name="user_id" type="integer">
+    用户 ID。
+  </ResponseField>
+
+  <ResponseField name="key" type="string">
+    Key 字符串（用于调用/鉴权）。
+  </ResponseField>
+
+  <ResponseField name="status" type="integer">
+    Key 状态。0 为未启用，1 为启用。
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Key 名称。
+  </ResponseField>
+
+  <ResponseField name="created_time" type="integer">
+    Key 创建时间（UNIX 时间戳）。
+  </ResponseField>
+
+  <ResponseField name="accessed_time" type="integer">
+    Key 最近获取/访问时间（UNIX 时间戳）。
+  </ResponseField>
+
+  <ResponseField name="expired_time" type="integer">
+    Key 过期时间（UNIX 时间戳）；-1 表示永不过期。
+  </ResponseField>
+
+  <ResponseField name="remain_quota" type="integer">
+    限额余量；-1 表示无限额。
+  </ResponseField>
+
+  <ResponseField name="unlimited_quota" type="boolean">
+    是否无限额。true 表示无限额；false 表示限额。
+  </ResponseField>
+
+  <ResponseField name="used_quota" type="integer">
+    已使用额度。实际用量换算：used_quota / 500000。
+  </ResponseField>
+
+  <ResponseField name="models" type="text">
+    限制当前 Key 使用的模型（空字符串表示不限制或未设置）。
+  </ResponseField>
+
+  <ResponseField name="subnet" type="text">
+    IP 限制（空字符串表示不限制或未设置）。
+  </ResponseField>
 </ResponseField>

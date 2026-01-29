@@ -8,13 +8,13 @@ api: "POST /api/token/"
 
 ### 请求头（headers）
 
-<ParamField header="Authorization" type="string" required>
+<ResponseField header="Authorization" type="string" required>
   请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
-</ParamField>
+</ResponseField>
 
-<ParamField header="Content-Type" type="string">
+<ResponseField header="Content-Type" type="string">
   请求内容类型。此参数必须设置为 application/json。
-</ParamField>
+</ResponseField>
 
 ### 请求体（Request Body）
 
