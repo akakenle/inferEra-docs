@@ -4,50 +4,17 @@ description: " 在 AIHubMix 中使用 Claude Code"
 icon: "terminal"
 ---
 
-## 快速入门
+## 快速开始
 
 本指南将帮助您在几分钟内使用由 AIHubMix 提供的 Claude Code.
 
-### 1. 安装Claude Code
-
-#### 使用脚本快速安装
-
-在你的终端或 IDE 中运行以下命令，下载一个帮你自动配置环境变量的 shell 脚本，运行即可。
-
-<CodeGroup>
-
-```shellscript MacOS
-curl -LO https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.sh
-
-chmod +x claude_code_prod.sh
-
-./claude_code_prod.sh
-```
-
-
-```powershell Windows
-$scriptUrl = "https://raw.githubusercontent.com/AiHubMix/claude-code/main/claude_code_prod.ps1"
-$localPath = Join-Path $env:TEMP "claude_code_install_windows.ps1"
-
-$ProgressPreference = 'SilentlyContinue'
-
-Invoke-WebRequest `
-  -Uri $scriptUrl `
-  -OutFile $localPath `
-  -UseBasicParsing
-
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-
-& $localPath
-```
-
-</CodeGroup>
+### 1. 安装 Claude Code
 
 #### 本地安装
 
 <CodeGroup>
 
-```shellscript MacOS
+```shellscript macOS
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
@@ -66,96 +33,176 @@ irm https://claude.ai/install.ps1 | iex
 npm install -g @anthropic-ai/claude-code
 ```
 
-### 2. 将 Claude Code 连接到 AIHubMix
+### 2. 配置 AIHubMix API
 
-设置环境变量，将 Claude Code 连接到 AIHubMix。
+要通过兼容 Anthropic API 的方式来接入 AIHubMix 的模型服务，需要配置以下环境变量。
 
-<Warning>
-  不要直接使用 Anthropic 登录。
-</Warning>
+1. 将`ANTHROPIC_BASE_URL` 设置为`https://aihubmix.com`
+2. `ANTHROPIC_API_KEY` 设置为从 [AIHubMix 平台](https://console.aihubmix.com/token) 获取的 API Key
+3. `ANTHROPIC_MODEL`：设置为[模型列表](https://aihubmix.com/models)中支持的模型。
 
-要求：
+<Tabs>
+  <Tab title="macOS">
+    1. 在终端中执行以下命令，查看默认 Shell 类型。
 
-1. 使用 `https://aihubmix.com` 作`ANTHROPIC_BASE_URL`
-2. 请提供 [AIHubMix API Key](https://aihubmix.com/token) 作为`ANTHROPIC_API_KEY`
+    ```shellscript
+    echo $SHELL
+    ```
 
-**Claude 配置文件：**`.claude/settings.json`
+    2. 根据 Shell 类型设置环境变量，命令如下：
 
-```bash
-{
-  "env": {
-    "ANTHROPIC_API_KEY": "AIHUBMIX_API_KEY",
-    "ANTHROPIC_BASE_URL": "https://aihubmix.com",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5",
-  }
-}
-```
+    <CodeGroup>
 
-请替换 `AIHUBMIX_API_KEY` 为实际的 AIHUBMIX API 密钥。
+    ```shellscript Zsh
+    # AIHUBMIX_API_KEY 替换为你从 AIHUBMIX 平台获取的 Key
+    echo 'export ANTHROPIC_BASE_URL="https://aihubmix.com"' >> ~/.zshrc
+    echo 'export ANTHROPIC_API_KEY="AIHUBMIX_API_KEY"' >> ~/.zshrc
+    echo 'export ANTHROPIC_MODEL="claude-sonnet-4-5"' >> ~/.zshrc
+    ```
 
-<Tip>
-  Claude Code 原生安装程序无法读取标准 `.env` 文件，因此请勿将这些内容放置在 `.env` 文件中。
-</Tip>
+    
+    ```shellscript Bash
+    # AIHUBMIX_API_KEY 替换为你从 AIHUBMIX 平台获取的 Key
+    echo 'export ANTHROPIC_BASE_URL="https://aihubmix.com"' >> ~/.bash_profile
+    echo 'export ANTHROPIC_API_KEY="AIHUBMIX_API_KEY"' >> ~/.bash_profile
+    echo 'export ANTHROPIC_MODEL="claude-sonnet-4-5"' >> ~/.bash_profile
+    ```
+
+    </CodeGroup>
+
+    3. 在终端中执行下列命令，使环境变量生效。
+
+    <CodeGroup>
+
+    ```shellscript Zsh
+    source ~/.zshrc
+    ```
+
+    
+    ```shellscript Bash
+    source ~/.bash_profile
+    ```
+
+    </CodeGroup>
+
+    4. 打开一个新的终端，执行下列命令，查看环境变量是否生效。
+
+    ```shellscript
+    echo $ANTHROPIC_BASE_URL
+    echo $ANTHROPIC_API_KEY
+    echo $ANTHROPIC_MODEL
+    ```
+  </Tab>
+  <Tab title="Windows">
+    在 Windows 中，可以通过 CMD 或 PowerShell 将 AiHubMix 的 Base URL 和 [API Key](https://help.aliyun.com/zh/model-studio/get-api-key) 设置为环境变量。
+
+    <Tabs>
+      <Tab title="CMD">
+        1. 在 CMD 中运行以下命令，设置环境变量。
+
+        ```shellscript
+        REM AIHubMix API Key 替换 AIHUBMIX_API_KEY
+        setx ANTHROPIC_API_KEY "AIHUBMIX_API_KEY"
+        setx ANTHROPIC_BASE_URL "https://aihubmix.com"
+        setx ANTHROPIC_MODEL "claude-sonnet-4-5"
+        ```
+
+        2. 打开一个新的 CMD 窗口，运行以下命令，检查环境变量是否生效。
+
+        ```shellscript
+        echo %ANTHROPIC_API_KEY%
+        echo %ANTHROPIC_BASE_URL%
+        echo %ANTHROPIC_MODEL%
+        ```
+      </Tab>
+      <Tab title="PowerShell">
+        1. 在 PowerShell 中运行以下命令，设置环境变量。
+
+        ```shellscript
+        # AIHubMix API Key 替换 AIHUBMIX_API_KEY
+        [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "AIHUBMIX_API_KEY", [EnvironmentVariableTarget]::User)
+        [Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://aihubmix.com", [EnvironmentVariableTarget]::User)
+        [Environment]::SetEnvironmentVariable("ANTHROPIC_MODEL", "claude-sonnet-4-5", [EnvironmentVariableTarget]::User)
+        ```
+
+        2. 打开一个新的 PowerShell 窗口，运行以下命令，检查环境变量是否生效。
+
+        ```shellscript
+        echo $env:ANTHROPIC_API_KEY
+        echo $env:ANTHROPIC_BASE_URL
+        echo $env:ANTHROPIC_MODEL
+        ```
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>
 
 ### 3. 开始使用
 
-导航到您的项目目录并启动 Claude Code：
+完成配置后，进入你的工作目录，在终端运行 `claude` 命令开始使用 Claude Code。
 
 ```bash
 $ cd /path/your-project
 > claude
 ```
 
-连接成功后，您发送的任何提示都将通过 AIHubMix 路由。
+初次使用 Claude Code 时，可能会强制要求登录 Anthropic 账户。请按以下步骤操作以跳过该流程：
 
-### 4. 验证
+![Cc 7](/public/cn/cc-7.jpg)
 
-您可以通过在 Claude Code 中输入 `/status`  命令来确认您的连接。
+1. 定位用户主目录下的 `.claude.json` 文件，具体路径如下：
+   - macOS / Linux: `~/.claude.json`
+   - Windows: `C:\Users\%USERNAME%\.claude.json`
+2. 设置`hasCompletedOnboarding` 字段的值为 `true`
 
-```bash
-> /status
-
- API key: sk-**** #AIHUBMIX_API_KEY
- Anthropic base URL: https://aihubmix.com
-
- Model: claude-sonnet-4-5
+```json
+{
+  "hasCompletedOnboarding": true
+}
 ```
 
-## 切换模型
+3. 保存文件，然后在终端中重新运行 `claude` 。
 
-### 覆盖默认模型
+#### （可选）更多配置模型的方式
 
-<Tip>
-  如需快速修改默认模型，推荐使用 [CC- Switch](https://docs.aihubmix.com/cn/api/Claude-Code#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE) 。
-</Tip>
+Claude Code 支持以下模型配置方式，**按优先级从高到低排列**，优先级高的配置会覆盖优先级低的配置。
 
-你可以通过环境变量覆盖默认模型别名，将 Claude Code 配置为使用 AIHubMix 上的**任何模型**（包括 OpenAI、Gemini 或 GLM 模型）。
+1. **对话期间：**执行`/model <模型名称>`命令切换模型。适用于临时切换模型。
 
-例如，要将默认别名“Sonnet”替换为 gpt-5.2-codex：
+```
+/model claude-sonnet-4-5
+```
+
+2. **启动 Claude Code 时：**执行`claude --model <模型名称>`指定模型。适用于单次会话。
+
+```
+claude --model claude-sonnet-4-5
+```
+
+3. **设置环境变量**：可按任务复杂度配置不同级别的模型，Claude Code 会根据任务类型自动选择合适的模型。适用于全局生效。
 
 ```shellscript
-export ANTHROPIC_DEFAULT_SONNET_MODEL="gpt-5.2-codex"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-5"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-5"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
 ```
 
-也可以覆盖其他层级：
+其中：
 
-```shellscript
-export ANTHROPIC_DEFAULT_OPUS_MODEL="gemini-3-flash-preview-search"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.7"
-```
+- `ANTHROPIC_DEFAULT_OPUS_MODEL`：用于复杂推理、架构设计等高难度任务。
+- `ANTHROPIC_DEFAULT_SONNET_MODEL`：用于代码编写、功能实现等日常任务。
+- `ANTHROPIC_DEFAULT_HAIKU_MODEL`：用于语法检查、文件搜索等简单任务。
 
-<Info>
-  虽然您可以通过 AIHubMix 使用任何模型，但为了获得最佳体验，我们建议您使用功能强大的模型（例如 Claude Opus 4.5、GPT 5.2 等）
-</Info>
+4. **在 setting.json 配置文件中永久设置**：在项目根目录或用户主目录创建`settings.json`文件，并写入模型配置信息，可分别进行项目级或用户级的永久配置。
 
-### 切换模型
-
-使用 Claude Code 命令：
-
-```shell
-/model [model id]
+```json
+{
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+  }
+}
 ```
 
 ## 通过 cc-switch 配置

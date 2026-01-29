@@ -653,12 +653,23 @@
     "href": "https://aihubmix.com"
   },
   "api": {
+    "openapi": "/v1-openapi.json",
     "mdx": {
+      "server": "https://aihubmix.com",
       "auth": {
         "method": "bearer"
       }
     },
-    "openapi": "/v1-openapi.json"
+    "playground": {
+      "display": "interactive",
+      "proxy": true
+    },
+    "examples": {
+      "languages": ["curl", "python"],
+      "defaults": "required",
+      "prefill": false,
+      "autogenerate": true
+    }
   },
   "navbar": {
     "primary": {
