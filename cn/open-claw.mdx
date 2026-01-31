@@ -1,0 +1,134 @@
+---
+title: "OpenClaw"
+description: "OpenClaw 是一个开源的智能体平台，可在你的本地机器上运行，并能通过你已经在使用的聊天应用来工作。"
+icon: "terminal"
+---
+
+## 开源地址
+
+```shellscript
+https://github.com/xinrui-z/openclaw-aihubmix
+```
+
+## 安装
+
+```shellscript
+npm install -g openclaw-aihubmix@latest
+```
+
+## 配置
+
+### 重置配置
+
+如果您之前安装过官方版本，建议执行重置：
+
+```shellscript
+openclaw-aihubmix reset
+```
+
+选择 `Full reset`
+
+![Oc 1](/public/cn/oc-1.png)
+
+选择 `Yes`
+
+![Oc 2](/public/cn/oc-2.png)
+
+### 开始配置
+
+打开终端，运行以下指令开始配置：
+
+```shellscript
+openclaw-aihubmix onboard
+```
+
+选择 `Yes`
+
+![Oc 3](/public/cn/oc-3.png)
+
+选择 `QuickStart`
+
+![Oc 4](/public/cn/oc-4.png)
+
+选择 `AIHubMix`
+
+![Oc 5](/public/cn/oc-5.png)
+
+选择 `AIHubMix API Key`
+
+![Oc 6](/public/cn/oc-6.png)
+
+输入 AIHUBMIX API Key
+
+![Oc 7](/public/cn/oc-7.png)
+
+选择 `aihubmix` 作为 model provider
+
+![Oc 8](/public/cn/oc-8.png)
+
+根据需求选择默认模型
+
+![Oc 9](/public/cn/oc-9.png)
+
+根据需求关联个人账户，如无相关需求请选择 `Skip for now`
+
+![Oc 10](/public/cn/oc-10.png)
+
+配置技能，选择 `Yes`
+
+![Oc 11](/public/cn/oc-11.png)
+
+选择 `npm`
+
+![Oc 12](/public/cn/oc-12.png)
+
+根据需求配置技能选择
+
+![Oc 13](/public/cn/oc-13.png)
+
+全部选择 `No`
+
+![Oc 14](/public/cn/oc-14.png)
+
+选择 `Yes`
+
+![Oc 15](/public/cn/oc-15.png)
+
+选择 `Hatch in UI`
+
+![Oc 16](/public/cn/oc-16.png)
+
+<Note>
+  配置完成后会自动弹出浏览器网页，请不要关闭，下一步会用到。
+</Note>
+
+![Oc 17](/public/cn/oc-17.png)
+
+## 启动
+
+```shellscript
+openclaw-aihubmix gateway
+```
+
+![Oc 18](/public/cn/oc-18.png)
+
+## 测试
+
+在聊天页面输入 `hello`，如收到回复则说明配置成功。
+
+![Oc 19](/public/cn/oc-19.png)
+
+## 常见问题
+
+### 版本升级
+
+```shellscript
+npm update -g openclaw-aihubmix
+```
+
+### Gateway 进程被占用
+
+```shellscript
+openclaw-aihubmix gateway stop
+openclaw-aihubmix gateway
+```

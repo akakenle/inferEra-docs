@@ -94,6 +94,7 @@
           {
             "tab": "开发工具",
             "pages": [
+              "cn/open-claw",
               "cn/api/Opencode",
               "cn/api/Claude-Code",
               "cn/api/Cline",
@@ -227,6 +228,7 @@
           {
             "tab": "AI CLI",
             "pages": [
+              "en/ai-cli/open-claw",
               "en/api/Opencode",
               "en/api/Claude-Code",
               "en/api/Cline",

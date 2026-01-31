@@ -1,0 +1,134 @@
+---
+title: 'OpenClaw'
+description: "OpenClaw is an open-source agent platform that runs on your local machine and works through the chat applications you are already using."
+icon: "terminal"
+---
+
+## Open Source Repository
+
+```shellscript
+https://github.com/xinrui-z/openclaw-aihubmix
+```
+
+## Installation
+
+```shellscript
+npm install -g openclaw-aihubmix@latest
+```
+
+## Configuration
+
+### Reset Configuration
+
+If you have previously installed the official version, it is recommended to perform a reset:
+
+```shellscript
+openclaw-aihubmix reset
+```
+
+Select `Full reset`
+
+![Oc 1](/public/cn/oc-1.png)
+
+Select `Yes`
+
+![Oc 2](/public/cn/oc-2.png)
+
+### Start Configuration
+
+Open the terminal and run the following command to start the configuration:
+
+```shellscript
+openclaw-aihubmix onboard
+```
+
+Select `Yes`
+
+![Oc 3](/public/cn/oc-3.png)
+
+Select `QuickStart`
+
+![Oc 4](/public/cn/oc-4.png)
+
+Select `AIHubMix`
+
+![Oc 5](/public/cn/oc-5.png)
+
+Select `AIHubMix API Key`
+
+![Oc 6](/public/cn/oc-6.png)
+
+Enter the AIHUBMIX API Key
+
+![Oc 7](/public/cn/oc-7.png)
+
+Select `aihubmix` as the model provider
+
+![Oc 8](/public/cn/oc-8.png)
+
+Choose the default model as needed
+
+![Oc 9](/public/cn/oc-9.png)
+
+Link your personal account as needed; if not required, please select `Skip for now`
+
+![Oc 10](/public/cn/oc-10.png)
+
+Configure skills by selecting `Yes`
+
+![Oc 11](/public/cn/oc-11.png)
+
+Select `npm`
+
+![Oc 12](/public/cn/oc-12.png)
+
+Configure skill selections as needed
+
+![Oc 13](/public/cn/oc-13.png)
+
+Select `No` for all
+
+![Oc 14](/public/cn/oc-14.png)
+
+Select `Yes`
+
+![Oc 15](/public/cn/oc-15.png)
+
+Select `Hatch in UI`
+
+![Oc 16](/public/cn/oc-16.png)
+
+<Note>
+  After configuration is complete, a browser window will automatically pop up. Please do not close it, as it will be needed for the next step.
+</Note>
+
+![Oc 17](/public/cn/oc-17.png)
+
+## Start
+
+```shellscript
+openclaw-aihubmix gateway
+```
+
+![Oc 18](/public/cn/oc-18.png)
+
+## Testing
+
+Type `hello` in the chat page; if you receive a reply, the configuration is successful.
+
+![Oc 19](/public/cn/oc-19.png)
+
+## Frequently Asked Questions
+
+### Version Upgrade
+
+```shellscript
+npm update -g openclaw-aihubmix
+```
+
+### Gateway Process is Occupied
+
+```shellscript
+openclaw-aihubmix gateway stop
+openclaw-aihubmix gateway
+```
