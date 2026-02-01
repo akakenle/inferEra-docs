@@ -1,0 +1,37 @@
+---
+title: "Delete KEY"
+description: "Delete a KEY based on token_id"
+api: "DELETE /api/token/{token_id}"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Request authentication. The interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  The content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+### Path Parameters
+
+<ParamField path="token_id" type="integer" required>
+  The ID of the KEY.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the operation was successful.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message information (may be empty). Returns the reason for failure if the request fails.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The result object of the deletion (as returned by the interface). May be an empty object `{}`.
+</ResponseField>

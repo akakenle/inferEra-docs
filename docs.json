@@ -213,7 +213,22 @@
                   "en/api/App-code",
                   "en/api/Auth",
                   "en/api/Third-PartyIntegrationTechnicalGuide",
-                  "en/api/Cli"
+                  {
+                    "group": "Obtain account information via API",
+                    "pages": [
+                      "en/api/Cli",
+                      "en/api/CliEndpoints/get-self",
+                      "en/api/CliEndpoints/list-keys",
+                      "en/api/CliEndpoints/create-key",
+                      "en/api/CliEndpoints/update-key",
+                      "en/api/CliEndpoints/get-key",
+                      "en/api/CliEndpoints/delete-key",
+                      "en/api/CliEndpoints/search-keys",
+                      "en/api/CliEndpoints/get-user-token",
+                      "en/api/CliEndpoints/list-models",
+                      "en/api/CliEndpoints/available-models"
+                    ]
+                  }
                 ]
               },
               {

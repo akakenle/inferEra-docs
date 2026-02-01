@@ -1,0 +1,35 @@
+---
+title: "Obtain User KEY"
+description: "Retrieve the KEY information of the current user (if the API returns the token field)"
+api: "GET /api/user/token"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication credentials. The API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  Content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Informational message (may be empty). Returns the reason for failure if the request fails.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Object containing the current user's KEY information (fields are subject to the actual return).
+
+  <ResponseField name="token" type="string">
+    User Token (if the API returns this field).
+  </ResponseField>
+</ResponseField>

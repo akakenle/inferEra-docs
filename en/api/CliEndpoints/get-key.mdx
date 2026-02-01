@@ -1,0 +1,89 @@
+---
+title: "Retrieve Single KEY Details"
+description: "Get detailed information about a KEY based on token_id"
+api: "GET /api/token/{token_id}"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication for the request. The interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  Content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+### Path Parameters
+
+<ParamField path="token_id" type="integer" required>
+  KEY ID.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message (may be empty). Returns the reason for failure if the request fails.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Key detail object. If the request fails, data may be an empty object `{}`.
+
+  <ResponseField name="id" type="integer">
+    Key ID.
+  </ResponseField>
+
+  <ResponseField name="user_id" type="integer">
+    User ID.
+  </ResponseField>
+
+  <ResponseField name="key" type="string">
+    Key string (used for calls/authentication).
+  </ResponseField>
+
+  <ResponseField name="status" type="integer">
+    Key status. 0 means disabled, 1 means enabled.
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Key name.
+  </ResponseField>
+
+  <ResponseField name="created_time" type="integer">
+    Key creation time (UNIX timestamp).
+  </ResponseField>
+
+  <ResponseField name="accessed_time" type="integer">
+    Key last accessed time (UNIX timestamp).
+  </ResponseField>
+
+  <ResponseField name="expired_time" type="integer">
+    Key expiration time (UNIX timestamp); -1 means never expires.
+  </ResponseField>
+
+  <ResponseField name="remain_quota" type="integer">
+    Remaining quota; -1 means unlimited.
+  </ResponseField>
+
+  <ResponseField name="unlimited_quota" type="boolean">
+    Indicates whether the quota is unlimited. true means unlimited; false means limited.
+  </ResponseField>
+
+  <ResponseField name="used_quota" type="integer">
+    Used quota. Actual usage calculation: used_quota / 500000.
+  </ResponseField>
+
+  <ResponseField name="models" type="text">
+    Models restricted for use with the current Key (an empty string means no restriction or not set).
+  </ResponseField>
+
+  <ResponseField name="subnet" type="text">
+    IP restrictions (an empty string means no restriction or not set).
+  </ResponseField>
+</ResponseField>

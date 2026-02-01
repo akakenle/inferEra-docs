@@ -1,0 +1,109 @@
+---
+title: "Retrieve Current User Information and Balance"
+description: "Retrieve current user information and account balance"
+api: "GET /api/user/self"
+---
+
+This endpoint is used to query the basic information and balance of the currently logged-in user.
+
+## Request Parameters
+
+### Request Headers (headers)
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication token. This interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  Content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="data" type="object">
+  User information object (typically includes username, display_name, quota, etc.).
+
+  <ResponseField name="id" type="integer">
+    User ID.
+  </ResponseField>
+  <ResponseField name="username" type="string">
+    Username.
+  </ResponseField>
+  <ResponseField name="password" type="string">
+    Password.
+  </ResponseField>
+  <ResponseField name="display_name" type="string">
+    User display name.
+  </ResponseField>
+  <ResponseField name="role" type="integer">
+    Administrator identifier.
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    Account status.
+  </ResponseField>
+  <ResponseField name="email" type="string">
+    Email.
+  </ResponseField>
+  <ResponseField name="github_id" type="string">
+    GitHub ID.
+  </ResponseField>
+  <ResponseField name="google_id" type="string">
+    Google ID.
+  </ResponseField>
+  <ResponseField name="wechat_id" type="string">
+    WeChat ID.
+  </ResponseField>
+  <ResponseField name="lark_id" type="string">
+    Lark ID.
+  </ResponseField>
+  <ResponseField name="oidc_id" type="string">
+    OpenID Connect ID.
+  </ResponseField>
+  <ResponseField name="clerk_id" type="string">
+    Clerk ID.
+  </ResponseField>
+  <ResponseField name="migrated_at" type="string">
+    Account authentication timestamp.
+  </ResponseField>
+  <ResponseField name="verification_code" type="string">
+    Verification code.
+  </ResponseField>
+  <ResponseField name="access_token" type="string">
+    Key for system administration.
+  </ResponseField>
+  <ResponseField name="quota" type="integer">
+    Account balance is: quota / 500000.
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    Used quota is: used_quota / 500000.
+  </ResponseField>
+  <ResponseField name="group" type="string">
+    Account group.
+  </ResponseField>
+  <ResponseField name="aff_code" type="string">
+    Invitation code.
+  </ResponseField>
+  <ResponseField name="inviter_id" type="integer">
+    Inviter ID.
+  </ResponseField>
+  <ResponseField name="created_at" type="integer">
+    Account creation time, stored as UNIX timestamp.
+  </ResponseField>
+  <ResponseField name="notify" type="boolean">
+    Whether to receive low balance alerts.
+  </ResponseField>
+  <ResponseField name="quota_remind_threshold" type="integer">
+    Receive email alerts when balance falls below quota_remind_threshold / 500000.
+  </ResponseField>
+  <ResponseField name="notify_email" type="boolean">
+    Receive alert emails.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Detailed information on request failure. This parameter will not be returned if the request is successful.
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Indicates success.
+</ResponseField>

@@ -1,0 +1,69 @@
+---
+title: 'Get KEY List'
+description: 'Retrieve a list of all KEYS, with support for the num parameter to control the quantity'
+api: 'GET /api/token/'
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication credentials. This API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  Content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="data" type="object">
+  Information related to the user Key (usually includes id, name, etc.).
+
+  <ResponseField name="id" type="integer">
+    Key ID.
+  </ResponseField>
+  <ResponseField name="user_id" type="integer">
+    User ID.
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    Key status. 0 means disabled, 1 means enabled.
+  </ResponseField>
+  <ResponseField name="name" type="string">
+    Key name.
+  </ResponseField>
+  <ResponseField name="created_time" type="integer">
+    Key creation time, stored as a UNIX timestamp.
+  </ResponseField>
+  <ResponseField name="accessed_time" type="integer">
+    Key access time, stored as a UNIX timestamp.
+  </ResponseField>
+  <ResponseField name="expired_time" type="string">
+    Key expiration time, -1 indicates never expires.
+  </ResponseField>
+  <ResponseField name="remain_quota" type="string">
+    Remaining quota, -1 indicates unlimited.
+  </ResponseField>
+  <ResponseField name="unlimited_quota" type="boolean">
+    Whether there is a quota limit.
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    Used quota: used_quota / 500000
+  </ResponseField>
+  <ResponseField name="models" type="text">
+    Models restricted for current Key usage.
+  </ResponseField>
+  <ResponseField name="subnet" type="text">
+    IP restrictions.
+  </ResponseField>
+
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Detailed information on request failure. This parameter will not be returned on successful requests.
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Indicates success.
+</ResponseField>

@@ -1,0 +1,95 @@
+---
+title: "Create New KEY"
+description: "Create a new API KEY"
+api: "POST /api/token/"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authorization for identity verification. The interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  The content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+### Request Body
+
+<ResponseField name="name" type="string" required>
+  The name of the new Key.
+</ResponseField>
+
+<ResponseField name="expired_time" type="integer">
+  Expiration time. Stored as a UNIX timestamp; -1 indicates it never expires.
+</ResponseField>
+
+<ResponseField name="unlimited_quota" type="boolean">
+  Whether there is a quota limit.
+</ResponseField>
+
+<ResponseField name="remain_quota" type="integer">
+  remain_quota is: expected quota * 500000
+</ResponseField>
+
+<ResponseField name="models" type="text">
+  Restricted models.
+</ResponseField>
+
+<ResponseField name="subnet" type="text">
+  Restricted IP.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="data" type="object">
+  Information related to the user's newly created Key (typically includes id, name, etc.).
+
+  <ResponseField name="id" type="integer">
+    Key ID.
+  </ResponseField>
+  <ResponseField name="user_id" type="integer">
+    User ID.
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    Key status. 0 means disabled, 1 means enabled.
+  </ResponseField>
+  <ResponseField name="name" type="string">
+    Key name.
+  </ResponseField>
+  <ResponseField name="created_time" type="integer">
+    Key creation time, stored as a UNIX timestamp.
+  </ResponseField>
+  <ResponseField name="accessed_time" type="integer">
+    Key retrieval time, stored as a UNIX timestamp.
+  </ResponseField>
+  <ResponseField name="expired_time" type="string">
+    Key expiration time; -1 indicates it never expires.
+  </ResponseField>
+  <ResponseField name="remain_quota" type="string">
+    Remaining quota; -1 indicates unlimited quota.
+  </ResponseField>
+  <ResponseField name="unlimited_quota" type="boolean">
+    Whether there is a quota limit.
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    Used quota is: used_quota / 500000
+  </ResponseField>
+  <ResponseField name="models" type="text">
+    Models restricted for the current Key usage.
+  </ResponseField>
+  <ResponseField name="subnet" type="text">
+    IP restrictions.
+  </ResponseField>
+
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Detailed information on request failure. This parameter is not returned on successful requests.
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Whether the request was successful.
+</ResponseField>

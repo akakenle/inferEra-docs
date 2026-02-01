@@ -1,0 +1,56 @@
+---
+title: "Get a List of All Available Models"
+description: "Returns a list of all available models (potentially grouped by channel/group)"
+api: "GET /api/models"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication credentials. The API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  Content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the request was successful.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Informational message (may be empty). Returns the reason for failure if the request fails.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Collection of models. Typically a mapping structure from "group/channel" to "array of models" (fields are subject to actual return), for example:
+  `channel_id -> model[]` or `group -> model[]`.
+
+  <ResponseField name="* (channel_id / group)" type="array">
+    List of models under a specific group (each element in the array is a model object).
+
+    <ResponseField name="id" type="string">
+      Model identifier (e.g., deepinfra-gemma-3-12b-it).
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Display name of the model (if this field is available in the API).
+    </ResponseField>
+
+    <ResponseField name="channel" type="string">
+      Associated channel/source (if this field is available in the API).
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      Model type (e.g., chat / embedding / image, etc., if this field is available in the API).
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      Description of the model (if this field is available in the API).
+    </ResponseField>
+  </ResponseField>
+</ResponseField>

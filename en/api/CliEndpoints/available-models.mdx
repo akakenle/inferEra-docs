@@ -1,0 +1,42 @@
+---
+title: "Get the List of Available Models for the Current User"
+description: "Returns the list of models that the current user is allowed to use"
+api: "GET /api/user/available_models"
+---
+
+## Request Parameters
+
+### Request Headers
+
+<ResponseField header="Authorization" type="string" required>
+  Authentication for the request. This API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+</ResponseField>
+
+<ResponseField header="Content-Type" type="string">
+  The content type of the request. This parameter must be set to application/json.
+</ResponseField>
+
+## Response Parameters
+
+<ResponseField name="data" type="array">
+  List of models.
+
+  <ResponseField name="model" type="string">
+    Model name.
+  </ResponseField>
+  <ResponseField name="developer_id" type="integer">
+    Model developer ID.
+  </ResponseField>
+  <ResponseField name="order" type="integer">
+    Model order.
+  </ResponseField>
+  
+</ResponseField>
+
+<ResponseField name="success" type="boolean">
+  Indicates success.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message (may be empty). Returns the reason for failure if the request fails.
+</ResponseField>
