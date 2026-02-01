@@ -8,11 +8,11 @@ api: "GET /api/user/available_models"
 
 ### 请求头（headers）
 
-<ResponseField header="Authorization" type="string" required>
-  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+<ResponseField type="string" required>
+  请求身份认证。接口使用 AIHubMix Manage Key 进行身份认证。
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   请求内容类型。此参数必须设置为 application/json。
 </ResponseField>
 
@@ -30,7 +30,6 @@ api: "GET /api/user/available_models"
   <ResponseField name="order" type="integer">
     模型顺序。
   </ResponseField>
-  
 </ResponseField>
 
 <ResponseField name="success" type="boolean">
@@ -40,4 +39,3 @@ api: "GET /api/user/available_models"
 <ResponseField name="message" type="string">
   提示信息（可能为空）。请求失败时返回失败原因。
 </ResponseField>
-

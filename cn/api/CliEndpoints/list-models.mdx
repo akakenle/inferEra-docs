@@ -8,11 +8,11 @@ api: "GET /api/models"
 
 ### 请求头（headers）
 
-<ResponseField header="Authorization" type="string" required>
-  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+<ResponseField type="string" required>
+  请求身份认证。接口使用 AIHubMix Manage Key 进行身份认证。
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   请求内容类型。此参数必须设置为 application/json。
 </ResponseField>
 
@@ -27,8 +27,7 @@ api: "GET /api/models"
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  模型集合。通常为“分组/渠道”到“模型数组”的映射结构（字段以实际返回为准），例如：
-  `channel_id -> model[]` 或 `group -> model[]`。
+  模型集合。通常为“分组/渠道”到“模型数组”的映射结构（字段以实际返回为准），例如： `channel_id -> model[]` 或 `group -> model[]`。
 
   <ResponseField name="* (channel_id / group)" type="array">
     某个分组下的模型列表（数组中每个元素为一个模型对象）。
@@ -36,19 +35,15 @@ api: "GET /api/models"
     <ResponseField name="id" type="string">
       模型标识（如：deepinfra-gemma-3-12b-it）。
     </ResponseField>
-
     <ResponseField name="name" type="string">
       模型展示名称（如接口有该字段）。
     </ResponseField>
-
     <ResponseField name="channel" type="string">
       所属渠道/来源（如接口有该字段）。
     </ResponseField>
-
     <ResponseField name="type" type="string">
       模型类型（如 chat / embedding / image 等，若接口有该字段）。
     </ResponseField>
-
     <ResponseField name="description" type="string">
       模型描述（如接口有该字段）。
     </ResponseField>

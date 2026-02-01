@@ -1,18 +1,18 @@
 ---
-title: 'Get KEY List'
-description: 'Retrieve a list of all KEYS, with support for the num parameter to control the quantity'
-api: 'GET /api/token/'
+title: "Get KEY List"
+description: "Retrieve a list of all KEYS, with support for the num parameter to control the quantity"
+api: "GET /api/token/"
 ---
 
 ## Request Parameters
 
 ### Request Headers
 
-<ResponseField header="Authorization" type="string" required>
-  Authentication credentials. This API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+<ResponseField type="string" required>
+  Authentication for the request. This API uses the AIHubMix Manage Key for authentication.
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   Content type of the request. This parameter must be set to application/json.
 </ResponseField>
 
@@ -57,7 +57,6 @@ api: 'GET /api/token/'
   <ResponseField name="subnet" type="text">
     IP restrictions.
   </ResponseField>
-
 </ResponseField>
 
 <ResponseField name="message" type="string">

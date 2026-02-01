@@ -8,11 +8,11 @@ api: "DELETE /api/token/{token_id}"
 
 ### Request Headers
 
-<ResponseField header="Authorization" type="string" required>
-  Request authentication. The interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+<ResponseField type="string" required>
+  Authentication for the request. This API uses the AIHubMix Manage Key for authentication. 
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   The content type of the request. This parameter must be set to application/json.
 </ResponseField>
 

@@ -8,11 +8,11 @@ api: "PUT /api/token/"
 
 ### Request Headers
 
-<ResponseField header="Authorization" type="string" required>
-  Authentication for the request. The API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+<ResponseField type="string" required>
+  Authentication for the request. This API uses the AIHubMix Manage Key for authentication.
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   The content type of the request. This parameter must be set to application/json.
 </ResponseField>
 
@@ -37,8 +37,7 @@ api: "PUT /api/token/"
 </ParamField>
 
 <ParamField body="remain_quota" type="integer">
-  Remaining quota. remain_quota should be: desired quota * 500000 (for example, if the desired quota is 10, then pass 5000000).
-  When unlimited_quota is true, it is recommended to pass -1.
+  Remaining quota. remain_quota should be: desired quota \* 500000 (for example, if the desired quota is 10, then pass 5000000). When unlimited_quota is true, it is recommended to pass -1.
 </ParamField>
 
 <ParamField body="status" type="integer">
@@ -66,16 +65,40 @@ api: "PUT /api/token/"
 <ResponseField name="data" type="object">
   The updated Key object.
 
-  <ResponseField name="id" type="integer" />
-  <ResponseField name="user_id" type="integer" />
-  <ResponseField name="status" type="integer" />
-  <ResponseField name="name" type="string" />
-  <ResponseField name="created_time" type="integer" />
-  <ResponseField name="accessed_time" type="integer" />
-  <ResponseField name="expired_time" type="integer" />
-  <ResponseField name="remain_quota" type="integer" />
-  <ResponseField name="unlimited_quota" type="boolean" />
-  <ResponseField name="used_quota" type="integer" />
-  <ResponseField name="models" type="text" />
-  <ResponseField name="subnet" type="text" />
+  <ResponseField name="id" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="user_id" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="name" type="string">
+    
+  </ResponseField>
+  <ResponseField name="created_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="accessed_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="expired_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="remain_quota" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="unlimited_quota" type="boolean">
+    
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="models" type="text">
+    
+  </ResponseField>
+  <ResponseField name="subnet" type="text">
+    
+  </ResponseField>
 </ResponseField>

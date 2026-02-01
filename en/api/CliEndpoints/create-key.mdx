@@ -8,11 +8,11 @@ api: "POST /api/token/"
 
 ### Request Headers
 
-<ResponseField header="Authorization" type="string" required>
-  Authorization for identity verification. The interface uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+<ResponseField type="string" required>
+  Authentication for the request. This API uses the AIHubMix Manage Key for authentication. 
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   The content type of the request. This parameter must be set to application/json.
 </ResponseField>
 
@@ -31,7 +31,7 @@ api: "POST /api/token/"
 </ResponseField>
 
 <ResponseField name="remain_quota" type="integer">
-  remain_quota is: expected quota * 500000
+  remain_quota is: expected quota \* 500000
 </ResponseField>
 
 <ResponseField name="models" type="text">
@@ -83,7 +83,6 @@ api: "POST /api/token/"
   <ResponseField name="subnet" type="text">
     IP restrictions.
   </ResponseField>
-
 </ResponseField>
 
 <ResponseField name="message" type="string">

@@ -8,11 +8,11 @@ api: "POST /api/token/"
 
 ### 请求头（headers）
 
-<ResponseField header="Authorization" type="string" required>
-  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+<ResponseField type="string" required>
+  请求身份认证。接口使用 AIHubMix Manage Key 进行身份认证。
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   请求内容类型。此参数必须设置为 application/json。
 </ResponseField>
 
@@ -31,7 +31,7 @@ api: "POST /api/token/"
 </ResponseField>
 
 <ResponseField name="remain_quota" type="integer">
-  remain_quota 为：期望限额*500000
+  remain_quota 为：期望限额\*500000
 </ResponseField>
 
 <ResponseField name="models" type="text">
@@ -83,7 +83,6 @@ api: "POST /api/token/"
   <ResponseField name="subnet" type="text">
     IP 限制。
   </ResponseField>
-
 </ResponseField>
 
 <ResponseField name="message" type="string">

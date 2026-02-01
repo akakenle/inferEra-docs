@@ -8,11 +8,11 @@ api: "GET /api/user/token"
 
 ### Request Headers
 
-<ResponseField header="Authorization" type="string" required>
-  Authentication credentials. The API uses the AIHubMix API Key for authentication. Example value: Bearer sk-xxxx
+<ResponseField type="string" required>
+  Authentication for the request. This API uses the AIHubMix Manage Key for authentication.
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   Content type of the request. This parameter must be set to application/json.
 </ResponseField>
 

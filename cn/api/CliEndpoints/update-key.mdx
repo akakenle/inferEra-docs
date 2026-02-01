@@ -8,11 +8,11 @@ api: "PUT /api/token/"
 
 ### 请求头（headers）
 
-<ResponseField header="Authorization" type="string" required>
-  请求身份认证。接口使用 AIHubMix API Key 进行身份认证。示例值：Bearer sk-xxxx
+<ResponseField type="string" required>
+  请求身份认证。接口使用 AIHubMix Manage Key 进行身份认证。
 </ResponseField>
 
-<ResponseField header="Content-Type" type="string">
+<ResponseField type="string">
   请求内容类型。此参数必须设置为 application/json。
 </ResponseField>
 
@@ -37,8 +37,7 @@ api: "PUT /api/token/"
 </ParamField>
 
 <ParamField body="remain_quota" type="integer">
-  限额余量。remain_quota 为：期望限额 * 500000（例如期望限额 10，则传 5000000）。
-  当 unlimited_quota 为 true 时建议传 -1。
+  限额余量。remain_quota 为：期望限额 \* 500000（例如期望限额 10，则传 5000000）。 当 unlimited_quota 为 true 时建议传 -1。
 </ParamField>
 
 <ParamField body="status" type="integer">
@@ -66,16 +65,40 @@ api: "PUT /api/token/"
 <ResponseField name="data" type="object">
   更新后的 Key 对象。
 
-  <ResponseField name="id" type="integer" />
-  <ResponseField name="user_id" type="integer" />
-  <ResponseField name="status" type="integer" />
-  <ResponseField name="name" type="string" />
-  <ResponseField name="created_time" type="integer" />
-  <ResponseField name="accessed_time" type="integer" />
-  <ResponseField name="expired_time" type="integer" />
-  <ResponseField name="remain_quota" type="integer" />
-  <ResponseField name="unlimited_quota" type="boolean" />
-  <ResponseField name="used_quota" type="integer" />
-  <ResponseField name="models" type="text" />
-  <ResponseField name="subnet" type="text" />
+  <ResponseField name="id" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="user_id" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="status" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="name" type="string">
+    
+  </ResponseField>
+  <ResponseField name="created_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="accessed_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="expired_time" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="remain_quota" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="unlimited_quota" type="boolean">
+    
+  </ResponseField>
+  <ResponseField name="used_quota" type="integer">
+    
+  </ResponseField>
+  <ResponseField name="models" type="text">
+    
+  </ResponseField>
+  <ResponseField name="subnet" type="text">
+    
+  </ResponseField>
 </ResponseField>
