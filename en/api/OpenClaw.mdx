@@ -1,122 +1,138 @@
 ---
-title: 'OpenClaw'
-description: "OpenClaw is an open-source agent platform that runs on your local machine and works through the chat applications you are already using."
+title: "OpenClaw"
+description: "OpenClaw is an open-source agent platform that runs on your local machine and works with the chat applications you are already using."
 icon: "terminal"
 ---
 
-## Open Source Repository
-
-```shellscript
-https://github.com/xinrui-z/openclaw-aihubmix
-```
-
 ## Installation
 
-```shellscript
-npm install -g openclaw-aihubmix@latest
-```
+<Note>
+  Please ensure Node >= 22 before installation.
+</Note>
 
-## Configuration
-
-### Reset Configuration
-
-If you have previously installed the official version, it is recommended to perform a reset:
+Run the installation command
 
 ```shellscript
-openclaw-aihubmix reset
+npm install -g openclaw@latest
 ```
 
-Select `Full reset`
+### Terminal Configuration
+
+Open the terminal and run the following command to start the configuration
+
+```shellscript
+openlaw onboard
+```
+
+Select `Yes`
 
 ![Oc 1](/public/cn/oc-1.png)
 
-Select `Yes`
+Select `QuickStart`
 
 ![Oc 2](/public/cn/oc-2.png)
 
-### Start Configuration
-
-Open the terminal and run the following command to start the configuration:
-
-```shellscript
-openclaw-aihubmix onboard
-```
-
-Select `Yes`
+Select `Skip for now`
 
 ![Oc 3](/public/cn/oc-3.png)
 
-Select `QuickStart`
+Select `All providers`
 
 ![Oc 4](/public/cn/oc-4.png)
 
-Select `AIHubMix`
+Choose the default model as needed; you can initially select `Keep current`, which can be modified in the configuration file in the next step.
 
 ![Oc 5](/public/cn/oc-5.png)
 
-Select `AIHubMix API Key`
+Link your personal account as needed; if not required, please select `Skip for now`.
 
 ![Oc 6](/public/cn/oc-6.png)
 
-Enter the AIHUBMIX API Key
+Configure skills by selecting `Yes`.
 
 ![Oc 7](/public/cn/oc-7.png)
 
-Select `aihubmix` as the model provider
+Select `npm`
 
 ![Oc 8](/public/cn/oc-8.png)
 
-Choose the default model as needed
+Configure skill selection as needed.
 
 ![Oc 9](/public/cn/oc-9.png)
 
-Link your personal account as needed; if not required, please select `Skip for now`
+Select `No` for all options.
 
 ![Oc 10](/public/cn/oc-10.png)
 
-Configure skills by selecting `Yes`
+Select `Skip for now`.
 
 ![Oc 11](/public/cn/oc-11.png)
 
-Select `npm`
+Select `Hatch in UI`.
 
-![Oc 12](/public/cn/oc-12.png)
+### Modify Configuration File
 
-Configure skill selections as needed
+Open the `~/.openclaw/openclaw.json` file and add the following configuration:
 
-![Oc 13](/public/cn/oc-13.png)
-
-Select `No` for all
-
-![Oc 14](/public/cn/oc-14.png)
-
-Select `Yes`
-
-![Oc 15](/public/cn/oc-15.png)
-
-Select `Hatch in UI`
-
-![Oc 16](/public/cn/oc-16.png)
-
-<Note>
-  After configuration is complete, a browser window will automatically pop up. Please do not close it, as it will be needed for the next step.
-</Note>
-
-![Oc 17](/public/cn/oc-17.png)
+```json
+{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "aihubmix": {
+        "baseUrl": "http://aihubmix.com/v1",
+        "apiKey": "AIHUBMIX_API_KEY",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "claude-sonnet-4-5",
+            "name": "claude-sonnet-4-5",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1000000,
+            "maxTokens": 64000
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "aihubmix/claude-sonnet-4-5"
+      },
+      "workspace": "your_workspace_path",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  }
+}
+```
 
 ## Start
 
 ```shellscript
-openclaw-aihubmix gateway
+openclaw gateway
 ```
 
-![Oc 18](/public/cn/oc-18.png)
-
-## Testing
+## Test
 
 Type `hello` in the chat page; if you receive a reply, the configuration is successful.
 
-![Oc 19](/public/cn/oc-19.png)
+![Oc 12](/public/cn/oc-12.png)
 
 ## Frequently Asked Questions
 
@@ -126,9 +142,9 @@ Type `hello` in the chat page; if you receive a reply, the configuration is succ
 npm update -g openclaw-aihubmix
 ```
 
-### Gateway Process is Occupied
+### Gateway Process Occupied
 
 ```shellscript
-openclaw-aihubmix gateway stop
-openclaw-aihubmix gateway
+openclaw gateway stop
+openclaw gateway
 ```
