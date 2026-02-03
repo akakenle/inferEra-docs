@@ -1,89 +1,97 @@
 ---
-title: "OpenAI Codex CLI 集成"
-description: "通过 AiHubMix 在命AiHubMix 提供了与 OpenAI Codex CLI 的无缝集成，让你可以在命令行环境中利用先进的 AI 编程助手。通过简单的配置步骤，即可在终端中直接使用自然语言执行各种编程和系统操作任务。"
+title: "OpenAI Codex"
 icon: "terminal"
+description: "通过 AIHubMix API 使用 Codex"
 ---
 
-**使用之前，请先运行以下命令安装或更新：**
+## 安装
+
+### 官网下载（macOS 版本）
+
+https://openai.com/zh-Hans-CN/codex/
+
+### 使用命令行安装
 
 ```bash
 npm install -g @openai/codex
 ```
 
-## **配置步骤**
+## **环境变量配置**
 
-### **1. 环境变量设置**
+### 使用配置文件配置
 
-\*\*打开你的 Shell 配置文件（例如 ****`.zshrc或 ** .bashrc），添加以下环境变量：`****
+1. 修改 ` ~/.codex/config.toml` 配置文件，增加如下配置：
 
-```bash
-export OPENAI_BASE_URL="https://aihubmix.com/v1"
-export OPENAI_API_KEY="sk-***" # 替换为你的 AiHubMix API 密钥
+```toml
+profile = "aihubmix"
+
+[model_providers.aihubmix]
+name = "aihubmix"
+base_url = "https://aihubmix.com/v1"
+personality = "pragmatic"
+wire_api = "responses"
+
+[profiles.aihubmix]
+model = "gpt-5.2"
+model_provider = "aihubmix"
+model_reasoning_effort = "high"
 ```
 
-<Warning>
-  \*\*这里的 [******`OPENAI_API_KEY应该使用 AiHubMix 的 密钥`******](https://aihubmix.com/token)，变量名保持为 \*\*`OPENAI_API_KEY`**是为了兼容 OpenAI 原生客户端。。**
-</Warning>
+2. 修改 ` ~/.codex/auth.json` 配置文件，修改如下配置：
 
-> 不想手动配置环境变量？可使用图形化工具快速设置：[通过 CC-Switch 可视化配置](https://docs.aihubmix.com/cn/api/Codex-CLI#%E9%80%9A%E8%BF%87-cc-switch-%E9%85%8D%E7%BD%AE)。
-
-### **2. 应用配置更改**
-
-**在终端中执行以下命令，使环境变量生效：**
-
-```bash
-source ~/.zshrc  # 如果使用 zsh
-# 或
-source ~/.bashrc  # 如果使用 bash
+```json
+{
+  "OPENAI_API_KEY": "AIHUBMIX_API_KEY"
+}
 ```
 
-### **3. 启动 Codex CLI**
+### 通过 cc-switch 配置
 
-\*\*定位到你的项目目录，然后运行 \*\*`codex`**命令：**
+1. 运行 CC-Switch，添加供应商。
+
+![Codex 1](/public/cn/codex-1.png)
+
+2. 在预设列表中选择「AiHubMix」。
+
+![Codex 2](/public/cn/codex-2.png)
+
+3. 在「API Key」栏中填写你的密钥并点击「添加」保存设置。
+
+![Codex 3](/public/cn/codex-3.png)
+
+4. 返回首页，在供应商列表中选择「AiHubMix」，点击「启用」即可使用。
+
+![Codex 4](/public/cn/codex-4.png)
+
+## 使用 Codex
+
+### 在终端中使用
+
+1. 打开终端，定位到你的项目目录，然后运行 `codex` 命令。
 
 ```bash
 cd /你的项目路径
 codex
 ```
 
-![图片](../../public/cn/CodexCli-1.png)
+2. 根据需求，设置权限。
 
-### **4. 使用自然语言执行任务**
+![Codex 5](/public/cn/codex-5.png)
 
-**现在你可以通过自然语言向 Codex CLI 输入指令，例如：**
+3. 根据需求，选择需要使用的模型。
 
-```bash
-# 示例输入
-讲解一下 AnimatedText
-```
+![Codex 6](/public/cn/codex-6.png)
 
-![图片](../../public/cn/CodexCli-2.png)
+4. 输入自然语言，若正常响应，则配置成功。
 
-## 通过 cc-switch 配置
+![Codex 8](/public/cn/codex-8.png)
 
-1. 运行 CC-Switch，点击「添加供应商」。
+### 在 Codex 桌面端使用
 
-![install](../../public/cn/cc-codex-1.png)
+1. 打开 Codex 桌面端，选择工作目录。
+2. 在输入框输入任务，若正常响应，则配置成功。
 
-2. 在预设列表中选择「AiHubMix」。
-
-![install](../../public/cn/cc-codex-2.png)
-
-3. 在「API Key」栏中填写你的密钥并点击「添加」保存设置。
-
-![install](../../public/cn/cc-codex-3.png)
-
-4. 返回首页，在供应商列表中选择「AiHubMix」，点击「启动」即可使用。
-
-![install](../../public/cn/cc-codex-4.png)
-
-## 高级配置
-
-<Tip>
-  - 默认模型为 `codex-mini-latest`，一个专为编码任务微调过的 `o4-mini`，可以在 `~/.codex/config.json`修改
-  - 目前仅支持 OpenAI 家的模型，模型列表可在 [Responses API 文档](https://platform.openai.com/docs/api-reference/responses) 中查看
-  - 你可以通过编辑 `~/.codex/instructions.md` 文件来自定义系统提示词，定制 AI 助手的行为
-</Tip>
+![Codex 9](/public/cn/codex-9.png)
 
 ## 实用命令参考
 
