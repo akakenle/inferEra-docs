@@ -1,94 +1,99 @@
 ---
-title: "OpenAI Codex CLI Integration"
-description: "Configure and use OpenAI Codex in your command line through AiHubMix"
+title: "OpenAI Codex"
 icon: "terminal"
+description: "Using Codex through the AIHubMix API"
 ---
 
-# OpenAI Codex CLI Integration
+## Installation
 
-AiHubMix offers seamless integration with OpenAI [Codex CLI](https://github.com/openai/codex), enabling you to leverage advanced AI programming assistance directly in your command line environment. With simple configuration steps, you can use natural language to perform various programming and system operations from your terminal.\
-Before using, please run the following command to install or update:
+### Official Download (macOS Version)
+
+https://openai.com/en/codex/
+
+### Install via Command Line
 
 ```bash
 npm install -g @openai/codex
 ```
 
-## Configuration Steps
+## **Environment Variable Configuration**
 
-### 1. Set Environment Variables
+### Configure Using Configuration Files
 
-Open your shell configuration file (e.g., `.zshrc` or `.bashrc`) and add the following environment variables:
+1. Modify the `~/.codex/config.toml` configuration file to add the following settings:
 
-```bash
-export OPENAI_BASE_URL="https://aihubmix.com/v1"
-export OPENAI_API_KEY="sk-***"
+```toml
+profile = "aihubmix"
+
+[model_providers.aihubmix]
+name = "aihubmix"
+base_url = "https://aihubmix.com/v1"
+personality = "pragmatic"
+wire_api = "responses"
+
+[profiles.aihubmix]
+model = "gpt-5.2"
+model_provider = "aihubmix"
+model_reasoning_effort = "high"
 ```
 
-<Warning>
-  The `OPENAI_API_KEY` should be your [AiHubMix key](https://aihubmix.com/token). The variable name remains `OPENAI_API_KEY` for compatibility with the OpenAI native client.
-</Warning>
+2. Modify the `~/.codex/auth.json` configuration file to change the following settings:
 
-> Skip manual environment variable configuration – use the graphical tool for quick setup: [Configuration via CC-Switch](https://docs.aihubmix.com/en/api/Codex-CLI#configuration-via-cc-switch).
-
-### 2. Apply Configuration Changes
-
-Execute the following command in your terminal to apply the environment variables:
-
-```bash
-source ~/.zshrc  # If using zsh
-# or
-source ~/.bashrc  # If using bash
+```json
+{
+  "OPENAI_API_KEY": "AIHUBMIX_API_KEY"
+}
 ```
 
-### 3. Launch Codex CLI
+### Configure via cc-switch
 
-Navigate to your project directory and run the `codex` command:
+1. Run CC-Switch and add the provider.
+
+![Codex 1](/public/en/codex-1.png)
+
+2. Select "AiHubMix" from the preset list.
+
+![Codex 2](/public/en/codex-2.png)
+
+3. Enter your key in the "API Key" field and click "Add" to save the settings.
+
+![Codex 3](/public/en/codex-3.png)
+
+4. Return to the home page, select "AiHubMix" from the provider list, and click "Enable" to start using it.
+
+![Codex 4](/public/en/codex-4.png)
+
+## Using Codex
+
+### Using in the Terminal
+
+1. Open the terminal, navigate to your project directory, and run the `codex` command.
 
 ```bash
-cd /your_project_path
+cd /your/project/path
 codex
 ```
 
-![Image](../../public/en/CodexCli-1-en.png)
+2. Set permissions as needed.
 
-### 4. Execute Tasks Using Natural Language
+![Codex 5](/public/cn/codex-5.png)
 
-Now you can input instructions to Codex CLI using natural language, for example:
+3. Select the model you need based on your requirements.
 
-```bash
-# Sample input
-Break down the TTSComponent, and distill its core logic into a Mermaid flowchart.
-```
+![Codex 6](/public/cn/codex-6.png)
 
-![Image](../../public/en/CodexCli-2-en.png)
+4. Input natural language; if you receive a normal response, the configuration is successful.
 
-## Configuration via cc-switch
+![Codex 8](/public/cn/codex-8.png)
 
-1. Run CC-Switch and click "Add Provider."
+### Using in the Codex Desktop Application
 
-![Image](../../public/en/cc-codex-1.png)
+1. Open the Codex desktop application and select the working directory.
+2. Enter the task in the input box; if you receive a normal response, the configuration is successful.
 
-2. From the preset list, select "AiHubMix."
+![Codex 9](/public/cn/codex-9.png)
 
-![Image](../../public/en/cc-codex-2.png)
-
-3. Enter your API key in the "API Key" field, then click "Add" to save the settings.
-
-![Image](../../public/en/cc-codex-3.png)
-
-4. Return to the home page, select "AiHubMix" from the vendor list, and click "Start" to begin using it.
-
-![Image](../../public/en/cc-codex-4.png)
-
-## Advanced Configuration
-
-<Tip>
-  - The default model is `codex-mini-latest` - a fine-tuned version of `o4-mini` specifically for use in Codex CLI, which can be modified in `~/.codex/config.json`
-  - Currently only OpenAI models are supported, you can find the model list in the [Responses API documentation](https://platform.openai.com/docs/api-reference/responses)
-  - You can customize the system prompt by editing the `~/.codex/instructions.md` file to tailor the AI assistant's behavior
-</Tip>
-
-## Useful Command Reference
+## Useful Command References
 
 ### Help Command
 
@@ -99,35 +104,35 @@ codex -h
 ### Complete Command Options
 
 ```bash
-  Usage
-    $ codex [options] <prompt>
+Usage
+  $ codex [options] <prompt>
 
-  Options
-    -h, --help                 Show usage and exit
-    -m, --model <model>        Model to use for completions (default: codex-mini-latest)
-    -i, --image <path>         Path(s) to image files to include as input
-    -v, --view <rollout>       Inspect a previously saved rollout instead of starting a session
-    -q, --quiet                Non-interactive mode that only prints the assistant's final output
-    -a, --approval-mode <mode> Override the approval policy: 'suggest', 'auto-edit', or 'full-auto'
+Options
+  -h, --help                 Show help information and exit
+  -m, --model <model>        Specify the model to use (default: codex-mini-latest)
+  -i, --image <path>         Path to the file containing image input
+  -v, --view <rollout>       View previously saved session records
+  -q, --quiet                Non-interactive mode, only prints the final output of the assistant
+  -a, --approval-mode <mode> Override approval policy: 'suggest', 'auto-edit', or 'full-auto'
 
-    --auto-edit                Automatically approve file edits; still prompt for commands
-    --full-auto                Automatically approve edits and commands when executed in the sandbox
+  --auto-edit                Automatically approve file edits; will still prompt for command confirmation
+  --full-auto                Automatically approve edits and commands in sandbox environment
 
-    --no-project-doc           Do not automatically include the repository's 'codex.md'
-    --project-doc <file>       Include an additional markdown file at <file> as context
-    --full-stdout              Do not truncate stdout/stderr from command outputs
+  --no-project-doc           Do not automatically include 'codex.md' file from the repository
+  --project-doc <file>       Include specified Markdown file as context
+  --full-stdout              Do not truncate stdout/stderr of command output
 
-  Dangerous options
-    --dangerously-auto-approve-everything
-                               Skip all confirmation prompts and execute commands without
-                               sandboxing. Intended solely for ephemeral local testing.
+Dangerous Options
+  --dangerously-auto-approve-everything
+                             Skip all confirmation prompts and execute commands directly (no sandbox protection)
+                             For use only in temporary local testing environments
 
-  Experimental options
-    -f, --full-context         Launch in "full-context" mode which loads the entire repository
-                               into context and applies a batch of edits in one go. Incompatible
-                               with all other flags, except for --model.
+Experimental Options
+  -f, --full-context         Start in "full context" mode, loading the entire repository into context
+                             and applying bulk edits in a single operation
+                             Only compatible with --model parameter
 
-  Examples
-    $ codex "Write and run a python program that prints ASCII art"
-    $ codex -q "fix build issues"
+Examples
+  $ codex "Write and run a Python program that prints ASCII art"
+  $ codex -q "Fix build issues"
 ```
