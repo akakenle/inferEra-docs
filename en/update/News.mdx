@@ -4,6 +4,21 @@ icon: "map"
 mode: "center"
 ---
 
+## 2026
+<Update label="Feb 08">
+  - New Feature: Chat → Responses Compatibility  
+    This release introduces Chat → Responses compatibility, allowing the Chat Completions API to invoke OpenAI models that support the Responses protocol only, including gpt-5.2-codex, gpt-5.1-codex-max, and gpt-5.2-pro.  
+
+    If you want to force the AIHubmix Chat API to route requests through the Responses protocol, add the following header to your request:  
+    `X-Use-Responses-Enabled: true`  
+
+    When a model supports both Chat and Responses protocols, setting this header will force the request to use the Responses API.  
+    Please note that the Responses protocol does not currently support audio input or output, so plan usage accordingly.
+
+  - Model Deprecation Notice:  
+    OpenAI will deprecate `chatgpt-4o-latest` on February 17, 2026. After the deprecation, we will automatically remap `chatgpt-4o-latest` to `gpt-4o-2024-11-20`.
+</Update>
+
 ## 2025
 
 <Update label="Dec 15">

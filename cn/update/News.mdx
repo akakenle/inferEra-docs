@@ -4,7 +4,14 @@ icon: "map"
 mode: "center"
 ---
 
-## 2025年
+## 2026 年
+
+<Update label="02 月 08 日">
+  - 新功能： Chat → Responses 兼容调用 本次上线 Chat → Responses 兼容能力，支持通过 chat/completions 接口调用 OpenAI 仅支持 Responses 协议的模型，包括 gpt-5.2-codex、gpt-5.1-codex-max、gpt-5.2-pro 等。 如需要强制 AIHubmix 的 chat 接口让背后路由都走 Responses 协议，请在请求中添加 Header：X-Use-Responses-Enabled: true。当模型同时支持 Chat 与 Responses 双协议时，设置该参数将强制请求使用 Responses 接口。当前 Responses 协议暂不支持音频输入输出，请注意使用场景。
+  - 模型弃用通知：OpenAI 将于 2026 年 2 月 17 日 下线 chatgpt-4o-latest，我们会在下线后自动将 chatgpt-4o-latest 映射至 gpt-4o-2024-11-20
+</Update>
+
+## 2025 年
 
 <Update label="12 月 15 日">
   - 新功能： Google 接口已支持 [Files API](https://docs.aihubmix.com/cn/api/Gemini-Guides#files-api)
@@ -254,7 +261,7 @@ mode: "center"
   - 新增模型广场页面代替原来的模型/价格页面
 </Update>
 
-## 2024年
+## 2024 年
 
 <Update label="12 月 30 日">
   - 修复 gemini-2.0-flash-thinking-exp-1219 模型只输出思考没有答案问题
