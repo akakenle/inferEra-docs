@@ -4,6 +4,10 @@ description: "Prompt caching significantly reduces processing time for repetitiv
 icon: "badge-percent"
 ---
 
+<Note>
+  The minimum cache token for Claude Opus 4.5, Claude Opus 4.6, and Claude Haiku 4.5 has been increased from 1,024 to 4,096.
+</Note>
+
 Here's an example of how to implement prompt caching with the Messages API using a cache_control block:
 
 <CodeGroup>
@@ -160,8 +164,7 @@ When you send a request with prompt caching enabled:
 
 1. The system checks if a prompt prefix, up to a specified cache breakpoint, is already cached from a recent query.
 2. If found, it uses the cached version, reducing processing time and costs.
-3. Otherwise, it processes the full prompt and caches the prefix once the response begins.
-   This is especially useful for:
+3. Otherwise, it processes the full prompt and caches the prefix once the response begins. This is especially useful for:
 
 - Prompts with many examples
 - Large amounts of context or background information
@@ -353,7 +356,7 @@ Tailor your prompt caching strategy to your scenario:
 - Conversational agents: Reduce cost and latency for extended conversations, especially those with long instructions or uploaded documents.
 - Coding assistants: Improve autocomplete and codebase Q&A by keeping relevant sections or a summarized version of the codebase in the prompt.
 - Large document processing: Incorporate complete long-form material including images in your prompt without increasing response latency.
-- Detailed instruction sets: Share extensive lists of instructions, procedures, and examples to fine-tune Claude's responses. Developers often include an example or two in the prompt, but with prompt caching you can get even better performance by including 20\+ diverse examples of high quality answers.
+- Detailed instruction sets: Share extensive lists of instructions, procedures, and examples to fine-tune Claude's responses. Developers often include an example or two in the prompt, but with prompt caching you can get even better performance by including 20+ diverse examples of high quality answers.
 - Agentic tool use: Enhance performance for scenarios involving multiple tool calls and iterative code changes, where each step typically requires a new API call.
 - Talk to books, papers, documentation, podcast transcripts, and other longform content: Bring any knowledge base alive by embedding the entire document(s) into the prompt, and letting users ask it questions.
 
