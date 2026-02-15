@@ -279,6 +279,9 @@ claude -v
 
 若能看到 `claude` 路径及版本号，说明安装成功。
 
+### Q：Claude Code 无法连接 Anthropic 服务
+升级到最新版本的 Claude Code 后，若出现无法连接 Anthropic 服务或认证失败的情况，通常是由于认证请求头名称已发生调整所致。新版本要求将请求头由 `ANTHROPIC_API_KEY` 修改为 `ANTHROPIC_AUTH_TOKEN`，API Key 的值无需更换，仅需更新请求头名称并重新加载配置即可。具体操作可参考本文档重新配置。
+
 ## 更多资源
 
 - [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)

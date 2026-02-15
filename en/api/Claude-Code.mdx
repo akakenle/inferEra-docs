@@ -297,6 +297,9 @@ claude -v
 
 If you can see the `claude` path and version number, the installation was successful.
 
+### Q: Claude Code Unable to Connect to Anthropic Services
+After upgrading to the latest version of Claude Code, if you encounter issues connecting to Anthropic services or authentication failures, it is typically due to changes in the authentication request header name. The new version requires updating the request header from `ANTHROPIC_API_KEY` to `ANTHROPIC_AUTH_TOKEN`. The value of the API Key does not need to be changed; you only need to update the request header name and reload the configuration. For specific instructions, please refer to this document for reconfiguration.
+
 ## More Resources
 
 - [Github](https://github.com/inferera/aihubmix/blob/main/packages/claude-code/README.md)
