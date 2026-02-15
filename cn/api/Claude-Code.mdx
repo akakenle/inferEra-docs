@@ -38,7 +38,7 @@ npm install -g @anthropic-ai/claude-code
 要通过兼容 Anthropic API 的方式来接入 AIHubMix 的模型服务，需要配置以下环境变量。
 
 1. 将`ANTHROPIC_BASE_URL` 设置为`https://aihubmix.com`
-2. `ANTHROPIC_API_KEY` 设置为从 [AIHubMix 平台](https://console.aihubmix.com/token) 获取的 API Key
+2. `ANTHROPIC_AUTH_TOKEN` 设置为从 [AIHubMix 平台](https://console.aihubmix.com/token) 获取的 API Key
 3. `ANTHROPIC_MODEL`：设置为[模型列表](https://aihubmix.com/models)中支持的模型。
 
 <Tabs>
@@ -56,7 +56,7 @@ npm install -g @anthropic-ai/claude-code
     ```shellscript Zsh
     # AIHUBMIX_API_KEY 替换为你从 AIHUBMIX 平台获取的 Key
     echo 'export ANTHROPIC_BASE_URL="https://aihubmix.com"' >> ~/.zshrc
-    echo 'export ANTHROPIC_API_KEY="AIHUBMIX_API_KEY"' >> ~/.zshrc
+    echo 'export ANTHROPIC_AUTH_TOKEN="AIHUBMIX_API_KEY"' >> ~/.zshrc
     echo 'export ANTHROPIC_MODEL="claude-sonnet-4-5"' >> ~/.zshrc
     ```
 
@@ -64,7 +64,7 @@ npm install -g @anthropic-ai/claude-code
     ```shellscript Bash
     # AIHUBMIX_API_KEY 替换为你从 AIHUBMIX 平台获取的 Key
     echo 'export ANTHROPIC_BASE_URL="https://aihubmix.com"' >> ~/.bash_profile
-    echo 'export ANTHROPIC_API_KEY="AIHUBMIX_API_KEY"' >> ~/.bash_profile
+    echo 'export ANTHROPIC_AUTH_TOKEN="AIHUBMIX_API_KEY"' >> ~/.bash_profile
     echo 'export ANTHROPIC_MODEL="claude-sonnet-4-5"' >> ~/.bash_profile
     ```
 
@@ -89,7 +89,7 @@ npm install -g @anthropic-ai/claude-code
 
     ```shellscript
     echo $ANTHROPIC_BASE_URL
-    echo $ANTHROPIC_API_KEY
+    echo $ANTHROPIC_AUTH_TOKEN
     echo $ANTHROPIC_MODEL
     ```
   </Tab>
@@ -102,7 +102,7 @@ npm install -g @anthropic-ai/claude-code
 
         ```shellscript
         REM AIHubMix API Key 替换 AIHUBMIX_API_KEY
-        setx ANTHROPIC_API_KEY "AIHUBMIX_API_KEY"
+        setx ANTHROPIC_AUTH_TOKEN "AIHUBMIX_API_KEY"
         setx ANTHROPIC_BASE_URL "https://aihubmix.com"
         setx ANTHROPIC_MODEL "claude-sonnet-4-5"
         ```
@@ -110,7 +110,7 @@ npm install -g @anthropic-ai/claude-code
         2. 打开一个新的 CMD 窗口，运行以下命令，检查环境变量是否生效。
 
         ```shellscript
-        echo %ANTHROPIC_API_KEY%
+        echo %ANTHROPIC_AUTH_TOKEN%
         echo %ANTHROPIC_BASE_URL%
         echo %ANTHROPIC_MODEL%
         ```
@@ -120,7 +120,7 @@ npm install -g @anthropic-ai/claude-code
 
         ```shellscript
         # AIHubMix API Key 替换 AIHUBMIX_API_KEY
-        [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "AIHUBMIX_API_KEY", [EnvironmentVariableTarget]::User)
+        [Environment]::SetEnvironmentVariable("ANTHROPIC_AUTH_TOKEN", "AIHUBMIX_API_KEY", [EnvironmentVariableTarget]::User)
         [Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://aihubmix.com", [EnvironmentVariableTarget]::User)
         [Environment]::SetEnvironmentVariable("ANTHROPIC_MODEL", "claude-sonnet-4-5", [EnvironmentVariableTarget]::User)
         ```
@@ -128,7 +128,7 @@ npm install -g @anthropic-ai/claude-code
         2. 打开一个新的 PowerShell 窗口，运行以下命令，检查环境变量是否生效。
 
         ```shellscript
-        echo $env:ANTHROPIC_API_KEY
+        echo $env:ANTHROPIC_AUTH_TOKEN
         echo $env:ANTHROPIC_BASE_URL
         echo $env:ANTHROPIC_MODEL
         ```
@@ -234,6 +234,50 @@ export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5"
 打开 Claude 终端，输入 `/config` ，找到 `Use custom API key` 选项，检查 Token 是否正确配置。
 
 ![install](../../public/cn/cc-6.png)
+
+### Q：macOS 中安装成功后仍然报错：`zsh: command not found: claude`
+
+这是因为 Claude CLI 已安装，但其可执行目录未加入系统 `PATH`。
+
+1. 确认 Claude 安装路径。Claude Code 官方脚本通常安装在以下目录之一：
+
+- `~/.claude/bin`
+- `~/.local/bin`
+
+在终端执行：
+
+```shellscript
+ls -l ~/.claude/bin
+或
+ls -l ~/.local/bin | grep claude
+```
+
+如果看到 claude 文件，说明安装成功，只是 PATH 未配置。
+
+2. 将安装目录加入 PATH。根据实际安装位置执行对应命令：
+
+##### 情况 A：安装在 `~/.claude/bin`
+
+```shellscript
+echo 'export PATH="$HOME/.claude/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+##### 情况 B：安装在 `~/.local/bin`
+
+```shellscript
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+3. 验证是否生效。执行：
+
+```
+which claude
+claude -v
+```
+
+若能看到 `claude` 路径及版本号，说明安装成功。
 
 ## 更多资源
 
