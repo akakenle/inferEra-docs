@@ -70,7 +70,36 @@ Select `Skip for now`.
 
 Select `Hatch in UI`.
 
-### Modify Configuration File
+## Configure AIHubMix
+
+### Method 1: Quick Setup via Plugin (Recommended)
+
+<Info>
+  Plugin source code: [aihubmix-auth](https://github.com/akakenle/aihubmix-auth)
+</Info>
+
+Install the AIHubMix auth plugin and restart the Gateway:
+
+```shellscript
+openclaw plugins install @akaknele/aihubmix-auth
+openclaw gateway restart
+```
+
+Run the auth command. Enter your AIHubMix API Key when prompted. The plugin will automatically sync available models and set AIHubMix as the default provider:
+
+```shellscript
+openclaw models auth login --provider aihubmix --method api-key --set-default
+```
+
+The plugin organizes models into the following groups:
+- **openai** — OpenAI models
+- **anthropic** — Anthropic models
+- **google** — Google models
+- **other** — Other models
+
+Once configured, jump to the [Start](#start) section to begin using it.
+
+### Method 2: Manual Configuration
 
 Open the `~/.openclaw/openclaw.json` file and add the following configuration:
 

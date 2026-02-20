@@ -70,7 +70,36 @@ openlaw onboard
 
 选择 `Hatch in UI`
 
-### 修改配置文件
+## 配置 AIHubMix
+
+### 方法一：使用插件快速配置（推荐）
+
+<Info>
+  插件开源地址：[aihubmix-auth](https://github.com/akakenle/aihubmix-auth)
+</Info>
+
+安装 AIHubMix 认证插件并重启 Gateway：
+
+```shellscript
+openclaw plugins install @akaknele/aihubmix-auth
+openclaw gateway restart
+```
+
+执行认证指令，按提示输入你的 AIHubMix API Key，插件会自动同步可用模型并设为默认 Provider：
+
+```shellscript
+openclaw models auth login --provider aihubmix --method api-key --set-default
+```
+
+插件会将模型自动归类为以下分组：
+- **openai** — OpenAI 系列模型
+- **anthropic** — Anthropic 系列模型
+- **google** — Google 系列模型
+- **other** — 其他模型
+
+配置完成后，跳转到[启动](#启动)步骤即可开始使用。
+
+### 方法二：手动修改配置文件
 
 打开 `~/.openclaw/openclaw.json` 文件，增加以下配置：
 
