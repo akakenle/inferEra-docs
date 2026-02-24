@@ -12,23 +12,47 @@ Claude 系列模型支持通过官方原生接口调用，使用之前确保安�
 pip install -U anthropic
 ```
 
-<Info>
-  非 claude 模型请用 openai 的接口格式调用。
-</Info>
-
 ## 模型信息
 
-| 模型名称     | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
-| -------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
-| 是否支持扩展思考 | 是             | 是               | 是                 | 否                 | 否                | 否             | 否              |
-| 上下文窗口大小  | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
-| 最长输出长度   | 32000 tokens  | 64000 tokens    | 64000 tokens      | 8192 tokens       | 8192 tokens      | 4096 tokens   | 4096 tokens    |
-| 训练数据截止时间 | 2025年3月       | 2025年3月         | 2024年11月          | 2024年4月           | 2024年7月          | 2023年8月       | 2023年8月        |
+| 模型名称     | Claude Opus 4.6                                 | Claude Sonnet 4.6                               | Claude Sonnet 4.5 | Claude Haiku 4.5 |
+| -------- | ----------------------------------------------- | ----------------------------------------------- | ----------------- | ---------------- |
+| 是否支持扩展思考 | 是                                               | 是                                               | 是                 | 是                |
+| 上下文窗口大小  | 200K tokens /<br />1M tokens (beta)<sup>3</sup> | 200K tokens /<br />1M tokens (beta)<sup>3</sup> | 200K              | 200K             |
+| 最大输出长度   | 128K tokens                                     | 128K tokens                                     | 64K tokens        | 64K tokens       |
+| 训练数据截止时间 | 2025年8月                                         | 2025年8月                                         | 2025年7月           | 2025年7月          |
 
-<Tip>
-  1. 对于 3.5 及以上的模型，如果需要超过 4096 Tokens 的输出，请传入明确的 "max_tokens" 数值，参考上方表格中的`最长输出长度`。
-  2. 对于 Sonnet 3.7，你可以通过在请求体中传入 `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}` 来把最大输出从 64K 扩展到 128K，见下方「流式 128K」调用，或者参考 Claude 官方的[Beta headers 说明](https://docs.anthropic.com/en/api/beta-headers)。
-</Tip>
+## Claude 4.6 新功能
+
+### 自适应思考（Adaptive Thinking）
+
+Claude 4.6 推荐使用新的自适应思考模式，该模式下，Claude 会根据问题复杂度自动决定是否进行思考及深度思考：
+
+```python
+thinking={"type": "adaptive"}
+```
+
+<Warning>
+  `thinking: {type: "enabled", budget_tokens: N}` 在 4.6 上已弃用，未来版本将移除。
+</Warning>
+
+### 自动上下文压缩（Compaction，Beta）
+
+当对话接近上下文窗口上限时，Claude 4.6 可自动对早期内容进行服务器端摘要压缩。
+
+**优势：**
+
+- 支持超长对话
+- 无需客户端自行摘要
+- 提高 Agent 连续会话能力
+
+**注意：**
+
+- 自动压缩可能丢失部分细节
+- 对强一致性场景建议评估测试
+
+### 弃用与变更
+
+- **移除 **`interleaved-thinking-2025-05-14`**Beta 头：** 在 4.6 中，自适应思考已自动支持交错思考，不需要再添加 `extra_headers` 。如仍添加，该头会被安全忽略。
 
 ## Claude 4 新功能
 
@@ -115,6 +139,7 @@ message = client.messages.create(
 print(message.content)
 ```
 
+
 ```py Python 流式 128K
 import anthropic
 
@@ -136,6 +161,7 @@ with client.messages.stream(
     for text in stream.text_stream:
         print(text, end="", flush=True)
 ```
+
 
 ```py Python 交错思考
 import anthropic
@@ -183,16 +209,16 @@ print(response.content)
 
 ### 请求参数
 
-| 名称           | 位置     | 类型       | 必选 | 说明                      |
-| ------------ | ------ | -------- | --- | ----------------------- |
-| x-api-key    | header | string   | 否  | Bearer AIHUBMIX_API_KEY |
-| Content-Type | header | string   | 否  | none                    |
-| body         | body   | object   | 否  | none                    |
-| » model      | body   | string   | 是  | none                    |
-| » messages   | body   | [object] | 是  | none                    |
-| »» role      | body   | string   | 否  | none                    |
-| »» content   | body   | string   | 是  | none                    |
-| » max_tokens | body   | number   | 是  | none                    |
+| 名称           | 位置     | 类型       | 必选 | 说明               |
+| ------------ | ------ | -------- | --- | ---------------- |
+| x-api-key    | header | string   | 否  | AIHUBMIX_API_KEY |
+| Content-Type | header | string   | 否  | none             |
+| body         | body   | object   | 否  | none             |
+| » model      | body   | string   | 是  | none             |
+| » messages   | body   | [object] | 是  | none             |
+| »» role      | body   | string   | 否  | none             |
+| »» content   | body   | string   | 是  | none             |
+| » max_tokens | body   | number   | 是  | none             |
 
 ### 返回示例
 
@@ -278,7 +304,8 @@ https://aihubmix.com
 ```
 
 - 建议打开「使用客户端请求模式」
-- 最后在模型列表添加自己要使用的模型（建议从我们网站的设置页面复制粘贴模型名后选择）\
+- 最后在模型列表添加自己要使用的模型（建议从我们网站的设置页面复制粘贴模型名后选择）\\
+
   ![图片](../../public/cn/cla1.png)
 
   ![图片](../../public/cn/cla2.png)
@@ -289,27 +316,26 @@ Claude 可以使用 Anthropic 定义的文本编辑工具来查看和修改文�
 
 ### 使用文本编辑工具前的准备
 
-选择兼容的模型
-Anthropic 的文本编辑工具支持以下 Claude 模型：
+选择兼容的模型 Anthropic 的文本编辑工具支持以下 Claude 模型：
 
 - **Claude 4 系列模型** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
 - **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
 - **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
 
 <Warning>
-Claude 4 模型使用了全新的文本编辑工具，与旧版本不兼容。请确保使用正确的工具类型和名称。
+  Claude 4 模型使用了全新的文本编辑工具，与旧版本不兼容。请确保使用正确的工具类型和名称。
 </Warning>
 
 ### 模型对应的工具配置
 
-| 模型版本 | 工具类型 | 工具名称 | 支持的功能 |
-|---------|---------|---------|-----------|
-| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
-| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
-| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| 模型版本                   | 工具类型                   | 工具名称                          | 支持的功能                                |
+| ---------------------- | ---------------------- | ----------------------------- | ------------------------------------ |
+| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create            |
+| Claude 3.7 Sonnet      | `text_editor_20250124` | `str_replace_editor`          | view, str_replace, create, undo_edit |
+| Claude 3.5 Sonnet      | `text_editor_20241022` | `str_replace_editor`          | view, str_replace, create, undo_edit |
 
 <Tip>
-**重要变化：** Claude 4 模型不再支持 `undo_edit` 命令，请在代码中移除对此功能的依赖。
+  **重要变化：** Claude 4 模型不再支持 `undo_edit` 命令，请在代码中移除对此功能的依赖。
 </Tip>
 
 ### 评估使用场景
@@ -323,8 +349,7 @@ Claude 4 模型使用了全新的文本编辑工具，与旧版本不兼容。�
 
 ### 使用文本编辑工具
 
-通过 Messages API 向 Claude 提供文本编辑工具（命名为 `str_replace_editor`）：
-需要安装 `anthropic` 包：
+通过 Messages API 向 Claude 提供文本编辑工具（命名为 `str_replace_editor`）： 需要安装 `anthropic` 包：
 
 ```shell
 pip install anthropic
@@ -363,6 +388,7 @@ print("Response content:")
 for message in response.content:
     print(message.text)
 ```
+
 
 ```py Python-Claude 3.7
 import anthropic
@@ -418,6 +444,7 @@ curl -X POST https://aihubmix.com/v1/messages \
   }'
 ```
 
+
 ```shell Curl-Claude 3.7
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
@@ -469,7 +496,7 @@ tools=[
 
 #### 移除不支持的功能
 
-- **`undo_edit` 命令**：Claude 4 模型不再支持撤销编辑功能
+- **`undo_edit 命令`**：Claude 4 模型不再支持撤销编辑功能
 - 请从您的代码中移除任何依赖 `undo_edit` 的逻辑
 
 返回示例：
