@@ -27,7 +27,7 @@
                   "cn/api/Cline",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
-                  "cn/api/Dify-plugin"
+                  "cn/api/Data-Pravicy"
                 ]
               },
               {
@@ -176,7 +176,7 @@
                   "en/api/Claude-Code",
                   "en/api/CC-any",
                   "en/api/AISDK",
-                  "en/api/Dify-plugin"
+                  "en/api/Data-Pravicy"
                 ]
               },
               {
