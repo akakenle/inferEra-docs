@@ -124,6 +124,40 @@ AiHubMix 当前对并发请求没有统一限制。若遇到并发问题，请�
 
 ---
 
+### 使用 Claude 模型时，为什么回答会提前结束？
+
+针对 Claude 模型，AIHubMix 当前支持两种调用方式：
+
+1. OpenAI Chat 兼容接口
+2. Anthropic Claude 原生接口
+
+当通过 OpenAI Chat 兼容接口调用 Claude 模型时，系统默认 max_tokens=4096。 如果请求中未显式设置更大的 max_tokens，模型将在达到该上限后自动停止输出。因此，出现“回答未完成即结束”的情况，通常并非模型异常，而是触达了默认输出长度限制。
+
+**如何生成更长文本？**
+
+在 OpenAI Chat 兼容接口下，可手动设置更大的 max_tokens 参数，例如：
+
+```Python
+completion = client.chat.completions.create(
+  model="claude-sonnet-4-6",
+  max_tokens=6000,
+  messages=[
+    {
+      "role": "assistant",
+      "content": "总是用中文回复"
+    },
+    {
+      "role": "user",
+      "content": "What is the meaning of life?, over 6000 words"
+    }
+  ]
+)
+```
+
+max_tokens 不得超过对应模型的最大支持上限，如设置后如仍出现截断情况，可提供模型名称及完整请求参数以便进一步排查。
+
+---
+
 ## 二、API 调用与数据
 
 ### 有哪些可用的 API 接口？
