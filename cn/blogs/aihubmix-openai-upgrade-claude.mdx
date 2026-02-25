@@ -72,7 +72,7 @@ User → [Thinking] → Tool Call → Tool Result → [Thinking] → Response
 
 流式返回时，思考内容会通过 `delta.reasoning_content` 和 `delta.reasoning_details` 逐块下发。完整的流式拼接逻辑见下方完整示例。
 
-### 1.4 多轮对话中保留思考\*\*（已内置交错思考，无需额外传参）\*\*
+### 1.4 多轮对话中保留思考（已内置交错思考，无需额外传参）
 
 要让模型在多轮对话中延续推理能力，只需将上一轮返回的 `reasoning_details` **原样放入**下一轮的 assistant 消息中：
 
@@ -95,7 +95,7 @@ messages = [
 
 AihubMix 检测到请求中包含历史思考信息时，会**自动开启交错思考（Interleaved Thinking）**，让模型在收到工具调用结果后继续深度推理，无需额外传参。
 
-### 1.4 完整示例
+### 1.5 完整示例
 
 以下两个示例演示了完整的多轮 Tool Call + 交错思考流程：用户提问 → 模型思考并调用工具 → 注入工具结果（保留 `reasoning_details`）→ 模型**交错思考**后给出最终回复。
 
@@ -338,7 +338,7 @@ while True:
         messages.append({"role": "tool", "tool_call_id": tc["id"], "content": tool_result})
 ```
 
-### 1.5 思考强度映射规则
+### 1.6 思考强度映射规则
 
 **effort 模式：**
 

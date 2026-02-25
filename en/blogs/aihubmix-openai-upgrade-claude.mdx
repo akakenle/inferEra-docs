@@ -33,14 +33,14 @@ This enables the model to:
 
 You can enable thinking in four ways, choosing any one of them:
 
-| Method                     | Example                                   | Description                      |
-| :--------------------- | :----------------------------------- | :---------------------- |
-| `reasoning_effort`     | `"reasoning_effort": "low"`          | OpenAI standard parameter, placed at the top level of the request body   |
-| `reasoning.effort`     | `"reasoning": {"effort": "low"}`     | Equivalent to the previous method, placed within the reasoning object |
-| `reasoning.max_tokens` | `"reasoning": {"max_tokens": 1024}`  | Precisely controls the maximum number of tokens for thinking       |
-| Model name with `-think`          | `"model": "claude-sonnet-4-5-think"` | The simplest way, requires no additional parameters           |
+| Method                   | Example                              | Description                                                            |
+| :----------------------- | :----------------------------------- | :--------------------------------------------------------------------- |
+| `reasoning_effort`       | `"reasoning_effort": "low"`          | OpenAI standard parameter, placed at the top level of the request body |
+| `reasoning.effort`       | `"reasoning": {"effort": "low"}`     | Equivalent to the previous method, placed within the reasoning object  |
+| `reasoning.max_tokens`   | `"reasoning": {"max_tokens": 1024}`  | Precisely controls the maximum number of tokens for thinking           |
+| Model name with `-think` | `"model": "claude-sonnet-4-5-think"` | The simplest way, requires no additional parameters                    |
 
-> **Priority** (when multiple methods are used): `reasoning_effort` > `reasoning.max_tokens` > `reasoning.effort` > `-think` suffix
+> **Priority** (when multiple methods are used): `reasoning_effort` \> `reasoning.max_tokens` \> `reasoning.effort` \> `-think` suffix
 
 **Possible values for effort:** `minimal` / `low` / `medium` / `high` / `xhigh`
 
@@ -97,7 +97,7 @@ AihubMix will **automatically enable interleaved thinking** when it detects hist
 
 ### 1.5 Complete Example
 
-The following two examples demonstrate the complete multi-turn Tool Call + interleaved thinking process: user inquiry ��� model thinks and calls a tool → inject tool results (preserving `reasoning_details`) → model **interleaved thinking** gives the final response.
+The following two examples demonstrate the complete multi-turn Tool Call + interleaved thinking process: user inquiry → model thinks and calls a tool → inject tool results (preserving `reasoning_details`) → model **interleaved thinking** gives the final response.
 
 Non-streaming · Interleaved Thinking
 
@@ -338,7 +338,7 @@ while True:
         messages.append({"role": "tool", "tool_call_id": tc["id"], "content": tool_result})
 ```
 
-### 1.5 Thinking Intensity Mapping Rules
+### 1.6 Thinking Intensity Mapping Rules
 
 **Effort Mode:**
 
@@ -360,12 +360,12 @@ budget_tokens = max(min(max_tokens × effort_ratio, 128000), 1024)
 **Adaptive Thinking Effort Mapping:**
 
 | Incoming Effort | Opus 4.6 | Sonnet 4.6 |
-| :-------- | :------- | :--------- |
-| xhigh     | max      | high       |
-| high      | high     | high       |
-| medium    | medium   | medium     |
-| low       | low      | low        |
-| minimal   | low      | low        |
+| :-------------- | :------- | :--------- |
+| xhigh           | max      | high       |
+| high            | high     | high       |
+| medium          | medium   | medium     |
+| low             | low      | low        |
+| minimal         | low      | low        |
 
 **max_tokens Mode:** Directly assigned as Anthropic's `budget_tokens`.
 
@@ -381,29 +381,29 @@ You can use Prompt Caching when making requests to the Claude model via the Chat
 
 ### 2.1 Caching Costs
 
-| Operation             | Price Multiplier (relative to original input price) |
-| :------------- | :-------------- |
-| Cache Write (5-minute TTL) | 1.25x           |
-| Cache Write (1-hour TTL) | 2x              |
-| Cache Read           | 0.1x            |
+| Operation                  | Price Multiplier (relative to original input price) |
+| :------------------------- | :-------------------------------------------------- |
+| Cache Write (5-minute TTL) | 1.25x                                               |
+| Cache Write (1-hour TTL)   | 2x                                                  |
+| Cache Read                 | 0.1x                                                |
 
 ### 2.2 Supported Models and Minimum Cache Length
 
-| Model                                                                              | Minimum Cache Token Count |
-| :------------------------------------------------------------------------------ | :----------- |
-| Claude Opus 4.6 / Opus 4.5                                                      | 4096         |
-| Claude Sonnet 4.6 / Sonnet 4.5 / Opus 4.1 / Opus 4 / Sonnet 4 / Sonnet 3.7 (deprecated) | 1024         |
-| Claude Haiku 4.5                                                                | 4096         |
-| Claude Haiku 3.5 (deprecated) / Haiku 3                                                  | 2048         |
+| Model                                                                                   | Minimum Cache Token Count |
+| :-------------------------------------------------------------------------------------- | :------------------------ |
+| Claude Opus 4.6 / Opus 4.5                                                              | 4096                      |
+| Claude Sonnet 4.6 / Sonnet 4.5 / Opus 4.1 / Opus 4 / Sonnet 4 / Sonnet 3.7 (deprecated) | 1024                      |
+| Claude Haiku 4.5                                                                        | 4096                      |
+| Claude Haiku 3.5 (deprecated) / Haiku 3                                                 | 2048                      |
 
 > **Breakpoint Quantity Limit:** A maximum of **4** `cache_control` breakpoints per request.
 
 ### 2.3 Cache TTL
 
-| TTL      | Syntax                                                    | Applicable Scenarios         |
-| :------- | :---------------------------------------------------- | :----------- |
-| 5 minutes (default) | `"cache_control": {"type": "ephemeral"}`              | Short sessions, routine requests     |
-| 1 hour     | `"cache_control": {"type": "ephemeral", "ttl": "1h"}` | Long sessions, to avoid repeated cache writes |
+| TTL                 | Syntax                                                | Applicable Scenarios                          |
+| :------------------ | :---------------------------------------------------- | :-------------------------------------------- |
+| 5 minutes (default) | `"cache_control": {"type": "ephemeral"}`              | Short sessions, routine requests              |
+| 1 hour              | `"cache_control": {"type": "ephemeral", "ttl": "1h"}` | Long sessions, to avoid repeated cache writes |
 
 Writing costs for 1-hour TTL are higher, but they can save total expenses by reducing repeated writes in lengthy sessions. All models from Claude 4.5 and later from all providers (including Anthropic, Amazon Bedrock, Google Vertex AI) support 1-hour TTL.
 
@@ -542,12 +542,12 @@ The response's `usage` will return `claude_cache_tokens_details`, recording deta
 }
 ```
 
-| Field                                    | Meaning                            |
-| :------------------------------------ | :---------------------------- |
-| `cache_creation_input_tokens`         | Number of tokens written to cache in this request            |
-| `cache_read_input_tokens`             | Number of tokens read from cache in this request           |
-| `cache_write_5_minutes_input_tokens`  | Number of tokens written to 5-minute TTL cache     |
-| `cache_write_1_hour_input_tokens`     | Number of tokens written to 1-hour TTL cache     |
+| Field                                 | Meaning                                                                  |
+| :------------------------------------ | :----------------------------------------------------------------------- |
+| `cache_creation_input_tokens`         | Number of tokens written to cache in this request                        |
+| `cache_read_input_tokens`             | Number of tokens read from cache in this request                         |
+| `cache_write_5_minutes_input_tokens`  | Number of tokens written to 5-minute TTL cache                           |
+| `cache_write_1_hour_input_tokens`     | Number of tokens written to 1-hour TTL cache                             |
 | `prompt_tokens_details.cached_tokens` | Number of cached tokens when cache is hit, compatible with OpenAI format |
 
 ---
