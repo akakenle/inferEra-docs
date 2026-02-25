@@ -1,0 +1,587 @@
+---
+title: "AihubMix OpenAI 兼容接口升级 —— 深度支持 Claude 思考、缓存与 Beta 功能"
+icon: "book"
+---
+
+我们升级了 OpenAI 兼容接口，针对 Claude 系列模型进行了更深入的适配优化。你可以更精细、更便捷地控制思考（thinking）与缓存（caching）——特别是多轮对话中的交错思考，我们做了更人性化的处理，无需额外传参即可无痛接入。同时支持开启 Anthropic 提供的 beta 功能。
+
+## 1. 模型思考（Extended Thinking）
+
+### 1.1 交错思考的优点
+
+未开启交错思考时，模型在一个 assistant turn 中只在开头进行一次思考，后续收到工具结果后直接生成回复，不再产生新的 thinking block：
+
+```json
+User → [Thinking] → Tool Call → Tool Result → Response
+```
+
+开启交错思考后，模型在每次收到工具结果时都会插入新的 thinking block，形成链式推理：
+
+```json
+User → [Thinking] → Tool Call → Tool Result → [Thinking] → Response
+                                                ↑ Interleaved Thinking
+```
+
+这使得模型能够：
+
+- **基于工具返回结果进行二次推理**，而非直接拼接输出
+- **在多次工具调用之间链式推理**，每一步决策都建立在上一步的分析之上
+
+> 参考：[Anthropic Interleaved Thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking#interleaved-thinking)
+
+### 1.2 开启思考
+
+支持四种方式，任选其一：
+
+| 方式                     | 示例                                   | 说明                      |
+| :--------------------- | :----------------------------------- | :---------------------- |
+| `reasoning_effort`     | `"reasoning_effort": "low"`          | OpenAI 标准参数，直接放在请求体顶层   |
+| `reasoning.effort`     | `"reasoning": {"effort": "low"}`     | 等效于上一种，放在 reasoning 对象中 |
+| `reasoning.max_tokens` | `"reasoning": {"max_tokens": 1024}`  | 精确控制思考的最大 token 数       |
+| 模型名加 `-think`          | `"model": "claude-sonnet-4-5-think"` | 最简单的方式，无需额外参数           |
+
+> **优先级**（同时使用多种时）：`reasoning_effort` \> `reasoning.max_tokens` \> `reasoning.effort` \> `-think` 后缀
+
+**effort 可选值：** `minimal` / `low` / `medium` / `high` / `xhigh`
+
+### 1.3 思考返回
+
+响应的 message 中会增加两个字段：
+
+- `reasoning_content`：思考内容（字符串），方便直接展示
+- `reasoning_details`：思考的完整结构化信息，**多轮对话时需要原样回传，内部结构在不同供应商下可能有差异**
+
+非流式示例（省略无关字段）：
+
+```json
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "content": "Hello! How can I help you today?",
+      "reasoning_content": "The user is just saying hello...",
+      "reasoning_details": {
+        "type": "thinking",
+        "thinking": "The user is just saying hello...",
+        "signature": "Er8CCkYI..."
+      }
+    }
+  }]
+}
+```
+
+流式返回时，思考内容会通过 `delta.reasoning_content` 和 `delta.reasoning_details` 逐块下发。完整的流式拼接逻辑见下方完整示例。
+
+### 1.4 多轮对话中保留思考\*\*（已内置交错思考，无需额外传参）\*\*
+
+要让模型在多轮对话中延续推理能力，只需将上一轮返回的 `reasoning_details` **原样放入**下一轮的 assistant 消息中：
+
+```json
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston?"},
+    {
+        "role": "assistant",
+        "content": response.choices[0].message.content,
+        "tool_calls": response.choices[0].message.tool_calls,
+        "reasoning_details": response.choices[0].message.reasoning_details,
+    },
+    {
+        "role": "tool",
+        "tool_call_id": "toolu_xxx",
+        "content": '{"temperature": 45, "condition": "rainy"}',
+    }
+]
+```
+
+AihubMix 检测到请求中包含历史思考信息时，会**自动开启交错思考（Interleaved Thinking）**，让模型在收到工具调用结果后继续深度推理，无需额外传参。
+
+### 1.4 完整示例
+
+以下两个示例演示了完整的多轮 Tool Call + 交错思考流程：用户提问 → 模型思考并调用工具 → 注入工具结果（保留 `reasoning_details`）→ 模型**交错思考**后给出最终回复。
+
+非流式 · 交错思考
+
+```python
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key=os.environ.get("AIHUBMIX_API_KEY", "sk-***"),
+)
+
+# ── Tool definition ───────────────────────────────────────────
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a location",
+        "parameters": {
+            "type": "object",
+            "properties": {"location": {"type": "string", "description": "City name"}},
+            "required": ["location"]
+        }
+    }
+}]
+
+# ── Mock tool execution ───────────────────────────────────────
+WEATHER_DB = {
+    "boston": {"temperature": "45°F (7°C)", "condition": "rainy", "humidity": "85%", "wind": "15 mph NE"},
+    "tokyo":  {"temperature": "72°F (22°C)", "condition": "sunny", "humidity": "45%", "wind": "5 mph S"},
+}
+
+def execute_tool(name: str, args: dict) -> str:
+    if name == "get_weather":
+        key = next((k for k in WEATHER_DB if k in args.get("location", "").lower()), None)
+        return json.dumps(WEATHER_DB.get(key, {"temperature": "65°F", "condition": "clear"}))
+    return "{}"
+
+# ── Multi-turn conversation loop ─────────────────────────────
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston? Then recommend what to wear."}
+]
+
+turn = 0
+while True:
+    turn += 1
+    print(f"\n── Turn {turn} ──")
+
+    response = client.chat.completions.create(
+        model="claude-sonnet-4-5",
+        messages=messages,
+        tools=tools,
+        extra_body={"reasoning": {"max_tokens": 2000}},
+    )
+    msg = response.choices[0].message
+
+    # Print thinking process
+    if msg.reasoning_content:
+        label = "Interleaved Thinking" if turn > 1 else "Thinking"
+        print(f"[{label}] {msg.reasoning_content}")
+
+    # Print response content
+    if msg.content:
+        print(f"[Response] {msg.content}")
+
+    # Print tool calls
+    if msg.tool_calls:
+        for tc in msg.tool_calls:
+            print(f"[Tool Call: {tc.function.name}] {tc.function.arguments}")
+
+    # Build assistant message, preserve reasoning_details (critical!)
+    assistant_msg = {"role": "assistant", "content": msg.content}
+    if msg.tool_calls:
+        assistant_msg["tool_calls"] = msg.tool_calls
+    if msg.reasoning_details:
+        assistant_msg["reasoning_details"] = msg.reasoning_details  # pass back unmodified
+    messages.append(assistant_msg)
+
+    # No tool_calls means conversation is done
+    if not msg.tool_calls:
+        break
+
+    # Execute tools and append results to messages
+    for tc in msg.tool_calls:
+        args = json.loads(tc.function.arguments)
+        result = execute_tool(tc.function.name, args)
+        print(f"[Tool Result: {tc.function.name}] {result}")
+        messages.append({"role": "tool", "tool_call_id": tc.id, "content": result})
+```
+
+流式 · 交错思考
+
+```python
+import os
+import sys
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key=os.environ.get("AIHUBMIX_API_KEY", "sk-***"),
+)
+
+# ── Tool definition & mock execution ─────────────────────────
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a location",
+        "parameters": {
+            "type": "object",
+            "properties": {"location": {"type": "string", "description": "City name"}},
+            "required": ["location"]
+        }
+    }
+}]
+
+WEATHER_DB = {
+    "boston": {"temperature": "45°F (7°C)", "condition": "rainy", "humidity": "85%", "wind": "15 mph NE"},
+    "tokyo":  {"temperature": "72°F (22°C)", "condition": "sunny", "humidity": "45%", "wind": "5 mph S"},
+}
+
+def execute_tool(name: str, args: dict) -> str:
+    if name == "get_weather":
+        key = next((k for k in WEATHER_DB if k in args.get("location", "").lower()), None)
+        return json.dumps(WEATHER_DB.get(key, {"temperature": "65°F", "condition": "clear"}))
+    return "{}"
+
+# ── Stream response collector ────────────────────────────────
+def stream_and_collect(turn: int, **kwargs):
+    """Stream response, print thinking/content in real-time, accumulate reasoning_details/tool_calls."""
+    rd = {}            # accumulated reasoning_details
+    content = ""       # accumulated response text
+    tc_map = {}        # accumulated tool_calls (by index)
+    cur = "none"       # current output section: none / thinking / content
+
+    stream = client.chat.completions.create(stream=True, **kwargs)
+    for chunk in stream:
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta
+
+        # ── Handle thinking ──
+        rd_delta = getattr(delta, "reasoning_details", None)
+        if rd_delta and isinstance(rd_delta, dict):
+            for k, v in rd_delta.items():
+                if k == "type":
+                    rd[k] = v
+                elif isinstance(v, str):
+                    rd[k] = rd.get(k, "") + v
+                elif v is not None:
+                    rd[k] = v
+            # Print thinking chunks in real-time
+            thinking_chunk = rd_delta.get("thinking", "")
+            if thinking_chunk:
+                if cur != "thinking":
+                    cur = "thinking"
+                    label = "Interleaved Thinking" if turn > 1 else "Thinking"
+                    sys.stdout.write(f"\n[{label}] ")
+                sys.stdout.write(thinking_chunk)
+                sys.stdout.flush()
+
+        # ── Handle content ──
+        if delta.content:
+            if cur != "content":
+                if cur == "thinking":
+                    sys.stdout.write("\n")
+                cur = "content"
+                sys.stdout.write("\n[Response] ")
+            sys.stdout.write(delta.content)
+            sys.stdout.flush()
+            content += delta.content
+
+        # ── Handle tool_calls ──
+        for tc in delta.tool_calls or []:
+            i = tc.index
+            if i not in tc_map:
+                tc_map[i] = {"id": "", "type": "function",
+                             "function": {"name": "", "arguments": ""}}
+            if tc.id:
+                tc_map[i]["id"] = tc.id
+            if tc.function:
+                tc_map[i]["function"]["name"] += tc.function.name or ""
+                tc_map[i]["function"]["arguments"] += tc.function.arguments or ""
+
+    # End current output section
+    if cur in ("thinking", "content"):
+        sys.stdout.write("\n")
+
+    tool_calls = [tc_map[i] for i in sorted(tc_map)] if tc_map else None
+    return {
+        "content": content or None,
+        "reasoning_details": rd or None,
+        "tool_calls": tool_calls,
+    }
+
+# ── Multi-turn conversation loop ─────────────────────────────
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston? Then recommend what to wear."}
+]
+
+turn = 0
+while True:
+    turn += 1
+    print(f"\n── Turn {turn} ──")
+
+    result = stream_and_collect(
+        turn,
+        model="claude-sonnet-4-5",
+        messages=messages,
+        tools=tools,
+        extra_body={"reasoning": {"max_tokens": 2000}},
+    )
+
+    # Print tool calls
+    if result["tool_calls"]:
+        for tc in result["tool_calls"]:
+            print(f"[Tool Call: {tc['function']['name']}] {tc['function']['arguments']}")
+
+    # Build assistant message, preserve reasoning_details (critical!)
+    assistant_msg = {"role": "assistant", "content": result["content"]}
+    if result["tool_calls"]:
+        assistant_msg["tool_calls"] = result["tool_calls"]
+    if result["reasoning_details"]:
+        assistant_msg["reasoning_details"] = result["reasoning_details"]  # pass back unmodified
+    messages.append(assistant_msg)
+
+    # No tool_calls means conversation is done
+    if not result["tool_calls"]:
+        break
+
+    # Execute tools and append results to messages
+    for tc in result["tool_calls"]:
+        args = json.loads(tc["function"]["arguments"])
+        tool_result = execute_tool(tc["function"]["name"], args)
+        print(f"[Tool Result: {tc['function']['name']}] {tool_result}")
+        messages.append({"role": "tool", "tool_call_id": tc["id"], "content": tool_result})
+```
+
+### 1.5 思考强度映射规则
+
+**effort 模式：**
+
+- Opus 4.6 / Sonnet 4.6 及以上：映射为 Anthropic 原生的**自适应思考（Adaptive Thinking）** effort 级别
+- 其他模型：按公式计算 `budget_tokens`：
+
+```json
+budget_tokens = max(min(max_tokens × effort_ratio, 128000), 1024)
+```
+
+| effort  | effort_ratio |
+| :------ | :----------- |
+| xhigh   | 0.95         |
+| high    | 0.80         |
+| medium  | 0.50         |
+| low     | 0.20         |
+| minimal | 0.10         |
+
+**自适应思考 effort 映射：**
+
+| 传入 effort | Opus 4.6 | Sonnet 4.6 |
+| :-------- | :------- | :--------- |
+| xhigh     | max      | high       |
+| high      | high     | high       |
+| medium    | medium   | medium     |
+| low       | low      | low        |
+| minimal   | low      | low        |
+
+**max_tokens 模式：** 直接赋值为 Anthropic 的 `budget_tokens`。
+
+`-think` **后缀：** Opus/Sonnet 4.6+ 使用自适应思考（effort=medium）；其他模型设 `budget_tokens = min(10240, max_tokens - 1)`，`max_tokens` 默认 4096。
+
+---
+
+## 2. 提示词缓存（Prompt Caching）
+
+你可以在 Chat 接口请求 Claude 模型时使用 Prompt Caching。通过在消息中设置 `cache_control` 断点，让重复使用的大段文本（角色卡片、RAG 数据、书籍章节等）被缓存下来，后续请求直接命中缓存，大幅降低成本。
+
+> Claude 官方文档：[Prompt Caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+
+### 2.1 缓存价格
+
+| 操作             | 价格倍率（相对于原始输入价格） |
+| :------------- | :-------------- |
+| 缓存写入（5 分钟 TTL） | 1.25x           |
+| 缓存写入（1 小时 TTL） | 2x              |
+| 缓存读取           | 0.1x            |
+
+### 2.2 支持的模型与最小缓存长度
+
+| 模型                                                                              | 最小缓存 token 数 |
+| :------------------------------------------------------------------------------ | :----------- |
+| Claude Opus 4.6 / Opus 4.5                                                      | 4096         |
+| Claude Sonnet 4.6 / Sonnet 4.5 / Opus 4.1 / Opus 4 / Sonnet 4 / Sonnet 3.7（已弃用） | 1024         |
+| Claude Haiku 4.5                                                                | 4096         |
+| Claude Haiku 3.5（已弃用）/ Haiku 3                                                  | 2048         |
+
+> **断点数量限制：** 每个请求最多 **4 个** `cache_control` 断点。
+
+### 2.3 缓存 TTL
+
+| TTL      | 写法                                                    | 适用场景         |
+| :------- | :---------------------------------------------------- | :----------- |
+| 5 分钟（默认） | `"cache_control": {"type": "ephemeral"}`              | 短会话、常规请求     |
+| 1 小时     | `"cache_control": {"type": "ephemeral", "ttl": "1h"}` | 长会话，避免反复缓存写入 |
+
+1 小时 TTL 的写入成本更高，但在长时间会话中可通过减少重复写入来节省总费用。所有 Claude 4.5 及之后版本模型的所有提供商（含 Anthropic、Amazon Bedrock、Google Vertex AI）均支持 1 小时 TTL。
+
+### 2.4 使用方式
+
+在 `system`、`user`（含图片）、`tools` 中均可通过 `cache_control` 字段设置缓存断点。以下示例仅展示关键结构，省略了大段正文内容。
+
+**System 消息缓存（默认 5 分钟 TTL）：**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [{"type": "text", "text": "Hello"}]
+    }
+  ]
+}
+```
+
+**User 消息缓存（1 小时 TTL）：**
+
+```
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [{"type": "text", "text": "You are an AI assistant"}]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral", "ttl": "1h"}
+        },
+        {"type": "text", "text": "Hello"}
+      ]
+    }
+  ]
+}
+```
+
+**图片消息缓存：**
+
+```
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": {"detail": "auto", "url": "data:image/jpeg;base64,/9j/4AAQ..."},
+      "cache_control": {"type": "ephemeral"}
+    },
+    {"type": "text", "text": "What's this？"}
+  ]
+}
+```
+
+**Tool 定义缓存：**
+
+`cache_control` 放在 tool 对象的顶层（与 `type`、`function` 同级）：
+
+```json
+{
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get current weather for a location",
+      "parameters": {
+        "type": "object",
+        "properties": {"city": {"type": "string"}},
+        "required": ["city"]
+      }
+    },
+    "cache_control": {"type": "ephemeral", "ttl": "1h"}
+  }]
+}
+```
+
+### 2.5 缓存状态查看
+
+响应的 `usage` 中会返回 `claude_cache_tokens_details`，记录缓存的详细信息：
+
+**首次请求（创建缓存）：**
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 22,
+    "completion_tokens": 890,
+    "total_tokens": 912,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 6266,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 6266,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+**后续请求（命中缓存）：**
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 22,
+    "completion_tokens": 810,
+    "total_tokens": 832,
+    "prompt_tokens_details": {
+      "cached_tokens": 6266
+    },
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 6266,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+| 字段                                    | 含义                            |
+| :------------------------------------ | :---------------------------- |
+| `cache_creation_input_tokens`         | 本次请求新写入缓存的 token 数            |
+| `cache_read_input_tokens`             | 本次请求命中缓存读取的 token 数           |
+| `cache_write_5_minutes_input_tokens`  | 其中写入 5 分钟 TTL 缓存的 token 数     |
+| `cache_write_1_hour_input_tokens`     | 其中写入 1 小时 TTL 缓存的 token 数     |
+| `prompt_tokens_details.cached_tokens` | 命中缓存时，兼容 OpenAI 格式的缓存 token 数 |
+
+---
+
+## 3. 请求头传递 anthropic-beta
+
+你可以通过 HTTP Header `anthropic-beta` 来开启 Claude 模型的 beta 特性，AihubMix 会将该 header 透传给 Anthropic API。
+
+### 用法
+
+在请求头中添加 `anthropic-beta`，值为对应的 beta 功能标识符：
+
+```json
+curl "https://aihubmix.com/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -H "anthropic-beta: context-1m-2025-08-07" \
+  -d '{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {"role": "user", "content": [{"type": "text", "text": "hello"}]}
+  ]
+}'
+```
+
+> 具体可用的 beta 标识符请参考 [Anthropic API 文档](https://docs.anthropic.com/en/api/beta)。

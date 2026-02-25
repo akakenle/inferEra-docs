@@ -1,0 +1,587 @@
+---
+title: "AihubMix OpenAI Compatible Interface Upgrade — Deep Support for Claude Thinking, Caching, and Beta Features"
+icon: "book"
+---
+
+We have upgraded the OpenAI compatible interface with deeper optimizations specifically for the Claude series models. You can now control thinking and caching more precisely and conveniently—especially interleaved thinking in multi-turn conversations, which we have made more user-friendly, allowing seamless integration without additional parameters. It also supports enabling the beta features offered by Anthropic.
+
+## 1. Model Thinking (Extended Thinking)
+
+### 1.1 Advantages of Interleaved Thinking
+
+When interleaved thinking is not enabled, the model performs thinking only once at the beginning of an assistant turn; subsequent responses are generated directly after receiving tool results, without producing new thinking blocks:
+
+```json
+User → [Thinking] → Tool Call → Tool Result → Response
+```
+
+When interleaved thinking is enabled, the model inserts a new thinking block each time it receives a tool result, forming a chain of reasoning:
+
+```json
+User → [Thinking] → Tool Call → Tool Result → [Thinking] → Response
+                                                ↑ Interleaved Thinking
+```
+
+This enables the model to:
+
+- **Perform secondary reasoning based on tool results**, rather than simply concatenating outputs.
+- **Chain reasoning between multiple tool calls**, where each decision is based on the analysis of the previous step.
+
+> Reference: [Anthropic Interleaved Thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking#interleaved-thinking)
+
+### 1.2 Enabling Thinking
+
+You can enable thinking in four ways, choosing any one of them:
+
+| Method                     | Example                                   | Description                      |
+| :--------------------- | :----------------------------------- | :---------------------- |
+| `reasoning_effort`     | `"reasoning_effort": "low"`          | OpenAI standard parameter, placed at the top level of the request body   |
+| `reasoning.effort`     | `"reasoning": {"effort": "low"}`     | Equivalent to the previous method, placed within the reasoning object |
+| `reasoning.max_tokens` | `"reasoning": {"max_tokens": 1024}`  | Precisely controls the maximum number of tokens for thinking       |
+| Model name with `-think`          | `"model": "claude-sonnet-4-5-think"` | The simplest way, requires no additional parameters           |
+
+> **Priority** (when multiple methods are used): `reasoning_effort` > `reasoning.max_tokens` > `reasoning.effort` > `-think` suffix
+
+**Possible values for effort:** `minimal` / `low` / `medium` / `high` / `xhigh`
+
+### 1.3 Thinking Return
+
+The response message will include two new fields:
+
+- `reasoning_content`: Thinking content (string), for easy display.
+- `reasoning_details`: Complete structured information about thinking, **which needs to be returned as-is in multi-turn conversations; the internal structure may differ between providers.**
+
+Non-streaming example (omitting unrelated fields):
+
+```json
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "content": "Hello! How can I help you today?",
+      "reasoning_content": "The user is just saying hello...",
+      "reasoning_details": {
+        "type": "thinking",
+        "thinking": "The user is just saying hello...",
+        "signature": "Er8CCkYI..."
+      }
+    }
+  }]
+}
+```
+
+In streaming responses, thinking content will be sent in chunks via `delta.reasoning_content` and `delta.reasoning_details`. For the complete streaming concatenation logic, refer to the full example below.
+
+### 1.4 Retaining Thinking in Multi-Turn Conversations **(Interleaved Thinking is built-in, no additional parameters needed)**
+
+To enable the model to continue its reasoning capabilities in multi-turn conversations, simply place the previously returned `reasoning_details` **as-is** into the next round's assistant message:
+
+```json
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston?"},
+    {
+        "role": "assistant",
+        "content": response.choices[0].message.content,
+        "tool_calls": response.choices[0].message.tool_calls,
+        "reasoning_details": response.choices[0].message.reasoning_details,
+    },
+    {
+        "role": "tool",
+        "tool_call_id": "toolu_xxx",
+        "content": '{"temperature": 45, "condition": "rainy"}',
+    }
+]
+```
+
+AihubMix will **automatically enable interleaved thinking** when it detects historical thinking information in the request, allowing the model to continue deep reasoning after receiving tool call results without requiring additional parameters.
+
+### 1.5 Complete Example
+
+The following two examples demonstrate the complete multi-turn Tool Call + interleaved thinking process: user inquiry ��� model thinks and calls a tool → inject tool results (preserving `reasoning_details`) → model **interleaved thinking** gives the final response.
+
+Non-streaming · Interleaved Thinking
+
+```python
+import os
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key=os.environ.get("AIHUBMIX_API_KEY", "sk-***"),
+)
+
+# ── Tool definition ───────────────────────────────────────────
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a location",
+        "parameters": {
+            "type": "object",
+            "properties": {"location": {"type": "string", "description": "City name"}},
+            "required": ["location"]
+        }
+    }
+}]
+
+# ── Mock tool execution ───────────────────────────────────────
+WEATHER_DB = {
+    "boston": {"temperature": "45°F (7°C)", "condition": "rainy", "humidity": "85%", "wind": "15 mph NE"},
+    "tokyo":  {"temperature": "72°F (22°C)", "condition": "sunny", "humidity": "45%", "wind": "5 mph S"},
+}
+
+def execute_tool(name: str, args: dict) -> str:
+    if name == "get_weather":
+        key = next((k for k in WEATHER_DB if k in args.get("location", "").lower()), None)
+        return json.dumps(WEATHER_DB.get(key, {"temperature": "65°F", "condition": "clear"}))
+    return "{}"
+
+# ── Multi-turn conversation loop ─────────────────────────────
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston? Then recommend what to wear."}
+]
+
+turn = 0
+while True:
+    turn += 1
+    print(f"\n── Turn {turn} ──")
+
+    response = client.chat.completions.create(
+        model="claude-sonnet-4-5",
+        messages=messages,
+        tools=tools,
+        extra_body={"reasoning": {"max_tokens": 2000}},
+    )
+    msg = response.choices[0].message
+
+    # Print thinking process
+    if msg.reasoning_content:
+        label = "Interleaved Thinking" if turn > 1 else "Thinking"
+        print(f"[{label}] {msg.reasoning_content}")
+
+    # Print response content
+    if msg.content:
+        print(f"[Response] {msg.content}")
+
+    # Print tool calls
+    if msg.tool_calls:
+        for tc in msg.tool_calls:
+            print(f"[Tool Call: {tc.function.name}] {tc.function.arguments}")
+
+    # Build assistant message, preserve reasoning_details (critical!)
+    assistant_msg = {"role": "assistant", "content": msg.content}
+    if msg.tool_calls:
+        assistant_msg["tool_calls"] = msg.tool_calls
+    if msg.reasoning_details:
+        assistant_msg["reasoning_details"] = msg.reasoning_details  # pass back unmodified
+    messages.append(assistant_msg)
+
+    # No tool_calls means conversation is done
+    if not msg.tool_calls:
+        break
+
+    # Execute tools and append results to messages
+    for tc in msg.tool_calls:
+        args = json.loads(tc.function.arguments)
+        result = execute_tool(tc.function.name, args)
+        print(f"[Tool Result: {tc.function.name}] {result}")
+        messages.append({"role": "tool", "tool_call_id": tc.id, "content": result})
+```
+
+Streaming · Interleaved Thinking
+
+```python
+import os
+import sys
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key=os.environ.get("AIHUBMIX_API_KEY", "sk-***"),
+)
+
+# ── Tool definition & mock execution ─────────────────────────
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a location",
+        "parameters": {
+            "type": "object",
+            "properties": {"location": {"type": "string", "description": "City name"}},
+            "required": ["location"]
+        }
+    }
+}]
+
+WEATHER_DB = {
+    "boston": {"temperature": "45°F (7°C)", "condition": "rainy", "humidity": "85%", "wind": "15 mph NE"},
+    "tokyo":  {"temperature": "72°F (22°C)", "condition": "sunny", "humidity": "45%", "wind": "5 mph S"},
+}
+
+def execute_tool(name: str, args: dict) -> str:
+    if name == "get_weather":
+        key = next((k for k in WEATHER_DB if k in args.get("location", "").lower()), None)
+        return json.dumps(WEATHER_DB.get(key, {"temperature": "65°F", "condition": "clear"}))
+    return "{}"
+
+# ── Stream response collector ────────────────────────────────
+def stream_and_collect(turn: int, **kwargs):
+    """Stream response, print thinking/content in real-time, accumulate reasoning_details/tool_calls."""
+    rd = {}            # accumulated reasoning_details
+    content = ""       # accumulated response text
+    tc_map = {}        # accumulated tool_calls (by index)
+    cur = "none"       # current output section: none / thinking / content
+
+    stream = client.chat.completions.create(stream=True, **kwargs)
+    for chunk in stream:
+        if not chunk.choices:
+            continue
+        delta = chunk.choices[0].delta
+
+        # ── Handle thinking ──
+        rd_delta = getattr(delta, "reasoning_details", None)
+        if rd_delta and isinstance(rd_delta, dict):
+            for k, v in rd_delta.items():
+                if k == "type":
+                    rd[k] = v
+                elif isinstance(v, str):
+                    rd[k] = rd.get(k, "") + v
+                elif v is not None:
+                    rd[k] = v
+            # Print thinking chunks in real-time
+            thinking_chunk = rd_delta.get("thinking", "")
+            if thinking_chunk:
+                if cur != "thinking":
+                    cur = "thinking"
+                    label = "Interleaved Thinking" if turn > 1 else "Thinking"
+                    sys.stdout.write(f"\n[{label}] ")
+                sys.stdout.write(thinking_chunk)
+                sys.stdout.flush()
+
+        # ── Handle content ──
+        if delta.content:
+            if cur != "content":
+                if cur == "thinking":
+                    sys.stdout.write("\n")
+                cur = "content"
+                sys.stdout.write("\n[Response] ")
+            sys.stdout.write(delta.content)
+            sys.stdout.flush()
+            content += delta.content
+
+        # ── Handle tool_calls ──
+        for tc in delta.tool_calls or []:
+            i = tc.index
+            if i not in tc_map:
+                tc_map[i] = {"id": "", "type": "function",
+                             "function": {"name": "", "arguments": ""}}
+            if tc.id:
+                tc_map[i]["id"] = tc.id
+            if tc.function:
+                tc_map[i]["function"]["name"] += tc.function.name or ""
+                tc_map[i]["function"]["arguments"] += tc.function.arguments or ""
+
+    # End current output section
+    if cur in ("thinking", "content"):
+        sys.stdout.write("\n")
+
+    tool_calls = [tc_map[i] for i in sorted(tc_map)] if tc_map else None
+    return {
+        "content": content or None,
+        "reasoning_details": rd or None,
+        "tool_calls": tool_calls,
+    }
+
+# ── Multi-turn conversation loop ─────────────────────────────
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston? Then recommend what to wear."}
+]
+
+turn = 0
+while True:
+    turn += 1
+    print(f"\n── Turn {turn} ──")
+
+    result = stream_and_collect(
+        turn,
+        model="claude-sonnet-4-5",
+        messages=messages,
+        tools=tools,
+        extra_body={"reasoning": {"max_tokens": 2000}},
+    )
+
+    # Print tool calls
+    if result["tool_calls"]:
+        for tc in result["tool_calls"]:
+            print(f"[Tool Call: {tc['function']['name']}] {tc['function']['arguments']}")
+
+    # Build assistant message, preserve reasoning_details (critical!)
+    assistant_msg = {"role": "assistant", "content": result["content"]}
+    if result["tool_calls"]:
+        assistant_msg["tool_calls"] = result["tool_calls"]
+    if result["reasoning_details"]:
+        assistant_msg["reasoning_details"] = result["reasoning_details"]  # pass back unmodified
+    messages.append(assistant_msg)
+
+    # No tool_calls means conversation is done
+    if not result["tool_calls"]:
+        break
+
+    # Execute tools and append results to messages
+    for tc in result["tool_calls"]:
+        args = json.loads(tc["function"]["arguments"])
+        tool_result = execute_tool(tc["function"]["name"], args)
+        print(f"[Tool Result: {tc['function']['name']}] {tool_result}")
+        messages.append({"role": "tool", "tool_call_id": tc["id"], "content": tool_result})
+```
+
+### 1.5 Thinking Intensity Mapping Rules
+
+**Effort Mode:**
+
+- Opus 4.6 / Sonnet 4.6 and above: maps to Anthropic's native **Adaptive Thinking** effort level.
+- Other models: calculated using the formula for `budget_tokens`:
+
+```json
+budget_tokens = max(min(max_tokens × effort_ratio, 128000), 1024)
+```
+
+| effort  | effort_ratio |
+| :------ | :----------- |
+| xhigh   | 0.95         |
+| high    | 0.80         |
+| medium  | 0.50         |
+| low     | 0.20         |
+| minimal | 0.10         |
+
+**Adaptive Thinking Effort Mapping:**
+
+| Incoming Effort | Opus 4.6 | Sonnet 4.6 |
+| :-------- | :------- | :--------- |
+| xhigh     | max      | high       |
+| high      | high     | high       |
+| medium    | medium   | medium     |
+| low       | low      | low        |
+| minimal   | low      | low        |
+
+**max_tokens Mode:** Directly assigned as Anthropic's `budget_tokens`.
+
+`-think` **suffix:** Opus/Sonnet 4.6+ uses adaptive thinking (effort=medium); other models set `budget_tokens = min(10240, max_tokens - 1)`, with a default `max_tokens` of 4096.
+
+---
+
+## 2. Prompt Caching
+
+You can use Prompt Caching when making requests to the Claude model via the Chat interface. By setting `cache_control` breakpoints in messages, large blocks of text (like role cards, RAG data, book chapters, etc.) can be cached for reuse, allowing subsequent requests to hit the cache directly and significantly reduce costs.
+
+> Claude Official Documentation: [Prompt Caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+
+### 2.1 Caching Costs
+
+| Operation             | Price Multiplier (relative to original input price) |
+| :------------- | :-------------- |
+| Cache Write (5-minute TTL) | 1.25x           |
+| Cache Write (1-hour TTL) | 2x              |
+| Cache Read           | 0.1x            |
+
+### 2.2 Supported Models and Minimum Cache Length
+
+| Model                                                                              | Minimum Cache Token Count |
+| :------------------------------------------------------------------------------ | :----------- |
+| Claude Opus 4.6 / Opus 4.5                                                      | 4096         |
+| Claude Sonnet 4.6 / Sonnet 4.5 / Opus 4.1 / Opus 4 / Sonnet 4 / Sonnet 3.7 (deprecated) | 1024         |
+| Claude Haiku 4.5                                                                | 4096         |
+| Claude Haiku 3.5 (deprecated) / Haiku 3                                                  | 2048         |
+
+> **Breakpoint Quantity Limit:** A maximum of **4** `cache_control` breakpoints per request.
+
+### 2.3 Cache TTL
+
+| TTL      | Syntax                                                    | Applicable Scenarios         |
+| :------- | :---------------------------------------------------- | :----------- |
+| 5 minutes (default) | `"cache_control": {"type": "ephemeral"}`              | Short sessions, routine requests     |
+| 1 hour     | `"cache_control": {"type": "ephemeral", "ttl": "1h"}` | Long sessions, to avoid repeated cache writes |
+
+Writing costs for 1-hour TTL are higher, but they can save total expenses by reducing repeated writes in lengthy sessions. All models from Claude 4.5 and later from all providers (including Anthropic, Amazon Bedrock, Google Vertex AI) support 1-hour TTL.
+
+### 2.4 Usage
+
+You can set cache breakpoints using the `cache_control` field in `system`, `user` (including images), and `tools`. The following examples only show the key structure, omitting large blocks of text.
+
+**System Message Caching (default 5-minute TTL):**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [{"type": "text", "text": "Hello"}]
+    }
+  ]
+}
+```
+
+**User Message Caching (1-hour TTL):**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [{"type": "text", "text": "You are an AI assistant"}]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral", "ttl": "1h"}
+        },
+        {"type": "text", "text": "Hello"}
+      ]
+    }
+  ]
+}
+```
+
+**Image Message Caching:**
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": {"detail": "auto", "url": "data:image/jpeg;base64,/9j/4AAQ..."},
+      "cache_control": {"type": "ephemeral"}
+    },
+    {"type": "text", "text": "What's this?"}
+  ]
+}
+```
+
+**Tool Definition Caching:**
+
+`cache_control` is placed at the top level of the tool object (alongside `type` and `function`):
+
+```json
+{
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get current weather for a location",
+      "parameters": {
+        "type": "object",
+        "properties": {"city": {"type": "string"}},
+        "required": ["city"]
+      }
+    },
+    "cache_control": {"type": "ephemeral", "ttl": "1h"}
+  }]
+}
+```
+
+### 2.5 Viewing Cache Status
+
+The response's `usage` will return `claude_cache_tokens_details`, recording detailed cache information:
+
+**First Request (Creating Cache):**
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 22,
+    "completion_tokens": 890,
+    "total_tokens": 912,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 6266,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 6266,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+**Subsequent Requests (Cache Hit):**
+
+```json
+{
+  "usage": {
+    "prompt_tokens": 22,
+    "completion_tokens": 810,
+    "total_tokens": 832,
+    "prompt_tokens_details": {
+      "cached_tokens": 6266
+    },
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 6266,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+| Field                                    | Meaning                            |
+| :------------------------------------ | :---------------------------- |
+| `cache_creation_input_tokens`         | Number of tokens written to cache in this request            |
+| `cache_read_input_tokens`             | Number of tokens read from cache in this request           |
+| `cache_write_5_minutes_input_tokens`  | Number of tokens written to 5-minute TTL cache     |
+| `cache_write_1_hour_input_tokens`     | Number of tokens written to 1-hour TTL cache     |
+| `prompt_tokens_details.cached_tokens` | Number of cached tokens when cache is hit, compatible with OpenAI format |
+
+---
+
+## 3. Request Header for anthropic-beta
+
+You can enable beta features of the Claude model via the HTTP Header `anthropic-beta`, which AihubMix will pass through to the Anthropic API.
+
+### Usage
+
+Add `anthropic-beta` to the request header, with the value being the corresponding beta feature identifier:
+
+```json
+curl "https://aihubmix.com/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -H "anthropic-beta: context-1m-2025-08-07" \
+  -d '{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {"role": "user", "content": [{"type": "text", "text": "hello"}]}
+  ]
+}'
+```
+
+> For specific available beta identifiers, please refer to the [Anthropic API Documentation](https://docs.anthropic.com/en/api/beta).
