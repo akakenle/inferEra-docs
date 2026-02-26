@@ -8,7 +8,12 @@
     "dark": "#2563EB"
   },
   "contextual": {
-    "options": ["copy", "chatgpt", "claude", "perplexity"]
+    "options": [
+      "copy",
+      "chatgpt",
+      "claude",
+      "perplexity"
+    ]
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -322,10 +327,9 @@
                 "pages": [
                   "jp/index",
                   "jp/quick-start",
-                  "jp/api-playground/inferUsages",
-                  "jp/api/CC-any",
+                  "jp/api/Claude-Code",
                   "jp/api/AISDK",
-                  "jp/api/Dify-plugin"
+                  "jp/api/Data-Pravicy"
                 ]
               },
               {
@@ -355,7 +359,12 @@
                   "jp/api/Models-API",
                   "jp/api/App-code",
                   "jp/api/Auth",
-                  "jp/api/Cli"
+                  {
+                    "group": "通过接口获取账户信息",
+                    "pages": [
+                      "jp/api/Cli"
+                    ]
+                  }
                 ]
               },
               {
@@ -370,14 +379,15 @@
           {
             "tab": "コマンドラインツール",
             "pages": [
+              "jp/api/Opencode",
               "jp/api/Claude-Code",
               "jp/api/Gemini-Cli",
               "jp/api/Codex-CLI",
               "jp/api/Qwen-code",
               "jp/api/AISDK",
-              "jp/api/Crush",
-              "jp/api/Opencode"
-            ]
+              "jp/api/Crush"
+            ],
+            "groups": []
           },
           {
             "tab": "利用ケース",
@@ -409,27 +419,27 @@
               "jp/clients/Immersive-Translate",
               "jp/clients/On-CS",
               "jp/clients/Oulu"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "よくある質問",
             "pages": [
-              "jp/FAQs/faq",
+              "jp/FAQs/Faq",
               "jp/FAQs/HTTP-Codes",
               "jp/FAQs/Human-Customer-Support"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "ブログ",
-            "pages": [
-              "jp/blogs/Building"
-            ]
+            "pages": [],
+            "groups": []
           },
           {
             "tab": "アップデート",
-            "pages": [
-              "jp/changelog/News"
-            ]
+            "pages": [],
+            "groups": []
           }
         ]
       },
@@ -444,10 +454,9 @@
                 "pages": [
                   "ko/index",
                   "ko/quick-start",
-                  "ko/api-playground/inferUsages",
-                  "ko/api/CC-any",
+                  "ko/api/Claude-Code",
                   "ko/api/AISDK",
-                  "ko/api/Dify-plugin"
+                  "ko/api/Data-Pravicy"
                 ]
               },
               {
@@ -477,7 +486,12 @@
                   "ko/api/Models-API",
                   "ko/api/App-code",
                   "ko/api/Auth",
-                  "ko/api/Cli"
+                  {
+                    "group": "通过接口获取账户信息",
+                    "pages": [
+                      "ko/api/Cli"
+                    ]
+                  }
                 ]
               },
               {
@@ -492,14 +506,15 @@
           {
             "tab": "명령줄 도구",
             "pages": [
+              "ko/api/Opencode",
               "ko/api/Claude-Code",
               "ko/api/Gemini-Cli",
               "ko/api/Codex-CLI",
               "ko/api/Qwen-code",
               "ko/api/AISDK",
-              "ko/api/Crush",
-              "ko/api/Opencode"
-            ]
+              "ko/api/Crush"
+            ],
+            "groups": []
           },
           {
             "tab": "사용 사례",
@@ -531,27 +546,27 @@
               "ko/clients/Immersive-Translate",
               "ko/clients/On-CS",
               "ko/clients/Oulu"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "자주 묻는 질문",
             "pages": [
-              "ko/FAQs/faq",
+              "ko/FAQs/Faq",
               "ko/FAQs/HTTP-Codes",
               "ko/FAQs/Human-Customer-Support"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "블로그",
-            "pages": [
-              "ko/blogs/Building"
-            ]
+            "pages": [],
+            "groups": []
           },
           {
             "tab": "업데이트",
-            "pages": [
-              "ko/changelog/News"
-            ]
+            "pages": [],
+            "groups": []
           }
         ]
       },
@@ -676,6 +691,218 @@
             ]
           }
         ]
+      },
+      {
+        "language": "fr",
+        "tabs": [
+          {
+            "tab": "用户指南",
+            "groups": [
+              {
+                "group": "基础",
+                "pages": [
+                  "fr/api/Data-Pravicy"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": []
+              },
+              {
+                "group": "平台管理",
+                "pages": []
+              },
+              {
+                "group": "隐私和条款",
+                "pages": []
+              }
+            ]
+          },
+          {
+            "tab": "开发工具",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "使用场景",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "FAQs",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "博客",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "更新",
+            "pages": [],
+            "groups": []
+          }
+        ]
+      },
+      {
+        "language": "de",
+        "tabs": [
+          {
+            "tab": "用户指南",
+            "groups": [
+              {
+                "group": "基础",
+                "pages": [
+                  "de/api/Data-Pravicy"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": []
+              },
+              {
+                "group": "平台管理",
+                "pages": []
+              },
+              {
+                "group": "隐私和条款",
+                "pages": []
+              }
+            ]
+          },
+          {
+            "tab": "开发工具",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "使用场景",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "FAQs",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "博客",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "更新",
+            "pages": [],
+            "groups": []
+          }
+        ]
+      },
+      {
+        "language": "es",
+        "tabs": [
+          {
+            "tab": "用户指南",
+            "groups": [
+              {
+                "group": "基础",
+                "pages": [
+                  "es/api/Data-Pravicy"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": []
+              },
+              {
+                "group": "平台管理",
+                "pages": []
+              },
+              {
+                "group": "隐私和条款",
+                "pages": []
+              }
+            ]
+          },
+          {
+            "tab": "开发工具",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "使用场景",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "FAQs",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "博客",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "更新",
+            "pages": [],
+            "groups": []
+          }
+        ]
+      },
+      {
+        "language": "pt",
+        "tabs": [
+          {
+            "tab": "用户指南",
+            "groups": [
+              {
+                "group": "基础",
+                "pages": [
+                  "pt/api/Data-Pravicy"
+                ]
+              },
+              {
+                "group": "API",
+                "pages": []
+              },
+              {
+                "group": "平台管理",
+                "pages": []
+              },
+              {
+                "group": "隐私和条款",
+                "pages": []
+              }
+            ]
+          },
+          {
+            "tab": "开发工具",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "使用场景",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "FAQs",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "博客",
+            "pages": [],
+            "groups": []
+          },
+          {
+            "tab": "更新",
+            "pages": [],
+            "groups": []
+          }
+        ]
       }
     ]
   },
@@ -691,7 +918,7 @@
       "auth": {
         "method": "bearer"
       },
-      "playground":{
+      "playground": {
         "display": "interactive"
       }
     },
@@ -700,7 +927,10 @@
       "proxy": true
     },
     "examples": {
-      "languages": ["curl", "python"],
+      "languages": [
+        "curl",
+        "python"
+      ],
       "defaults": "required",
       "prefill": false,
       "autogenerate": true
