@@ -1,0 +1,58 @@
+---
+title: "データプライバシー"
+icon: "note"
+---
+## データ収集の説明
+
+### データ保存の原則
+
+AIHubMixは、ユーザーのプロンプトやモデルの応答内容を積極的に保存しません。
+
+### AIHubMixが保存するデータは？
+
+サービスの品質とシステムの安定性を確保するために、AIHubMixは各リクエストの必要なメタデータ（例えば、トークン数、遅延など）を保存します。これらの情報は、私たちのレポートやモデルのランキング、及びあなたの[使用状況](https://console.aihubmix.com/statistics)をサポートするためのみに使用されます。
+
+このメタデータには、あなたのプロンプト内容やモデルの応答テキストは含まれず、リクエスト自体に関連する技術情報に限られます。
+
+<Info>
+  OpenAIとGrokの公式は、使用ポリシーに違反する可能性のあるコンテンツを検出した場合、アカウントの制限または禁止措置を講じ、AIHubMixにコンプライアンス通知を送信します。
+
+  AIHubMixはプロンプトや応答内容を積極的に保存しません。アカウントが禁止され、公式のコンプライアンス通知を受け取った場合にのみ、プラットフォームは関連するリクエスト情報（リクエスト時間、プロンプト内容、モデルの応答、及び違反説明など）を受動的に受け取り、保存します。
+</Info>
+
+## ログとデータ処理
+
+AIHubMixプラットフォームが接続している各AIプロバイダーは、独自のデータ処理方針を持っており、ログ記録メカニズムやデータ保持期間を含みます。
+
+### プロバイダーのデータポリシー
+
+コンプライアンス要件に基づき、異なるサービスプロバイダーはそれぞれのデータ保持ポリシーを策定し、実施します。
+
+プラットフォームは主要なプロバイダーのデータ保持ポリシーをまとめて説明しています。完全な条項を知りたい場合は、該当するプロバイダーの公式リンクを通じて確認してください。
+
+| プロバイダー                                                                                                                                                                         | データ保持       | 訓練に使用されるか  |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :------ |
+| [Alibaba Cloud Int.](https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html?spm=a2c4g.11186623.0.0.5c52f1e5ZqHnxl) | プロンプト情報の保持期間は不明 | 訓練には使用されない  |
+| [Anthropic](https://privacy.claude.com/en/collections/10663361-commercial-customers)                                                                                        | 30日間保持    | 訓練には使用されない  |
+| [AWS](https://aws.amazon.com/cn/bedrock/security-compliance/)                                                                                                               | データ保持なし      | 訓練には使用されない  |
+| [Azure](https://www.microsoft.com/en-sg/trust-center/privacy)                                                                                                               | データ保持なし      | 訓練には使用されない  |
+| [ByteDance](https://www.volcengine.com/docs/6256/64902)                                                                                                                     | データ保持なし      | 訓練には使用されない  |
+| [Cerebras](https://www.cerebras.ai/policies)                                                                                                                                | データ保持なし      | 訓練には使用されない  |
+| [Chutes](https://chutes.ai/privacy)                                                                                                                                         | プロンプト情報の保持期間は不明 | 訓練に使用される可能性 |
+| DaoCloud                                                                                                                                                                    | プロンプト情報の保持期間は不明 | 訓練には使用されない  |
+| [Deepinfra](https://deepinfra.com/docs/data)                                                                                                                                | データ保持なし      | 訓練には使用されない  |
+| [DeepSeek](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)                                                                                            | プロンプト情報の保持期間は不明 | 訓練に使用される可能性 |
+| [Google AI Studio](https://ai.google.dev/gemini-api/docs/logs-policy?hl=zh-cn)                                                                                              | 55日間保持    | 訓練には使用されない  |
+| [Google Vertex](https://cloud.google.com/privacy)                                                                                                                           | データ保持なし      | 訓練には使用されない  |
+| [Groq](https://groq.com/privacy-policy)                                                                                                                                     | データ保持なし      | 訓練には使用されない  |
+| [Ideogram](https://ideogram.ai/legal/privacy)                                                                                                                               | プロンプト情報の保持期間は不明 | 訓練に使用される可能性 |
+| [Jina AI](https://jina.ai/legal/)                                                                                                                                           | プロンプト情報の保持期間は不明 | 訓練に使用される可能性 |
+| [MiniMax](https://platform.minimax.io/protocol/privacy-policy)                                                                                                              | プロンプト情報の保持期間は不明 | 訓練に使用される可能性 |
+| [Moonshot AI](https://platform.moonshot.cn/docs/agreement/userprivacy)                                                                                                      | データ保持なし      | 訓練には使用されない  |
+| [OpenAI](https://developers.openai.com/api/docs/guides/your-data)                                                                                                           | プロンプト情報の保持期間は不明 | 訓練には使用されない  |
+| [SiliconFlow](https://docs.siliconflow.com/en/legals/privacy-policy)                                                                                                        | データ保持なし      | 訓練には使用されない  |
+| [Sophnet](https://github.com/axdlee/sophnet/blob/main/PRIVACY.md)                                                                                                           | データ保持なし      | 訓練には使用されない  |
+| [StepFun](https://platform.stepfun.com/legal/privacy-policy.html)                                                                                                           | プロンプト情報の保持期間は不明 | 訓練には使用されない  |
+| [xAI](https://x.ai/legal/terms-of-service-enterprise/)                                                                                                                      | 30日間保持    | 訓練には使用されない  |
+| [Xiaomi](https://www.mi.com/global/about/privacy/)                                                                                                                          | 30日間保持    | 訓練には使用されない  |
+| [Z.ai](http://Z.ai)                                                                                                                                                         | データ保持なし      | 訓練には使用されない  |

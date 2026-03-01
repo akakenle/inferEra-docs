@@ -135,6 +135,40 @@ Large language models use probabilistic sampling (e.g., temperature, top-p) to g
 - Lowering temperature or disabling sampling can make results more consistent.
 - Variations may also be affected by context, system prompts, or network conditions.
 
+--- 
+
+### Why Do Responses from the Claude Model End Prematurely?
+
+For the Claude model, AIHubMix currently supports two calling methods:
+
+1. OpenAI Chat compatible interface
+2. Anthropic Claude native interface
+
+When invoking the Claude model through the OpenAI Chat compatible interface, the system defaults to max_tokens=4096. If a larger max_tokens is not explicitly set in the request, the model will automatically stop outputting once it reaches this limit. Therefore, the occurrence of "responses ending before completion" is usually not due to a model malfunction, but rather because it has hit the default output length restriction.
+
+**How to Generate Longer Texts?**
+
+Under the OpenAI Chat compatible interface, you can manually set a larger max_tokens parameter, for example:
+
+```Python
+completion = client.chat.completions.create(
+  model="claude-sonnet-4-6",
+  max_tokens=6000,
+  messages=[
+    {
+      "role": "assistant",
+      "content": "Always respond in Chinese"
+    },
+    {
+      "role": "user",
+      "content": "What is the meaning of life?, over 6000 words"
+    }
+  ]
+)
+```
+
+max_tokens must not exceed the maximum supported limit for the corresponding model. If truncation still occurs after setting it, please provide the model name and the complete request parameters for further investigation.
+
 ---
 
 ## 2. API Calls & Data

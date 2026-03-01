@@ -1,0 +1,59 @@
+---
+title: "Data Pravicy"
+icon: "note"
+---
+
+## 数据采集说明
+
+### 数据存储原则
+
+AIHubMix 不会主动存储您的提示（Prompt）或模型响应内容。
+
+### AIHubMix 会存储哪些数据？
+
+为保障服务质量与系统稳定性，AIHubMix 会存储每次请求的必要元数据（例如 Token 数量、延迟等）。这些信息仅用于支持我们的报告和模型排名，以及您的[用量情况](https://console.aihubmix.com/statistics)。
+
+此元数据不包含您的提示内容或模型响应文本，仅限于与请求本身相关的技术信息。
+
+<Info>
+  OpenAI 与 Grok 官方在检测到可能违反其使用政策的内容时，会采取账号限制或封禁措施，并向 AIHubMix 发送合规通知。
+
+  AIHubMix 不主动存储提示或响应内容。仅在发生账号封禁且收到官方合规通知时，平台才会被动接收并留存相关请求信息（包括请求时间、提示内容、模型响应及违规说明等）。
+</Info>
+
+## 日志与数据处理
+
+AIHubMix 平台对接的每一家 AI 供应商均拥有独立的数据处理策略，包括日志记录机制和数据保留期限。
+
+### 供应商数据政策
+
+基于合规要求，不同服务提供商会制定并执行各自的数据保留政策。
+
+平台已对主要供应商的数据保留政策进行汇总说明，如需了解完整条款，请通过对应供应商的官方链接进行查阅。
+
+| 供应商                                                                                                                                                                         | 数据保留       | 是否用于训练  |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :------ |
+| [Alibaba Cloud Int.](https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html?spm=a2c4g.11186623.0.0.5c52f1e5ZqHnxl) | 提示信息保留时间未知 | 不会用于训练  |
+| [Anthropic](https://privacy.claude.com/en/collections/10663361-commercial-customers)                                                                                        | 保留 30 天    | 不会用于训练  |
+| [AWS](https://aws.amazon.com/cn/bedrock/security-compliance/)                                                                                                               | 零数据保留      | 不会用于训练  |
+| [Azure](https://www.microsoft.com/en-sg/trust-center/privacy)                                                                                                               | 零数据保留      | 不会用于训练  |
+| [ByteDance](https://www.volcengine.com/docs/6256/64902)                                                                                                                     | 零数据保留      | 不会用于训练  |
+| [Cerebras](https://www.cerebras.ai/policies)                                                                                                                                | 零数据保留      | 不会用于训练  |
+| [Chutes](https://chutes.ai/privacy)                                                                                                                                         | 提示信息保留时间未知 | 可能会用于训练 |
+| DaoCloud                                                                                                                                                                    | 提示信息保留时间未知 | 不会用于训练  |
+| [Deepinfra](https://deepinfra.com/docs/data)                                                                                                                                | 零数据保留      | 不会用于训练  |
+| [DeepSeek](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)                                                                                            | 提示信息保留时间未知 | 可能会用于训练 |
+| [Google AI Studio](https://ai.google.dev/gemini-api/docs/logs-policy?hl=zh-cn)                                                                                              | 保留 55 天    | 不会用于训练  |
+| [Google Vertex](https://cloud.google.com/privacy)                                                                                                                           | 零数据保留      | 不会用于训练  |
+| [Groq](https://groq.com/privacy-policy)                                                                                                                                     | 零数据保留      | 不会用于训练  |
+| [Ideogram](https://ideogram.ai/legal/privacy)                                                                                                                               | 提示信息保留时间未知 | 可能会用于训练 |
+| [Jina AI](https://jina.ai/legal/)                                                                                                                                           | 提示信息保留时间未知 | 可能会用于训练 |
+| [MiniMax](https://platform.minimax.io/protocol/privacy-policy)                                                                                                              | 提示信息保留时间未知 | 可能会用于训练 |
+| [Moonshot AI](https://platform.moonshot.cn/docs/agreement/userprivacy)                                                                                                      | 零数据保留      | 不会用于训练  |
+| [OpenAI](https://developers.openai.com/api/docs/guides/your-data)                                                                                                           | 提示信息保留时间未知 | 不会用于训练  |
+| [SiliconFlow](https://docs.siliconflow.com/en/legals/privacy-policy)                                                                                                        | 零数据保留      | 不会用于训练  |
+| [Sophnet](https://github.com/axdlee/sophnet/blob/main/PRIVACY.md)                                                                                                           | 零数据保留      | 不会用于训练  |
+| [StepFun](https://platform.stepfun.com/legal/privacy-policy.html)                                                                                                           | 提示信息保留时间未知 | 不会用于训练  |
+| [xAI](https://x.ai/legal/terms-of-service-enterprise/)                                                                                                                      | 保留 30 天    | 不会用于训练  |
+| [Xiaomi](https://www.mi.com/global/about/privacy/)                                                                                                                          | 保留 30 天    | 不会用于训练  |
+| [Z.ai](http://Z.ai)                                                                                                                                                         | 零数据保留      | 不会用于训练  |

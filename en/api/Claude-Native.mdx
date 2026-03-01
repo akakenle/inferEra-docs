@@ -1,40 +1,64 @@
 ---
-title: "Claude Native API Integration"
+title: "Claude Native API Calls"
 description: " "
 icon: "c"
 ---
 
-## Instructions
+## Description
 
-The Claude series models can be accessed via the official native API. Before using, make sure to install or upgrade the anthropic dependency:
+The Claude series models support official native API calls. Before using, ensure that the `anthropic` dependency is installed or upgraded:
 
 ```bash
 pip install -U anthropic
 ```
 
-<Info>
-  For non-Claude models, please use the OpenAI API format instead.
-</Info>
+## Model Information
 
-## Models Information
+| Model Name       | Claude Opus 4.6                                 | Claude Sonnet 4.6                               | Claude Sonnet 4.5 | Claude Haiku 4.5 |
+| ---------------- | ----------------------------------------------- | ----------------------------------------------- | ----------------- | ---------------- |
+| Supports Extended Thinking | Yes                                               | Yes                                               | Yes                 | Yes                |
+| Context Window Size | 200K tokens /<br />1M tokens (beta)<sup>3</sup> | 200K tokens /<br />1M tokens (beta)<sup>3</sup> | 200K              | 200K             |
+| Maximum Output Length | 128K tokens                                     | 128K tokens                                     | 64K tokens        | 64K tokens       |
+| Training Data Cutoff | August 2025                                         | August 2025                                         | July 2025           | July 2025          |
 
-| Model             | Claude Opus 4 | Claude Sonnet 4 | Claude Sonnet 3.7 | Claude Sonnet 3.5 | Claude Haiku 3.5 | Claude Opus 3 | Claude Haiku 3 |
-| ----------------- | ------------- | --------------- | ----------------- | ----------------- | ---------------- | ------------- | -------------- |
-| Extended Thinking | Yes           | Yes             | Yes               | No                | No               | No            | No             |
-| Context Window    | 200K          | 200K            | 200K              | 200K              | 200K             | 200K          | 200K           |
-| Max Output        | 32000 tokens  | 64000 tokens    | 64000 tokens      | 8192 tokens       | 8192 tokens      | 4096 tokens   | 4096 tokens    |
-| Training Cut-off  | Mar 2025      | Mar 2025        | Nov 2024          | Apr 2024          | July 2024        | Aug 2023      | Aug 2023       |
+## New Features in Claude 4.6
 
-<Tip>
-  1. For models version 3.5 and above, if you need output longer than 4096 tokens, be sure to explicitly specify the `"max_tokens"` parameter, referring to the `Max Output` column in the table above.
-  2. For Sonnet 3.7, you can increase the max output from 64K to 128K by passing `extra_headers={"anthropic-beta": "output-128k-2025-02-19"}`. See the "Streaming 128K" example below.
-</Tip>
+### Adaptive Thinking
 
-## Claude 4 New Features
+Claude 4.6 recommends using a new adaptive thinking mode, where Claude automatically determines whether to think and the depth of thinking based on the complexity of the question:
+
+```python
+thinking={"type": "adaptive"}
+```
+
+<Warning>
+  `thinking: {type: "enabled", budget_tokens: N}` has been deprecated in 4.6 and will be removed in future versions.
+</Warning>
+
+### Automatic Context Compaction (Beta)
+
+When conversations approach the context window limit, Claude 4.6 can automatically perform server-side summary compaction of earlier content.
+
+**Advantages:**
+
+- Supports ultra-long conversations
+- No need for client-side summarization
+- Enhances agent's ability for continuous dialogues
+
+**Note:**
+
+- Automatic compaction may lose some details
+- It is recommended to evaluate tests in scenarios requiring strong consistency
+
+### Deprecations and Changes
+
+- **Removed `interleaved-thinking-2025-05-14` Beta Header:** In 4.6, adaptive thinking now automatically supports interleaved thinking, and there is no need to add `extra_headers`. If still added, this header will be safely ignored.
+
+## New Features in Claude 4
 
 ### New Refusal Stop Reason
 
-Claude 4 models introduce a new `refusal` stop reason for content that the model declines to generate for safety reasons:
+The Claude 4 model introduces a new `refusal` stop reason to handle cases where the model refuses to generate content for safety reasons:
 
 ```json
 {
@@ -54,21 +78,21 @@ Claude 4 models introduce a new `refusal` stop reason for content that the model
 }
 ```
 
-When migrating to Claude 4, you should update your application to handle `refusal` stop reasons.
+When migrating to Claude 4, you should update your application to handle the `refusal` stop reason.
 
 ### Extended Thinking
 
-With extended thinking enabled, the Messages API for Claude 4 models returns a summary of Claude's full thinking process. Summarized thinking provides the full intelligence benefits of extended thinking, while preventing misuse.
+Once extended thinking is enabled, the Claude 4 model's Messages API will return a summary of Claude's complete thought process. The summary provides all the intelligent advantages of extended thinking while preventing abuse.
 
-While the API is consistent across Claude 3.7 and 4 models, streaming responses for extended thinking might return in a "chunky" delivery pattern, with possible delays between streaming events.
+While the API remains consistent between Claude 3.7 and 4 models, the streaming response for extended thinking may return in a "chunked" mode, with possible delays between streaming events.
 
-Summarization is processed by a different model than the one you target in your requests. The thinking model does not see the summarized output.
+The summary is processed by a model different from the one specified in your request. The thinking model will not see the summary output.
 
 ### Interleaved Thinking
 
-Claude 4 models support interleaving tool use with extended thinking, allowing for more natural conversations where tool uses and responses can be mixed with regular messages.
+Claude 4 model supports interleaving tool usage with extended thinking, allowing for more natural conversations where tool usage and responses can be mixed with regular messages.
 
-Interleaved thinking is in beta. To enable interleaved thinking, add the beta header `interleaved-thinking-2025-05-14` to your API request:
+Interleaved thinking is currently in testing. To enable interleaved thinking, add the test header `interleaved-thinking-2025-05-14` in your API request:
 
 ```python
 extra_headers={
@@ -78,13 +102,13 @@ extra_headers={
 
 **Endpoint:** `POST` /v1/messages
 
-## Usage
+## Invocation
 
 <CodeGroup>
 
 ```shell Curl
-curl https://aihubmix.com/v1/messages \ # Replace the official endpoint with AiHubMix's API endpoint
-     --header "x-api-key: $AIHUBMIX_API_KEY" \ # Replace with the key you generated in AiHubMix
+curl https://aihubmix.com/v1/messages \
+     --header "x-api-key: $ANTHROPIC_API_KEY" \ # Replace with the key generated on AiHubMix
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --data \
@@ -98,41 +122,37 @@ curl https://aihubmix.com/v1/messages \ # Replace the official endpoint with AiH
 ```
 
 
-```py Python
+```py Python Non-streaming
 import anthropic
 
-# Initialize the Anthropics client
 client = anthropic.Anthropic(
-    api_key="sk-***", # Replace it by your AiHubMix Key
+    api_key="sk-***", # Replace with the key generated on AiHubMix
     base_url="https://aihubmix.com"
 )
-
-# Construct your message
 message = client.messages.create(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-3-5-sonnet-20241022",
     max_tokens=1024,
     messages=[
         {"role": "user", "content": "Hello, Claude"}
     ]
 )
-
-# Print the response content
 print(message.content)
 ```
+
 
 ```py Python Streaming 128K
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key="sk-***", # Replace it by your AiHubMix Key
+    api_key="sk-***", # Replace with the key generated on AiHubMix
     base_url="https://aihubmix.com"
 )
 
 with client.messages.stream(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-3-7-sonnet-20250219",  # claude-opus-4-20250514, claude-sonnet-4-20250514
     max_tokens=128000,
     messages=[
-        {"role": "user", "content": "Please generate the beginning of a novel that will span 100,000 tokens."}
+        {"role": "user", "content": "Please generate a 100,000 token article that elaborates on Charlie Munger's 100 mental models (approximately 1,000 tokens for each model), with each section including an introduction to the model, multidimensional thinking, application methods, practical blind spots, and specific examples. Clarity and engagement are key. Use bullet points only when necessary."}
     ],
     extra_headers={
         "anthropic-beta": "output-128k-2025-02-19"
@@ -142,11 +162,12 @@ with client.messages.stream(
         print(text, end="", flush=True)
 ```
 
+
 ```py Python Interleaved Thinking
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key="sk-***", # Replace it by your AiHubMix Key
+    api_key="sk-***", # Replace with the key generated on AiHubMix
     base_url="https://aihubmix.com"
 )
 
@@ -154,7 +175,7 @@ response = client.messages.create(
     model="claude-sonnet-4-20250514",  # or claude-opus-4-20250514
     max_tokens=1024,
     messages=[
-        {"role": "user", "content": "Help me analyze this data and generate charts"}
+        {"role": "user", "content": "Help me analyze this data and generate a chart"}
     ],
     tools=[
         {
@@ -171,7 +192,7 @@ print(response.content)
 
 </CodeGroup>
 
-### Request Body
+### Body Request Structure
 
 ```json
 {
@@ -188,16 +209,16 @@ print(response.content)
 
 ### Request Parameters
 
-| Name         | Location | Type     | Required | Description             |
-| ------------ | -------- | -------- | -------- | ----------------------- |
-| x-api-key    | header   | string   | No       | Bearer AIHUBMIX_API_KEY |
-| Content-Type | header   | string   | No       | none                    |
-| body         | body     | object   | No       | none                    |
-| » model      | body     | string   | Yes      | none                    |
-| » messages   | body     | [object] | Yes      | none                    |
-| »» role      | body     | string   | No       | none                    |
-| »» content   | body     | string   | Yes      | none                    |
-| » max_tokens | body     | number   | Yes      | none                    |
+| Name           | Location | Type     | Required | Description          |
+| -------------- | -------- | -------- | -------- | -------------------- |
+| x-api-key      | header   | string   | No       | AIHUBMIX_API_KEY     |
+| Content-Type   | header   | string   | No       | none                 |
+| body           | body     | object   | No       | none                 |
+| » model        | body     | string   | Yes      | none                 |
+| » messages     | body     | [object] | Yes      | none                 |
+| »» role        | body     | string   | No       | none                 |
+| »» content     | body     | string   | Yes      | none                 |
+| » max_tokens   | body     | number   | Yes      | none                 |
 
 ### Response Example
 
@@ -230,15 +251,15 @@ print(response.content)
 
 ### Response Results
 
-| Status Code | Status Description | Description | Data Model |
-| ----------- | ------------------ | ----------- | ---------- |
-| 200         | OK                 | none        | Inline     |
+| Status Code | Status Meaning | Description | Data Model |
+| ----------- | -------------- | ----------- | ---------- |
+| 200         | OK             | none        | Inline     |
 
 ## Migrating to Claude 4
 
-If you're migrating from Claude 3.7 to Claude 4 models, please note the following changes:
+If you are migrating from the Claude 3.7 to Claude 4 models, be aware of the following changes:
 
-### Update Model Names
+### Update Model Name
 
 ```python
 # From Claude 3.7
@@ -254,17 +275,17 @@ Update your application to handle the new `refusal` stop reason:
 
 ```python
 if response.stop_reason == "refusal":
-    print("Claude refused to generate this content")
+    print("Claude refuses to generate this content")
 elif response.stop_reason == "end_turn":
     print("Completed normally")
 ```
 
 ### Remove Unsupported Features
 
-- **Token-efficient tool use**: Only available in Claude Sonnet 3.7, no longer supported in Claude 4
-- **Extended output**: The `output-128k-2025-02-19` beta header is only available in Claude Sonnet 3.7
+- **Token Efficient Tool Usage:** Only available in Claude Sonnet 3.7, no longer supported in Claude 4
+- **Extended Output:** The `output-128k-2025-02-19` test header is only available in Claude Sonnet 3.7
 
-If you're migrating from Claude Sonnet 3.7, we recommend removing these beta headers from your requests:
+If you are migrating from Claude Sonnet 3.7, it is recommended to remove these test headers from your requests:
 
 ```python
 # Remove these headers (if present)
@@ -272,77 +293,77 @@ If you're migrating from Claude Sonnet 3.7, we recommend removing these beta hea
 # "output-128k-2025-02-19"
 ```
 
-## Using Claude in Applications (Example: Lobe-Chat)
+## Using in Applications (Example with Lobe-Chat)
 
-Here's how you can configure Claude models in a third-party application like Lobe-Chat:
+- Go to the settings page and select the model provider Claude
+- Input the API key from [our site](https://aihubmix.com/token)
+- Enter the API proxy address directly as follows:
 
-1. Navigate to the settings page and select **Claude** as your model provider.
-2. Enter your [API Key](https://aihubmix.com/token) from AiHubMix.
-3. Set the API proxy endpoint to:
+```
+https://aihubmix.com
+```
 
-   ```
-   https://aihubmix.com
-   ```
-4. (Recommended) Enable the "Client Request Mode" option.
-5. Add your chosen model to the model list.
-   - It's recommended to copy the model name from AiHubMix's settings page and paste it in the application.
+- It is recommended to enable "Use Client Request Mode"
+- Finally, add the models you wish to use to the model list (it is suggested to copy and paste the model name from our website's settings page)\\
 
-![图片](../../public/en/cla1.png)
+  ![Image](../../public/cn/cla1.png)
 
-![图片](../../public/en/cla2.png)
+  ![Image](../../public/cn/cla2.png)
 
-## Claude Text Editor Tool
+## Claude Text Editing Tools
 
-Claude can use Anthropic's text editor tool to view and modify text files, helping you debug, fix, and improve code or other text documents. This enables Claude to interact directly with your files, providing practical assistance rather than just suggestions.
+Claude can use text editing tools defined by Anthropic to view and modify text files, helping you debug, fix, and improve code or other text documents. This enables Claude to interact directly with your files, providing practical operational assistance rather than just suggestions.
 
-### Preparation Before Using the Text Editor Tool
+### Preparation Before Using Text Editing Tools
 
-Select a Compatible Model
-Anthropic's text editor tool supports the following Claude models:
+Select compatible models. Anthropic's text editing tools support the following Claude models:
 
-- **Claude 4 Models** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
+- **Claude 4 Series Models** (`claude-opus-4-20250514`, `claude-sonnet-4-20250514`): `text_editor_20250429`
 - **Claude 3.7 Sonnet** (`claude-3-7-sonnet-20250219`): `text_editor_20250124`
 - **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`): `text_editor_20241022`
 
 <Warning>
-Claude 4 models use a completely new text editor tool that is incompatible with older versions. Make sure to use the correct tool type and name.
+  Claude 4 models use a brand new text editing tool that is not compatible with older versions. Please ensure you are using the correct tool type and name.
 </Warning>
 
-### Model-Specific Tool Configuration
+### Tool Configuration per Model
 
-| Model Version | Tool Type | Tool Name | Supported Features |
-|---------------|-----------|-----------|-------------------|
-| Claude 4 (Opus/Sonnet) | `text_editor_20250429` | `str_replace_based_edit_tool` | view, str_replace, create |
-| Claude 3.7 Sonnet | `text_editor_20250124` | `str_replace_editor` | view, str_replace, create, undo_edit |
-| Claude 3.5 Sonnet | `text_editor_20241022` | `str_replace_editor` | view, str_replace, create, undo_edit |
+| Model Version               | Tool Type                   | Tool Name                          | Supported Features                      |
+| --------------------------- | --------------------------- | ---------------------------------- | --------------------------------------- |
+| Claude 4 (Opus/Sonnet)      | `text_editor_20250429`     | `str_replace_based_edit_tool`     | view, str_replace, create              |
+| Claude 3.7 Sonnet           | `text_editor_20250124`     | `str_replace_editor`              | view, str_replace, create, undo_edit   |
+| Claude 3.5 Sonnet           | `text_editor_20241022`     | `str_replace_editor`              | view, str_replace, create, undo_edit   |
 
 <Tip>
-**Important Change:** Claude 4 models no longer support the `undo_edit` command. Please remove any dependencies on this functionality from your code.
+  **Important Change:** The Claude 4 model no longer supports the `undo_edit` command. Please remove any dependencies on this functionality from your code.
 </Tip>
 
-### Evaluating Use Cases
-Here are some typical scenarios for using the text editor tool:
+### Assessment of Use Cases
 
-- Code Debugging: Help identify and fix issues in code, from syntax errors to logical problems.
-- Code Refactoring: Improve code structure, readability, and performance through targeted edits.
-- Documentation Generation: Add docstrings, comments, or README files to your codebase.
-- Test Creation: Create unit tests based on implementation understanding.
+Here are some typical scenarios for using text editing tools:
 
-### Using the Text Editor Tool
-Provide the text editor tool to Claude through the Messages API:
-You need to install the `anthropic` package:
+- Code Debugging: Helps identify and fix issues in code, ranging from syntax errors to logical problems.
+- Code Refactoring: Improves code structure, readability, and performance through targeted edits.
+- Documentation Generation: Adds documentation strings, comments, or README files to your codebase.
+- Test Creation: Creates unit tests based on an understanding of the implementation.
+
+### Using Text Editing Tools
+
+Provide Claude with text editing tools (named `str_replace_editor`) through the Messages API: You need to install the `anthropic` package:
+
 ```shell
 pip install anthropic
 ```
 
-**Usage Example:**
+**Invocation Examples:**
+
 <CodeGroup>
-  
-```py python-Claude 4
+
+```python Python-Claude 4
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    api_key="sk-***", # Replace with the key generated on AiHubMix
     base_url="https://aihubmix.com"
 )
 
@@ -368,11 +389,12 @@ for message in response.content:
     print(message.text)
 ```
 
-```py python-Claude 3.7
+
+```py Python-Claude 3.7
 import anthropic
 
 client = anthropic.Anthropic(
-    api_key="AIHUBMIX_API_KEY", # Replace with the key you generated in AiHubMix
+    api_key="sk-***", # Replace with the key generated on AiHubMix
     base_url="https://aihubmix.com"
 )
 
@@ -398,6 +420,7 @@ for message in response.content:
     print(message.text)
 ```
 
+
 ```shell Curl-Claude 4
 curl -X POST https://aihubmix.com/v1/messages \
   -H "Content-Type: application/json" \
@@ -420,6 +443,7 @@ curl -X POST https://aihubmix.com/v1/messages \
     ]
   }'
 ```
+
 
 ```shell Curl-Claude 3.7
 curl -X POST https://aihubmix.com/v1/messages \
@@ -446,9 +470,9 @@ curl -X POST https://aihubmix.com/v1/messages \
 
 </CodeGroup>
 
-### Migrating to Claude 4 (Text Editor Tool)
+### Migrating to Claude 4 (Text Editing Tools)
 
-If you're migrating from Claude 3.7 Sonnet to Claude 4 models, please note the following changes:
+If you are migrating from Claude 3.7 Sonnet to Claude 4 models, be aware of the following changes:
 
 #### Update Tool Configuration
 
@@ -472,10 +496,11 @@ tools=[
 
 #### Remove Unsupported Features
 
-- **`undo_edit` command**: Claude 4 models no longer support the undo edit functionality
-- Please remove any logic that depends on `undo_edit` from your code
+- **`undo_edit command`**: The Claude 4 model no longer supports the undo edit functionality.
+- Please remove any logic that depends on `undo_edit` from your code.
 
 Response Example:
+
 ```json
 {
   "id": "msg_bdrk_012xyNaFCQg4zsVcTk5VkDAe",

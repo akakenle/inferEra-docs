@@ -1,0 +1,58 @@
+---
+title: "데이터 프라이버시"
+icon: "note"
+---
+## 데이터 수집 설명
+
+### 데이터 저장 원칙
+
+AIHubMix는 귀하의 프롬프트(Prompt)나 모델 응답 내용을 적극적으로 저장하지 않습니다.
+
+### AIHubMix가 저장하는 데이터는 무엇인가요?
+
+서비스 품질과 시스템 안정성을 보장하기 위해, AIHubMix는 매 요청의 필수 메타데이터(예: 토큰 수, 지연 시간 등)를 저장합니다. 이 정보는 우리의 보고서 및 모델 순위를 지원하고 귀하의 [사용량 상황](https://console.aihubmix.com/statistics)에만 사용됩니다.
+
+이 메타데이터는 귀하의 프롬프트 내용이나 모델 응답 텍스트를 포함하지 않으며, 요청 자체와 관련된 기술 정보에 한정됩니다.
+
+<Info>
+  OpenAI와 Grok 공식은 사용 정책을 위반할 가능성이 있는 내용을 감지할 경우 계정 제한 또는 정지 조치를 취하고 AIHubMix에 준수 알림을 전송합니다.
+
+  AIHubMix는 프롬프트나 응답 내용을 적극적으로 저장하지 않습니다. 계정 정지가 발생하고 공식 준수 알림을 받은 경우에만 플랫폼은 관련 요청 정보(요청 시간, 프롬프트 내용, 모델 응답 및 위반 설명 등)를 수동으로 수신하고 보관합니다.
+</Info>
+
+## 로그 및 데이터 처리
+
+AIHubMix 플랫폼과 연결된 각 AI 공급자는 독립적인 데이터 처리 정책을 가지고 있으며, 로그 기록 메커니즘과 데이터 보존 기간을 포함합니다.
+
+### 공급자 데이터 정책
+
+규정 준수 요구 사항에 따라, 각 서비스 제공자는 자체 데이터 보존 정책을 수립하고 시행합니다.
+
+플랫폼은 주요 공급자의 데이터 보존 정책을 요약하여 설명하였으며, 전체 조항을 확인하려면 해당 공급자의 공식 링크를 통해 조회하시기 바랍니다.
+
+| 공급자                                                                                                                                                                         | 데이터 보존       | 훈련에 사용 여부  |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :------ |
+| [Alibaba Cloud Int.](https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html?spm=a2c4g.11186623.0.0.5c52f1e5ZqHnxl) | 프롬프트 정보 보존 기간 미상 | 훈련에 사용되지 않음  |
+| [Anthropic](https://privacy.claude.com/en/collections/10663361-commercial-customers)                                                                                        | 30일 보존    | 훈련에 사용되지 않음  |
+| [AWS](https://aws.amazon.com/cn/bedrock/security-compliance/)                                                                                                               | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Azure](https://www.microsoft.com/en-sg/trust-center/privacy)                                                                                                               | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [ByteDance](https://www.volcengine.com/docs/6256/64902)                                                                                                                     | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Cerebras](https://www.cerebras.ai/policies)                                                                                                                                | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Chutes](https://chutes.ai/privacy)                                                                                                                                         | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| DaoCloud                                                                                                                                                                    | 프롬프트 정보 보존 기간 미상 | 훈련에 사용되지 않음  |
+| [Deepinfra](https://deepinfra.com/docs/data)                                                                                                                                | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [DeepSeek](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html)                                                                                            | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| [Google AI Studio](https://ai.google.dev/gemini-api/docs/logs-policy?hl=zh-cn)                                                                                              | 55일 보존    | 훈련에 사용되지 않음  |
+| [Google Vertex](https://cloud.google.com/privacy)                                                                                                                           | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Groq](https://groq.com/privacy-policy)                                                                                                                                     | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Ideogram](https://ideogram.ai/legal/privacy)                                                                                                                               | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| [Jina AI](https://jina.ai/legal/)                                                                                                                                           | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| [MiniMax](https://platform.minimax.io/protocol/privacy-policy)                                                                                                              | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| [Moonshot AI](https://platform.moonshot.cn/docs/agreement/userprivacy)                                                                                                      | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [OpenAI](https://developers.openai.com/api/docs/guides/your-data)                                                                                                           | 프롬프트 정보 보존 기간 미상 | 훈련에 사용되지 않음  |
+| [SiliconFlow](https://docs.siliconflow.com/en/legals/privacy-policy)                                                                                                        | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [Sophnet](https://github.com/axdlee/sophnet/blob/main/PRIVACY.md)                                                                                                           | 데이터 보존 없음      | 훈련에 사용되지 않음  |
+| [StepFun](https://platform.stepfun.com/legal/privacy-policy.html)                                                                                                           | 프롬프트 정보 보존 기간 미상 | 훈련에 사용될 가능성 있음 |
+| [xAI](https://x.ai/legal/terms-of-service-enterprise/)                                                                                                                      | 30일 보존    | 훈련에 사용되지 않음  |
+| [Xiaomi](https://www.mi.com/global/about/privacy/)                                                                                                                          | 30일 보존    | 훈련에 사용되지 않음  |
+| [Z.ai](http://Z.ai)                                                                                                                                                         | 데이터 보존 없음      | 훈련에 사용되지 않음  |
