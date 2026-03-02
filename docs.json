@@ -181,9 +181,9 @@
                   "en/quick-start",
                   "en/api/OpenClaw",
                   "en/api/Claude-Code",
-                  "en/api/CC-any",
                   "en/api/AISDK",
-                  "en/api/Data-Pravicy"
+                  "en/api/Data-Pravicy",
+                  "en/api/Status"
                 ]
               },
               {
@@ -259,21 +259,25 @@
               "en/api/Qwen-code",
               "en/api/AISDK",
               "en/api/Crush"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "Use Cases",
             "pages": [
               "en/clients/AHM-mcp",
               "en/clients/Cherry-Studio",
+              "en/clients/Lobe-Chat",
+              "en/clients/OpenAI-Translator",
+              "en/clients/Pot-App",
+              "en/clients/Chatx",
+              "en/clients/Bob",
               "en/clients/AnythingLLM",
               "en/clients/Avante.nvim",
-              "en/clients/Bob",
               "en/clients/ChatAll",
               "en/clients/ChatBox",
               "en/clients/ChatGPT-Next-Web",
               "en/clients/ChatHub",
-              "en/clients/Chatx",
               "en/clients/Cline",
               "en/clients/Cursor",
               "en/clients/Dify",
@@ -282,11 +286,8 @@
               "en/clients/LangChain",
               "en/clients/N8N",
               "en/clients/LibreChat",
-              "en/clients/Lobe-Chat",
               "en/clients/Obsidian",
               "en/clients/Open-WebUI",
-              "en/clients/OpenAI-Translator",
-              "en/clients/Pot-App",
               "en/clients/Utools-ChatGPT",
               "en/clients/Zotero",
               "en/clients/Immersive-Translate",
@@ -294,7 +295,8 @@
               "en/clients/Oulu",
               "en/clients/FeelFish",
               "en/clients/GCMP"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "FAQs",
@@ -302,19 +304,22 @@
               "en/FAQs/Faq",
               "en/FAQs/HTTP-Codes",
               "en/FAQs/Human-Customer-Support"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "Blogs",
             "pages": [
               "en/blogs/aihubmix-openai-upgrade-claude"
-            ]
+            ],
+            "groups": []
           },
           {
             "tab": "Updates",
             "pages": [
               "en/update/News"
-            ]
+            ],
+            "groups": []
           }
         ]
       },
