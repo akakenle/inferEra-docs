@@ -32,7 +32,8 @@
                   "cn/api/OpenClaw",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
-                  "cn/api/Data-Pravicy"
+                  "cn/api/Data-Pravicy",
+                  "cn/api/Status"
                 ]
               },
               {

@@ -1,0 +1,75 @@
+---
+title: "Status"
+---
+
+## 页面介绍
+
+AIHubMix Status Page 是用于展示平台系统运行状态的官方页面，旨在提升平台透明度与服务可靠性。通过该页面，您可以实时了解 AIHubMix 各项核心服务的运行情况，以及历史事件记录与处理进展。
+
+访问地址：\
+https://status.aihubmix.com/
+
+## 功能说明
+
+### 实时系统状态
+
+Status 页面展示当前各项核心服务组件的运行状态，包括：
+
+- OpenAI Chat 兼容 API 服务可用性
+
+
+- Gemini 兼容 API 服务可用性
+- Claude 兼容 API 服务可用性
+- AIHubMix 官网稳定性
+- 模型管理 API 服务可用性
+
+当系统运行正常时，将显示为 Operational 状态；若发生异常，将显示对应的 Incident 或 Degraded Performance 信息。
+
+---
+
+### 事件（Incident）说明
+
+当出现服务异常或性能波动时，Status 页面将发布 Incident 公告，包含：
+
+- 事件开始时间
+- 影响范围
+- 当前状态（Investigating / Identified / Monitoring / Resolved）
+- 修复进展更新
+- 最终解决时间
+
+所有事件均会保留历史记录，便于您追溯与核查。
+
+---
+
+### 历史记录查询
+
+您可查看历史事件记录，了解：
+
+- 过去服务中断情况
+- 处理时长
+- 问题类型
+- 系统稳定性表现
+
+---
+
+### 订阅更新通知
+
+Status Page 支持订阅更新功能，您可通过邮箱订阅，以便在发生 Incident 时自动接收通知。
+
+通知内容包括：
+
+- 新 Incident 发布提醒
+- 状态变更通知
+- 事件解决确认
+
+---
+
+## 状态等级说明
+
+| 状态                   | 说明           |
+| :------------------- | :----------- |
+| Operational          | 服务运行正常       |
+| Degraded Performance | 性能下降，但服务仍可使用 |
+| Partial Outage       | 部分功能不可用      |
+| Major Outage         | 核心服务中断       |
+| Maintenance          | 计划维护中        |
