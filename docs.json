@@ -29,7 +29,7 @@
                 "pages": [
                   "cn/index",
                   "cn/quick-start",
-                  "cn/api/Cline",
+                  "cn/api/OpenClaw",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
                   "cn/api/Data-Pravicy"
@@ -178,6 +178,7 @@
                 "pages": [
                   "en/index",
                   "en/quick-start",
+                  "en/api/OpenClaw",
                   "en/api/Claude-Code",
                   "en/api/CC-any",
                   "en/api/AISDK",
