@@ -1,186 +1,688 @@
 ---
 title: "视频生成接口"
+description: " AiHubMix 提供统一的视频生成 API，兼容 OpenAI Sora 接口格式，后端支持多家厂商模型"
 icon: "video"
 ---
 
-## 接口说明
+## 快速开始
 
-为了方便开发者调用不同的视频生成模型，AIHubMix 提供了统一的视频接口，支持以下多种主流模型：
+视频生成是异步操作，整个流程分为三步：
 
-- Google Veo 系列
-- OpenAI 系列
-- 万相（Wan）系列
+```
+1. 提交任务 → 获得 video_id
+2. 轮询状态 → 等待 status 变为 completed
+3. 下载视频 → 获取 MP4 文件
+```
 
-**接口规格：**
+**最简示例**
 
-```bash
-curl -X POST "https://aihubmix.com/v1/videos" \
+```shellscript
+# 第一步：提交视频生成任务
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
   -d '{
-    "model": "<model_path>",
-    "prompt": "your prompt"
+    "model": "wan2.6-t2v",
+    "prompt": "一只猫在钢琴上弹奏爵士乐，温暖的灯光，电影感镜头",
+    "seconds": "5",
+    "size": "1280x720"
   }'
-```
 
-**其中：**
+# 响应示例：
+# {
+#   "id": "eyJtb2RlbCI6IndhbjI...",
+#   "object": "video",
+#   "status": "in_progress",
+#   "model": "wan2.6-t2v",
+#   "duration": 5,
+#   "width": 1280,
+#   "height": 720,
+#   ...
+# }
 
-- `https://aihubmix.com/v1/videos` 为固定前缀
-- `<model_path>` 为模型路径，支持：
-  - [veo-3.1-generate-preview](https://aihubmix.com/model/veo-3.1-generate-preview)
-  - [veo-3.0-generate-preview](https://aihubmix.com/model/veo-3.0-generate-preview)
-  - [sora-2](https://aihubmix.com/model/sora-2)
-  - [sora-2-pro](https://aihubmix.com/model/sora-2-pro)
-  - [wan2.2-i2v-plus](https://aihubmix.com/model/wan2.2-i2v-plus)
-  - [wan2.2-t2v-plus](https://aihubmix.com/model/wan2.2-t2v-plus)
-  - [wan2.5-i2v-preview](https://aihubmix.com/model/wan2.5-i2v-preview)
-  - [wan2.5-t2v-preview](https://aihubmix.com/model/wan2.5-t2v-preview)
-- `sk-***` 为你在 AIHubMix 生成的 API Key
+# 第二步：轮询查询状态（每 15 秒查询一次，直到 status 为 completed）
+curl https://aihubmix.com/v1/videos/{video_id} \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY"
 
----
-
-## 支持的参数
-
-<ResponseField name="prompt" type="String" required>
-  提示词。需要使用自然语言描述镜头，包括镜头类型、主体、动作、场景、光线以及任何所需的镜头运动，以减少歧义。为确保最佳效果，请保持描述内容单一。
-</ResponseField>
-
-<ResponseField name="model" type="String">
-  模型。支持 veo-3.1-generate-preview，veo-3.0-generate-preview，sora-2，sora-2-pro，wan2.2-i2v-plus，wan2.2-t2v-plus，wan2.5-i2v-preview，wan2.5-t2v-preview。
-</ResponseField>
-
-<ResponseField name="size" type="String">
-  尺寸（图像分辨率，宽度x高度），可以通过调整该参数修改生成视频比例。
-
-  - sora 系列支持：720×1280（默认）、1280×720
-  - veo 系列支持：720P（默认），1080P
-  - wan 系列支持：480P（832x480、480x832、624x624），720P（1088x832、832x1088、960x960、1280x720、720x1280）和 1080P（1248x1632、1632x1248、1440x1440、1080x1920、1920x1080）。
-</ResponseField>
-
-<ResponseField name="seconds" type="String">
-  生成视频长度。
-
-  - sora 系列支持：4s（默认），8s，12s
-  - veo 系列支持：4s，6s，8s（默认）
-  - wan 系列支持：5s，10s（仅 wan2.5-t2v-preview 支持）
-</ResponseField>
-
-<ResponseField name="input_reference" type="File">
-  参考图像，用于引导视频生成，该图像将作为视频的第一帧。支持的文件格式包括`image/jpeg` `image/pbg` `image/webp` 。
-</ResponseField>
-
-> 更多细节可以参考：[Sora 2 API Reference](https://platform.openai.com/docs/guides/video-generation#page-top)
-
-## 调用方法
-
-### 默认生成（无引导图片）
-
-<CodeGroup>
-
-```bash cURL
-curl -X POST "https://aihubmix.com/v1/videos" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-***" \
-  -d '{
-    "model": "sora-2-pro",
-    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
-    "size": "720x1280",
-    "seconds": "4"
-  }'
-```
-
-
-```python Python
-import requests
-import json
-
-url = "https://aihubmix.com/v1/videos"
-headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer sk-***"
-}
-
-payload = {
-    "model": "sora-2",
-    "prompt": "A astronaut floating in space, holding a glowing plant, with Earth and stars in the background, slow-motion movement",
-    "size": "720x1280",
-    "seconds": '4',
-}
-
-response = requests.post(url, headers=headers, json=payload)
-
-print("Status Code:", response.status_code)
-print("Response:", response.text)
-```
-
-</CodeGroup>
-
-### 使用引导图片
-
-<CodeGroup>
-
-```bash cURL
-curl --location --request POST 'https://aihubmix.com/v1/videos' \
---header 'Authorization: Bearer sk-***' \
---form 'prompt="The kitten is taking a nap under the tree."' \
---form 'model="sora-2"' \
---form 'size="1280x720"' \
---form 'seconds="4"' \
---form 'input_reference=@"xxx=/cat.jpeg"'
-```
-
-
-```python Python
-import requests
-
-url = "https://aihubmix.com/v1/videos"
-
-headers = {
-    "Authorization": "Bearer sk-***"
-}
-
-
-# Prepare the multipart/form-data payload
-files = {
-    "prompt": (None, "The kitten is taking a nap under the tree."),
-    "model": (None, "sora-2-pro"),
-    "size": (None, "1280x720"),
-    "seconds": (None, "4"),
-
-    "input_reference": (
-        "cat.jpeg",
-        open("cat.jpeg", "rb"),
-        "image/jpeg"
-    )
-}
-
-response = requests.post(url, headers=headers, files=files)
-
-print("Status:", response.status_code)
-print("Response:", response.text)
-```
-
-</CodeGroup>
-
-### 下载 MP4 文件
-
-```bash
-
-curl -L "https://aihubmix.com/v1/videos/{video_id}/content" \
-  -H "Authorization: Bearer sk-***" \
+# 第三步：下载视频
+curl https://aihubmix.com/v1/videos/{video_id}/content \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
   --output video.mp4
 ```
 
-### 下载略缩图和精灵图
+## 接口概览
 
-```bash
-# 下载略缩图
-curl -L "https://aihubmix.com/v1/videos/{video_id}/content?variant=thumbnail" \
-  -H "Authorization: Bearer sk-***" \
-  --output thumbnail.webp
+| 接口   | 方法     | 路径                              | 说明           |
+| :--- | :----- | :------------------------------ | :----------- |
+| 创建视频 | POST   | `/v1/videos`                    | 提交视频生成任务     |
+| 查询状态 | GET    | `/v1/videos/{video_id}`         | 查询任务状态与进度    |
+| 下载视频 | GET    | `/v1/videos/{video_id}/content` | 下载生成的 MP4 视频 |
+| 删除任务 | DELETE | `/v1/videos/{video_id}`         | 删除视频任务       |
 
-# 下载精灵图
-curl -L "https://aihubmix.com/v1/videos/{video_id}/content?variant=spritesheet" \
-  -H "Authorization: Bearer sk-***" \
-  --output spritesheet.jpg
+Base URL：`https://aihubmix.com`
+
+认证方式：Bearer Token
+
+```shellscript
+Authorization: Bearer $AIHUBMIX_API_KEY
 ```
+
+## 支持的模型
+
+### 文生视频（Text-to-Video）
+
+| 厂商     | 模型名称                            | 特点                    |
+| ------ | ------------------------------- | --------------------- |
+| OpenAI | sora-2                          | 标准视频生成，支持音画同步         |
+| OpenAI | sora-2-pro                      | 高质量版本，更精致稳定的画面        |
+| Google | `veo-3.1-generate-preview`      | 最新 Veo 3.1，原生音频，支持 4K |
+| Google | `veo-3.1-fast-generate-preview` | Veo 3.1 快速版，生成速度更快    |
+| Google | `veo-3.0-generate-preview`      | Veo 3.0，高保真视频         |
+| Google | `veo-2.0-generate-001`          | Veo 2.0，稳定版           |
+| 阿里     | `wan2.6-t2v`                    | 通义万相最新版，音画同步          |
+| 阿里     | `wan2.5-t2v-preview`            | 通义万相 2.5，中文优化         |
+| 阿里     | `wan2.2-t2v-plus`               | 通义万相 2.2              |
+| 即梦AI   | `jimeng-3.0-pro`                | 即梦 3.0 Pro，1080P 高清   |
+| 即梦AI   | `jimeng-3.0-1080p`              | 即梦 3.0 1080P          |
+
+### 图生视频（Image-to-Video）
+
+| 厂商 | 模型名称                 | 特点            |
+| --- | -------------------- | ------------- |
+| 阿里 | `wan2.6-i2v`         | 通义万相最新版图生视频   |
+| 阿里 | `wan2.5-i2v-preview` | 通义万相 2.5 图生视频 |
+| 阿里 | `wan2.2-i2v-plus`    | 通义万相 2.2 图生视频 |
+
+<Note>
+  图生视频需通过 `input_reference` 参数传入参考图片。
+</Note>
+
+## API 详细说明
+
+### 请求头
+
+```shellscript
+Authorization: Bearer $AIHUBMIX_API_KEY
+Content-Type: application/json
+```
+
+### 创建视频生成任务
+
+```shellscript
+POST /v1/videos
+```
+
+#### **请求体**
+
+| 参数                | 类型            | 必填 | 说明                                      |
+| :---------------- | :------------ | :-- | :-------------------------------------- |
+| `model`           | string        | 是  | 模型名称，如 `wan2.6-t2v`、`sora-2`            |
+| `prompt`          | string        | 是  | 视频描述文本                                  |
+| `seconds`         | string        | 否  | 视频时长（秒），统一使用字符串类型，如 `"5"`、`"8"`（见各模型详解） |
+| `size`            | string        | 否  | 分辨率，格式 `宽x高`，如 `1920x1080`（各模型支持值不同）    |
+| `input_reference` | string/object | 否  | 参考图片（图生视频），支持 URL 或 base64              |
+
+> 不同模型的响应格式略有差异，但都包含 `id`（video_id）和 `status` 字段。以 `status` 判断任务进度即可。
+
+#### 响应示例（**通义万相/Veo/即梦AI**）
+
+```json
+{
+  "id": "eyJtb2RlbCI6IndhbjI...",
+  "object": "video",
+  "created": 1772460274,
+  "model": "wan2.6-t2v",
+  "status": "in_progress",
+  "prompt": "一只猫在窗台上看雨",
+  "duration": 5,
+  "width": 1920,
+  "height": 1080,
+  "url": null,
+  "error": null
+}
+```
+
+**响应示例（Sora）**
+
+```json
+{
+  "id": "eyJtb2RlbCI6InNvcmEtMi...",
+  "object": "video",
+  "created_at": 1772451930,
+  "status": "queued",
+  "model": "sora-2",
+  "progress": 0,
+  "prompt": "A cinematic drone shot over mountains",
+  "seconds": "8",
+  "size": "1280x720"
+}
+```
+
+#### 通用状态值说明
+
+| 状态            | 说明           |
+| :------------ | :----------- |
+| `queued`      | 排队中（Sora 特有） |
+| `in_progress` | 生成中          |
+| `completed`   | 生成完成，可以下载    |
+| `failed`      | 生成失败         |
+
+### 查询视频状态
+
+```shellscript
+GET /v1/videos/{video_id}
+```
+
+轮询此接口检查任务是否完成。建议每 **15 秒** 查询一次。
+
+#### **响应示例（生成完成 - 通义万相）**
+
+```json
+{
+  "id": "eyJtb2RlbCI6IndhbjI...",
+  "object": "video",
+  "status": "completed",
+  "model": "wan2.5-t2v-preview",
+  "duration": 5,
+  "width": 1920,
+  "height": 1080,
+  "url": "https://aihubmix.com/v1/videos/eyJtb2RlbCI6IndhbjI.../content",
+  "error": null
+}
+```
+
+#### **响应示例（生成完成 - Sora）**
+
+```json
+{
+  "id": "eyJtb2RlbCI6InNvcmEtMi...",
+  "object": "video",
+  "created_at": 1772451930,
+  "status": "completed",
+  "completed_at": 1772452114,
+  "expires_at": 1772538330,
+  "model": "sora-2",
+  "progress": 100,
+  "prompt": "A cinematic drone shot over mountains",
+  "seconds": "8",
+  "size": "1280x720"
+}
+```
+
+> 所有模型均通过 `status == "completed"` 判断完成状态，然后调用 `/content` 接口下载。
+
+### 下载视频内容
+
+```shellscript
+GET /v1/videos/{video_id}/content
+```
+
+当状态为 `completed` 后，调用此接口下载 MP4 视频文件。
+
+**响应**: 直接返回视频二进制流`Content-Type: video/mp4`）。
+
+```shellscript
+curl https://aihubmix.com/v1/videos/{video_id}/content \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  --output my_video.mp4
+```
+
+> **注意**：视频下载链接通常有 24 小时有效期，请及时下载保存。
+
+### 删除视频任务
+
+该接口用于删除已创建的视频任务。
+
+```shellscript
+DELETE /v1/videos/{video_id}
+```
+
+## 各模型参数详解
+
+### **OpenAI Sora**
+
+| 参数           | 支持值                                               |
+| ------------ | ------------------------------------------------- |
+| 模型           | `sora-2`、`sora-2-pro`                             |
+| 时长 (seconds) | `"4"`（默认）、`"8"`、`"12"`                            |
+| 分辨率 (size)   | `720x1280`（默认）、`1280x720`、`1024x1792`、`1792x1024` |
+| 图生视频         | 支持，通过 `input_reference` 传入图片                      |
+
+> 提示：所有模型的 `seconds` 参数统一使用字符串类型传入（如 `"8"`）。
+
+**示例**
+
+<CodeGroup>
+
+```shellscript Sora
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "sora-2",
+    "prompt": "A cinematic drone shot soaring over a misty mountain range at sunrise, golden light filtering through the clouds",
+    "seconds": "8",
+    "size": "1280x720"
+  }'
+```
+
+
+```shellscript Sora Pro 竖版视频
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "sora-2-pro",
+    "prompt": "A person walking through a neon-lit city street at night, rain reflecting on the pavement, cinematic lighting",
+    "seconds": "12",
+    "size": "720x1280"
+  }'
+```
+
+</CodeGroup>
+
+### Google Veo
+
+| 参数           | 支持值                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| 模型           | `veo-3.1-generate-preview`（推荐）、`veo-3.1-fast-generate-preview`（快速）、`veo-3.0-generate-preview`、`veo-2.0-generate-001` |
+| 时长 (seconds) | Veo 3/3.1：`"4"`、`"6"`、`"8"`；Veo 2：`"5"`~`"8"`（默认 `"8"`）                                                              |
+| 分辨率 (size)   | `720p`（默认）、`1080p`、`4k`（4K 仅 Veo 3+），或像素格式如 `1280x720`、`1920x1080`                                                   |
+| 宽高比          | 16:9（默认）、9:16                                                                                                        |
+| 图生视频         | 支持，通过 `input_reference` 传入首帧图片（Veo 3.1），使用时 `seconds` 固定为 `"8"`                                                      |
+
+**示例**
+
+<CodeGroup>
+
+```shellscript Veo 3.1
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "veo-3.1-generate-preview",
+    "prompt": "一个宁静的日式庭院，樱花花瓣缓缓飘落，锦鲤在池塘中游动，背景传来悠扬的风铃声",
+    "seconds": "8",
+    "size": "1280x720"
+  }'
+```
+
+
+```shellscript Veo 3.1 Fast
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "veo-3.1-fast-generate-preview",
+    "prompt": "Ocean waves crashing on rocky cliffs at sunset, seagulls flying overhead",
+    "seconds": "8",
+    "size": "1280x720"
+  }'
+```
+
+</CodeGroup>
+
+> 提示：Veo 支持原生音频生成，可在 prompt 中描述音效，如"背景传来鸟鸣声"、"钢琴旋律"。
+
+### 通义万相
+
+| 参数           | 支持值                                                     |
+| ------------ | ------------------------------------------------------- |
+| 文生视频模型       | `wan2.6-t2v`（推荐）、`wan2.5-t2v-preview`、`wan2.2-t2v-plus` |
+| 图生视频模型       | `wan2.6-i2v`（推荐）、`wan2.5-i2v-preview`、`wan2.2-i2v-plus` |
+| 时长 (seconds) | 因模型而异（见下方说明），默认 `"5"`                                   |
+| 分辨率 (size)   | 见下方表格，`x` 和 `*` 分隔符均可（如 `1920x1080` 或 `1920*1080`）      |
+| 图生视频         | 通过 `input_reference` 传入图片 URL 或 base64                  |
+
+#### 各模型支持的时长
+
+| 模型                                          | seconds 可选值         | 默认值   |
+| :------------------------------------------ | :------------------ | :---- |
+| `wan2.6-t2v` / `wan2.6-i2v`                 | `"2"`~`"15"`（任意整数值） | `"5"` |
+| `wan2.5-t2v-preview` / `wan2.5-i2v-preview` | `"5"` 或 `"10"`      | `"5"` |
+| `wan2.2-t2v-plus` / `wan2.2-i2v-plus`       | `"5"`（固定）           | `"5"` |
+
+#### 支持的分辨率（宽\*高）
+
+| 清晰度   | 可选分辨率                                                                 |
+| :---- | :-------------------------------------------------------------------- |
+| 480P  | `832x480`、`480x832`、`624x624`                                         |
+| 720P  | `1280x720`（默认）、`720x1280`、`960x960`、`1088x832`（4:3）、`832x1088`（3:4）   |
+| 1080P | `1920x1080`、`1080x1920`、`1440x1440`、`1632x1248`（4:3）、`1248x1632`（3:4） |
+
+> **注意**：wan2.6 仅支持 720P 和 1080P；wan2.5 支持 480P、720P、1080P；wan2.2 仅支持 480P 和 1080P。
+
+**示例**
+
+<CodeGroup>
+
+```shellscript 文生视频
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "wan2.6-t2v",
+    "prompt": "一条蜿蜒的小溪穿过秋天的森林，金黄色的落叶飘落在水面上，阳光透过树叶洒下斑驳的光影",
+    "seconds": "5",
+    "size": "1920x1080"
+  }'
+```
+
+
+```shellscript 图生视频
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "wan2.6-i2v",
+    "prompt": "画面中的人物缓缓转头微笑，镜头缓慢推进",
+    "seconds": "5",
+    "size": "1280x720",
+    "input_reference": "https://example.com/my-image.jpg"
+  }'
+```
+
+</CodeGroup>
+
+> 提示：wan2.5 及以上版本默认生成有声视频（自动配音），中文 prompt 效果更佳。
+
+### 即梦 AI
+
+| 参数           | 支持值                                       |
+| ------------ | ----------------------------------------- |
+| 模型           | `jimeng-3.0-pro`（推荐）、`jimeng-3.0-1080p`   |
+| 时长 (seconds) | `"5"` 或 `"10"`（默认 `"5"`）                  |
+| 分辨率 (size)   | 支持宽高比格式或像素格式                              |
+| 图生视频         | 支持，通过 `input_reference` 传入图片 URL 或 base64 |
+
+#### 支持的宽高比与对应分辨率
+
+| 宽高比 (size)           | 实际分辨率     |
+| :------------------- | :-------- |
+| `16:9` 或 `1920x1080` | 1920×1088 |
+| `9:16` 或 `1080x1920` | 1088×1920 |
+| `4:3` 或 `1664x1248`  | 1664×1248 |
+| `3:4` 或 `1248x1664`  | 1248×1664 |
+| `1:1` 或 `1440x1440`  | 1440×1440 |
+| `21:9` 或 `2176x928`  | 2176×928  |
+
+#### 示例
+
+<CodeGroup>
+
+```shellscript 即梦 AI
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "jimeng-3.0-pro",
+    "prompt": "一位身穿汉服的少女在竹林间翩翩起舞，长裙随风飘动，背景是淡淡的晨雾",
+    "seconds": "5",
+    "size": "16:9"
+  }'
+```
+
+
+```即梦 AI 竖屏版
+curl -X POST https://aihubmix.com/v1/videos \
+  -H "Authorization: Bearer $AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "jimeng-3.0-1080p",
+    "prompt": "A sunset over the ocean, waves gently rolling, warm golden light",
+    "seconds": "5",
+    "size": "9:16"
+  }'
+```
+
+</CodeGroup>
+
+## **完整调用示例**
+
+<CodeGroup>
+
+```python 通义万相
+import requests
+import time
+
+API_KEY = "AIHUBMIX_API_KEY"
+BASE_URL = "https://aihubmix.com"
+HEADERS = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# 第一步：创建视频生成任务
+response = requests.post(
+    f"{BASE_URL}/v1/videos",
+    headers=HEADERS,
+    json={
+        "model": "wan2.6-t2v",
+        "prompt": "一片星空下的沙漠，流星划过夜空，远处篝火的光芒在微风中摇曳",
+        "seconds": "5",
+        "size": "1920x1080"
+    }
+)
+result = response.json()
+video_id = result["id"]
+print(f"任务已创建，video_id: {video_id}")
+
+# 第二步：轮询查询状态
+while True:
+    status_response = requests.get(
+        f"{BASE_URL}/v1/videos/{video_id}",
+        headers=HEADERS
+    )
+    status_data = status_response.json()
+    current_status = status_data["status"]
+    print(f"当前状态: {current_status}")
+
+    if current_status == "completed":
+        print("视频生成完成！")
+        break
+    elif current_status == "failed":
+        error_msg = status_data.get("error", {})
+        if isinstance(error_msg, dict):
+            error_msg = error_msg.get("message", "未知错误")
+        print(f"生成失败: {error_msg}")
+        break
+
+    time.sleep(15)  # 每 15 秒查询一次
+
+# 第三步：下载视频
+video_response = requests.get(
+    f"{BASE_URL}/v1/videos/{video_id}/content",
+    headers=HEADERS
+)
+with open("output.mp4", "wb") as f:
+    f.write(video_response.content)
+print(f"视频已保存为 output.mp4（{len(video_response.content) / 1024 / 1024:.1f} MB）")
+```
+
+
+```python Sora
+import requests
+import time
+
+API_KEY = "AIHUBMIX_API_KEY"
+BASE_URL = "https://aihubmix.com"
+HEADERS = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+# 创建视频生成任务
+response = requests.post(
+    f"{BASE_URL}/v1/videos",
+    headers=HEADERS,
+    json={
+        "model": "sora-2",
+        "prompt": "A cinematic shot of a futuristic city at sunset, flying cars in the background",
+        "seconds": "8",       # 可选 "4"/"8"/"12"
+        "size": "1280x720"    # 支持 1280x720, 720x1280, 1024x1792, 1792x1024
+    }
+)
+result = response.json()
+video_id = result["id"]
+print(f"任务已创建，video_id: {video_id}")
+
+# Sora 状态轮询（可能出现 queued -> in_progress -> completed）
+while True:
+    status_response = requests.get(
+        f"{BASE_URL}/v1/videos/{video_id}",
+        headers=HEADERS
+    )
+    status_data = status_response.json()
+    current_status = status_data["status"]
+    progress = status_data.get("progress", "")
+    print(f"状态: {current_status}, 进度: {progress}%")
+
+    if current_status == "completed":
+        print("视频生成完成！")
+        break
+    elif current_status == "failed":
+        print(f"生成失败: {status_data.get('error')}")
+        break
+
+    time.sleep(15)
+
+# 下载视频
+video_response = requests.get(
+    f"{BASE_URL}/v1/videos/{video_id}/content",
+    headers=HEADERS
+)
+with open("sora_output.mp4", "wb") as f:
+    f.write(video_response.content)
+print("视频已保存为 sora_output.mp4")
+```
+
+
+```javascript Node.js
+const API_KEY = "your_aihubmix_api_key";
+const BASE_URL = "https://aihubmix.com";
+
+async function generateVideo() {
+  // 第一步：创建任务（以 Veo 3.1 为例）
+  const createResponse = await fetch(`${BASE_URL}/v1/videos`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "veo-3.1-generate-preview",
+      prompt: "一片星空下的沙漠，流星划过夜空",
+      seconds: "8",
+      size: "1280x720"
+    })
+  });
+  const { id: videoId } = await createResponse.json();
+  console.log(`任务已创建: ${videoId}`);
+
+  // 第二步：轮询状态
+  let status = "in_progress";
+  while (status !== "completed" && status !== "failed") {
+    await new Promise(resolve => setTimeout(resolve, 15000));
+    const statusResponse = await fetch(`${BASE_URL}/v1/videos/${videoId}`, {
+      headers: { "Authorization": `Bearer ${API_KEY}` }
+    });
+    const result = await statusResponse.json();
+    status = result.status;
+    console.log(`当前状态: ${status}`);
+  }
+
+  if (status === "completed") {
+    // 第三步：下载视频
+    const videoResponse = await fetch(`${BASE_URL}/v1/videos/${videoId}/content`, {
+      headers: { "Authorization": `Bearer ${API_KEY}` }
+    });
+    const fs = require("fs");
+    const buffer = Buffer.from(await videoResponse.arrayBuffer());
+    fs.writeFileSync("output.mp4", buffer);
+    console.log("视频已保存为 output.mp4");
+  }
+}
+
+generateVideo();
+```
+
+</CodeGroup>
+
+## **FAQ**
+
+### **视频生成需要多长时间？**
+
+视频生成通常需要 1-5 分钟，具体时间取决于模型、分辨率和时长。建议设置 15 秒的轮询间隔。
+
+###  `input_reference` **参数怎么用？**
+
+`input_reference` 用于图生视频场景，支持三种传入方式：
+
+```json
+// 方式一：直接传入图片 URL
+"input_reference": "https://example.com/image.jpg"
+
+// 方式二：传入 base64 编码的图片（对象格式）
+"input_reference": {
+  "mime_type": "image/jpeg",
+  "data": "<BASE64_ENCODED_IMAGE>"
+}
+
+// 方式三：传入 data URL
+"input_reference": "data:image/jpeg;base64,<BASE64_ENCODED_IMAGE>"
+```
+
+### **视频下载链接有效期是多久？**
+
+生成的视频下载链接通常有 **24 小时** 有效期，请及时下载保存。
+
+### **各模型**`seconds` **参数有什么区别？**
+
+| 模型                                       | 可选值                  | 默认值   |
+| ---------------------------------------- | -------------------- | ----- |
+| Sora (`sora-2` / `sora-2-pro`)           | `"4"`, `"8"`, `"12"` | `"4"` |
+| Veo 3/3.1 (`veo-3.1-generate-preview` 等) | `"4"`, `"6"`, `"8"`  | `"8"` |
+| Veo 2 (`veo-2.0-generate-001`)           | `"5"`~`"8"`          | `"8"` |
+| 通义万相 `wan2.6`                            | `"2"`~`"15"`         | `"5"` |
+| 通义万相 `wan2.5`                            | `"5"`, `"10"`        | `"5"` |
+| 通义万相 `wan2.2`                            | `"5"`（固定）            | `"5"` |
+| 即梦AI (`jimeng-3.0-pro` 等)                | `"5"`, `"10"`        | `"5"` |
+
+\> **提示**：所有模型的 `seconds` 参数统一使用字符串类型传入（如 `"8"`），API 会自动处理。
+
+### 不同模型`size` 参数格式有什么区别？
+
+| 模型    | 支持的 size 值                                    |
+| ----- | --------------------------------------------- |
+| Sora  | `1280x720720x12801024x17921792x1024`          |
+| Veo   | 像素格式`1280x720` 等）或分辨率标签`720p1080p4k`）         |
+| 通义万相  | 像素格式`x` 和 `*` 均可（如 `1920x1080` 或 `1920*1080`） |
+| 即梦 AI | 宽高比格式`16:99:16` 等）或像素格式                       |
+
+**###** `seconds` **和** `duration` **有什么区别？**
+
+两者含义相同，均表示视频时长。API 同时支持这两个参数名（Sora 除外，Sora 只接受 `seconds`）。推荐统一使用 `seconds`。
+
+### 如何编写更好的 prompt？
+
+- **描述具体场景**：包含主体、动作、环境、光线、氛围
+- **指定镜头语言**：如"特写"、"航拍"、"推镜头"、"慢动作"
+- **描述风格**：如"电影感"、"纪录片风格"、"动画风格"
+- **中文模型用中文 prompt 效果更好**：通义万相针对中文优化
+- **Veo 支持音频描述**：可在 prompt 中描述声音，如"鸟鸣声"、"钢琴旋律"
+
+### 任务失败怎么处理？
+
+当 `status` 为 `failed` 时，响应中的 `error` 字段会包含错误信息：
+
+```json
+{
+  "status": "failed",
+  "error": {
+    "message": "Video generation failed due to content policy violation",
+    "type": "video_generation_error"
+  }
+}
+```
+
+常见失败原因包括：内容违规、prompt 过长、图片格式不支持等。请根据错误信息调整后重试。
