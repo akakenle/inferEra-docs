@@ -100,8 +100,8 @@
           {
             "tab": "开发工具",
             "pages": [
-              "cn/api/OpenClaw",
               "cn/api/Opencode",
+              "cn/api/OpenClaw",
               "cn/api/Claude-Code",
               "cn/api/Cline",
               "cn/api/Gemini-Cli",
@@ -250,8 +250,8 @@
           {
             "tab": "AI CLI",
             "pages": [
-              "en/api/OpenClaw",
               "en/api/Opencode",
+              "en/api/OpenClaw",
               "en/api/Claude-Code",
               "en/api/Cline",
               "en/api/Gemini-Cli",
