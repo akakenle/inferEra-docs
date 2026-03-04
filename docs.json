@@ -32,8 +32,7 @@
                   "cn/api/OpenClaw",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
-                  "cn/api/Data-Pravicy",
-                  "cn/api/Status"
+                  "cn/api/Data-Pravicy"
                 ]
               },
               {
@@ -85,7 +84,8 @@
                       "cn/api/CliEndpoints/list-models",
                       "cn/api/CliEndpoints/available-models"
                     ]
-                  }
+                  },
+                  "cn/api/Status"
                 ]
               },
               {
@@ -182,8 +182,7 @@
                   "en/api/OpenClaw",
                   "en/api/Claude-Code",
                   "en/api/AISDK",
-                  "en/api/Data-Pravicy",
-                  "en/api/Status"
+                  "en/api/Data-Pravicy"
                 ]
               },
               {
@@ -235,7 +234,8 @@
                       "en/api/CliEndpoints/list-models",
                       "en/api/CliEndpoints/available-models"
                     ]
-                  }
+                  },
+                  "en/api/Status"
                 ]
               },
               {
@@ -259,8 +259,7 @@
               "en/api/Qwen-code",
               "en/api/AISDK",
               "en/api/Crush"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "Use Cases",
@@ -295,8 +294,7 @@
               "en/clients/Oulu",
               "en/clients/FeelFish",
               "en/clients/GCMP"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "FAQs",
@@ -304,22 +302,19 @@
               "en/FAQs/Faq",
               "en/FAQs/HTTP-Codes",
               "en/FAQs/Human-Customer-Support"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "Blogs",
             "pages": [
               "en/blogs/aihubmix-openai-upgrade-claude"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "Updates",
             "pages": [
               "en/update/News"
-            ],
-            "groups": []
+            ]
           }
         ]
       },
@@ -393,8 +388,7 @@
               "jp/api/Qwen-code",
               "jp/api/AISDK",
               "jp/api/Crush"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "利用ケース",
@@ -426,8 +420,7 @@
               "jp/clients/Immersive-Translate",
               "jp/clients/On-CS",
               "jp/clients/Oulu"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "よくある質問",
@@ -435,18 +428,13 @@
               "jp/FAQs/Faq",
               "jp/FAQs/HTTP-Codes",
               "jp/FAQs/Human-Customer-Support"
-            ],
-            "groups": []
+            ]
           },
           {
-            "tab": "ブログ",
-            "pages": [],
-            "groups": []
+            "tab": "ブログ"
           },
           {
-            "tab": "アップデート",
-            "pages": [],
-            "groups": []
+            "tab": "アップデート"
           }
         ]
       },
@@ -520,8 +508,7 @@
               "ko/api/Qwen-code",
               "ko/api/AISDK",
               "ko/api/Crush"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "사용 사례",
@@ -553,8 +540,7 @@
               "ko/clients/Immersive-Translate",
               "ko/clients/On-CS",
               "ko/clients/Oulu"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "자주 묻는 질문",
@@ -562,18 +548,13 @@
               "ko/FAQs/Faq",
               "ko/FAQs/HTTP-Codes",
               "ko/FAQs/Human-Customer-Support"
-            ],
-            "groups": []
+            ]
           },
           {
-            "tab": "블로그",
-            "pages": [],
-            "groups": []
+            "tab": "블로그"
           },
           {
-            "tab": "업데이트",
-            "pages": [],
-            "groups": []
+            "tab": "업데이트"
           }
         ]
       },
@@ -726,29 +707,19 @@
             ]
           },
           {
-            "tab": "开发工具",
-            "pages": [],
-            "groups": []
+            "tab": "开发工具"
           },
           {
-            "tab": "使用场景",
-            "pages": [],
-            "groups": []
+            "tab": "使用场景"
           },
           {
-            "tab": "FAQs",
-            "pages": [],
-            "groups": []
+            "tab": "FAQs"
           },
           {
-            "tab": "博客",
-            "pages": [],
-            "groups": []
+            "tab": "博客"
           },
           {
-            "tab": "更新",
-            "pages": [],
-            "groups": []
+            "tab": "更新"
           }
         ]
       },
@@ -779,29 +750,19 @@
             ]
           },
           {
-            "tab": "开发工具",
-            "pages": [],
-            "groups": []
+            "tab": "开发工具"
           },
           {
-            "tab": "使用场景",
-            "pages": [],
-            "groups": []
+            "tab": "使用场景"
           },
           {
-            "tab": "FAQs",
-            "pages": [],
-            "groups": []
+            "tab": "FAQs"
           },
           {
-            "tab": "博客",
-            "pages": [],
-            "groups": []
+            "tab": "博客"
           },
           {
-            "tab": "更新",
-            "pages": [],
-            "groups": []
+            "tab": "更新"
           }
         ]
       },
@@ -832,29 +793,19 @@
             ]
           },
           {
-            "tab": "开发工具",
-            "pages": [],
-            "groups": []
+            "tab": "开发工具"
           },
           {
-            "tab": "使用场景",
-            "pages": [],
-            "groups": []
+            "tab": "使用场景"
           },
           {
-            "tab": "FAQs",
-            "pages": [],
-            "groups": []
+            "tab": "FAQs"
           },
           {
-            "tab": "博客",
-            "pages": [],
-            "groups": []
+            "tab": "博客"
           },
           {
-            "tab": "更新",
-            "pages": [],
-            "groups": []
+            "tab": "更新"
           }
         ]
       },
@@ -885,29 +836,19 @@
             ]
           },
           {
-            "tab": "开发工具",
-            "pages": [],
-            "groups": []
+            "tab": "开发工具"
           },
           {
-            "tab": "使用场景",
-            "pages": [],
-            "groups": []
+            "tab": "使用场景"
           },
           {
-            "tab": "FAQs",
-            "pages": [],
-            "groups": []
+            "tab": "FAQs"
           },
           {
-            "tab": "博客",
-            "pages": [],
-            "groups": []
+            "tab": "博客"
           },
           {
-            "tab": "更新",
-            "pages": [],
-            "groups": []
+            "tab": "更新"
           }
         ]
       }
