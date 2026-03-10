@@ -1,0 +1,273 @@
+---
+title: "Tool Calling"
+icon: "toolbox"
+description: "Function calling and tool integration using the Responses API Beta"
+---
+
+The Responses API Beta supports full Tool Calling capabilities, allowing the model to:
+
+- Function Calling
+- Execute multiple tools in parallel
+- Handle complex multi-step workflows
+
+## Basic Tool Definition
+
+### Request Header
+
+```shellscript
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+```
+
+### Request Body
+
+```json
+{
+  "model": "gpt-5.1",
+  "input": [
+    {
+      "type": "message",
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "What is the weather in San Francisco?"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get the current weather at a location",
+      "strict": null,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "The city and state, e.g. San Francisco, CA"
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["celsius", "fahrenheit"]
+          }
+        },
+        "required": ["location"]
+      }
+    }
+  ],
+  "tool_choice": "auto",
+  "max_output_tokens": 5000
+}
+```
+
+## Tool Invocation Strategy
+
+The `tool_choice` parameter controls when and how the model invokes tools.
+
+| Parameter                              | Description                        |
+| :------------------------------------ | :-------------------------------- |
+| auto                                  | The model automatically decides whether to invoke tools |
+| none                                  | Prevents the model from invoking any tools |
+
+## Multiple Tool Definitions
+
+In complex tasks, multiple tools can be defined, allowing the model to choose the appropriate tool based on user needs.
+
+```python
+import requests
+
+# Weather tool
+weather_tool = {
+    "type": "function",
+    "name": "get_weather",
+    "description": "Get current weather information for a city",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {
+                "type": "string",
+                "description": "The name of the city"
+            }
+        },
+        "required": ["city"]
+    }
+}
+
+# Calculator tool
+calculator_tool = {
+    "type": "function",
+    "name": "calculate",
+    "description": "Perform mathematical calculations",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "expression": {
+                "type": "string",
+                "description": "The mathematical expression to evaluate"
+            }
+        },
+        "required": ["expression"]
+    }
+}
+
+response = requests.post(
+    "https://aihubmix.com/v1/responses",
+    headers={
+        "Authorization": "Bearer AIHUBMIX_API_KEY",
+        "Content-Type": "application/json",
+    },
+    json={
+        "model": "gpt-5.1",
+        "input": [
+            {
+                "type": "message",
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": "What is 25 * 4?"
+                    }
+                ]
+            }
+        ],
+        "tools": [weather_tool, calculator_tool],
+        "tool_choice": "auto",
+        "max_output_tokens": 5000
+    }
+)
+
+print(response.json())
+```
+
+## Response with Tool Invocation
+
+```json
+{
+  "id": "resp_09b8eb7c272559fc0069affbaab5cc8194a5005746b80f3b57",
+  "object": "response",
+  "created_at": 1773140906,
+  "completed_at": 1773140908,
+  "status": "completed",
+  "background": false,
+  "error": null,
+  "model": "gpt-51",
+  "service_tier": "default",
+  "temperature": 1.0,
+  "top_p": 1.0,
+  "frequency_penalty": 0.0,
+  "presence_penalty": 0.0,
+  "max_output_tokens": 5000,
+  "max_tool_calls": null,
+  "parallel_tool_calls": true,
+  "tool_choice": "auto",
+  "truncation": "disabled",
+  "store": true,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": null,
+  "instructions": null,
+  "safety_identifier": null,
+  "user": null,
+  "metadata": {},
+
+  "reasoning": {
+    "effort": "none",
+    "summary": null
+  },
+
+  "content_filters": [
+    {
+      "blocked": false,
+      "source_type": "completion",
+      "content_filter_raw": [],
+      "content_filter_results": {},
+      "content_filter_offsets": {
+        "start_offset": 0,
+        "end_offset": 1289,
+        "check_offset": 0
+      }
+    }
+  ],
+
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+
+  "output": [
+    {
+      "id": "fc_09b8eb7c272559fc0069affbabb0288194b63aa879435c7cd0",
+      "type": "function_call",
+      "status": "completed",
+      "name": "calculate",
+      "call_id": "call_PFtWscQ3pAyfSaotwujhT0sn",
+      "arguments": {
+        "expression": "25*4"
+      }
+    }
+  ],
+
+  "tools": [
+    {
+      "type": "function",
+      "name": "get_weather",
+      "description": "Get current weather information for a city",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "The name of the city"
+          }
+        },
+        "required": ["city"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "function",
+      "name": "calculate",
+      "description": "Perform mathematical calculations",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "expression": {
+            "type": "string",
+            "description": "The mathematical expression to evaluate"
+          }
+        },
+        "required": ["expression"],
+        "additionalProperties": false
+      }
+    }
+  ],
+
+  "usage": {
+    "input_tokens": 86,
+    "output_tokens": 25,
+    "total_tokens": 111,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  }
+}
+```
+
+## Usage Recommendations
+
+1. Clear Descriptions: Provide detailed function descriptions and parameter explanations.
+2. Correct Format: Parameters should use valid JSON.
+3. Error Handling: Handle situations where tools may not be callable.
+4. Parallel Execution: Design tools to run independently whenever possible.
+5. Conversational Flow: Include tool responses in subsequent requests to provide context.

@@ -1,0 +1,197 @@
+---
+title: "推理"
+icon: "light-ceiling"
+description: "Responses API Beta 支持高级推理能力，允许模型在回答问题时展示其内部推理过程，并且可以通过参数配置推理努力程度。"
+---
+
+## 推理配置
+
+可以通过 `reasoning` 参数配置推理行为：
+
+```shellscript
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-5",
+    "input": "Plan a week-long trip to the US for me.",
+    "reasoning": {
+      "effort": "high"
+    },
+    "max_output_tokens": 5000
+  }'
+```
+
+## 推理强度
+
+`effort` 参数用于控制模型投入多少计算资源进行推理，即控制模型推理努力程度。
+
+| 推理等级    | 描述            |
+| :------ | :------------ |
+| minimal | 最基础推理，计算量最小   |
+| low     | 轻量推理，适合简单问题   |
+| medium  | 平衡推理，适合中等复杂问题 |
+| high    | 深度推理，适合复杂问题   |
+
+## 在对话中使用推理
+
+推理功能也可以用于多轮对话：
+
+```python
+import requests
+
+url = "https://aihubmix.com/v1/responses"
+
+headers = {
+    "Authorization": "Bearer YOUR_AIHUBMIX_API_KEY",
+    "Content-Type": "application/json",
+}
+
+data = {
+    "model": "gpt-5.1",
+    "input": [
+        {
+            "type": "message",
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": "What is your favorite animal?",
+                }
+            ],
+        },
+        {
+            "type": "message",
+            "role": "assistant",
+            "id": "msg_123",
+            "status": "completed",
+            "content": [
+                {
+                    "type": "output_text",
+                    "text": "I don't have a favorite animal.",
+                    "annotations": []
+                }
+            ],
+        },
+        {
+            "type": "message",
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": "Why is the sky blue?",
+                }
+            ],
+        },
+    ],
+    "reasoning": {
+        "effort": "high"
+    },
+    "max_output_tokens": 5000,
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.status_code)
+print(response.json())
+```
+
+## 含有推理信息的响应
+
+当启用推理后，API 返回结果的会包含推理数据：
+
+```json
+{
+  "id": "resp_051e00420efb9e150069aff6a18418819591abb7ce5f8487ed",
+  "object": "response",
+  "created_at": 1773139617,
+  "status": "completed",
+  "background": false,
+  "completed_at": 1773139621,
+  "content_filters": [
+    {
+      "blocked": false,
+      "source_type": "completion",
+      "content_filter_raw": [],
+      "content_filter_results": {},
+      "content_filter_offsets": {
+        "start_offset": 0,
+        "end_offset": 1147,
+        "check_offset": 0
+      }
+    }
+  ],
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": null,
+  "instructions": null,
+  "max_output_tokens": 5000,
+  "max_tool_calls": null,
+  "model": "gpt-51",
+  "output": [
+    {
+      "id": "rs_051e00420efb9e150069aff6a32f948195996db3ff98314ef2",
+      "type": "reasoning",
+      "summary": []
+    },
+    {
+      "id": "msg_051e00420efb9e150069aff6a33d808195825716a666d8ba8b",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [],
+          "logprobs": [],
+          "text": "The sky looks blue because of how sunlight interacts with Earth’s atmosphere.\n\n1. **Sunlight isn’t just “white”**\nSunlight is made of many colors (red, orange, yellow, green, blue, violet), each with different wavelengths.\n\n2. **Air scatters short wavelengths more**\nAs sunlight passes through the atmosphere, it hits gas molecules and tiny particles.\n- Shorter wavelengths (blue, violet) are scattered in all directions much more than longer wavelengths (red, orange).\n- This effect is called **Rayleigh scattering**.\n\n3. **We see more blue than violet**\n- Our eyes are more sensitive to blue than to violet.\n- Some violet light is also absorbed higher in the atmosphere.\nSo the scattered light we perceive is mostly blue.\n\n4. **Why sunsets are red/orange**\nAt sunrise and sunset, sunlight passes through much more atmosphere.\n- Most of the blue light gets scattered out of the direct path.\n- The remaining light reaching your eyes from the Sun is richer in reds and oranges."
+        }
+      ]
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": null,
+  "reasoning": {
+    "effort": "high",
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": true,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tools": [],
+  "top_logprobs": 0,
+  "top_p": 1.0,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 35,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 267,
+    "output_tokens_details": {
+      "reasoning_tokens": 29
+    },
+    "total_tokens": 302
+  },
+  "user": null,
+  "metadata": {}
+}
+```
+
+## 使用建议
+
+1. **选择合适的推理努力程度**：`high`用于复杂问题，`low`用于简单任务。
+2. **考虑 token 使用情况**：推理会增加 token 消耗
+3. **使用流式处理**：对于较长的推理链，流式处理可提供更好的用户体验。
+4. **包含上下文**：为模型提供足够的上下文，使其能够有效推理。

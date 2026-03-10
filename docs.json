@@ -64,9 +64,9 @@
                     "icon": "bolt-lightning",
                     "pages": [
                       "cn/api/responses/overview",
-                      "cn/api/responses/basic-usage",
-                      "cn/api/responses/reasoning",
-                      "cn/api/responses/tool-calling"
+                      "cn/api/responses/Basic-Usage",
+                      "cn/api/responses/Reasoning",
+                      "cn/api/responses/Tool-Calling"
                     ]
                   }
                 ]
@@ -222,10 +222,10 @@
                     "group": "Responses API",
                     "icon": "bolt",
                     "pages": [
-                      "en/api/responses/overview",
-                      "en/api/responses/basic-usage",
-                      "en/api/responses/reasoning",
-                      "en/api/responses/tool-calling"
+                      "en/api/responses/Overview",
+                      "en/api/responses/Basic-Usage",
+                      "en/api/responses/Reasoning",
+                      "en/api/responses/Tool-Calling"
                     ]
                   }
                 ]
