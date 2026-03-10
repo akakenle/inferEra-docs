@@ -1,0 +1,156 @@
+---
+title: "Basic Usage"
+description: "开始使用 Responses API Beta"
+icon: "play"
+---
+
+Responses API Beta 支持「简单字符串输入」 和 「结构化消息数组」两种方式。
+
+## 简单字符串输入
+
+使用 API 最简单的方法是直接传入一个字符串：
+
+```shellscript
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "o4-mini",
+    "input": "What is the meaning of life?",
+    "max_output_tokens": 9000
+  }'
+```
+
+## 结构化消息输入
+
+如果需要进行更复杂的对话，可以使用消息数组格式：
+
+```shellscript
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "o4-mini",
+    "input": [
+      {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Plan a week-long trip to the US for me."
+          }
+        ]
+      }
+    ],
+    "max_output_tokens": 9000
+  }'
+```
+
+## 响应格式
+
+API 会返回一个结构化响应，包含生成的内容：
+
+```json
+{
+  "id": "resp_06785a42ff90c6",
+  "object": "response",
+  "created_at": 1773136544,
+  "status": "completed",
+  "background": false,
+  "completed_at": 1773136550,
+  "content_filters": null,
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": null,
+  "instructions": null,
+  "max_output_tokens": 9000,
+  "max_tool_calls": null,
+  "model": "o4-mini",
+  "output": [
+    {
+      "id": "rs_06785a42ff90c6d20069afeaa0731c81979150247a7ee80c8a",
+      "type": "reasoning",
+      "summary": []
+    },
+    {
+      "id": "msg_06785a42ff90c6d20069afeaa22f3c819781184c050374974d",
+      "type": "message",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [],
+          "logprobs": [],
+          "text": "There is no single, universally agreed-upon “answer” to the question “What is the meaning of life?”—it depends on your background, beliefs and the lenses through which you look. Here are a few ways people have approached it:\n\n1. Religious and spiritual perspectives  \n   • In many theistic traditions, life’s meaning is found in a relationship with the divine—loving and serving God (or gods), living according to sacred teachings, and preparing for an afterlife or spiritual growth.  \n   • In Eastern spiritualities (Buddhism, Hinduism), life can be about liberating yourself from suffering and ignorance (nirvana or moksha), often through compassion, selflessness and meditation.\n\n2. Philosophical viewpoints  \n   • Existentialism (Sartre, Camus) argues that life has no inherent meaning—each of us must create our own through our choices, actions and commitments.  \n   • Nihilism holds that life is ultimately meaningless, but some see this “freedom from pre-existing purpose” as an opportunity to build authentic values for oneself.  \n   • Aristotelian ethics looks for eudaimonia (“flourishing” or “well-being”) achieved by cultivating virtues—courage, wisdom, justice, friendship—and living in balance.\n\n3. Scientific and naturalistic outlooks  \n   • From a biological standpoint, life’s “purpose” is to survive and reproduce, passing on genes to the next generation.  \n   • Many scientists and secular thinkers add that we can create our own meaning by pursuing knowledge, understanding the universe, and using our creativity to improve the human condition.\n\n4. Psychological and humanistic approaches  \n   • Viktor Frankl (logotherapy) proposed that finding purpose—even in suffering—is crucial to mental health. Meaning can be discovered through work you care about, relationships you value, and the attitude you take toward unavoidable suffering.  \n   • Positive psychology emphasizes factors like relationships, achievement, personal growth and contribution to something larger than yourself as sources of fulfilment.\n\n5. A personal, evolving journey  \n   • Ultimately, most agree that “the meaning of life” is something you discover or construct for yourself. It may come from:  \n     – Deep relationships (family, friends, community)  \n     – Creative expression (art, music, writing, invention)  \n     – Service to others (volunteering, activism, caregiving)  \n     – Pursuit of knowledge (science, philosophy, exploration)  \n     – Personal growth (learning, overcoming challenges, self-reflection)\n\nHow to explore your own answer:  \n• Reflect on your core values and what gives you genuine joy.  \n• Notice what activities make you lose track of time or give you a sense of flow.  \n• Engage in conversations with people of different beliefs and life experiences.  \n• Experiment with new pursuits—volunteering, creative hobbies, study, travel.  \n• Be patient: your sense of purpose may shift as you grow, face new challenges or learn more about the world and yourself.\n\nIn the end, the question “What is the meaning of life?” invites you not to find a one-size-fits-all answer, but to embark on a lifelong journey of discovery—to shape, live out and continually refine your own answer."
+        }
+      ],
+      "role": "assistant"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": null,
+  "reasoning": {
+    "effort": "medium",
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": true,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tools": [],
+  "top_logprobs": 0,
+  "top_p": 1.0,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 13,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 935,
+    "output_tokens_details": {
+      "reasoning_tokens": 256
+    },
+    "total_tokens": 948
+  },
+  "user": null,
+  "metadata": {}
+}
+```
+
+## 流式响应
+
+可以开启流式输出，实现实时生成内容：
+
+```shellscript
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "o4-mini",
+    "input": "What is the meaning of life?",
+    "max_output_tokens": 9000
+	"stream": true
+  }'
+```
+
+## 常用参数
+
+| 参数                | 类型             | 描述                   |
+| :---------------- | :------------- | :------------------- |
+| model             | string         | 必填。要使用的模型，例如 `gpt-5` |
+| input             | string 或 array | 必填。输入文本或消息数组         |
+| stream            | boolean        | 是否启用流式响应（默认 false）   |
+| max_output_tokens | integer        | 最大生成 token 数         |
+| temperature       | number         | 采样温度，参数范围 0～2        |
+| top_p             | number         | 采样参数，参数范围 0～1        |

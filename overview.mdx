@@ -1,0 +1,79 @@
+---
+icon: "compass"
+description: "OpenAI-compatible Responses API (Beta)"
+title: "Overview"
+---
+
+<Warning>
+  **Beta API**
+
+  该 API 目前处于 测试阶段（Beta），未来可能会有较大更新，在生产环境中使用时需要谨慎。
+</Warning>
+
+AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses API 兼容的访问方式，您可以通过该接口调用多个 AI 模型。
+
+该接口还提供了增强功能，包括：
+
+- 推理（Reasoning）
+- 工具调用（Tool Calling）
+
+## Base URL
+
+```tex
+https://aihubmix.com/api/v1/responses
+```
+
+## 认证
+
+所有的请求都需要通过 AIHubMix API Key 认证。
+
+<CodeGroup>
+
+```python Python
+import requests
+
+url = "https://aihubmix.com/v1/responses"
+
+headers = {
+    "Authorization": "Bearer YOUR_AIHUBMIX_API_KEY",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "model": "o4-mini",
+    "input": "Hello, world!"
+}
+
+response = requests.post(url, headers=headers, json=data)
+
+print(response.status_code)
+print(response.json())
+```
+
+
+```text TypeScript
+const response = await fetch('https://aihubmix.com/v1/responses', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_AIHUBMIX_API_KEY',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: 'o4-mini',
+    input: 'Hello, world!',
+  }),
+});
+```
+
+
+```shellscript cURL
+curl -X POST https://aihubmix.com/v1/responses \
+  -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "o4-mini",
+    "input": "Hello, world!"
+  }'
+```
+
+</CodeGroup>

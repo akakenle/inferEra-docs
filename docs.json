@@ -40,7 +40,6 @@
                 "pages": [
                   "cn/api/Aihubmix-Integration",
                   "cn/api/vision",
-                  "cn/api/Responses-API",
                   "cn/api/LLM-Search",
                   "cn/api/Image-Gen",
                   "cn/api/Video-Gen",
@@ -59,7 +58,17 @@
                   "cn/api/GPT-Image-1",
                   "cn/api/IdeogramAI",
                   "cn/api/Qwen",
-                  "cn/api/Jina-AI"
+                  "cn/api/Jina-AI",
+                  {
+                    "group": "Responses API",
+                    "icon": "bolt-lightning",
+                    "pages": [
+                      "overview",
+                      "basic-usage",
+                      "reasoning",
+                      "tool-calling"
+                    ]
+                  }
                 ]
               },
               {
@@ -190,7 +199,6 @@
                 "pages": [
                   "en/api/Aihubmix-Integration",
                   "en/api/vision",
-                  "en/api/Responses-API",
                   "en/api/LLM-Search",
                   "en/api/Image-Gen",
                   "en/api/Video-Gen",
