@@ -217,7 +217,17 @@
                   "en/api/GPT-Image-1",
                   "en/api/IdeogramAI",
                   "en/api/Qwen",
-                  "en/api/Jina-AI"
+                  "en/api/Jina-AI",
+                  {
+                    "group": "Responses API",
+                    "icon": "bolt",
+                    "pages": [
+                      "overview-1",
+                      "basic-usage-1",
+                      "reasoning-1",
+                      "tool-calling-1"
+                    ]
+                  }
                 ]
               },
               {

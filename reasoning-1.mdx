@@ -1,12 +1,12 @@
 ---
-title: "推理"
+title: "Reasoning"
 icon: "light-ceiling"
-description: "Responses API Beta 支持高级推理能力，允许模型在回答问题时展示其内部推理过程，并且可以通过参数配置推理努力程度。"
+description: "The Responses API Beta supports advanced reasoning capabilities, allowing the model to demonstrate its internal reasoning process when answering questions, and the level of reasoning effort can be configured via parameters."
 ---
 
-## 推理配置
+## Reasoning Configuration
 
-可以通过 `reasoning` 参数配置推理行为：
+You can configure the reasoning behavior using the `reasoning` parameter:
 
 ```shellscript
 curl -X POST https://aihubmix.com/v1/responses \
@@ -22,20 +22,20 @@ curl -X POST https://aihubmix.com/v1/responses \
   }'
 ```
 
-## 推理强度
+## Reasoning Intensity
 
-`effort` 参数用于控制模型投入多少计算资源进行推理，即控制模型推理努力程度。
+The `effort` parameter controls how much computational resource the model invests in reasoning, essentially dictating the level of reasoning effort.
 
-| 推理等级    | 描述            |
-| :------ | :------------ |
-| minimal | 最基础推理，计算量最小   |
-| low     | 轻量推理，适合简单问题   |
-| medium  | 平衡推理，适合中等复杂问题 |
-| high    | 深度推理，适合复杂问题   |
+| Reasoning Level | Description                |
+| :-------------- | :------------------------- |
+| minimal         | Basic reasoning with minimal computation |
+| low             | Lightweight reasoning suitable for simple questions |
+| medium          | Balanced reasoning suitable for moderately complex problems |
+| high            | Deep reasoning suitable for complex issues |
 
-## 在对话中使用推理
+## Using Reasoning in Conversations
 
-推理功能也可以用于多轮对话：
+The reasoning feature can also be utilized in multi-turn dialogues:
 
 ```python
 import requests
@@ -96,9 +96,9 @@ print(response.status_code)
 print(response.json())
 ```
 
-## 含有推理信息的响应
+## Responses Containing Reasoning Information
 
-当启用推理后，API 返回结果的会包含推理数据：
+When reasoning is enabled, the API returns results that include reasoning data:
 
 ```json
 {
@@ -189,9 +189,9 @@ print(response.json())
 }
 ```
 
-## 使用建议
+## Usage Recommendations
 
-1. **选择合适的推理努力程度**：`high`用于复杂问题，`low`用于简单任务。
-2. **考虑 token 使用情况**：推理会增加 token 消耗
-3. **使用流式处理**：对于较长的推理链，流式处理可提供更好的用户体验。
-4. **包含上下文**：为模型提供足够的上下文，使其能够有效推理。
+1. **Choose the appropriate reasoning effort level**: Use `high` for complex issues and `low` for simple tasks.
+2. **Consider token usage**: Reasoning will increase token consumption.
+3. **Utilize streaming**: For longer reasoning chains, streaming can enhance user experience.
+4. **Provide context**: Give the model sufficient context to enable effective reasoning.

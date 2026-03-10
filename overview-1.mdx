@@ -1,21 +1,21 @@
 ---
 icon: "compass"
 description: "OpenAI-compatible Responses API (Beta)"
-title: "概述"
+title: "Overview"
 ---
 
 <Warning>
   **Beta API**
 
-  该 API 目前处于 测试阶段（Beta），未来可能会有较大更新，在生产环境中使用时需要谨慎。
+  This API is currently in the testing phase (Beta) and may undergo significant updates in the future. Exercise caution when using it in production environments.
 </Warning>
 
-AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses API 兼容的访问方式，您可以通过该接口调用多个 AI 模型。
+The Responses API (Beta) from AIHubMix provides a unified interface for accessing multiple AI models compatible with the OpenAI Responses API.
 
-该接口还提供了增强功能，包括：
+This interface also offers enhanced features, including:
 
-- 推理（Reasoning）
-- 工具调用（Tool Calling）
+- Reasoning
+- Tool Calling
 
 ## Base URL
 
@@ -23,9 +23,9 @@ AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses
 https://aihubmix.com/api/v1/responses
 ```
 
-## 认证
+## Authentication
 
-所有的请求都需要通过 AIHubMix API Key 认证。
+All requests require authentication via the AIHubMix API Key.
 
 <CodeGroup>
 
@@ -40,7 +40,7 @@ headers = {
 }
 
 data = {
-    "model": "gpt-5.1",
+    "model": "o4-mini",
     "input": "Hello, world!"
 }
 

@@ -1,18 +1,18 @@
 ---
-title: "工具调用"
+title: "Tool Invocation"
 icon: "toolbox"
-description: "使用 Responses API Beta 进行函数调用与工具集成"
+description: "Function calling and tool integration using the Responses API Beta"
 ---
 
-Responses API Beta 支持完整的工具调用能力，允许模型：
+The Responses API Beta supports full Tool Calling capabilities, allowing the model to:
 
-- 调用函数
-- 并行执行多个工具
-- 处理复杂的多步骤工作流
+- Function Calling
+- Execute multiple tools in parallel
+- Handle complex multi-step workflows (Multi-step Workflow)
 
-## 基础工具定义
+## Basic Tool Definition
 
-### 请求头
+### Request Header
 
 ```shellscript
 curl -X POST https://aihubmix.com/v1/responses \
@@ -20,7 +20,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Content-Type: application/json" \
 ```
 
-### 请求体
+### Request Body
 
 ```json
 {
@@ -64,23 +64,23 @@ curl -X POST https://aihubmix.com/v1/responses \
 }
 ```
 
-## 工具调用策略
+## Tool Invocation Strategy
 
-`tool_choice` 参数用于控制模型何时以及如何调用工具。
+The `tool_choice` parameter controls when and how the model invokes tools.
 
-| 参数   | 说明            |
-| :--- | :------------ |
-| auto | 由模型自动决定是否调用工具 |
-| none | 禁止模型调用任何工具    |
+| Parameter                              | Description                        |
+| :------------------------------------ | :-------------------------------- |
+| auto                                  | The model automatically decides whether to invoke tools |
+| none                                  | Prevents the model from invoking any tools |
 
-## 多工具定义
+## Multiple Tool Definitions
 
-在复杂任务中，可以定义多个工具，让模型根据用户需求选择合适的工具。
+In complex tasks, multiple tools can be defined, allowing the model to choose the appropriate tool based on user needs.
 
 ```python
 import requests
 
-# 天气工具
+# Weather tool
 weather_tool = {
     "type": "function",
     "name": "get_weather",
@@ -97,7 +97,7 @@ weather_tool = {
     }
 }
 
-# 计算器工具
+# Calculator tool
 calculator_tool = {
     "type": "function",
     "name": "calculate",
@@ -143,7 +143,7 @@ response = requests.post(
 print(response.json())
 ```
 
-## 含有工具调用的响应
+## Response with Tool Invocation
 
 ```json
 {
@@ -264,10 +264,10 @@ print(response.json())
 }
 ```
 
-## 使用建议
+## Usage Recommendations
 
-1. 清晰的描述：提供详细的功能描述和参数解释。
-2. 正确的模式：参数应使用有效的 JSON。
-3. 错误处理：处理工具可能无法调用的情况。
-4. 并行执行：尽可能设计能够独立运行的工具。
-5. 对话流程：在后续请求中包含工具响应以提供背景信息。
+1. Clear Descriptions: Provide detailed function descriptions and parameter explanations.
+2. Correct Format: Parameters should use valid JSON.
+3. Error Handling: Handle situations where tools may not be callable.
+4. Parallel Execution: Design tools to run independently whenever possible.
+5. Conversational Flow: Include tool responses in subsequent requests to provide context.

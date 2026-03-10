@@ -1,5 +1,5 @@
 ---
-title: "Basic Usage"
+title: "快速使用"
 description: "开始使用 Responses API Beta"
 icon: "play"
 ---
@@ -15,9 +15,9 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gpt-5.2",
     "input": "What is the meaning of life?",
-    "max_output_tokens": 9000
+    "max_output_tokens": 5000
   }'
 ```
 
@@ -30,7 +30,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gpt-5.2",
     "input": [
       {
         "type": "message",
