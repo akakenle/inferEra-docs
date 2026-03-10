@@ -8,7 +8,7 @@ The Responses API Beta supports full Tool Calling capabilities, allowing the mod
 
 - Function Calling
 - Execute multiple tools in parallel
-- Handle complex multi-step workflows (Multi-step Workflow)
+- Handle complex multi-step workflows 
 
 ## Basic Tool Definition
 
@@ -68,10 +68,10 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 The `tool_choice` parameter controls when and how the model invokes tools.
 
-| Parameter                              | Description                        |
-| :------------------------------------ | :-------------------------------- |
-| auto                                  | The model automatically decides whether to invoke tools |
-| none                                  | Prevents the model from invoking any tools |
+| Parameter | Description                                             |
+| :-------- | :------------------------------------------------------ |
+| auto      | The model automatically decides whether to invoke tools |
+| none      | Prevents the model from invoking any tools              |
 
 ## Multiple Tool Definitions
 
