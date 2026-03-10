@@ -13,7 +13,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5",
+    "model": "glm-5",
     "input": "Plan a week-long trip to the US for me.",
     "reasoning": {
       "effort": "high"
@@ -48,7 +48,7 @@ headers = {
 }
 
 data = {
-    "model": "gpt-5.1",
+    "model": "kimi-k2.5",
     "input": [
         {
             "type": "message",
@@ -127,7 +127,7 @@ print(response.json())
   "instructions": null,
   "max_output_tokens": 5000,
   "max_tool_calls": null,
-  "model": "gpt-51",
+  "model": "gpt-54",
   "output": [
     {
       "id": "rs_051e00420efb9e150069aff6a32f948195996db3ff98314ef2",

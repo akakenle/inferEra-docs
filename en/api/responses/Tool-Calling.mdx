@@ -24,7 +24,7 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 ```json
 {
-  "model": "gpt-5.1",
+  "model": "claude-sonnet-4-6",
   "input": [
     {
       "type": "message",
@@ -68,10 +68,10 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 The `tool_choice` parameter controls when and how the model invokes tools.
 
-| Parameter                              | Description                        |
-| :------------------------------------ | :-------------------------------- |
-| auto                                  | The model automatically decides whether to invoke tools |
-| none                                  | Prevents the model from invoking any tools |
+| Parameter | Description                                             |
+| :-------- | :------------------------------------------------------ |
+| auto      | The model automatically decides whether to invoke tools |
+| none      | Prevents the model from invoking any tools              |
 
 ## Multiple Tool Definitions
 
@@ -121,7 +121,7 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "model": "gpt-5.1",
+        "model": "glm-5",
         "input": [
             {
                 "type": "message",
@@ -154,7 +154,7 @@ print(response.json())
   "status": "completed",
   "background": false,
   "error": null,
-  "model": "gpt-51",
+  "model": "gpt-54",
   "service_tier": "default",
   "temperature": 1.0,
   "top_p": 1.0,

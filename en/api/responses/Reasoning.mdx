@@ -13,7 +13,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5",
+    "model": "glm-5",
     "input": "Plan a week-long trip to the US for me.",
     "reasoning": {
       "effort": "high"
@@ -26,12 +26,12 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 The `effort` parameter controls how much computational resource the model invests in reasoning, essentially dictating the level of reasoning effort.
 
-| Reasoning Level | Description                |
-| :-------------- | :------------------------- |
-| minimal         | Basic reasoning with minimal computation |
-| low             | Lightweight reasoning suitable for simple questions |
+| Reasoning Level | Description                                                 |
+| :-------------- | :---------------------------------------------------------- |
+| minimal         | Basic reasoning with minimal computation                    |
+| low             | Lightweight reasoning suitable for simple questions         |
 | medium          | Balanced reasoning suitable for moderately complex problems |
-| high            | Deep reasoning suitable for complex issues |
+| high            | Deep reasoning suitable for complex issues                  |
 
 ## Using Reasoning in Conversations
 
@@ -48,7 +48,7 @@ headers = {
 }
 
 data = {
-    "model": "gpt-5.1",
+    "model": "kimi-k2.5",
     "input": [
         {
             "type": "message",
@@ -127,7 +127,7 @@ When reasoning is enabled, the API returns results that include reasoning data:
   "instructions": null,
   "max_output_tokens": 5000,
   "max_tool_calls": null,
-  "model": "gpt-51",
+  "model": "gpt-54",
   "output": [
     {
       "id": "rs_051e00420efb9e150069aff6a32f948195996db3ff98314ef2",

@@ -24,7 +24,7 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 ```json
 {
-  "model": "gpt-5.1",
+  "model": "claude-sonnet-4-6",
   "input": [
     {
       "type": "message",
@@ -68,10 +68,10 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 `tool_choice` 参数用于控制模型何时以及如何调用工具。
 
-| 参数                                    | 说明            |
-| :------------------------------------ | :------------ |
-| auto                                  | 由模型自动决定是否调用工具 |
-| none                                  | 禁止模型调用任何工具    |
+| 参数   | 说明            |
+| :--- | :------------ |
+| auto | 由模型自动决定是否调用工具 |
+| none | 禁止模型调用任何工具    |
 
 ## 多工具定义
 
@@ -121,7 +121,7 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "model": "gpt-5.1",
+        "model": "glm-5",
         "input": [
             {
                 "type": "message",
@@ -154,7 +154,7 @@ print(response.json())
   "status": "completed",
   "background": false,
   "error": null,
-  "model": "gpt-51",
+  "model": "gpt-54",
   "service_tier": "default",
   "temperature": 1.0,
   "top_p": 1.0,

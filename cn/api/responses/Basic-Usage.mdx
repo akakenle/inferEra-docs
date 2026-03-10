@@ -15,7 +15,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5.2",
+    "model": "gpt-5.4",
     "input": "What is the meaning of life?",
     "max_output_tokens": 5000
   }'
@@ -30,7 +30,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5.2",
+    "model": "gemini-3.1-pro-preview",
     "input": [
       {
         "type": "message",
@@ -66,7 +66,7 @@ API 会返回一个结构化响应，包含生成的内容：
   "instructions": null,
   "max_output_tokens": 9000,
   "max_tool_calls": null,
-  "model": "o4-mini",
+  "model": "gpt-54",
   "output": [
     {
       "id": "rs_06785a42ff90c6d20069afeaa0731c81979150247a7ee80c8a",
@@ -137,20 +137,20 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gpt-5.4",
     "input": "What is the meaning of life?",
-    "max_output_tokens": 9000
+    "max_output_tokens": 5000
 	"stream": true
   }'
 ```
 
 ## 常用参数
 
-| 参数                | 类型             | 描述                   |
-| :---------------- | :------------- | :------------------- |
-| model             | string         | 必填。要使用的模型，例如 `gpt-5` |
-| input             | string 或 array | 必填。输入文本或消息数组         |
-| stream            | boolean        | 是否启用流式响应（默认 false）   |
-| max_output_tokens | integer        | 最大生成 token 数         |
-| temperature       | number         | 采样温度，参数范围 0～2        |
-| top_p             | number         | 采样参数，参数范围 0～1        |
+| 参数                | 类型             | 描述                     |
+| :---------------- | :------------- | :--------------------- |
+| model             | string         | 必填。要使用的模型，例如 `gpt-5.4` |
+| input             | string 或 array | 必填。输入文本或消息数组           |
+| stream            | boolean        | 是否启用流式响应（默认 false）     |
+| max_output_tokens | integer        | 最大生成 token 数           |
+| temperature       | number         | 采样温度，参数范围 0～2          |
+| top_p             | number         | 采样参数，参数范围 0～1          |

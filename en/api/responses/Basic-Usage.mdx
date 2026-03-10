@@ -15,9 +15,9 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gpt-5.4",
     "input": "What is the meaning of life?",
-    "max_output_tokens": 9000
+    "max_output_tokens": 5000
   }'
 ```
 
@@ -30,7 +30,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gemini-3.1-pro-preview",
     "input": [
       {
         "type": "message",
@@ -43,7 +43,7 @@ curl -X POST https://aihubmix.com/v1/responses \
         ]
       }
     ],
-    "max_output_tokens": 9000
+    "max_output_tokens": 5000
   }'
 ```
 
@@ -66,7 +66,7 @@ The API will return a structured response containing the generated content:
   "instructions": null,
   "max_output_tokens": 9000,
   "max_tool_calls": null,
-  "model": "o4-mini",
+  "model": "gpt-54",
   "output": [
     {
       "id": "rs_06785a42ff90c6d20069afeaa0731c81979150247a7ee80c8a",
@@ -137,7 +137,7 @@ curl -X POST https://aihubmix.com/v1/responses \
   -H "Authorization: Bearer YOUR_AIHUBMIX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "o4-mini",
+    "model": "gpt-5.4",
     "input": "What is the meaning of life?",
     "max_output_tokens": 9000,
     "stream": true
@@ -146,11 +146,11 @@ curl -X POST https://aihubmix.com/v1/responses \
 
 ## Common Parameters
 
-| Parameter          | Type             | Description                   |
-| :---------------- | :--------------- | :---------------------------- |
-| model             | string           | Required. The model to use, e.g., `gpt-5` |
-| input             | string or array  | Required. Input text or message array         |
-| stream            | boolean          | Whether to enable streaming response (default false)   |
-| max_output_tokens | integer          | Maximum number of output tokens         |
-| temperature       | number           | Sampling temperature, range 0 to 2        |
-| top_p             | number           | Sampling parameter, range 0 to 1        |
+| Parameter         | Type            | Description                                          |
+| :---------------- | :-------------- | :--------------------------------------------------- |
+| model             | string          | Required. The model to use, e.g., `gpt-5.4`          |
+| input             | string or array | Required. Input text or message array                |
+| stream            | boolean         | Whether to enable streaming response (default false) |
+| max_output_tokens | integer         | Maximum number of output tokens                      |
+| temperature       | number          | Sampling temperature, range 0 to 2                   |
+| top_p             | number          | Sampling parameter, range 0 to 1                     |

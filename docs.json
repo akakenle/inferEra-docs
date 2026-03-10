@@ -222,7 +222,7 @@
                     "group": "Responses API",
                     "icon": "bolt",
                     "pages": [
-                      "en/api/responses/Overview",
+                      "en/api/responses/overview",
                       "en/api/responses/Basic-Usage",
                       "en/api/responses/Reasoning",
                       "en/api/responses/Tool-Calling"

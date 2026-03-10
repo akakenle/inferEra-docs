@@ -10,7 +10,7 @@ title: "概述"
   该 API 目前处于 测试阶段（Beta），未来可能会有较大更新，在生产环境中使用时需要谨慎。
 </Warning>
 
-AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses API 兼容的访问方式，您可以通过该接口调用多个 AI 模型。
+AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses API 兼容的访问方式，您可以通过该接口调用多个模型，包括 GPT、Claude、GLM、Gemini等。
 
 该接口还提供了增强功能，包括：
 
@@ -20,7 +20,7 @@ AIHubMix 的 Responses API（Beta）通过统一接口提供与 OpenAI Responses
 ## Base URL
 
 ```tex
-https://aihubmix.com/api/v1/responses
+https://aihubmix.com/v1/responses
 ```
 
 ## 认证
@@ -40,7 +40,7 @@ headers = {
 }
 
 data = {
-    "model": "gpt-5.1",
+    "model": "claude-sonnet-4-6",
     "input": "Hello, world!"
 }
 
