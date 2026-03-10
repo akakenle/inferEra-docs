@@ -63,10 +63,10 @@
                     "group": "Responses API",
                     "icon": "bolt-lightning",
                     "pages": [
-                      "overview",
-                      "basic-usage",
-                      "reasoning",
-                      "tool-calling"
+                      "cn/api/responses/overview",
+                      "cn/api/responses/basic-usage",
+                      "cn/api/responses/reasoning",
+                      "cn/api/responses/tool-calling"
                     ]
                   }
                 ]
@@ -222,10 +222,10 @@
                     "group": "Responses API",
                     "icon": "bolt",
                     "pages": [
-                      "overview-1",
-                      "basic-usage-1",
-                      "reasoning-1",
-                      "tool-calling-1"
+                      "en/api/responses/overview",
+                      "en/api/responses/basic-usage",
+                      "en/api/responses/reasoning",
+                      "en/api/responses/tool-calling"
                     ]
                   }
                 ]
