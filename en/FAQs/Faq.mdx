@@ -67,6 +67,15 @@ If you encounter a wrongful suspension or unusual restrictions, you can submit a
 
 ---
 
+### Why does my account still fail to call certain models (such as Claude Opus or GPT-4.5-Pro) even though it has a balance?
+
+We recently introduced a pre-charge mechanism. When high-concurrency requests are made to higher-cost models (such as the Claude Opus series or GPT-4.5-Pro series), the system performs a pre-charge validation based on the maximum possible output cost at the time the request is initiated.
+
+Therefore, please ensure that your account balance is greater than `output_price × max_output`. Otherwise, the request may be rejected.
+
+We recommend checking that your account balance is sufficient before calling these models.
+
+
 ### Why is GPT-5 not recommended for translation tools?
 
 GPT-5 is a reasoning model designed for complex inference and structured generation, not for high-frequency real-time tasks.
