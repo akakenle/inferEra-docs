@@ -67,11 +67,7 @@ If you encounter a wrongful suspension or unusual restrictions, you can submit a
 
 ### Why does my account still fail to call certain models (such as Claude Opus or GPT-5.4-Pro) even though it has a balance?
 
-We recently introduced a pre-charge mechanism. When high-concurrency requests are made to higher-cost models (such as the Claude Opus series or GPT-5.4-Pro series), the system performs a pre-charge validation based on the maximum possible output cost at the time the request is initiated.
-
-Therefore, please ensure that your account balance is greater than `output_price × max_output`. Otherwise, the request may be rejected.
-
-We recommend checking that your account balance is sufficient before calling these models.
+We use a **pre-charge mechanism**. When calling higher-cost models (such as Claude Opus or GPT-5.4-Pro), the system estimates the maximum possible output cost based on the configured output token limit and checks your balance when the request is initiated. If your account balance is **less than the output token price × maximum output tokens**, the request may be rejected. To avoid this, ensure your account balance is sufficient before calling these models and set a reasonable maximum output token limit; if not specified, the system will use the default value for estimation. Note that the parameter name for maximum output differs by model: Claude and GPT models use `max_tokens`, while Gemini models use `max_output_tokens`.
 
 ### Why is GPT-5 not recommended for translation tools?
 
