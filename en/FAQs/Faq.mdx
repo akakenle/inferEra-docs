@@ -53,7 +53,6 @@ Account suspensions are usually triggered automatically by the system's risk con
    This series of models is designed for complex reasoning and structured content generation, making it unsuitable for high-frequency, real-time translation tasks. Frequent calls in such scenarios may trigger the system's risk control policies, leading to temporary restrictions or account suspension. To ensure stable account operation, please prioritize using non-reasoning models for translation tasks, such as:
    - `gpt-4.1-mini`
    - `gpt-4o-mini`
-
 2. **Sending Violating Content While Using the Grok Model**
 
    During the use of the Grok model, if the requested content is deemed by the system to violate usage norms (e.g., involving violence, gore, pornography, etc.), it will directly trigger the suspension mechanism. Please ensure that your request content complies with the platform and model's usage guidelines to avoid sending illegal or inappropriate content.
@@ -64,17 +63,15 @@ If you encounter a wrongful suspension or unusual restrictions, you can submit a
   If you are a developer, you can use AIHUBMIX's [Moderation API](https://docs.aihubmix.com/cn/api/moderation) to conduct compliance checks on input content before making requests, thereby reducing the risk of violations. This step is optional, but it is strongly recommended in scenarios where content is open or user input is uncontrollable.
 </Tip>
 
-
 ---
 
-### Why does my account still fail to call certain models (such as Claude Opus or GPT-4.5-Pro) even though it has a balance?
+### Why does my account still fail to call certain models (such as Claude Opus or GPT-5.4-Pro) even though it has a balance?
 
-We recently introduced a pre-charge mechanism. When high-concurrency requests are made to higher-cost models (such as the Claude Opus series or GPT-4.5-Pro series), the system performs a pre-charge validation based on the maximum possible output cost at the time the request is initiated.
+We recently introduced a pre-charge mechanism. When high-concurrency requests are made to higher-cost models (such as the Claude Opus series or GPT-5.4-Pro series), the system performs a pre-charge validation based on the maximum possible output cost at the time the request is initiated.
 
 Therefore, please ensure that your account balance is greater than `output_price × max_output`. Otherwise, the request may be rejected.
 
 We recommend checking that your account balance is sufficient before calling these models.
-
 
 ### Why is GPT-5 not recommended for translation tools?
 
@@ -144,7 +141,7 @@ Large language models use probabilistic sampling (e.g., temperature, top-p) to g
 - Lowering temperature or disabling sampling can make results more consistent.
 - Variations may also be affected by context, system prompts, or network conditions.
 
---- 
+---
 
 ### Why Do Responses from the Claude Model End Prematurely?
 
