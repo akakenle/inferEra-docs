@@ -358,7 +358,6 @@
                 "group": "API",
                 "pages": [
                   "jp/api/Aihubmix-Integration",
-                  "jp/api/Responses-API",
                   "jp/api/LLM-Search",
                   "jp/api/Image-Gen",
                   "jp/api/TTS",
@@ -382,7 +381,8 @@
                   "jp/api/App-code",
                   "jp/api/Auth",
                   {
-                    "group": "通过接口获取账户信息",
+                    "group": "アカウント情報をインターフェース経由で取得",
+                    "icon": "badge-check",
                     "pages": [
                       "jp/api/Cli"
                     ]
@@ -390,7 +390,7 @@
                 ]
               },
               {
-                "group": "利用規約とプライバシー",
+                "group": "プライバシーと利用規約",
                 "pages": [
                   "jp/terms-and-privacy/Terms",
                   "jp/terms-and-privacy/Privacy"
@@ -408,10 +408,11 @@
               "jp/api/Qwen-code",
               "jp/api/AISDK",
               "jp/api/Crush"
-            ]
+            ],
+            "groups": []
           },
           {
-            "tab": "利用ケース",
+            "tab": "使用シーン",
             "pages": [
               "jp/clients/AHM-mcp",
               "jp/clients/Cherry-Studio",
@@ -440,21 +441,27 @@
               "jp/clients/Immersive-Translate",
               "jp/clients/On-CS",
               "jp/clients/Oulu"
-            ]
+            ],
+            "groups": []
           },
           {
-            "tab": "よくある質問",
+            "tab": "FAQs",
             "pages": [
               "jp/FAQs/Faq",
               "jp/FAQs/HTTP-Codes",
               "jp/FAQs/Human-Customer-Support"
-            ]
+            ],
+            "groups": []
           },
           {
-            "tab": "ブログ"
+            "tab": "ブログ",
+            "pages": [],
+            "groups": []
           },
           {
-            "tab": "アップデート"
+            "tab": "アップデート",
+            "pages": [],
+            "groups": []
           }
         ]
       },
