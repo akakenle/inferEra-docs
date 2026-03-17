@@ -80,6 +80,7 @@
                   "cn/api/Third-PartyIntegrationTechnicalGuide",
                   {
                     "group": "通过接口获取账户信息",
+                    "icon": "badge-check",
                     "pages": [
                       "cn/api/Cli",
                       "cn/api/CliEndpoints/get-self",
@@ -239,6 +240,7 @@
                   "en/api/Third-PartyIntegrationTechnicalGuide",
                   {
                     "group": "Obtain account information via API",
+                    "icon": "badge-check",
                     "pages": [
                       "en/api/Cli",
                       "en/api/CliEndpoints/get-self",
