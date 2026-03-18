@@ -99,6 +99,12 @@
                 ]
               },
               {
+                "group": "最佳实践",
+                "pages": [
+                  "cn/practices/prompt-caching"
+                ]
+              },
+              {
                 "group": "隐私和条款",
                 "pages": [
                   "cn/terms-and-privacy/Terms",
@@ -259,6 +265,12 @@
                 ]
               },
               {
+                "group": "Best Practices",
+                "pages": [
+                  "en/practices/prompt-caching"
+                ]
+              },
+              {
                 "group": "Terms and Privacy",
                 "pages": [
                   "en/terms-and-privacy/Terms",
@@ -408,8 +420,7 @@
               "jp/api/Qwen-code",
               "jp/api/AISDK",
               "jp/api/Crush"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "使用シーン",
@@ -441,8 +452,7 @@
               "jp/clients/Immersive-Translate",
               "jp/clients/On-CS",
               "jp/clients/Oulu"
-            ],
-            "groups": []
+            ]
           },
           {
             "tab": "FAQs",
@@ -450,18 +460,13 @@
               "jp/FAQs/Faq",
               "jp/FAQs/HTTP-Codes",
               "jp/FAQs/Human-Customer-Support"
-            ],
-            "groups": []
+            ]
           },
           {
-            "tab": "ブログ",
-            "pages": [],
-            "groups": []
+            "tab": "ブログ"
           },
           {
-            "tab": "アップデート",
-            "pages": [],
-            "groups": []
+            "tab": "アップデート"
           }
         ]
       },
