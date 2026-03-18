@@ -38,6 +38,7 @@
               {
                 "group": "API",
                 "pages": [
+                  "cn/practices/prompt-caching",
                   "cn/api/Aihubmix-Integration",
                   "cn/api/vision",
                   "cn/api/LLM-Search",
@@ -96,12 +97,6 @@
                     ]
                   },
                   "cn/api/Status"
-                ]
-              },
-              {
-                "group": "最佳实践",
-                "pages": [
-                  "cn/practices/prompt-caching"
                 ]
               },
               {
@@ -204,6 +199,7 @@
               {
                 "group": "API",
                 "pages": [
+                  "en/practices/prompt-caching",
                   "en/api/Aihubmix-Integration",
                   "en/api/vision",
                   "en/api/LLM-Search",
@@ -262,12 +258,6 @@
                     ]
                   },
                   "en/api/Status"
-                ]
-              },
-              {
-                "group": "Best Practices",
-                "pages": [
-                  "en/practices/prompt-caching"
                 ]
               },
               {

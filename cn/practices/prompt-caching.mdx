@@ -5,23 +5,30 @@ icon: "brightness-low"
 
 提示词缓存（Prompt Caching）是一种用于降低模型推理成本的重要机制。通过缓存已经处理过的提示内容，在后续请求中重复利用，从而减少重复计算、降低费用并提升响应效率。
 
-## 核心机制
+## 原理
 
-### 自动与显示缓存
+当您发送启用了提示缓存的请求时，系统会检查提示前缀是否已从最近的查询中缓存。如果找到，则使用缓存，减少处理时间和成本；否则，处理完整提示并在响应开始后缓存前缀。这对以下场景特别有用：
+
+- 包含大量示例的提示
+- 大量上下文或背景信息
+- 具有一致指令的重复任务
+- 长时间的多轮对话
+
+## 核心机制
 
 不同模型供应商对缓存的支持方式不同：
 
-1. **自动缓存**
+### 自动缓存
 
 - 无需额外配置
 - 系统自动识别并缓存可复用内容
-- 适用于 OpenAI、DeepSeek、Gemini 等模型
+- 适用于 OpenAI、DeepSeek 等模型
 
-2. **显示缓存**
+### 显示缓存
 
 - 需要通过 `cache_control`  手动指定缓存位置
 - 可以精细控制缓存粒度
-- 适用于 Anthropic、Gemini（部分场景）
+- 适用于 Anthropic Claude 模型
 
 ## 各模型缓存策略对比
 
@@ -33,36 +40,15 @@ icon: "brightness-low"
 
 ### Anthropic Claude
 
-#### 自动缓存
-
-```json
-{
-  "model": "claude-sonnet-4-6",
-  "cache_control": { "type": "ephemeral" }
-}
-```
-
-特点：
-
-- 自动推进缓存边界
-- 适合多轮对话
-
-#### 显式缓存断点
-
 ```json
 {
 	"type": "text",
-	"text": "HUGE TEXT",
+	"text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n",
 	"cache_control": { "type": "ephemeral" }
 }
 ```
 
-特点：
-
-- 最多 4 个断点
-- 精细控制缓存内容
-
-#### 缓存时间
+**缓存时间**
 
 - 默认： 5 分钟
 - 可选：1 小时（"ttl": "1h"）
@@ -71,24 +57,9 @@ icon: "brightness-low"
 
 ### Gemini
 
-#### 显式缓存（推荐）
-
-```json
-{
-	"cache_control": { "type": "ephemeral" }
-}
-```
-
-特点：
-
-- 只使用最后一个断点
-- 可兼容 Anthropic 写法
-
-#### 隐式缓存
-
-- 自动生效，无需配置
-- TTL：约 3-5 分钟
-- 最低 token：约 4096
+- 默认启用隐式上下文缓存，缓存自动生效，无需手动配置。
+- 缓存仅在内容、模型、参数完全一致时生效；任何字段不同都会视为新请求，不命中缓存。
+- 缓存有效期由开发者设定，也可以不设置。如果未指定，默认为 1 小时。无最小或最大时长限制，费用取决于缓存 token 数与缓存时间。
 
 ### DeepSeek / Grok / Moonshot / Groq
 
@@ -116,11 +87,11 @@ icon: "brightness-low"
 - CSV / JSON 数据
 - 角色设定
 
-3. \*\* 控制 TTL\*\*
+3. **控制 TTL**
 
 - 短会话 → 5 分钟
 - 长会话 → 1 小时（更省成本）
 
-4. \*\* 减少缓存写入\*\*
+4. **减少缓存写入**
 
 避免频繁变化的内容进入缓存，不要缓存时间戳、用户输入变量、高频变化数据等内容。
