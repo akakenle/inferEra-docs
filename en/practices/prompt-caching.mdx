@@ -3,95 +3,244 @@ title: "Prompt Caching"
 icon: "brightness-low"
 ---
 
-Prompt Caching is an important mechanism used to reduce the inference costs of models. By caching previously processed prompt content, it can be reused in subsequent requests, thus reducing redundant calculations, lowering costs, and improving response efficiency.
+Prompt Caching is an important mechanism used to reduce model inference costs. By caching previously processed prompt content, it can be reused in subsequent requests, thereby reducing redundant computations, lowering costs, and improving response efficiency.
 
-## Principles
+## Principle
 
-When you send a request with prompt caching enabled, the system checks if the prompt prefix has been cached from recent queries. If found, it uses the cache to reduce processing time and costs; otherwise, it processes the entire prompt and caches the prefix after the response begins. This is particularly useful in the following scenarios:
+When you send a request with prompt caching enabled, the system checks if the prompt prefix has been cached from recent queries. If found, it uses the cache, reducing processing time and costs; otherwise, it processes the full prompt and caches the prefix after the response begins. This is particularly useful in the following scenarios:
 
-- Prompts containing a large number of examples
+- Prompts containing numerous examples
 - Extensive context or background information
-- Repeated tasks with consistent instructions
-- Long multi-turn dialogues
+- Repetitive tasks with consistent instructions
+- Long multi-turn conversations
 
-## Core Mechanisms
+## Core Mechanism
 
-Different model providers support caching in various ways:
+Different model providers have varying support for caching:
 
 ### Automatic Caching
 
-- No additional configuration required
-- The system automatically identifies and caches reusable content
-- Applicable to models like OpenAI, DeepSeek, etc.
+Automatic caching requires no additional configuration; the system automatically identifies and caches reusable content, applicable to models like OpenAI, DeepSeek, etc.
 
-### Explicit Caching
+#### OpenAI
 
-- Requires manual specification of the cache location through `cache_control`
-- Allows for fine control over caching granularity
-- Applicable to Anthropic Claude model
-
-## Comparison of Caching Strategies Across Models
-
-### OpenAI
-
-- Automatic caching, no configuration needed
 - Minimum prompt length: 1024 tokens
-- Pricing: Writing to cache is free, reading from cache costs 0.25x to 0.5x the original price
+- Cost: Writing to cache is free; reading from cache costs 0.25x to 0.5x the original price
 
-### Anthropic Claude
+#### Gemini
+
+- Implicit context caching is enabled by default, and caching is automatically effective without manual configuration.
+- Caching is only effective when the content, model, and parameters are identical; any differences will be treated as a new request and will not hit the cache.
+- The cache validity period is set by the developer, and it can also be left unset. If unspecified, it defaults to 1 hour. There are no minimum or maximum duration limits, and costs depend on the number of cached tokens and cache duration.
+
+#### DeepSeek / Grok / Moonshot / Groq
+
+- Cost: Writing to cache is free or at the same price, reading from cache is below the original price
+
+### Claude Model Display Caching
+
+- Requires manual specification of the cache location via `cache_control`
+- Allows fine-grained control over caching granularity
+- Applicable to Anthropic Claude models
+
+#### OpenAI Compatible Interface
+
+You can set caching breakpoints in `system`, `user` (including images), and `tools` using the `cache_control` field. The following examples only show the key structure:
+
+**System Message Caching (default 5 minutes TTL):**
 
 ```json
 {
-	"type": "text",
-	"text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n",
-	"cache_control": { "type": "ephemeral" }
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [{"type": "text", "text": "Hello"}]
+    }
+  ]
 }
 ```
 
-**Cache Duration**
+**User Message Caching (1 hour TTL):**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [{"type": "text", "text": "You are an AI assistant"}]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral", "ttl": "1h"}
+        },
+        {"type": "text", "text": "Hello"}
+      ]
+    }
+  ]
+}
+```
+
+**Image Message Caching:**
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": {"detail": "auto", "url": "data:image/jpeg;base64,/9j/4AAQ..."},
+      "cache_control": {"type": "ephemeral"}
+    },
+    {"type": "text", "text": "What's this?"}
+  ]
+}
+```
+
+**Tool Definition Caching:**
+
+Place the `cache_control` at the top level of the tool object (at the same level as `type` and `function`):
+
+```json
+{
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get current weather for a location",
+      "parameters": {
+        "type": "object",
+        "properties": {"city": {"type": "string"}},
+        "required": ["city"]
+      }
+    },
+    "cache_control": {"type": "ephemeral", "ttl": "1h"}
+  }]
+}
+```
+
+#### Anthropic Compatible Interface
+
+<CodeGroup>
+
+```shellscript cURL
+curl https://aihubmix.com/v1/messages \
+  -H "content-type: application/json" \
+  -H "x-api-key: $AIHUBMIX_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-4-6",
+    "max_tokens": 1024,
+    "system": [
+      {
+        "type": "text",
+        "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n"
+      },
+      {
+        "type": "text",
+        "text": "<the entire contents of Pride and Prejudice>",
+        "cache_control": {"type": "ephemeral"}
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze the major themes in Pride and Prejudice."
+      }
+    ]
+  }'
+
+# Call the model again with the same input until the caching checkpoint
+curl https://aihubmix.com/v1/messages # rest of input
+```
+
+```python Python
+import anthropic
+
+client = Anthropic(
+  api_key="<AIHUBMIX_API_KEY>",  
+  base_url="https://aihubmix.com"
+)
+
+params = {
+    "model": "claude-opus-4-6",
+    "max_tokens": 1024,
+    "system": [
+        {
+            "type": "text",
+            "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n",
+        },
+        {
+            "type": "text",
+            "text": "<the entire contents of 'Pride and Prejudice'>",
+            "cache_control": {"type": "ephemeral"},
+        },
+    ],
+    "messages": [
+        {
+            "role": "user",
+            "content": "Analyze the major themes in 'Pride and Prejudice'.",
+        }
+    ],
+}
+response = client.messages.create(**params)
+print(response.usage.model_dump_json())
+
+# Call the model again with the same input until the caching checkpoint
+response = client.messages.create(**params)
+print(response.usage.model_dump_json())
+```
+
+</CodeGroup>
+
+#### Caching Duration
 
 - Default: 5 minutes
 - Optional: 1 hour ("ttl": "1h")
 
-> For more information, please see: [Claude Prompt Caching](https://docs.aihubmix.com/en/blogs/aihubmix-openai-upgrade-claude#2-prompt-caching)
-
-### Gemini
-
-- Implicit context caching is enabled by default, with caching automatically in effect and no manual configuration required.
-- Caching only takes effect when content, model, and parameters are exactly the same; any difference in fields is treated as a new request and does not hit the cache.
-- The cache expiration is set by the developer, and can also be left unset. If not specified, the default is 1 hour. There are no minimum or maximum duration limits, and costs depend on the number of cached tokens and the cache duration.
-
-### DeepSeek / Grok / Moonshot / Groq
-
-- All support automatic caching
-- No additional configuration required
-- General rule: Writing to cache is free or at the same price, reading from cache is below the original price
+> For more information, please refer to: [Claude Prompt Caching](https://docs.aihubmix.com/en/blogs/aihubmix-openai-upgrade-claude#2-prompt-caching)
 
 ## Usage Recommendations
 
-1. **Keep Prefix Stable**
+1. **Maintain Stable Prefixes**
 
 Place fixed content at the beginning of the prompt, recommended structure:
 
 ```text
 [System Settings / Long Text / RAG Data] 
-[User Query (Variable Part)]
+[User Question (Variable Part)]
 ```
 
 2. **Cache Large Texts**
 
 Prioritize caching the following content:
 
-- RAG Data
-- Long Texts
-- CSV / JSON Data
-- Role Settings
+- RAG data
+- Long texts
+- CSV / JSON data
+- Role settings
 
 3. **Control TTL**
 
-- Short Sessions → 5 minutes
-- Long Sessions → 1 hour (more cost-effective)
+- Short sessions → 5 minutes
+- Long sessions → 1 hour (more cost-effective)
 
 4. **Reduce Cache Writes**
 
-Avoid frequently changing content from entering the cache; do not cache timestamps, user input variables, high-frequency changing data, etc.
+Avoid frequently changing content from entering the cache. Do not cache timestamps, user input variables, high-frequency changing data, etc.

@@ -20,52 +20,201 @@ icon: "brightness-low"
 
 ### 自动缓存
 
-- 无需额外配置
-- 系统自动识别并缓存可复用内容
-- 适用于 OpenAI、DeepSeek 等模型
+自动缓存无需额外配置，系统自动识别并缓存可复用内容，适用于 OpenAI、DeepSeek 等模型。
 
-### 显示缓存
+#### OpenAI
 
-- 需要通过 `cache_control`  手动指定缓存位置
-- 可以精细控制缓存粒度
-- 适用于 Anthropic Claude 模型
-
-## 各模型缓存策略对比
-
-### OpenAI
-
-- 自动缓存，无需配置
 - 最低提示长度：1024 tokens
 - 价格：写缓存免费，读缓存 0.25x～0.5x 原价
 
-### Anthropic Claude
-
-```json
-{
-	"type": "text",
-	"text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n",
-	"cache_control": { "type": "ephemeral" }
-}
-```
-
-**缓存时间**
-
-- 默认： 5 分钟
-- 可选：1 小时（"ttl": "1h"）
-
-> 需要了解更多信息请查看：[Claude 提示词缓存](https://docs.aihubmix.com/cn/blogs/aihubmix-openai-upgrade-claude#2-%E6%8F%90%E7%A4%BA%E8%AF%8D%E7%BC%93%E5%AD%98%EF%BC%88prompt-caching%EF%BC%89)
-
-### Gemini
+#### Gemini
 
 - 默认启用隐式上下文缓存，缓存自动生效，无需手动配置。
 - 缓存仅在内容、模型、参数完全一致时生效；任何字段不同都会视为新请求，不命中缓存。
 - 缓存有效期由开发者设定，也可以不设置。如果未指定，默认为 1 小时。无最小或最大时长限制，费用取决于缓存 token 数与缓存时间。
 
-### DeepSeek / Grok / Moonshot / Groq
+#### DeepSeek / Grok / Moonshot / Groq
 
-- 全部支持自动缓存
-- 无需额外配置
-- 一般规则：写缓存免费或同价，读缓存低于原价
+- 价格：写缓存免费或同价，读缓存低于原价
+
+### Claude 模型显示缓存
+
+- 需要通过 `cache_control`  手动指定缓存位置
+- 可以精细控制缓存粒度
+- 适用于 Anthropic Claude 模型
+
+#### OpenAI 兼容接口
+
+在 `system`、`user`（含图片）、`tools` 中均可通过 `cache_control` 字段设置缓存断点，以下示例仅展示关键结构：
+
+**System 消息缓存（默认 5 分钟 TTL）：**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [
+        {"type": "text", "text": "You are an AI assistant"},
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral"}
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [{"type": "text", "text": "Hello"}]
+    }
+  ]
+}
+```
+
+**User 消息缓存（1 小时 TTL）：**
+
+```json
+{
+  "model": "claude-opus-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": [{"type": "text", "text": "You are an AI assistant"}]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "(long context)",
+          "cache_control": {"type": "ephemeral", "ttl": "1h"}
+        },
+        {"type": "text", "text": "Hello"}
+      ]
+    }
+  ]
+}
+```
+
+**图片消息缓存：**
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": {"detail": "auto", "url": "data:image/jpeg;base64,/9j/4AAQ..."},
+      "cache_control": {"type": "ephemeral"}
+    },
+    {"type": "text", "text": "What's this？"}
+  ]
+}
+```
+
+**Tool 定义缓存：**
+
+`cache_control` 放在 tool 对象的顶层（与 `type`、`function` 同级）：
+
+```json
+{
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "Get current weather for a location",
+      "parameters": {
+        "type": "object",
+        "properties": {"city": {"type": "string"}},
+        "required": ["city"]
+      }
+    },
+    "cache_control": {"type": "ephemeral", "ttl": "1h"}
+  }]
+}
+```
+
+#### Anthropic 兼容接口
+
+<CodeGroup>
+
+```shellscript cURL
+curl https://aihubmix.com/v1/messages \
+  -H "content-type: application/json" \
+  -H "x-api-key: $AIHUBMIX_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-4-6",
+    "max_tokens": 1024,
+    "system": [
+      {
+        "type": "text",
+        "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n"
+      },
+      {
+        "type": "text",
+        "text": "<the entire contents of Pride and Prejudice>",
+        "cache_control": {"type": "ephemeral"}
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Analyze the major themes in Pride and Prejudice."
+      }
+    ]
+  }'
+
+# 使用相同的输入再次调用模型，直到缓存检查点
+curl https://aihubmix.com/v1/messages # rest of input
+```
+
+```python Python
+import anthropic
+
+client = Anthropic(
+  api_key="<AIHUBMIX_API_KEY>",  
+  base_url="https://aihubmix.com"
+)
+
+params = {
+    "model": "claude-opus-4-6",
+    "max_tokens": 1024,
+    "system": [
+        {
+            "type": "text",
+            "text": "You are an AI assistant tasked with analyzing literary works. Your goal is to provide insightful commentary on themes, characters, and writing style.\n",
+        },
+        {
+            "type": "text",
+            "text": "<the entire contents of 'Pride and Prejudice'>",
+            "cache_control": {"type": "ephemeral"},
+        },
+    ],
+    "messages": [
+        {
+            "role": "user",
+            "content": "Analyze the major themes in 'Pride and Prejudice'.",
+        }
+    ],
+}
+response = client.messages.create(**params)
+print(response.usage.model_dump_json())
+
+# 使用相同的输入再次调用模型，直到缓存检查点
+response = client.messages.create(**params)
+print(response.usage.model_dump_json())
+```
+
+</CodeGroup>
+
+#### 缓存时间
+
+- 默认： 5 分钟
+- 可选：1 小时（"ttl": "1h"）
+
+> 需要了解更多信息请查看：[Claude 提示词缓存](https://docs.aihubmix.com/cn/blogs/aihubmix-openai-upgrade-claude#2-%E6%8F%90%E7%A4%BA%E8%AF%8D%E7%BC%93%E5%AD%98%EF%BC%88prompt-caching%EF%BC%89)
 
 ## 使用建议
 
