@@ -572,7 +572,7 @@
           {
             "tab": "자주 묻는 질문",
             "pages": [
-              "ko/FAQs/Faq",
+              "ko/FAQs/faq",
               "ko/FAQs/HTTP-Codes",
               "ko/FAQs/Human-Customer-Support"
             ]
