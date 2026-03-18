@@ -3,3 +3,124 @@ title: "Prompt Caching"
 icon: "brightness-low"
 ---
 
+Prompt Caching is an important mechanism used to reduce the cost of model inference. By caching previously processed prompt content, it can be reused in subsequent requests, thus minimizing redundant calculations, lowering expenses, and enhancing response efficiency.
+
+## Core Mechanism
+
+### Automatic and Explicit Caching
+
+Different model providers have varying support for caching:
+
+1. **Automatic Caching**
+
+- No additional configuration required
+- The system automatically identifies and caches reusable content
+- Applicable to models like OpenAI, DeepSeek, Gemini, etc.
+
+2. **Explicit Caching**
+
+- Requires manual specification of the cache location via `cache_control`
+- Allows for fine-grained control of caching
+- Applicable to models like Anthropic, Gemini (in certain scenarios)
+
+## Comparison of Caching Strategies Across Models
+
+### OpenAI
+
+- Automatic caching, no configuration needed
+- Minimum prompt length: 1024 tokens
+- Pricing: Writing to cache is free; reading from cache costs 0.25x to 0.5x the original price
+
+### Anthropic Claude
+
+#### Automatic Caching
+
+```json
+{
+  "model": "claude-sonnet-4-6",
+  "cache_control": { "type": "ephemeral" }
+}
+```
+
+Features:
+
+- Automatically advances cache boundaries
+- Suitable for multi-turn conversations
+
+#### Explicit Caching Checkpoints
+
+```json
+{
+	"type": "text",
+	"text": "HUGE TEXT",
+	"cache_control": { "type": "ephemeral" }
+}
+```
+
+Features:
+
+- Up to 4 checkpoints
+- Fine control over cached content
+
+#### Cache Duration
+
+- Default: 5 minutes
+- Optional: 1 hour ("ttl": "1h")
+
+> For more information, please refer to: [Claude Prompt Caching](https://docs.aihubmix.com/en/blogs/aihubmix-openai-upgrade-claude#2-prompt-caching)
+
+### Gemini
+
+#### Explicit Caching (Recommended)
+
+```json
+{
+	"cache_control": { "type": "ephemeral" }
+}
+```
+
+Features:
+
+- Only uses the last checkpoint
+- Compatible with Anthropic's syntax
+
+#### Implicit Caching
+
+- Automatically effective, no configuration needed
+- TTL: Approximately 3-5 minutes
+- Minimum tokens: Approximately 4096
+
+### DeepSeek / Grok / Moonshot / Groq
+
+- All support automatic caching
+- No additional configuration required
+- General rule: Writing to cache is free or at the same price, reading from cache is below the original price
+
+## Usage Recommendations
+
+1. **Maintain Stable Prefixes**
+
+Place fixed content at the beginning of the Prompt; recommended structure:
+
+```text
+[System Settings / Long Text / RAG Data] 
+[User Question (variable part)]
+```
+
+2. **Cache Large Texts**
+
+Prioritize caching the following content:
+
+- RAG data
+- Long texts
+- CSV / JSON data
+- Role settings
+
+3. **Control TTL**
+
+- Short sessions → 5 minutes
+- Long sessions → 1 hour (more cost-effective)
+
+4. **Reduce Cache Writes**
+
+Avoid frequently changing content from entering the cache; do not cache timestamps, user input variables, high-frequency changing data, etc.
