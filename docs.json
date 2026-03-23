@@ -168,7 +168,8 @@
           {
             "tab": "博客",
             "pages": [
-              "cn/blogs/aihubmix-openai-upgrade-claude"
+              "cn/blogs/aihubmix-openai-upgrade-claude",
+              "cn/blogs/global-acceleration"
             ]
           },
           {
@@ -329,7 +330,8 @@
           {
             "tab": "Blogs",
             "pages": [
-              "en/blogs/aihubmix-openai-upgrade-claude"
+              "en/blogs/aihubmix-openai-upgrade-claude",
+              "en/blogs/global-acceleration"
             ]
           },
           {

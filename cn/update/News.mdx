@@ -6,6 +6,12 @@ mode: "center"
 
 ## 2026 年
 
+<Update label="03 月 23 日"> 
+- AIHubMix 全球加速网络正式上线：自建全球边缘节点与智能调度体系，通过持续监控与动态优化，实现响应延迟降低 75%、稳定性提升 60%、可用性达 99.99%，让 AI 应用体验更快更稳。 
+- 新增 7×24 实时健康监测：多区域探针每分钟全网检测延迟、成功率与稳定性，异常可在用户感知前自动识别并处理，保障服务持续稳定。
+- 优化智能流量调度：基于多时间窗口动态计算节点健康评分，毫秒级自动切换最优路径，显著降低波动与超时，提升整体请求成功率。 
+</Update>
+
 <Update label="02 月 08 日">
   - 新功能： Chat → Responses 兼容调用 本次上线 Chat → Responses 兼容能力，支持通过 chat/completions 接口调用 OpenAI 仅支持 Responses 协议的模型，包括 gpt-5.2-codex、gpt-5.1-codex-max、gpt-5.2-pro 等。 如需要强制 AIHubmix 的 chat 接口让背后路由都走 Responses 协议，请在请求中添加 Header：X-Use-Responses-Enabled: true。当模型同时支持 Chat 与 Responses 双协议时，设置该参数将强制请求使用 Responses 接口。当前 Responses 协议暂不支持音频输入输出，请注意使用场景。
   - 模型弃用通知：OpenAI 将于 2026 年 2 月 17 日 下线 chatgpt-4o-latest，我们会在下线后自动将 chatgpt-4o-latest 映射至 gpt-4o-2024-11-20
@@ -79,19 +85,19 @@ mode: "center"
 </Update>
 
 <Update label="6 月 5 日">
-  - 新增 Gemini 隐式缓存功能，支持自动命中与命中反馈。开发者可以通过 usage_metadata 判断命中情况。成本节省非保证，实际效果因请求结构和使用场景而异。
+  - 新增 Gemini 隐式缓存功能，支持自动命中与命中反馈。开发者可以通过 usage\_metadata 判断命中情况。成本节省非保证，实际效果因请求结构和使用场景而异。
 </Update>
 
 <Update label="5 月 31 日">
   Claude 4 新功能全面支持
 
   - ⏳ **新的缓存周期**：1 小时级别的缓存<sup>Beta</sup> 支持
-  - 🎉 **新的文本编辑工具**：Claude 4 模型支持全新的 text_editor_20250429 工具类型和 str_replace_based_edit_tool 工具名称
+  - 🎉 **新的文本编辑工具**：Claude 4 模型支持全新的 text\_editor\_20250429 工具类型和 str\_replace\_based\_edit\_tool 工具名称
   - 🚫 **拒绝停止原因**：引入新的 refusal 停止原因，用于处理模型因安全原因拒绝生成的内容
   - 🧠 **扩展思考**：Claude 4 模型返回完整思考过程的摘要，提供扩展思考的全部智能优势
   - 🔄 **交错思考**：支持工具使用与扩展思考交错，实现更自然的对话体验（Beta）
   - ⚠️ **不再支持的功能**：
-    - Claude 4 文本编辑工具不再支持 undo_edit 命令
+    - Claude 4 文本编辑工具不再支持 undo\_edit 命令
     - 移除了 token-efficient-tools-2025-02-19 支持（仅 Claude 3.7 可用）
     - 移除了 output-128k-2025-02-19 支持（仅 Claude 3.7 可用）
   - 📚 更新了完整的迁移指南和代码示例，帮助用户从 Claude 3.7 平滑迁移到 Claude 4
@@ -245,7 +251,6 @@ mode: "center"
 
 <Update label="1 月 19 日">
   - 新增 Perplexity Ai API 模型；仅支持 api.aihubmix.com 预览版服务器调用，如果没问题我们会更新到主服务器 aihubmi.com； api.aihubmix.com 为预览版服务器，后续新功能先更新到这个服务器，通常稳定 1 周我们再更新到主服务器 aihubmix.com
-
     新增模型：
   - MiniMax-Text-01
   - codestral-latest（Mistral 推出了新的 code 模型 - Codestral 25.01）
@@ -311,7 +316,6 @@ mode: "center"
   - GPT-4o-mini
   - o1-preview
   - o1-mini
-
     请注意，gpt-4o-2024-05-13 版本不在官方支持范围内。 如果请求命中缓存，您将能够在后台日志中看到相关的缓存 token 数据。 更多详细信息和使用规则，请访问 OpenAI 官方网站：OpenAI 缓存功能详情
 </Update>
 
@@ -337,12 +341,12 @@ mode: "center"
   - system 字段：400 报错
   - tools 字段：400 报错
   - 图片输入：400 报错
-  - json_object 输出：500 报错
+  - json\_object 输出：500 报错
   - structured 输出：400 报错
   - logprobs 输出：403 报错
   - stream 输出：400 报错
   - o1 系列：20 RPM，150,000,000 TPM，很低，随时 429 报错
-  - 其他：temperature, top_p and n 被固定为 1；presence_penalty 和 frequency_penalty 被固定为 0
+  - 其他：temperature, top\_p and n 被固定为 1；presence\_penalty 和 frequency\_penalty 被固定为 0
 </Update>
 
 <Update label="9 月 10 日">
@@ -358,7 +362,7 @@ mode: "center"
 </Update>
 
 <Update label="8 月 7 日">
-  - 新增 Openai 刚刚更新 4o 版本 gpt-4o-2024-08-06，见 https://platform.openai.com/docs/guides/structured-outputs
+  - 新增 Openai 刚刚更新 4o 版本 gpt-4o-2024-08-06，见 [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
   - 新增 Google 最新模型：gemini-1.5-pro-exp-0801
 </Update>
 
@@ -366,7 +370,7 @@ mode: "center"
   - 增加了在线直接支付充值
   - 修复了 Claude 多轮对话格式报错问题：1、messages: roles must alternate between "user" and "assistant", but found multiple "user" roles in a row；
   - 优化了 Claude 模型的使用 function 功能时 index 问题
-  - https://orisound.cn 备用服务器将在 9 月 7 日全面下线；目前在使用这个地址的请抽空改成主服务器 https://aihubmix.com 或者备用服务器 https://api.aihubmix.com
+  - [https://orisound.cn](https://orisound.cn) 备用服务器将在 9 月 7 日全面下线；目前在使用这个地址的请抽空改成主服务器 [https://aihubmix.com](https://aihubmix.com) 或者备用服务器 [https://api.aihubmix.com](https://api.aihubmix.com)
 </Update>
 
 <Update label="7 月 27 日">
@@ -384,9 +388,7 @@ mode: "center"
     图片输入价格：OpenAI 官方的 gpt-4o-mini 模型输入图片的价格与 gpt-4o 模型价格相等。
   - 为了确保价格计算的准确性，我们在计算 gpt-4o-mini 模型输入图片的 token 数时，将其乘以 33 倍，以与官方价格对齐。
   - 详情可见 Open AI 官方价格
-
     ![图片](/media/cn/4ominijiage.png)
-
     ![图片](/media/cn/4ojiage.png)
 </Update>
 
@@ -395,7 +397,7 @@ mode: "center"
 </Update>
 
 <Update label="7 月 15 日 公告">
-  - 支持官方的 api 参数 include_usage，传入参数可返回 stream 模式下的 usage，详情见 官方文档
+  - 支持官方的 api 参数 include\_usage，传入参数可返回 stream 模式下的 usage，详情见 官方文档
 </Update>
 
 <Update label="7 月 14 日 公告">
@@ -432,7 +434,7 @@ mode: "center"
   - 整体服务架构升级，全部服务器和数据迁入微软 Azure；
   - 未来我将基于 one api 的开源版本项目进行二次深度开发和优化（原本我们已通过赞助获得 oneapi 项目商业版授权）
   - 日志部分数据量太大（超过 1 亿级的请求日志）因此暂时无法迁移，如需查询之前的老日志请联系客服
-  - 优化 gpt-4o 的 token 计费，tokenizer 的 cI100k_base 改为 0200k_base，之前的 gpt-4 系列用的是 cI100k_base；结果就是中文、韩文、日文的流式请求的 token 计数会比之前下降；
+  - 优化 gpt-4o 的 token 计费，tokenizer 的 cI100k\_base 改为 0200k\_base，之前的 gpt-4 系列用的是 cI100k\_base；结果就是中文、韩文、日文的流式请求的 token 计数会比之前下降；
 </Update>
 
 <Update label="6 月 8 日 公告">
