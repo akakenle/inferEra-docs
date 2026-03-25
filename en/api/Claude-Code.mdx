@@ -18,7 +18,6 @@ This guide will help you get started with Claude Code provided by AIHubMix in ju
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-
 ```shellscript Windows
 irm https://claude.ai/install.ps1 | iex
 ```
@@ -60,7 +59,6 @@ To access AIHubMix's model services via the compatible Anthropic API, you need t
     echo 'export ANTHROPIC_MODEL="claude-sonnet-4-5"' >> ~/.zshrc
     ```
 
-    
     ```shellscript Bash
     # Replace AIHUBMIX_API_KEY with the Key obtained from the AIHUBMIX platform
     echo 'export ANTHROPIC_BASE_URL="https://aihubmix.com"' >> ~/.bash_profile
@@ -78,7 +76,6 @@ To access AIHubMix's model services via the compatible Anthropic API, you need t
     source ~/.zshrc
     ```
 
-    
     ```shellscript Bash
     source ~/.bash_profile
     ```
@@ -169,13 +166,13 @@ Claude Code supports the following model configuration methods, **ranked in orde
 
 1. **During a conversation:** Execute the `/model <model_name>` command to switch models. This is suitable for temporary model changes.
 
-```
+```text
 /model claude-sonnet-4-5
 ```
 
 2. **When starting Claude Code:** Execute `claude --model <model_name>` to specify the model. This is suitable for single-session use.
 
-```
+```text
 claude --model claude-sonnet-4-5
 ```
 
@@ -222,6 +219,7 @@ Where:
   alt="Cc 3"
   className="hidden dark:block"
 />
+
 <img
   src="/public/en/cc-3.png"
   alt="Cc 3"
@@ -231,11 +229,6 @@ Where:
 4. After configuration is complete, click "Add" to save the settings.
 
 <img
-  src="/public/en/cc-4.jpg"
-  alt="Cc 4"
-  className="hidden dark:block"
-/>
-<img
   src="/public/en/cc-4.png"
   alt="Cc 4"
   className="dark:hidden"
@@ -244,6 +237,38 @@ Where:
 5. Return to the homepage, select "AiHubMix" from the vendor list, and click "Start" to use it.
 
 ![Cc 5](/public/en/cc-5.jpg)
+
+## Configuration through VS Code Plugin
+
+1. Run VS Code and install the plugin.
+
+<Frame>
+  ![I Shot 2026 03 25 11 44 03](/images/iShot_2026-03-25_11.44.03.jpg)
+</Frame>
+
+2. Press `Ctrl + Shift + P` (or `Cmd + Shift + P`), type `Settings` to open the settings.
+
+<Frame>
+  ![I Shot 2026 03 25 11 47 48](/images/iShot_2026-03-25_11.47.48.jpg)
+</Frame>
+
+3. Search for `Claude Code`, find `Claude Code: Environment Variable` → `Edit in settings.json`.
+
+<Frame>
+  ![I Shot 2026 03 25 11 49 37](/images/iShot_2026-03-25_11.49.37.jpg)
+</Frame>
+
+4. Fill in the AIHubMix-related information in `claudeCode.environmentVariables`.
+
+<Frame>
+  ![I Shot 2026 03 25 11 53 07](/images/iShot_2026-03-25_11.53.07.jpg)
+</Frame>
+
+## [Wechat-Agent-SDK](https://github.com/AIhubmix/wechat-agent-sdk)
+
+With simple API calls, easily integrate mainstream AI entities like Claude Code, Codex, and Kimi into WeChat with one click. It supports the ACP protocol, runs entirely locally without the need for a server or database, and includes enterprise-level features such as built-in breakpoint resume and automatic reconnection, enabling your AI assistant to engage in intelligent conversations seamlessly within WeChat.
+
+> Installation link: [https://github.com/AIhubmix/wechat-agent-sdk](https://github.com/AIhubmix/wechat-agent-sdk)
 
 ## Frequently Asked Questions
 
@@ -298,6 +323,7 @@ claude -v
 If you can see the `claude` path and version number, the installation was successful.
 
 ### Q: Claude Code Unable to Connect to Anthropic Services
+
 After upgrading to the latest version of Claude Code, if you encounter issues connecting to Anthropic services or authentication failures, it is typically due to changes in the authentication request header name. The new version requires updating the request header from `ANTHROPIC_API_KEY` to `ANTHROPIC_AUTH_TOKEN`. The value of the API Key does not need to be changed; you only need to update the request header name and reload the configuration. For specific instructions, please refer to this document for reconfiguration.
 
 ## More Resources
