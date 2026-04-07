@@ -7,7 +7,7 @@ icon: "palette"
 ## 可用模型列表
 
 <Tip>
-  Nano  Banana 系列请参考：https://docs.aihubmix.com/cn/api/Gemini-Guides
+  Nano  Banana 系列请参考：[https://docs.aihubmix.com/cn/api/Gemini-Guides](https://docs.aihubmix.com/cn/api/Gemini-Guides)
 </Tip>
 
 ### OpenAI 模型
@@ -33,8 +33,6 @@ icon: "palette"
 ### Doubao 模型
 
 - [doubao-seedream-5.0-lite](https://aihubmix.com/model/doubao-seedream-5.0-lite) —— 字节跳动发布的最新图像创作模型，该模型首次搭载联网检索功能，能融合实时网络信息，提升生图时效性。
-
-
 - [doubao-seedream-4-5](https://aihubmix.com/model/doubao-seedream-4-5) —— 字节跳动推出的图像多模态模型，整合了文生图、图生图、组图输出等能力。
 - [doubao-seedream-4-0](https://aihubmix.com/model/doubao-seedream-4-0) —— 字节跳动SOTA级多模态图像创作模型，支持多图融合创作、图像编辑、组图生成等多样玩法。
 
@@ -63,7 +61,7 @@ POST https://aihubmix.com/v1/models/<model_path>/predictions
 ```
 
 <Tip>
-  \<model_path\> 为\<供应商/模型id\>，如\<openai/gpt-image-1.5\>，\<qianfan/qwen-image\>。
+  \<model\_path\> 为\<供应商/模型id\>，如\<openai/gpt-image-1.5\>，\<qianfan/qwen-image\>。
 </Tip>
 
 ### 请求头
@@ -77,50 +75,56 @@ Content-Type: application/json
 
 #### 通用参数
 
-| 参数      | 类型      | 必填 | 说明                                                                                                                                      |
-| ------- | ------- | --- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| prompt  | string  | 是  | 提示词                                                                                                                                     |
-| size    | string  | 否  | 图像尺寸，支持`1K`(Doubao-4-5系列不支持)、`2K`、`4K`、`auto` (默认)。Qwen系列支持参数：`512*1024`、`768*512`、 `768*1024`、 `1024*576`、 `576*1024`、 `1024*1024`（默认） |
-| image   | string  | 否  | 参考图片路径                                                                                                                                  |
-| n       | integer | 否  | 生成图像数量，支持1-10，默认为 1                                                                                                                     |
-| quality | string  | 否  | 渲染质量，支持 `low` 、`medium` 和`high`，质量越高，耗时越长                                                                                               |
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| prompt | string | 是 | 提示词 |
+| size | string | 否 | 图像尺寸，支持`1K`(Doubao-4-5系列不支持)、`2K`、`4K`、`auto` (默认)。Qwen系列支持参数：`512*1024`、`768*512`、 `768*1024`、 `1024*576`、 `576*1024`、 `1024*1024`（默认） |
+| image | string | 否 | 参考图片路径 |
+| n | integer | 否 | 生成图像数量，支持1-10，默认为 1。Imagen 模型该参数不生效 |
+| quality | string | 否 | 渲染质量，支持 `low` 、`medium` 和`high`，质量越高，耗时越长 |
 
 #### OpenAI 模型参数
 
-| 参数             | 类型     | 必填 | 说明                                                    |
-| -------------- | ------ | --- | ----------------------------------------------------- |
-| input_fidelity | string | 否  | 保真度，支`high`和 `low`（默认）                                |
-| moderation     | string | 否  | 内容审核严格程度，支持 `auto` （默认，标准过滤）和 `low`（过滤限制较少），图生图模式下不支持 |
-| output_format  | string | 否  | 输出图片格式，支持 `png` 、 `jpeg`  （默认）  、`webp`               |
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| input\_fidelity | string | 否 | 保真度，支`high`和 `low`（默认） |
+| moderation | string | 否 | 内容审核严格程度，支持 `auto` （默认，标准过滤）和 `low`（过滤限制较少），图生图模式下不支持 |
+| output\_format | string | 否 | 输出图片格式，支持 `png` 、 `jpeg`  （默认）  、`webp` |
+
+#### Imagen 模型参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| sampleCount | integer | 否 | 生成图像数量，默认为 4 |
 
 #### Flux 模型参数
 
-| 参数               | 类型      | 必填 | 说明                                     |
-| ---------------- | ------- | --- | -------------------------------------- |
-| safety_tolerance | integer | 否  | 审核宽松度，数值越大越宽松。支持范围 `0<=x<=5` ，默认值为 `2` |
-| aspect_ratio     | string  | 否  | 图像所需的宽高比，支持`16:9`（默认）， `1:1` 、`4:3`    |
-| seed             | integer | 否  | 随机数种子                                  |
-| raw              | boolean | 否  | 是否启用原始模式，获得更自然的视觉效果，默认`false`          |
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| safety\_tolerance | integer | 否 | 审核宽松度，数值越大越宽松。支持范围 `0<=x<=5` ，默认值为 `2` |
+| aspect\_ratio | string | 否 | 图像所需的宽高比，支持`16:9`（默认）， `1:1` 、`4:3` |
+| seed | integer | 否 | 随机数种子 |
+| raw | boolean | 否 | 是否启用原始模式，获得更自然的视觉效果，默认`false` |
 
 #### Qwen 模型参数
 
-| 参数        | 类型      | 必填 | 说明                                    |
-| --------- | ------- | --- | ------------------------------------- |
-| watermark | boolean | 否  | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |
-| seed      | integer | 否  | 随机数种子，取值范围`[0,2147483647]`            |
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| watermark | boolean | 否 | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |
+| seed | integer | 否 | 随机数种子，取值范围`[0,2147483647]` |
 
 #### Doubao 模型参数
 
-| 参数                                  | 类型      | 必填 | 说明                                                                                       | |
-| ----------------------------------- | ------- | --- | ---------------------------------------------------------------------------------------- | --- |
-| sequential_image_generation         | string  | 否  | 控制是否关闭组图功能                                                                               | |
-| sequential_image_generation_options | object  | 否  | 组图功能配置，仅当 `sequential_image_generation` 为 `auto` 时生效。目前支`max_images`，取值范围[1, 15]，默认值为 15 | |
-| watermark                           | boolean | 否  | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false`                                                    | |
-| seed                                | integer | 否  | 随机数种子，取值范围为 [-1, 2147483647]，默认值为 -1                                                     | |
-| response_format                     | string  | 否  | 生成图像的返回格式，支`url`（链接在图片生成后24小时内有效，请及时下载图片）`base64_json`                                   | |
+| 参数 | 类型 | 必填 | 说明 |  |
+| --- | --- | --- | --- | --- |
+| sequential\_image\_generation | string | 否 | 控制是否关闭组图功能 |  |
+| sequential\_image\_generation\_options | object | 否 | 组图功能配置，仅当 `sequential_image_generation` 为 `auto` 时生效。目前支`max_images`，取值范围\[1, 15\]，默认值为 15 |  |
+| watermark | boolean | 否 | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |  |
+| seed | integer | 否 | 随机数种子，取值范围为 \[-1, 2147483647\]，默认值为 -1 |  |
+| response\_format | string | 否 | 生成图像的返回格式，支`url`（链接在图片生成后24小时内有效，请及时下载图片）`base64_json` |  |
 
 <Tip>
-  实际可生成的图片数量，除受到 `max_images` 影响外，还受到输入的参考图数量影响。输入的参考图数量+最终生成的图片数量 ≤ 15 张。
+  实际可生成的图片数量，除受到 `max_images` 影响外，还受到输入的参考图数量影响。输入的参考图数量\+最终生成的图片数量 ≤ 15 张。
 </Tip>
 
 ## 使用示例
@@ -144,7 +148,6 @@ curl https://aihubmix.com/v1/models/openai/gpt-image-1.5/predictions \
   }
 }'
 ```
-
 
 ```shellscript 图生图
 curl https://aihubmix.com/v1/models/openai/gpt-image-1/predictions \
@@ -202,7 +205,6 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
   }'
 ```
 
-
 ```shellscript Qwen-Image-Edit
 curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
     -H "Content-Type: application/json" \
@@ -241,7 +243,6 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-0/predictions \
   }'
 ```
 
-
 ```shellscript 图生图
 curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
   -H "Content-Type: application/json" \
@@ -256,7 +257,6 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
     }
   }'
 ```
-
 
 ```shellscript 多图融合
 curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
@@ -273,7 +273,6 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
     }
   }'
 ```
-
 
 ```shellscript 多参考图生组图
 curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
@@ -337,7 +336,6 @@ curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
 }'
 ```
 
-
 ```shell 图生图
 curl https://aihubmix.com/v1/models/bfl/flux-kontext-max/predictions \
     -H "Content-Type: application/json" \
@@ -378,7 +376,7 @@ curl https://api.aihubmix.com/v1/tasks/<taskId> \
 ### Ideogram V3
 
 <Note>
-  1. V3 以下版本（V_2、V_1 等）为旧接口，暂不支持
+  1. V3 以下版本（V\_2、V\_1 等）为旧接口，暂不支持
   2. 返回的链接需要打开代理网络才能获取
 </Note>
 
@@ -418,7 +416,6 @@ curl https://aihubmix.com/v1/models/qianfan/irag-1.0/predictions\
     }
   }'
 ```
-
 
 ```bash ERNIE iRAG Edit
 curl https://aihubmix.com/v1/models/qianfan/ernie-irag-edit/predictions \

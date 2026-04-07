@@ -10,8 +10,6 @@
   "contextual": {
     "options": [
       "copy",
-      "chatgpt",
-      "claude",
       "perplexity"
     ]
   },
