@@ -1,0 +1,133 @@
+---
+title: "Hermes Agent 使用 AIHubmix 接口指南"
+---
+
+Hermes Agent 是 Nous Research 推出的开源 **self-improving AI 智能体**，它会自主学习、持续进化，并拥有持久记忆系统。
+
+<Frame>
+  ![Image](/images/image-4.png)
+</Frame>
+
+# 快速开始
+
+## Step 1: 安装 Hermes
+
+打开终端，执行以下命令：
+
+### Linux / macOS / WSL2
+
+```text
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+### Android / Termux
+
+```text
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+> **不支持**原生 Windows 系统，请安装[<u>WSL2</u>](https://learn.microsoft.com/en-us/windows/wsl/install)并从 WSL2 中运行 Hermes Agent。
+
+## Step2：选择供应商
+
+安装成功后，选择 Quick setup -\> More providers -\> Custom endpoint。
+
+<Frame>
+  <img
+    src="/images/image-5.png"
+    alt="Image"
+    title="Image"
+    style={{ width:"95%" }}
+  />
+
+  <Frame>
+    <img
+      src="/images/image-7.png"
+      alt="Image"
+      title="Image"
+      style={{ width:"97%" }}
+    />
+  </Frame>
+
+  <img
+    src="/images/image-12.png"
+    alt="Image"
+    title="Image"
+    style={{ width:"96%" }}
+  />
+</Frame>
+
+## Step3：配置 AIHubMix 参数
+
+1. 输入 API base URL ：`https://aihubmix.com/v1`。
+2. 输入 [AIHUBMIX\_API\_KEY](https://console.aihubmix.com/token)：sk-\*\*\*。
+   <Frame>
+     <img
+       src="/images/image-22.png"
+       alt="Image"
+       title="Image"
+     />
+   </Frame>
+3. 输入模型编号，选择需要使用的模型。
+
+<Frame>
+  ![Image](/images/image-16.png)
+</Frame>
+
+## Step 4：设置消息平台
+
+按需设置消息平台（使用 Skip 作为参考）-\> 是否需要运行（选择 Y）
+
+<Frame>
+  ![Image](/images/image-17.png)
+</Frame>
+
+<Frame>
+  ![Image](/images/image-18.png)
+</Frame>
+
+## Step 5：运行测试
+
+1. 在终端输入 `hermes`，进入 Hermes Agent 交互页面。
+   <Frame>
+     ![Image](/images/image-23.png)
+   </Frame>
+2. 在对话框中输入内容，若模型正常响应，则代表安装成功。
+
+<Frame>
+  ![Image](/images/image-20.png)
+</Frame>
+
+# 常用指令
+
+代码块
+
+```text
+hermes model          # 选择模型供应商
+hermes tools          # 配置要启动的工具
+hermes gateway setup  # 设置消息平台
+hermes config set     # 设置各个配置参数
+hermes setup          # 运行完整设置向导，一次性配置所有内容
+```
+
+# Hermes 进化仪表盘
+
+为了让 **Hermes Agent** 的自进化过程清晰可见，AIHubMix 发布了配套的“养马”神器——**Hermes 进化仪表盘**。
+
+它将枯燥的 `~/.hermes/` 目录，转化为一棵具备生命张力的“进化树”。
+
+在这套系统里：
+
+✅ **视觉进化**：基于 D3.js 实时观察 Agent 的成长轨迹——技能如新叶绽放，记忆使树干变粗，并可动态追踪技能源码与健康度。
+
+✅ **全局视角**：Token 趋势、模型成本、工具分布全透明。配合活跃度热力图，支持多维度的运行数据分析。
+
+✅ **极致克制**：**纯只读设计**。在不触动核心配置的前提下，直观把控记忆容量与检索优先级，提供跨对话全文搜索的满格掌控感。
+
+这是一场关于“可视化智能”的实验，也是我们献给 Agent 开发者社区的礼物。
+
+🔗 **访问 GitHub 获取源码：**[https://github.com/AIhubmix/hermes-dashboard](https://github.com/AIhubmix/hermes-dashboard)
+
+<Frame>
+  ![Image](/images/image-21.png)
+</Frame>
