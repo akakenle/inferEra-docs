@@ -27,11 +27,11 @@
                 "pages": [
                   "cn/index",
                   "cn/quick-start",
+                  "cn/api/hermes-agent-ai-hubmix",
                   "cn/api/OpenClaw",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
-                  "cn/api/Data-Pravicy",
-                  "cn/api/hermes-agent-ai-hubmix"
+                  "cn/api/Data-Pravicy"
                 ]
               },
               {
