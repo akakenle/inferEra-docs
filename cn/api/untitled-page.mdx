@@ -1,0 +1,34 @@
+---
+title: "👾OpenAI 与 Grok 模型请求封号说明"
+---
+
+## **封控说明**
+
+- **AiHubmix 不做内容审查**：平台本身不会对内容做任何停留和审查，所有违规判断标准由 OpenAI 官方决定。
+- **封控来源：**目前 OpenAI 和 Grok 模型的封控来自模型厂商自身（OpenAI/Grok 团队）。Azure 的高级账户已主动关闭额外的 content filter，因此不存在微软层面的额外拦截。
+- **封号风险与规避：**目前会触发封号风险的模型主要是 OpenAI 和 Grok。为规避风险，推荐在请求前使用 AiHubmix 集成的 OpenAI 官方审核接口进行内容预检，详见：[https://docs.aihubmix.com/cn/api/moderation](https://docs.aihubmix.com/cn/api/moderation) 本接口适合做保守的预检——被它判违规的内容强烈不建议提交，这个违规接口的严格程度是比官方会触发封号的违规报错要严格一些。
+- 平台立场：AIHubmix 不希望任何用户被封号。用户频繁触发封号，不仅影响自身使用，还会对 AIHubmix 全平台的账号健康度产生负面影响，甚至可能导致平台级别的风控升级。因此，我们强烈建议用户遵守合规规范，主动做好内容预检，这既是对自己账号的保护，也是对平台整体稳定性的维护。
+
+## **会触发封号的接口返回的报错如下**
+
+当您的提示词触发平台安全机制时，可能会收到以下错误信息：
+
+| English Error Message | 中文翻译 |
+| --- | --- |
+| Invalid prompt: your prompt was flagged as potentially violating our usage policy | 无效提示词：您的提示词被标记为可能违反我们的使用政策 |
+| Your request was rejected by the safety system. | 您的请求被安全系统拒绝。 |
+| Content violates usage guidelines | 内容违反使用准则 |
+| Invalid prompt: we've limited access to this content for safety reasons. This type of information may be used to benefit or to harm people. | 无效提示词：出于安全考虑，我们已限制对此内容的访问。此类信息可能被用于造福或伤害他人。 |
+| Your request was rejected as a result of our safety system. | 由于我们的安全系统，您的请求被拒绝。 |
+| Your request was rejected as a result of our safety system. The revised prompt may contain text that is not allowed by our safety system. | 由于我们的安全系统，您的请求被拒绝。修改后的提示词可能包含安全系统不允许的文本。 |
+| The response was filtered due to the prompt triggering Azure OpenAI's content management policy. Please modify your prompt and retry. | 由于提示词触发了 Azure OpenAI 的内容管理策略，响应被过滤。请修改您的提示词后重试。 |
+| The model produced invalid content. Consider modifying your prompt if you are seeing this error persistently | 模型生成了无效内容。如果您持续看到此错误，请考虑修改您的提示词。 |
+| System detected potentially unsafe or sensitive content in input or generation. Please avoid using prompts that may generate sensitive content. Thank you for your cooperation | 系统在输入或生成内容中检测到潜在不安全或敏感内容。请避免使用可能生成敏感内容的提示词。感谢您的配合。 |
+
+说明：当您收到此类错误时，表示请求内容已触发安全机制。建议立即停止当前请求模式，检查输入内容，并使用审核接口进行预检。
+
+## 账户被禁用时如何处理？
+
+若账户出现禁用情况，可联系在线客服或发送邮件至 [feedback@aihubmix.com](feedback@aihubmix.com) 申请处理或解封。
+
+更多高频问题请查阅 [https://docs.aihubmix.com/cn/FAQs/Faq](https://docs.aihubmix.com/cn/FAQs/Faq)
