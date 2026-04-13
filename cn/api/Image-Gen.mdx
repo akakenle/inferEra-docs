@@ -25,10 +25,25 @@ icon: "palette"
 - [imagen-4.0-fast-generate-preview-06-06](https://aihubmix.com/model/imagen-4.0-fast-generate-preview-06-06)
 - [imagen-3.0-generate-002](https://aihubmix.com/model/imagen-3.0-generate-002)
 
-### Qwen 模型
+### 阿里云模型
 
-- [qwen-image](https://aihubmix.com/model/qwen-image) —— Qwen 系列中的一个图像生成基础模型，在复杂文本渲染和精确图像编辑方面取得了显著进展。
-- [qwen-image-edit](https://aihubmix.com/model/qwen-image-edit) —— Qwen 图像编辑模型。
+#### Wan（万相）系列
+
+- [wan2.7-image-pro](https://aihubmix.com/model/wan2.7-image-pro) —— 万相 2.7 专业版，支持思考模式与最高 4K 分辨率
+- [wan2.7-image](https://aihubmix.com/model/wan2.7-image) —— 万相 2.7 标准版，最高支持 2K 分辨率
+- [wan2.6-t2i](https://aihubmix.com/model/wan2.6-t2i) —— 万相 2.6 文生图
+
+#### Qwen-Image（千问图像）系列
+
+- [qwen-image](https://aihubmix.com/model/qwen-image) —— 图像生成基础模型，在复杂文本渲染和精确图像编辑方面取得了显著进展
+- [qwen-image-edit](https://aihubmix.com/model/qwen-image-edit) —— 图像编辑模型，单图编辑和多图融合
+- [qwen-image-2.0-pro](https://aihubmix.com/model/qwen-image-2.0-pro) —— 2.0 专业版，文字渲染和语义理解更强，同时支持图片编辑
+- [qwen-image-2.0](https://aihubmix.com/model/qwen-image-2.0) —— 2.0 加速版，兼顾质量和速度，同时支持图片编辑
+- [qwen-image-max](https://aihubmix.com/model/qwen-image-max) —— Max 版，擅长工业设计和几何推理
+- [qwen-image-plus](https://aihubmix.com/model/qwen-image-plus) —— Plus 版，支持多图和自定义分辨率
+- [qwen-image-edit-plus](https://aihubmix.com/model/qwen-image-edit-plus) —— 编辑 Plus 版，支持多输出和自定义分辨率
+- [qwen-image-edit-max](https://aihubmix.com/model/qwen-image-edit-max) —— 编辑 Max 版，擅长工业设计和几何推理
+
 
 ### GLM 模型
 
@@ -68,6 +83,29 @@ POST https://aihubmix.com/v1/models/<model_path>/predictions
 <Tip>
   \<model\_path\> 为\<供应商/模型id\>，如\<openai/gpt-image-1.5\>，\<qianfan/qwen-image\>。
 </Tip>
+
+### 其他请求地址（百炼模型）
+
+**文生图**
+
+```shellscript
+POST https://aihubmix.com/v1/images/generations
+```
+
+<Tip>
+  请求体为 JSON 格式。
+</Tip>
+
+**图片编辑**
+
+```shellscript
+POST https://aihubmix.com/v1/images/edits
+```
+
+<Tip>
+  请求体为 multipart/form-data 格式。
+</Tip>
+
 
 ### 请求头
 
@@ -126,12 +164,56 @@ Content-Type: application/json
   `prompt_upsampling`、`safety_tolerance`、`seed` 需放在请求体的 `extra_body` 字段内传递。
 </Tip>
 
-#### Qwen 模型参数
+#### 阿里云模型参数
+
+阿里云模型支持两种调用方式：OpenAI 兼容接口和 zimage 原生接口。
+
+**OpenAI 兼容接口 — 标准参数**
+
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| model | string | 是 | - | 模型名称 |
+| prompt | string | 是 | - | 图像描述提示词，最长 800 字符 |
+| n | integer | 否 | 1 | 生成图片数量，取值范围因模型而异 |
+| size | string | 否 | 1024x1024 | 图片尺寸，格式 `宽x高` |
+| response_format | string | 否 | url | 返回格式：`url` 或 `b64_json` |
+
+**OpenAI 兼容接口 — 扩展参数（与 `model`、`prompt` 同级传递）**
+
+| 参数 | 类型 | 默认值 | 支持模型 | 说明 |
+| --- | --- | --- | --- | --- |
+| thinking_mode | boolean | true | wan2.7 系列 | 思考模式，提升生成质量，增加耗时约 10-30s |
+| negative_prompt | string | - | qwen-image 系列、wan2.6 | 反向提示词，最长 500 字符。wan2.7 系列请在 prompt 中使用「不要出现 XX」 |
+| prompt_extend | boolean | true | qwen-image 系列、wan2.6 | 提示词智能改写，wan2.7 系列不支持 |
+| seed | integer | 随机 | 全部 | 随机种子，范围 `0`-`2147483647` |
+| watermark | boolean | false | 全部 | 是否添加水印 |
+
+**zimage 原生接口参数（位于 `input` 对象内）**
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| watermark | boolean | 否 | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |
-| seed | integer | 否 | 随机数种子，取值范围`[0,2147483647]` |
+| prompt | string | 是 | 图像描述或编辑指令，最长 800 字符 |
+| images | string[] | 否 | 图片 URL 或 base64 数组（1-3 张），有值时为图片编辑模式 |
+| n | integer | 否 | 生成图片数量，取值范围因模型而异 |
+| size | string | 否 | 输出分辨率，格式为 `宽*高` 或缩写 `1K`/`2K`/`4K` |
+| seed | integer | 否 | 随机种子，范围 `0`-`2147483647` |
+| negative_prompt | string | 否 | 反向提示词，最长 500 字符，wan2.7 系列不支持 |
+| prompt_extend | boolean | 否 | 提示词智能改写，默认 `true`，wan2.7 系列不支持 |
+| thinking_mode | boolean | 否 | 思考模式，仅 wan2.7 系列，默认 `true` |
+| watermark | boolean | 否 | 是否添加水印，默认 `false` |
+| color_palette | array | 否 | 自定义颜色主题，含 3-10 个颜色对象，仅 wan2.7 系列支持 |
+
+**各模型 `n` 和 `size` 取值范围**
+
+| 模型 | n 范围 | size 范围 | 默认 size |
+| --- | --- | --- | --- |
+| wan2.7-image-pro | 1（组图模式 1-12） | `1K`/`2K`/`4K`；自定义每边 768-4096px，宽高比 1:8~8:1 | 2K |
+| wan2.7-image | 1（组图模式 1-12） | `1K`/`2K`；自定义每边 768-2048px，宽高比 1:8~8:1 | 2K |
+| wan2.6-t2i | 1-4 | 自定义每边 1280-1440px，宽高比 1:4~4:1 | 1280x1280 |
+| qwen-image-2.0-pro / qwen-image-2.0 | 1-6 | 自定义每边 512-2048px，总像素 ≤ 2048×2048 | 2048x2048 |
+| qwen-image-max / qwen-image-plus | 1-6 | 5 种固定规格：`1664x928`、`1472x1104`、`1328x1328`、`1104x1472`、`928x1664` | 1664x928 |
+| qwen-image-edit | 固定 1 | 不可指定，由模型自动决定 | - |
+| qwen-image-edit-plus / qwen-image-edit-max | 1-6 | 自定义每边 512-2048px | 约 1024x1024 |
 
 #### GLM 模型参数
 
@@ -213,39 +295,71 @@ curl https://aihubmix.com/v1/models/google/imagen-4.0-fast-generate-001/predicti
 
 </CodeGroup>
 
-### Qwen
+### 阿里云模型
+
+<Note>
+  - 支持两种调用方式：OpenAI 兼容接口（`/v1/images/generations` 和 `/v1/images/edits`）和 zimage 原生接口（`/v1/models/bailian/:model/predictions`）
+  - zimage 接口 `size` 格式为 `宽*高`（如 `1024*1024`），OpenAI 兼容接口使用 `宽x高`（如 `1024x1024`），系统自动转换
+  - zimage 响应格式为 `{"output": [{"url": "..."}]}`，OpenAI 兼容接口为 `{"data": [{"url": "..."}]}`
+  - 返回的图片 URL 有效期 24 小时，请及时下载保存
+</Note>
 
 <CodeGroup>
 
-```shellscript Qwen-Image
-curl https://aihubmix.com/v1/models/qianfan/qwen-image/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
+```shellscript OpenAI兼容-文生图
+curl https://aihubmix.com/v1/images/generations \
+  -H "Authorization: Bearer sk-***" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "wan2.7-image-pro",
+    "prompt": "一座古色古香的中国风小桥，水墨画风格",
+    "n": 1,
+    "size": "1024x1024",
+    "thinking_mode": true,
+    "seed": 42
+  }'
+```
+
+```shellscript OpenAI兼容-图片编辑
+curl https://aihubmix.com/v1/images/edits \
+  -H "Authorization: Bearer sk-***" \
+  -F "model=qwen-image-edit-plus" \
+  -F "prompt=把背景换成蓝天白云" \
+  -F "image=@/path/to/photo.png" \
+  -F "n=1" \
+  -F "size=1024x1024" \
+  -F "seed=42" \
+  -F "watermark=false"
+```
+
+```shellscript zimage-文生图
+curl https://aihubmix.com/v1/models/bailian/wan2.7-image-pro/predictions \
+  -H "Authorization: Bearer sk-***" \
+  -H "Content-Type: application/json" \
   -d '{
     "input": {
-      "prompt": "A beautiful sunset over a calm ocean",
-      "refer_image": "",
+      "prompt": "一座古色古香的中国风小桥，水墨画风格",
       "n": 1,
-      "size": "1024x1024",
-      "watermark": false
+      "size": "2K",
+      "thinking_mode": true,
+      "seed": 42
     }
   }'
 ```
 
-```shellscript Qwen-Image-Edit
-curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer sk-***" \
-    -d '{
-  "input": {
-    "prompt": "让这只熊坐在月亮下（用白色背景上的浅灰弯月轮廓表示），抱着吉他，周围漂浮着小星星和诗句气泡，如“Be Kind”。",
-    "image": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/4766809571/p999719.png"，
-    "n": 1,
-    "size": "1024x1024",
-    "watermark": false,
-    "seed":0
-  }
-}'
+```shellscript zimage-图片编辑
+curl https://aihubmix.com/v1/models/bailian/qwen-image-edit-plus/predictions \
+  -H "Authorization: Bearer sk-***" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": {
+      "prompt": "把背景换成蓝天白云",
+      "images": ["https://example.com/photo.png"],
+      "n": 1,
+      "size": "1024*1024",
+      "watermark": false
+    }
+  }'
 ```
 
 </CodeGroup>
