@@ -5,7 +5,7 @@ icon: "palette"
 ---
 
 ## 可用模型列表
- 
+
 <Tip>
   Nano  Banana 系列请参考：[https://docs.aihubmix.com/cn/api/Gemini-Guides](https://docs.aihubmix.com/cn/api/Gemini-Guides)
 </Tip>
@@ -44,7 +44,6 @@ icon: "palette"
 - [qwen-image-edit-plus](https://aihubmix.com/model/qwen-image-edit-plus) —— 编辑 Plus 版，支持多输出和自定义分辨率
 - [qwen-image-edit-max](https://aihubmix.com/model/qwen-image-edit-max) —— 编辑 Max 版，擅长工业设计和几何推理
 
-
 ### GLM 模型
 
 - [glm-image](https://aihubmix.com/model/glm-image) —— 智谱 AI 发布的图像生成模型，支持高清（hd）和标准（standard）两种质量模式。
@@ -56,7 +55,6 @@ icon: "palette"
 - [doubao-seedream-4-0](https://aihubmix.com/model/doubao-seedream-4-0) —— 字节跳动SOTA级多模态图像创作模型，支持多图融合创作、图像编辑、组图生成等多样玩法。
 
 ### Flux 模型
-
 
 - [flux-2-flex ](https://aihubmix.com/model/flux-2-flex)—— 专为真实世界的创意生产工作流打造，在生成高质量图像的同时，能够保持多参考图之间的角色与风格一致性。
 - [flux-2-pro ](https://aihubmix.com/model/flux-2-pro)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
@@ -74,7 +72,7 @@ icon: "palette"
 
 ## API 接口
 
-### 请求地址
+### zimage 接口
 
 ```shellscript
 
@@ -85,7 +83,7 @@ POST https://aihubmix.com/v1/models/<model_path>/predictions
   \<model\_path\> 为\<供应商/模型id\>，如\<openai/gpt-image-1.5\>，\<qianfan/qwen-image\>。
 </Tip>
 
-### 其他请求地址（百炼模型）
+### openai 兼容接口
 
 **文生图**
 
@@ -168,15 +166,15 @@ Content-Type: application/json
 | prompt | string | 是 | - | 图像描述提示词，最长 800 字符 |
 | n | integer | 否 | 1 | 生成图片数量，取值范围因模型而异 |
 | size | string | 否 | 1024x1024 | 图片尺寸，格式 `宽x高` |
-| response_format | string | 否 | url | 返回格式：`url` 或 `b64_json` |
+| response\_format | string | 否 | url | 返回格式：`url` 或 `b64_json` |
 
 **OpenAI 兼容接口 — 扩展参数（与 `model`、`prompt` 同级传递）**
 
 | 参数 | 类型 | 默认值 | 支持模型 | 说明 |
 | --- | --- | --- | --- | --- |
-| thinking_mode | boolean | true | wan2.7 系列 | 思考模式，提升生成质量，增加耗时约 10-30s |
-| negative_prompt | string | - | qwen-image 系列、wan2.6 | 反向提示词，最长 500 字符。wan2.7 系列请在 prompt 中使用「不要出现 XX」 |
-| prompt_extend | boolean | true | qwen-image 系列、wan2.6 | 提示词智能改写，wan2.7 系列不支持 |
+| thinking\_mode | boolean | true | wan2.7 系列 | 思考模式，提升生成质量，增加耗时约 10-30s |
+| negative\_prompt | string | - | qwen-image 系列、wan2.6 | 反向提示词，最长 500 字符。wan2.7 系列请在 prompt 中使用「不要出现 XX」 |
+| prompt\_extend | boolean | true | qwen-image 系列、wan2.6 | 提示词智能改写，wan2.7 系列不支持 |
 | seed | integer | 随机 | 全部 | 随机种子，范围 `0`-`2147483647` |
 | watermark | boolean | false | 全部 | 是否添加水印 |
 
@@ -185,15 +183,15 @@ Content-Type: application/json
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | prompt | string | 是 | 图像描述或编辑指令，最长 800 字符 |
-| images | string[] | 否 | 图片 URL 或 base64 数组（1-3 张），有值时为图片编辑模式 |
+| images | string\[\] | 否 | 图片 URL 或 base64 数组（1-3 张），有值时为图片编辑模式 |
 | n | integer | 否 | 生成图片数量，取值范围因模型而异 |
 | size | string | 否 | 输出分辨率，格式为 `宽*高` 或缩写 `1K`/`2K`/`4K` |
 | seed | integer | 否 | 随机种子，范围 `0`-`2147483647` |
-| negative_prompt | string | 否 | 反向提示词，最长 500 字符，wan2.7 系列不支持 |
-| prompt_extend | boolean | 否 | 提示词智能改写，默认 `true`，wan2.7 系列不支持 |
-| thinking_mode | boolean | 否 | 思考模式，仅 wan2.7 系列，默认 `true` |
+| negative\_prompt | string | 否 | 反向提示词，最长 500 字符，wan2.7 系列不支持 |
+| prompt\_extend | boolean | 否 | 提示词智能改写，默认 `true`，wan2.7 系列不支持 |
+| thinking\_mode | boolean | 否 | 思考模式，仅 wan2.7 系列，默认 `true` |
 | watermark | boolean | 否 | 是否添加水印，默认 `false` |
-| color_palette | array | 否 | 自定义颜色主题，含 3-10 个颜色对象，仅 wan2.7 系列支持 |
+| color\_palette | array | 否 | 自定义颜色主题，含 3-10 个颜色对象，仅 wan2.7 系列支持 |
 
 **各模型 `n` 和 `size` 取值范围**
 
@@ -450,7 +448,7 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
 <Note>
   - `flux-2-flex` 和 `flux-2-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
   - `FLUX.1-Kontext-pro` 使用通用接口，一步到位
-  - `FLUX-1.1-pro` 等 Azure 渠道 BFL 模型均为一步绘图，非异步
+  - Azure 渠道的`FLUX-1.1-pro` 等 BFL 模型均为同步绘图，而非异步。
 </Note>
 
 #### **FLUX 一步绘图**
