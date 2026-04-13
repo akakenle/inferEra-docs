@@ -30,6 +30,10 @@ icon: "palette"
 - [qwen-image](https://aihubmix.com/model/qwen-image) —— Qwen 系列中的一个图像生成基础模型，在复杂文本渲染和精确图像编辑方面取得了显著进展。
 - [qwen-image-edit](https://aihubmix.com/model/qwen-image-edit) —— Qwen 图像编辑模型。
 
+### GLM 模型
+
+- [glm-image](https://aihubmix.com/model/glm-image) —— 智谱 AI 发布的图像生成模型，支持高清（hd）和标准（standard）两种质量模式。
+
 ### Doubao 模型
 
 - [doubao-seedream-5.0-lite](https://aihubmix.com/model/doubao-seedream-5.0-lite) —— 字节跳动发布的最新图像创作模型，该模型首次搭载联网检索功能，能融合实时网络信息，提升生图时效性。
@@ -39,8 +43,9 @@ icon: "palette"
 ### Flux 模型
 
 - [flux-2-flex ](https://aihubmix.com/model/flux-2-flex)—— 专为真实世界的创意生产工作流打造，在生成高质量图像的同时，能够保持多参考图之间的角色与风格一致性。
-- [flux-2-pro ](https://aihubmix.com/model/flux-2-flex)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
-- [FLUX.1-Kontext-pro](FLUX.1-Kontext-pro) ——  黑森林实验室研发的多模态流匹配模型，既支持文本到图像的生成，又支持在上下文中进行图像编辑。
+- [flux-2-pro ](https://aihubmix.com/model/flux-2-pro)—— 黑森林实验室研发的图片生成与编辑模型，支持复杂文本的读写。
+- [FLUX.1-Kontext-pro](https://aihubmix.com/model/FLUX.1-Kontext-pro) ——  黑森林实验室研发的多模态流匹配模型，既支持文本到图像的生成，又支持在上下文中进行图像编辑。
+- [FLUX-1.1-pro](https://aihubmix.com/model/FLUX-1.1-pro) —— 黑森林实验室研发的图片生成模型，通过 Azure 渠道提供，支持一步绘图。
 
 ### iRAG 模型
 
@@ -106,12 +111,34 @@ Content-Type: application/json
 | seed | integer | 否 | 随机数种子 |
 | raw | boolean | 否 | 是否启用原始模式，获得更自然的视觉效果，默认`false` |
 
+#### FLUX-1.1-pro 模型参数
+
+| 参数 | 类型 | 默认值 | 必填 | 说明 |
+| --- | --- | --- | --- | --- |
+| prompt | string | - | 是 | 图像的文本描述 |
+| size | string | 1024x1024 | 否 | 图像尺寸（像素） |
+| prompt\_upsampling | boolean | false | 否 | 是否对提示词进行增强优化以获得更好的效果 |
+| seed | integer | null | 否 | 随机数种子，用于结果复现，可填任意整数 |
+| safety\_tolerance | integer | 2 | 否 | 内容审核级别，范围 0（最严格）到 6（最宽松） |
+| output\_format | string | jpeg | 否 | 输出图片格式，支持 `jpeg` 和 `png` |
+
+<Tip>
+  `prompt_upsampling`、`safety_tolerance`、`seed` 需放在请求体的 `extra_body` 字段内传递。
+</Tip>
+
 #### Qwen 模型参数
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | watermark | boolean | 否 | 是否在生成的图片中添加水印，支持 `true` （默认）和 `false` |
 | seed | integer | 否 | 随机数种子，取值范围`[0,2147483647]` |
+
+#### GLM 模型参数
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| quality | string | 否 | 渲染质量，支持 `hd`（默认，细节更丰富，约 20 秒）和 `standard`（生成更快，约 5-10 秒） |
+| size | string | 否 | 图像尺寸，默认 `1280x1280`。推荐值：`1280x1280`、`1568x1056`、`1056x1568`、`1472x1088`、`1088x1472`、`1728x960`、`960x1728`。自定义尺寸要求：宽高均在 1024px–2048px 之间，必须能被 32 整除，且总像素不超过 2²² px |
 
 #### Doubao 模型参数
 
@@ -223,6 +250,25 @@ curl https://aihubmix.com/v1/models/qianfan/qwen-image-edit/predictions \
 
 </CodeGroup>
 
+### GLM
+
+<CodeGroup>
+
+```shellscript glm-image
+curl https://aihubmix.com/v1/models/openai/glm-image/predictions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer sk-***" \
+    -d '{
+  "input": {
+    "prompt": "A deer drinking in the lake, Sakura petals falling, green and clean water, japanese temple, dappled sunlight, cinematic lighting, expansive view, peace",
+    "size": "1024x1024",
+    "quality": "hd"
+  }
+}'
+```
+
+</CodeGroup>
+
 ### Doubao
 
 <CodeGroup>
@@ -300,6 +346,7 @@ curl https://aihubmix.com/v1/models/doubao/doubao-seedream-4-5/predictions \
 <Note>
   - `flux-2-flex` 和 `flux-2-pro` 为异步端口，需要分 2 步请求。该系列速度极快，几乎秒出。
   - `FLUX.1-Kontext-pro` 使用通用接口，一步到位
+  - `FLUX-1.1-pro` 等 Azure 渠道 BFL 模型均为一步绘图，非异步
 </Note>
 
 #### **FLUX 一步绘图**
@@ -315,6 +362,24 @@ curl https://aihubmix.com/v1/images/generations \
 }' \
 | jq -r '.data[0].b64_json' \
 | base64 -D > "$HOME/Desktop/image_extract.png"
+```
+
+```shellscript FLUX-1.1-pro
+curl https://aihubmix.com/v1/models/bfl/FLUX-1.1-pro/predictions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-***" \
+  -d '{
+    "input": {
+      "prompt": "A serene deer drinking from a crystal-clear lake, sakura petals gently falling, traditional Japanese temple in the background, warm dappled sunlight, cinematic lighting, ultra-wide composition, peaceful atmosphere, highly detailed",
+      "size": "1024x1024",
+      "output_format": "jpeg",
+      "extra_body": {
+        "prompt_upsampling": true,
+        "safety_tolerance": 6,
+        "seed": 1
+      }
+    }
+  }'
 ```
 
 #### **Flux 异步绘图**
