@@ -38,6 +38,7 @@
                 "group": "API",
                 "pages": [
                   "cn/api/Aihubmix-Integration",
+                  "cn/api/unified-inference",
                   "cn/api/vision",
                   "cn/api/LLM-Search",
                   "cn/api/Image-Gen",

@@ -1,0 +1,1587 @@
+---
+title: "AIHubMix 统一推理适配规范"
+icon: "face-glasses"
+---
+
+为了简化不同模型供应商（OpenAI, Anthropic, Google, DeepSeek 等）对推理/思考过程的处理逻辑，AIHubMix 现已对接**统一推理参数规范**。开发者可以通过一套标准接口控制模型的思考强度并获取详细的推理链路，控制 claude、Gemini、glm-5、minimax、等模型的思考开关及强度。
+
+# 渠道与模型兼容性列表 (OpenAI API 兼容)
+
+AIHubMix 已深度适配以下主流渠道。所有模型均支持通过标准 OpenAI SDK 调用，并已完成推理令牌（Reasoning Tokens）的标准化下发。
+
+                                                          <kbd>已验证渠道与模型对照表</kbd>
+
+| **渠道供应商** | **支持模型 ID** | **特色支持** | **状态** |
+| :-- | :-- | :-- | :-- |
+| **字节跳动 (豆包)** | doubao-seed-2-0-lite-260215 | 最新 2.0 种子模型 | ✅ |
+| **小米 (Xiaomi)** | xiaomi-mimo-v2-pro, xiaomi-mimo-v2-omni | 智能家居/多模态优化 | ✅ |
+| **DeepSeek** | deepseek-chat, deepseek-coder | 官方原生 API 适配 | ✅ |
+| **SiliconFlow (硅基流动)** | sf-kimi-k2-thinking, siliconflow-qwen3-235b-a22b, siliconflow-deepseek-v3.2, sf-qwen3.5-4b | **深度思考型 (Reasoning)** | ✅ |
+| **百度 (Baidu)** | baidu-glm-5, baidu-deepseek-v3.2, baidu-deepseek-v3.2-think, baidu-kimi-k2.5, ernie-5.0-thinking-preview | 文心一言 & 推理预览版 | ✅ |
+| **MiniMax** | mm-minimax-m2.5 | 角色扮演与上下文优化 | ✅ |
+| **阿里 (AliCloud)** | alicloud-qwen3.5-397b-a17b, alicloud-minimax-m2.5, alicloud-glm-5, alicloud-kimi-k2.5, alicloud-deepseek-v3.2, alicloud-qwen3-235b-a22b | 全系列通义千问与第三方分发 | ✅ |
+| **算能平台 (SophNet)** | sophnet-qwen3.5-397b-a17b, sophnet-minimax-m2.5, sophnet-glm-5, sophnet-kimi-k2.5, sophnet-deepseek-v3.2, s-kimi-k2-thinking | 高性价比推理集群 | ✅ |
+| **DeepInfra** | deepinfra-glm-5 | 国际化模型分发 | ✅ |
+
+# **供应商渠道类型映射**
+
+## 已适配渠道映射表
+
+由于不同供应商对推理参数（Reasoning Tokens）的实现协议各异，AIHubMix 现已针对各大主流渠道进行了专项适配。**请务必根据实际供应商选择对应的渠道类型**。如果使用通用的“OpenAI”类型配置非 OpenAI 原厂渠道，推理相关的开关与强度参数将无法生效。
+
+| **实际供应商 (Upstream)** | **建议选择的“渠道类型”** | **特别说明** |
+| :-- | :-- | :-- |
+| **Siliconflow (硅基流动)** | Siliconflow | 支持 Kimi/DeepSeek/Qwen 推理流 |
+| **Sophnet (算能平台)** | Sophnet | \[新增\] 针对算能集群优化 |
+| **阿里云百炼 (官网)** | 阿里云百炼OpenAI兼容 | \[新增\] 需配合百炼专用 API Key |
+| **Xiaomi (小米)** | Xiaomi MIMO | \[新增\] 支持 MIMO 官方推理协议 |
+| **字节跳动 (火山方舟)** | 字节跳动豆包 | 适配 Doubao-Seed 推理链路 |
+| **DeepSeek (官网)** | DeepSeek | 原生支持 reasoning\_content |
+| **MiniMax (官网)** | MiniMax | 适配 mm-minimax 系列推理 |
+| **智谱 AI** | 智谱ChatGLM | 支持 GLM-5 及以上推理模型 |
+| **百度文心千帆** | 百度文心千帆 | 适配 Ernie-Thinking 预览版 |
+| **DeepInfra** | OpenAI | 默认兼容，暂无需切换 |
+
+## 代理/分销渠道配置规范
+
+如果您使用的渠道是经过二次代理的（例如 `zeka-***` 或其他中转服务），请根据其**底层调用的实际供应商**进行配置：
+
+- **案例**：若 zeka 渠道最终转发至阿里百炼，则**必须**配置为 `阿里云百炼OpenAI兼容` 类型，否则 `reasoning` 参数将无法透传给底层模型。
+
+# **统一参数定义**
+
+## 开启思考`reasoning`
+
+reasoning可以通过以下方式设置：
+
+### （推荐）使用openai标准定义的reasoning\_effort参数：
+
+```text
+{
+  "model": "claude-sonnet-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an AI assistant"
+    },
+    {
+      "role": "user",
+      "content": "Hello?"
+    }
+  ],
+  "reasoning_effort": "low"
+}
+```
+
+reasoning\_effort的值包含：
+
+- none（推荐）：主动关闭思考（部分强制思考模型可能不生效，如minimax-m2.7等）
+- minimal：最小化思考，部分模型的效果是关闭思考
+- low（推荐）
+- medium（推荐）
+- high（推荐）
+- xhigh
+
+**对于可设置思考强度的模型**，reasoning\_effort有对应的映射关系：
+
+| **effort值** | **gpt** | **claude** | **gemini** | **doubao** |
+| :-- | :-- | :-- | :-- | :-- |
+| minimal | minimal | low | MINIMAL | minimal |
+| low | low | low | LOW | low |
+| medium | medium | medium | MEDIUM | medium |
+| high | high | high | HIGH | high |
+| xhigh | xhigh | max | HIGH | high |
+
+**对于只支持设置thinking budget的模型**，reasoning\_effort对应的计算规则为基于MaxOutputTokens，计算thinking budget的比例：
+
+- "xhigh": 0.95,
+- "high": 0.8,
+- "medium": 0.5,
+- "low": 0.2,
+- "minimal": 0.1,
+
+**对于只支持是否开启思考的模型/供应商**，例如deepseek、qwen、glm、kimi等，reasoning\_effort的效果只有两种：
+
+- none：关闭思考
+- 其他：开启思考
+
+### （不推荐）使用reasoning参数的effort：
+
+```text
+{
+  "model": "claude-sonnet-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an AI assistant"
+    },
+    {
+      "role": "user",
+      "content": "Hello?"
+    }
+  ],
+  "reasoning": {"effort": "low"}
+}
+```
+
+### （不推荐）使用reasoning参数的max\_tokens，精确控制thinking的最大token数：
+
+```text
+{
+  "model": "claude-sonnet-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an AI assistant"
+    },
+    {
+      "role": "user",
+      "content": "Hello?"
+    }
+  ],
+  "reasoning": {"max_tokens":1024}
+}
+```
+
+## 思考返回
+
+思考结果增加两个字段：
+
+- reasoning\_content：思考内容，格式为字符串。
+- reasoning\_details：思考原始信息，供多轮对话使用，保留思考内容提升模型效果，格式为结构体，除type为固定属性外，其他属性会随不同模型变化，但类型均为字符串。
+
+非流式返回示例：
+
+```text
+{
+  "id": "chatcmpl-msg_01RSXhFMjbZFadHbeV5wA8Qh",
+  "model": "claude-sonnet-4-5-20250929",
+  "object": "chat.completion",
+  "created": 1771840947,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Hello! How can I help you today?",
+        "reasoning_content": "The user is just saying \"Hello?\" - this is a simple greeting. I should respond in a friendly and welcoming manner, and let them know I'm here to help.",
+        "reasoning_details": {
+          "type": "thinking",
+          "thinking": "The user is just saying \"Hello?\" - this is a simple greeting. I should respond in a friendly and welcoming manner, and let them know I'm here to help.",
+          "signature": "Er8CCkYICxgCKkBbWyg5ZeExgqX80Bf5g/2pE/oiuJEhkKhFmMkqcAqeqvKNEIMMqfkY2qm12Vg7dcv+ZMg88VXQ9f8nVK65B9npEgxo8vfdPn1IZBFj0iAaDHnXh4Vk9Czek7MDyCIwOzmEvPUKfM2bg8kwSsxMxgyk6ZZQIUHfPzITEZzge3DH1hrg5DenhuSO8WwEeJpTKqYBnSxK/SP/UEOpiDRJd2gxhAVbxweRQu2qrQTV0E+1kt32KXyuJ2qsOi45gq0LoOX+e9utmXImadFTag+fZ7im1TLOAk5nAQ/yOG72T3SQt/WMFwI+szVmT9M2uc2FVyrpIwM8HyDaH+0mJ457en5SVu32kJdluyIGpcl9LLcqGfJdgV6O3DYsNFzuZYZ5h5VtjhXRXl600PySbNN55wIWzJJY0ECrxxgB"
+        }
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 44,
+    "completion_tokens": 56,
+    "total_tokens": 100,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+流式返回示例：
+
+```text
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"role":"assistant","content":"","reasoning_details":{"type":"thinking"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":"The user is greeting","reasoning_details":{"type":"thinking","thinking":"The user is greeting"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" me with","reasoning_details":{"type":"thinking","thinking":" me with"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" \"Hello?\". This is a simple","reasoning_details":{"type":"thinking","thinking":" \"Hello?\". This is a simple"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" greeting,","reasoning_details":{"type":"thinking","thinking":" greeting,"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" so I should respond in a friendly and","reasoning_details":{"type":"thinking","thinking":" so I should respond in a friendly and"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" helpful","reasoning_details":{"type":"thinking","thinking":" helpful"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" manner","reasoning_details":{"type":"thinking","thinking":" manner"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":". I'll","reasoning_details":{"type":"thinking","thinking":". I'll"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" gr","reasoning_details":{"type":"thinking","thinking":" gr"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":"eet them back and let","reasoning_details":{"type":"thinking","thinking":"eet them back and let"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" them know I'm here","reasoning_details":{"type":"thinking","thinking":" them know I'm here"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_content":" to help.","reasoning_details":{"type":"thinking","thinking":" to help."}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_details":{"type":"thinking"}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"","reasoning_details":{"type":"thinking","signature":"EtkCCkYICxgCKkA1InJ3Nd008PJgr4w3LT55M0niYdNg6kJdwXDU4PxzLMI9IYVJM4rDAsY+mXgK1TIY2+QRf1vzF98SN9anTQR4EgzXpyX2O9gMMWYaSDQaDDE2Owvd9BJdFiGTwSIwf+JRijgNbVCGLytiEKN6sc/BQ4Y5cKfMBQC7Bupy2w0AS8gCAZORRAjTqPw6JfTtKsABSTlAYhtWpx7QcgqlpYHzRx5Kklf6UElBMNMs/HBCqTDF7pn6gy08RWiJIUCyqyu7diubqeFgqnkNgg5Rw6FRSMW53zNca3o3IgxD7fgTpVM1LgRJ2lWYy5DiPrsN8Lpj6TdYlo2LRYlatlkGuOCvHIved68c9TIuhV31KOc9dvr6Apyv2SsIrzDDzGFyYqgTHh8YVyWzeHG+XPKOih6s4wHZ5DpyNdXdPq5Af6txC00UnbY7axTQ3ElA3oBAT/9/GAE="}}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"role":"assistant","content":""}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":"Hello! How can"}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":" I help you today?"}}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"chat.completion.chunk","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[{"index":0,"delta":{"content":""},"finish_reason":"stop"}],"system_fingerprint":"fp-msg_015ZkNJK6y6mNaNukhgKxoah"}
+
+data: {"id":"chatcmpl-msg_015ZkNJK6y6mNaNukhgKxoah","object":"","created":1771845184,"model":"claude-sonnet-4-5-20250929","choices":[],"usage":{"prompt_tokens":44,"completion_tokens":63,"total_tokens":107,"claude_cache_tokens_details":{"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_write_5_minutes_input_tokens":0,"cache_write_1_hour_input_tokens":0}}}
+
+data: [DONE]
+```
+
+## 多轮对话
+
+要在多轮对话中保留思考内容，可将reasoning\_details直接传到下一轮对话中即可，以便于模型在收到tool call结果后进行更复杂的推理；流式返回则只需要将type相同的连续的reasoning\_details中除type外所有参数拼接起来，再把type值加入，传到下一轮对话即可。
+
+### **非流式版本参考示例**
+
+**参考代码**
+
+```text
+import json
+import logging
+import http.client
+import ssl
+from urllib.parse import urlparse
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
+
+BASE_URL = "https://aihubmix.com"
+API_KEY = "sk-***"
+MODEL = "claude-sonnet-4-6"
+EFFORT = "low"
+
+def send_request(path, data):
+    """Send HTTP POST request and return JSON response"""
+    parsed = urlparse(BASE_URL)
+    host = parsed.netloc
+    use_https = parsed.scheme == 'https'
+
+    if use_https:
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        conn = http.client.HTTPSConnection(host, context=context)
+    else:
+        conn = http.client.HTTPConnection(host)
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    json_data = json.dumps(data)
+
+    try:
+        conn.request("POST", path, json_data, headers)
+        response = conn.getresponse()
+        response_data = json.loads(response.read().decode('utf-8'))
+
+        if response.status != 200:
+            logger.error(f"HTTP Error: {response.status}")
+            logger.error(response_data)
+            raise Exception(f"HTTP {response.status}: {response_data}")
+
+        return response_data
+    finally:
+        conn.close()
+
+# Define tools once and reuse
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string"}
+            },
+            "required": ["location"]
+        }
+    }
+}]
+
+# ===== Turn 1 =====
+req1 = {
+    "model": MODEL,
+    "messages": [
+        {"role": "user", "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."}
+    ],
+    "parallel_tool_calls": True,
+    "reasoning_effort": EFFORT,
+    "tools": tools
+}
+
+logger.debug("[Turn 1] Request:\n%s", json.dumps(req1, indent=2, default=str))
+
+response_data = send_request("/v1/chat/completions", req1)
+
+logger.debug("[Turn 1] Response:\n%s", json.dumps(response_data, indent=2, default=str))
+
+# Extract the assistant message
+message = response_data["choices"][0]["message"]
+
+# ===== Turn 2 =====
+# Build messages with all tool call responses
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."},
+    message
+]
+
+# Add tool responses for all tool calls
+for tool_call in message.get("tool_calls", []):
+    messages.append({
+        "role": "tool",
+        "tool_call_id": tool_call["id"],
+        "content": '{"temperature": 45, "condition": "rainy", "humidity": 85}'
+    })
+
+req2 = {
+    "model": MODEL,
+    "messages": messages,
+    "parallel_tool_calls": True,
+    "reasoning_effort": EFFORT,
+    "tools": tools
+}
+
+logger.debug("[Turn 2] Request:\n%s", json.dumps(req2, indent=2, default=str))
+
+response_data2 = send_request("/v1/chat/completions", req2)
+
+logger.debug("[Turn 2] Response:\n%s", json.dumps(response_data2, indent=2, default=str))
+```
+
+**参考输出**
+
+```text
+2026-04-12 15:04:10,370 DEBUG [Turn 1] Request:
+{
+  "model": "claude-sonnet-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."
+    }
+  ],
+  "parallel_tool_calls": true,
+  "reasoning_effort": "low",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
+2026-04-12 15:04:13,528 DEBUG [Turn 1] Response:
+{
+  "id": "chatcmpl-msg_01U5aVScUcBHPZRm3KsJZkux",
+  "model": "claude-sonnet-4-6",
+  "object": "chat.completion",
+  "created": 1775977453,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sure! Let me check the weather in both cities at the same time!",
+        "reasoning_content": "Let me get weather for both cities simultaneously.",
+        "reasoning_details": {
+          "type": "thinking",
+          "thinking": "Let me get weather for both cities simultaneously.",
+          "signature": "Eu8BClsIDBgCKkDZd7aZm59FCfvnO9XsFaQfTfhr+CiB/jpZAHHFU2pfSlZneYfF5/mV2FDmm+f19/I4oixVk0CrxTDcD8VpU7ULMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxj7ktUelYOB0toCBEaDF5tUjSLUbud1CsT/CIw7zwSrL7Ouf5HhoUf/K6px1ENA3/AyDsVoEYldXmhtLQylLTcUtZVi1eV8wcdp+mzKkLrgzTjxq8+JtRcJym/KJYHoa3CPhcAgCd9nJoF3OGcuCnY4sfF2EF0+g0d2WPyWI/k7F4I3y3q0ZGKnNo4JV84YJIYAQ=="
+        },
+        "tool_calls": [
+          {
+            "id": "toolu_01Uf7t8TeTQBQji8YmFRGxXy",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"location\":\"Boston\"}"
+            }
+          },
+          {
+            "id": "toolu_01GMW4HDcCdEEPQi2TAqnLqJ",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"location\":\"Beijing\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 571,
+    "completion_tokens": 129,
+    "total_tokens": 700,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+2026-04-12 15:04:13,528 DEBUG [Turn 2] Request:
+{
+  "model": "claude-sonnet-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."
+    },
+    {
+      "role": "assistant",
+      "content": "Sure! Let me check the weather in both cities at the same time!",
+      "reasoning_content": "Let me get weather for both cities simultaneously.",
+      "reasoning_details": {
+        "type": "thinking",
+        "thinking": "Let me get weather for both cities simultaneously.",
+        "signature": "Eu8BClsIDBgCKkDZd7aZm59FCfvnO9XsFaQfTfhr+CiB/jpZAHHFU2pfSlZneYfF5/mV2FDmm+f19/I4oixVk0CrxTDcD8VpU7ULMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxj7ktUelYOB0toCBEaDF5tUjSLUbud1CsT/CIw7zwSrL7Ouf5HhoUf/K6px1ENA3/AyDsVoEYldXmhtLQylLTcUtZVi1eV8wcdp+mzKkLrgzTjxq8+JtRcJym/KJYHoa3CPhcAgCd9nJoF3OGcuCnY4sfF2EF0+g0d2WPyWI/k7F4I3y3q0ZGKnNo4JV84YJIYAQ=="
+      },
+      "tool_calls": [
+        {
+          "id": "toolu_01Uf7t8TeTQBQji8YmFRGxXy",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"location\":\"Boston\"}"
+          }
+        },
+        {
+          "id": "toolu_01GMW4HDcCdEEPQi2TAqnLqJ",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"location\":\"Beijing\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_01Uf7t8TeTQBQji8YmFRGxXy",
+      "content": "{\"temperature\": 45, \"condition\": \"rainy\", \"humidity\": 85}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_01GMW4HDcCdEEPQi2TAqnLqJ",
+      "content": "{\"temperature\": 45, \"condition\": \"rainy\", \"humidity\": 85}"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "reasoning_effort": "low",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
+
+2026-04-12 15:04:20,866 DEBUG [Turn 2] Response:
+{
+  "id": "chatcmpl-msg_01Pp25hirYgzKuyEKsdQ3dqn",
+  "model": "claude-sonnet-4-6",
+  "object": "chat.completion",
+  "created": 1775977461,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Interestingly, both cities are experiencing very similar weather right now! Here's a summary and outfit recommendations:\n\n---\n\n### \ud83c\udf27\ufe0f Boston & Beijing \u2013 Current Weather\n| | Boston | Beijing |\n|---|---|---|\n| \ud83c\udf21\ufe0f Temperature | 45\u00b0F (~7\u00b0C) | 45\u00b0F (~7\u00b0C) |\n| \ud83c\udf26\ufe0f Condition | Rainy | Rainy |\n| \ud83d\udca7 Humidity | 85% | 85% |\n\n---\n\n### \ud83d\udc57 What to Wear\n\nSince both cities share the same chilly, rainy conditions, here are recommendations for **both**:\n\n1. **Waterproof Jacket or Raincoat** \ud83e\udde5 \u2013 A must with the rain and high humidity. Go for something windproof too if possible.\n2. **Warm Layers** \ud83e\udde3 \u2013 At 45\u00b0F, it's cold enough for a sweater or fleece underneath your jacket.\n3. **Waterproof Boots or Water-Resistant Shoes** \ud83d\udc62 \u2013 Keep your feet dry on wet streets.\n4. **Umbrella** \u2602\ufe0f \u2013 Don't leave home without one!\n5. **Scarf & Gloves** \ud83e\udde4 \u2013 Optional but recommended, especially if you'll be outside for extended periods.\n\nStay warm and dry! \u2614"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 799,
+    "completion_tokens": 324,
+    "total_tokens": 1123,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+```
+
+### 流式版本参考示例
+
+**参考代码**
+
+```text
+import json
+import logging
+import http.client
+import ssl
+from urllib.parse import urlparse
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
+
+BASE_URL = "https://aihubmix.com"
+API_KEY = "sk-***"
+MODEL = "claude-sonnet-4-6"
+EFFORT = "low"
+
+def send_stream_request(path, data):
+    """Send HTTP POST request with streaming and return accumulated message"""
+    parsed = urlparse(BASE_URL)
+    host = parsed.netloc
+    use_https = parsed.scheme == 'https'
+
+    if use_https:
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        conn = http.client.HTTPSConnection(host, context=context)
+    else:
+        conn = http.client.HTTPConnection(host)
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    json_data = json.dumps(data)
+
+    try:
+        conn.request("POST", path, json_data, headers)
+        response = conn.getresponse()
+
+        if response.status != 200:
+            error_data = response.read().decode('utf-8')
+            logger.error(f"HTTP Error: {response.status}")
+            logger.error(error_data)
+            raise Exception(f"HTTP {response.status}: {error_data}")
+
+        # Read and process streaming response
+        accumulated_message = {}
+        tool_calls_dict = {}  # Use dict to merge tool_calls by index
+
+        for line in response:
+            line = line.decode('utf-8').strip()
+
+            if not line or line == "data: [DONE]":
+                continue
+
+            if line.startswith("data: "):
+                try:
+                    chunk_data = json.loads(line[6:])  # Remove "data: " prefix
+                    logger.debug(f"Stream chunk: {json.dumps(chunk_data, indent=2, default=str)}")
+
+                    # Accumulate message from stream chunks
+                    if "choices" in chunk_data and len(chunk_data["choices"]) > 0:
+                        choice = chunk_data["choices"][0]
+
+                        if "delta" in choice:
+                            delta = choice["delta"]
+
+                            # Accumulate content
+                            if "content" in delta:
+                                if "content" not in accumulated_message:
+                                    accumulated_message["content"] = ""
+                                accumulated_message["content"] += delta["content"]
+                                # print(delta["content"], end="", flush=True)
+
+                            # Accumulate role
+                            if "role" in delta:
+                                accumulated_message["role"] = delta["role"]
+
+                            # Accumulate tool_calls (merge by index)
+                            if "tool_calls" in delta:
+                                for tool_call in delta["tool_calls"]:
+                                    index = tool_call.get("index", 0)
+                                    if index not in tool_calls_dict:
+                                        tool_calls_dict[index] = {}
+
+                                    # Merge tool_call fields
+                                    for key, value in tool_call.items():
+                                        if key == "index":
+                                            continue
+                                        if key == "function":
+                                            if "function" not in tool_calls_dict[index]:
+                                                tool_calls_dict[index]["function"] = {}
+                                            # Merge function fields
+                                            for func_key, func_value in value.items():
+                                                if func_key == "arguments":
+                                                    if "arguments" not in tool_calls_dict[index]["function"]:
+                                                        tool_calls_dict[index]["function"]["arguments"] = ""
+                                                    tool_calls_dict[index]["function"]["arguments"] += func_value
+                                                else:
+                                                    tool_calls_dict[index]["function"][func_key] = func_value
+                                        else:
+                                            tool_calls_dict[index][key] = value
+
+                            # Accumulate reasoning_content
+                            if "reasoning_content" in delta:
+                                if "reasoning_content" not in accumulated_message:
+                                    accumulated_message["reasoning_content"] = ""
+                                accumulated_message["reasoning_content"] += delta["reasoning_content"]
+
+                            # Accumulate reasoning_details: type is overwritten, strings concatenated
+                            rd = delta.get("reasoning_details")
+                            if rd and isinstance(rd, dict):
+                                if "reasoning_details" not in accumulated_message:
+                                    accumulated_message["reasoning_details"] = {}
+                                for key, value in rd.items():
+                                    if key == "type":
+                                        accumulated_message["reasoning_details"]["type"] = value
+                                    elif isinstance(value, str):
+                                        accumulated_message["reasoning_details"][key] = accumulated_message["reasoning_details"].get(key, "") + value
+                                    elif value is not None:
+                                        accumulated_message["reasoning_details"][key] = value
+
+                        # Get final message details from response (for non-delta fields like role)
+                        if "message" in choice:
+                            message_data = choice["message"]
+                            for key, value in message_data.items():
+                                if key not in accumulated_message:  # Don't overwrite accumulated content
+                                    accumulated_message[key] = value
+
+                except json.JSONDecodeError:
+                    logger.debug(f"Skipping non-JSON line: {line}")
+
+        # Convert tool_calls_dict back to list
+        if tool_calls_dict:
+            accumulated_message["tool_calls"] = [
+                tool_calls_dict[i] for i in sorted(tool_calls_dict)
+            ]
+
+        print()  # New line after streaming
+        return accumulated_message
+    finally:
+        conn.close()
+
+# Define tools once and reuse
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string"}
+            },
+            "required": ["location"]
+        }
+    }
+}]
+
+# ===== Turn 1 =====
+req1 = {
+    "model": MODEL,
+    "messages": [
+        {"role": "user", "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."}
+    ],
+    "parallel_tool_calls": True,
+    "reasoning_effort": EFFORT,
+    "tools": tools,
+    "stream": True
+}
+
+logger.debug("[Turn 1] Request:\n%s", json.dumps(req1, indent=2, default=str))
+print("\n[Turn 1] Streaming response:\n")
+
+message = send_stream_request("/v1/chat/completions", req1)
+
+logger.debug("[Turn 1] Accumulated message:\n%s", json.dumps(message, indent=2, default=str))
+
+# ===== Turn 2 =====
+# Build messages with all tool call responses
+messages = [
+    {"role": "user", "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."},
+    message
+]
+
+# Add tool responses for all tool calls
+for tool_call in message.get("tool_calls", []):
+    messages.append({
+        "role": "tool",
+        "tool_call_id": tool_call["id"],
+        "content": '{"temperature": 45, "condition": "rainy", "humidity": 85}'
+    })
+
+req2 = {
+    "model": MODEL,
+    "messages": messages,
+    "parallel_tool_calls": True,
+    "reasoning_effort": EFFORT,
+    "tools": tools,
+    "stream": True
+}
+
+logger.debug("[Turn 2] Request:\n%s", json.dumps(req2, indent=2, default=str))
+print("\n[Turn 2] Streaming response:\n")
+
+message2 = send_stream_request("/v1/chat/completions", req2)
+
+logger.debug("[Turn 2] Accumulated message:\n%s", json.dumps(message2, indent=2, default=str))
+```
+
+**参考输出**
+
+```text
+2026-04-12 15:19:39,815 DEBUG [Turn 1] Request:
+{
+  "model": "claude-sonnet-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."
+    }
+  ],
+  "parallel_tool_calls": true,
+  "reasoning_effort": "low",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        }
+      }
+    }
+  ],
+  "stream": true
+}
+
+[Turn 1] Streaming response:
+
+2026-04-12 15:19:41,714 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_details": {
+          "type": "thinking"
+        }
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:41,714 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "",
+        "reasoning_content": "Let me get the weather for both cities simultaneously.",
+        "reasoning_details": {
+          "type": "thinking",
+          "thinking": "Let me get the weather for both cities simultaneously."
+        }
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:41,715 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "",
+        "reasoning_details": {
+          "type": "thinking",
+          "signature": "EvMBClsIDBgCKkApA3tLqIXac23x4XppC7wlH5lCSu/6iSh/hYWFWKNIlSDW0xTsOargmleRKY9UrTgqCbIDvl+C18yy8cWscQPsMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxnIIYapULsC2rToUoaDPYn/n0x9r+NtYMUYSIwpgr7lxtZvR8AxXeFAeygW9THqnqMcTwT3lKfBRbR9scj8nc7tpYD0bCJlLWay0kkKkau/0c3WHoLnM7oce2g8K8YrrxKGdPT1olGme7l9Hhj9b93AjwJkG92Toj7JPU1DRU4W1tEULdif7k0d0y6epgiegQe1HJEGAE="
+        }
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:41,715 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "content": ""
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:41,715 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "Sure! Let me check the weather in both cities"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,230 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " at the same time!"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,233 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "id": "toolu_01Aeac9GjnyE3cJTmpwKiXeT",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": ""
+            },
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,233 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": ""
+            },
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,859 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"locat"
+            },
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,860 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "ion\": \"Bos"
+            },
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,860 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "ton\"}"
+            },
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,860 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "id": "toolu_01ErK5zYygpSoARL39dfHcQ1",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": ""
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,860 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": ""
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,861 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\""
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,861 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "loc"
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,861 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "ation\": "
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,861 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "\"Be"
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,862 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "ijing\"}"
+            },
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,863 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "chat.completion.chunk",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": ""
+      },
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "system_fingerprint": "fp-msg_019r7FZ1qS2DvsTXKAWLVTwX"
+}
+2026-04-12 15:19:42,863 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_019r7FZ1qS2DvsTXKAWLVTwX",
+  "object": "",
+  "created": 1775978381,
+  "model": "claude-sonnet-4-6",
+  "choices": [],
+  "usage": {
+    "prompt_tokens": 571,
+    "completion_tokens": 130,
+    "total_tokens": 701,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+
+2026-04-12 15:19:42,863 DEBUG [Turn 1] Accumulated message:
+{
+  "content": "Sure! Let me check the weather in both cities at the same time!",
+  "role": "assistant",
+  "reasoning_details": {
+    "type": "thinking",
+    "thinking": "Let me get the weather for both cities simultaneously.",
+    "signature": "EvMBClsIDBgCKkApA3tLqIXac23x4XppC7wlH5lCSu/6iSh/hYWFWKNIlSDW0xTsOargmleRKY9UrTgqCbIDvl+C18yy8cWscQPsMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxnIIYapULsC2rToUoaDPYn/n0x9r+NtYMUYSIwpgr7lxtZvR8AxXeFAeygW9THqnqMcTwT3lKfBRbR9scj8nc7tpYD0bCJlLWay0kkKkau/0c3WHoLnM7oce2g8K8YrrxKGdPT1olGme7l9Hhj9b93AjwJkG92Toj7JPU1DRU4W1tEULdif7k0d0y6epgiegQe1HJEGAE="
+  },
+  "reasoning_content": "Let me get the weather for both cities simultaneously.",
+  "tool_calls": [
+    {
+      "id": "toolu_01Aeac9GjnyE3cJTmpwKiXeT",
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "arguments": "{\"location\": \"Boston\"}"
+      }
+    },
+    {
+      "id": "toolu_01ErK5zYygpSoARL39dfHcQ1",
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "arguments": "{\"location\": \"Beijing\"}"
+      }
+    }
+  ]
+}
+2026-04-12 15:19:42,864 DEBUG [Turn 2] Request:
+{
+  "model": "claude-sonnet-4-6",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the weather like in Boston and Beijing? Then recommend what to wear."
+    },
+    {
+      "content": "Sure! Let me check the weather in both cities at the same time!",
+      "role": "assistant",
+      "reasoning_details": {
+        "type": "thinking",
+        "thinking": "Let me get the weather for both cities simultaneously.",
+        "signature": "EvMBClsIDBgCKkApA3tLqIXac23x4XppC7wlH5lCSu/6iSh/hYWFWKNIlSDW0xTsOargmleRKY9UrTgqCbIDvl+C18yy8cWscQPsMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxnIIYapULsC2rToUoaDPYn/n0x9r+NtYMUYSIwpgr7lxtZvR8AxXeFAeygW9THqnqMcTwT3lKfBRbR9scj8nc7tpYD0bCJlLWay0kkKkau/0c3WHoLnM7oce2g8K8YrrxKGdPT1olGme7l9Hhj9b93AjwJkG92Toj7JPU1DRU4W1tEULdif7k0d0y6epgiegQe1HJEGAE="
+      },
+      "reasoning_content": "Let me get the weather for both cities simultaneously.",
+      "tool_calls": [
+        {
+          "id": "toolu_01Aeac9GjnyE3cJTmpwKiXeT",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"location\": \"Boston\"}"
+          }
+        },
+        {
+          "id": "toolu_01ErK5zYygpSoARL39dfHcQ1",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"location\": \"Beijing\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_01Aeac9GjnyE3cJTmpwKiXeT",
+      "content": "{\"temperature\": 45, \"condition\": \"rainy\", \"humidity\": 85}"
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "toolu_01ErK5zYygpSoARL39dfHcQ1",
+      "content": "{\"temperature\": 45, \"condition\": \"rainy\", \"humidity\": 85}"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "reasoning_effort": "low",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get current weather",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "location"
+          ]
+        }
+      }
+    }
+  ],
+  "stream": true
+}
+
+[Turn 2] Streaming response:
+
+2026-04-12 15:19:44,954 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "role": "assistant",
+        "content": ""
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:44,954 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "Inter"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:45,399 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "estingly, both cities have the same weather right now! Here's a summary and outfit recommendations:\n\n---\n\n### "
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:45,779 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "\ud83c\udf27\ufe0f Boston & Beijing \u2014 Current Weather\n| | Boston"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:46,264 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " | Beijing |\n|---|---|---|\n| \ud83c\udf21\ufe0f Temperature | 45\u00b0F | 45\u00b0F |\n| \ud83c\udf26\ufe0f Condition | Rainy"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:46,618 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " | Rainy |\n| \ud83d\udca7 Humidity | 85% | 85% |\n\n---\n\n### \ud83d\udc57 What to Wear\n\nSince both"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:46,968 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " cities are experiencing **cool, rainy, and humid**"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:47,668 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " conditions, here's what we recommend:\n\n1. **Waterproof Jacket or Raincoat** \ud83e\udde5 "
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:47,827 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "\u2014 Essential to stay dry in the rain.\n2. **Warm Mid"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:48,263 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "-Layer** \ud83e\udde3 \u2014 At 45\u00b0F, a sweater or fleece underneath will"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:48,670 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " keep you comfortable.\n3. **Waterproof Boots or Shoes** \ud83d\udc62 \u2014 Keep your feet dry on wet"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:49,012 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " streets.\n4. **Umbrella** \u2602\ufe0f \u2014 A must-have for both cities today!"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:49,439 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": "\n5. **Scarf & Light Gloves** \ud83e\udde4 \u2014 The combination of cold"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:49,991 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " and humidity can feel extra chilly.\n\nStay warm and dry out"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:50,056 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": " there! \ud83c\udf27\ufe0f"
+      }
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:50,142 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "chat.completion.chunk",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [
+    {
+      "index": 0,
+      "delta": {
+        "content": ""
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "system_fingerprint": "fp-msg_01FXZYmNPMbnd9EHho9ZEmdY"
+}
+2026-04-12 15:19:50,170 DEBUG Stream chunk: {
+  "id": "chatcmpl-msg_01FXZYmNPMbnd9EHho9ZEmdY",
+  "object": "",
+  "created": 1775978385,
+  "model": "claude-sonnet-4-6",
+  "choices": [],
+  "usage": {
+    "prompt_tokens": 800,
+    "completion_tokens": 302,
+    "total_tokens": 1102,
+    "claude_cache_tokens_details": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_write_5_minutes_input_tokens": 0,
+      "cache_write_1_hour_input_tokens": 0
+    }
+  }
+}
+
+2026-04-12 15:19:50,171 DEBUG [Turn 2] Accumulated message:
+{
+  "content": "Interestingly, both cities have the same weather right now! Here's a summary and outfit recommendations:\n\n---\n\n### \ud83c\udf27\ufe0f Boston & Beijing \u2014 Current Weather\n| | Boston | Beijing |\n|---|---|---|\n| \ud83c\udf21\ufe0f Temperature | 45\u00b0F | 45\u00b0F |\n| \ud83c\udf26\ufe0f Condition | Rainy | Rainy |\n| \ud83d\udca7 Humidity | 85% | 85% |\n\n---\n\n### \ud83d\udc57 What to Wear\n\nSince both cities are experiencing **cool, rainy, and humid** conditions, here's what we recommend:\n\n1. **Waterproof Jacket or Raincoat** \ud83e\udde5 \u2014 Essential to stay dry in the rain.\n2. **Warm Mid-Layer** \ud83e\udde3 \u2014 At 45\u00b0F, a sweater or fleece underneath will keep you comfortable.\n3. **Waterproof Boots or Shoes** \ud83d\udc62 \u2014 Keep your feet dry on wet streets.\n4. **Umbrella** \u2602\ufe0f \u2014 A must-have for both cities today!\n5. **Scarf & Light Gloves** \ud83e\udde4 \u2014 The combination of cold and humidity can feel extra chilly.\n\nStay warm and dry out there! \ud83c\udf27\ufe0f",
+  "role": "assistant"
+}
+```
