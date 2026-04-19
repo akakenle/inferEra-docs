@@ -5,7 +5,6 @@ icon: "badge"
 
 > 本文介绍 [Claude Opus 4.7](https://aihubmix.com/model/claude-opus-4-7)在推理控制方面的两项重要变化，以及 AIHubmix 原生接口与 Chat 统一接口的完整调用说明。详见 [Anthropic 官方公告](https://www.anthropic.com/news/claude-opus-4-7) 与 [模型更新日志](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7)。
 
-
 <Frame>
   <img
     src="/images/image-24.png"
@@ -15,8 +14,6 @@ icon: "badge"
     className="mx-auto"
   />
 </Frame>
-
----
 
 ## 一、推理控制新特性
 
@@ -59,7 +56,7 @@ low  ──  medium  ──  high  ──  xhigh ★NEW  ──  max
 
 ## 二、Claude 原始格式接口说明
 
-**Anthropic 原生接口的** `effort `**值与官方保持一致，参考如下：**
+### **Anthropic 原生接口的** `effort `**值与官方保持一致，参考如下：**
 
 | **effort值** | **适用模型** | **说明** | **推荐场景** |
 | :-- | :-- | :-- | :-: |
@@ -68,6 +65,8 @@ low  ──  medium  ──  high  ──  xhigh ★NEW  ──  max
 | high | 所有支持模型 | 默认值，高能力表现 | 复杂推理、编程、agentic 任务 |
 | **xhigh（新增）** | **Opus 4.7 专属** | 扩展能力，介于 high 和 max 之间，长程任务表现优异 | 编程和 agentic 任务的推荐起点 |
 | max | Opus 系列 | 最高能力 | 前沿研究问题 |
+
+
 
 ### **AIHubmix Claude 原生接口 Claude Opus 4.7 调用示例**
 
@@ -97,11 +96,11 @@ print(response.content[-1].text)
 
 ---
 
-## 三、AIHubmix 的Chat 统一接口 的推理思考effort 增加了适配
+## 三、AIHubmix 的Chat 统一接口 的推理思考effort 增加适配
 
 AIHubMix Chat 统一接口与 OpenAI 规范对齐，通过 `reasoning.effort` 控制推理强度，**不同模型自动适配对应级别**：
 
-**Claude 系列模型的参数**`reasoning_effort `**（思考强度控制）说明**
+### **Claude 系列模型的参数**`reasoning_effort `**（思考强度控制）说明**
 
 | **effort值** | **Opus \>=4-7（新增）** | **Opus 4.6 / 4.5** | **Sonnet 4.6** |
 | :-- | :-: | :-: | :-: |
@@ -146,7 +145,7 @@ print(completion.choices[0].message.content)
 
 在 OpenAI 兼容接口中，`reasoning` 支持 `display` 字段，用于控制是否返回思考摘要。
 
-**Claude Opus 4.7 默认不返回思考内容，需手动设置** `"display": "summarized" `**开启。**
+#### **Claude Opus 4.7 默认不返回思考内容，需手动设置** `"display": "summarized" `**开启。**
 
 | 字段 | 值 | 说明 |
 | :-- | :-- | :-- |
@@ -181,4 +180,4 @@ print(completion.choices[0].message.content)
 
 ---
 
-_如需进一步了解接口细节，请参考 [AIHubmix 文档](https://docs.aihubmix.com/cn) 或 [Anthropic 官方文档](https://docs.anthropic.com)。_
+_如需进一步了解接口细节，请参考 [AIHubmix 官方文档](https://docs.aihubmix.com/cn) 或 [Anthropic 官方文档](https://docs.anthropic.com)。_
