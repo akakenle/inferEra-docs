@@ -1,0 +1,170 @@
+---
+title: "Claude Opus 4.7 New Parameters Guide"
+icon: "badge"
+---
+
+> This article covers two key changes to reasoning control in [Claude Opus 4.7](https://aihubmix.com/model/claude-opus-4-7), along with complete usage instructions for both the **AIHubmix** native API and the **Chat** unified interface. See also: [Anthropic official announcement](https://www.anthropic.com/news/claude-opus-4-7) and [model change log](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7).
+
+<Frame>
+  ![Image](/images/image-27.png)
+</Frame>
+
+## 1. New Reasoning Control Features
+
+### ✦ New `xhigh` Reasoning Effort Level
+
+The new `xhigh` level sits between `high` and `max`, designed specifically for **coding and Agentic tasks**, striking a better balance between capability and efficiency.
+
+```text
+low  ──  medium  ──  high  ──  xhigh ★NEW  ──  max
+```
+
+### ✦ Thinking Content Hidden by Default
+
+In streaming responses, the thinking process is **no longer shown by default**. To receive a reasoning summary, explicitly pass the `display` field in your request:
+
+| **display value** | **Opus 4.7** | **Opus 4.6** | **Behavior** |
+| :-- | :-- | :-- | :-- |
+| "omitted" | **Default** | Non-default | Thinking block content is empty |
+| "summarized" | Must set manually | **Default** | Returns thinking summary text |
+
+```text
+"reasoning": {
+  "effort": "xhigh",
+  "display": "summarized"
+}
+```
+
+> **Figure**: Opus 4.7 new xhigh level — Agentic coding performance comparison (Source: Anthropic official)
+
+<Frame>
+  ![Image](/images/image-26.png)
+</Frame>
+
+---
+
+## 2. Claude Native API Reference
+
+#### **The** `effort `**values for the Anthropic native API are consistent with the official specification:**
+
+| **effort value** | **Supported Models** | **Description** | **Recommended Use Case** |
+| :-- | :-- | :-- | :-: |
+| low | All supported models | Significant token savings with moderate capability trade-off | Simple tasks, high-concurrency requests, sub-agents |
+| medium | All supported models | Balanced mode with moderate token savings | General agentic tasks |
+| high | All supported models | Default; high capability performance | Complex reasoning, coding, agentic tasks |
+| **xhigh (new)** | **Opus 4.7 only** | Extended capability between high and max; excels at long-horizon tasks | Recommended starting point for coding and agentic tasks |
+| max | Opus series | Maximum capability | Frontier research problems |
+
+#### **AIHubmix Claude Native API — Opus 4.7 Example**
+
+```text
+from anthropic import Anthropic
+
+client = Anthropic(
+    api_key="<AIHUBMIX_API_KEY>",
+    base_url="https://aihubmix.com"
+)
+
+response = client.messages.create(
+    model="claude-opus-4-7",
+    max_tokens=16000,
+    thinking={"type": "adaptive"},
+    output_config={"effort": "xhigh"},  # Options: low / medium / high / xhigh / max
+    messages=[
+        {
+            "role": "user",
+            "content": "A snail is at the bottom of a 10-meter well. Each day it climbs 3 meters, but each night it slides back 2 meters. How many days does it take to reach the top?"
+        }
+    ]
+)
+
+print(response.content[-1].text)
+```
+
+---
+
+## 3. Reasoning Effort Support in the AIHubmix Chat Unified Interface
+
+The AIHubMix Chat unified interface aligns with the OpenAI specification and controls reasoning intensity via `reasoning.effort`. **Different Claude models are automatically mapped to the corresponding effort level:**
+
+#### `reasoning_effort `**(Reasoning Intensity Control) for Claude Models**
+
+| **effort value** | **Opus \>=4.7 (new)** | **Opus 4.6 / 4.5** | **Sonnet 4.6** |
+| :-- | :-: | :-: | :-: |
+| minimal | low | low | low |
+| medium | medium | medium | medium |
+| high | high | high | high |
+| xhigh | xhigh | max | high |
+| max | max | max | high |
+
+**Note**: `xhigh` is natively supported only on Opus 4.7. Other Opus models automatically fall back to `max`, and the Sonnet series falls back to `high`.
+
+#### **Chat Unified Interface — Opus 4.7 Example**
+
+```text
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key="<AIHUBMIX_API_KEY>",
+)
+
+completion = client.chat.completions.create(
+    model="claude-opus-4-7",
+    # max_tokens=10000,  # Default is 4096; enable for longer outputs
+    messages=[
+        {
+            "role": "user",
+            "content": "A snail is at the bottom of a 10-meter well. Each day it climbs 3 meters, but each night it slides back 2 meters. How many days does it take to reach the top?"
+        }
+    ],
+    extra_body={
+        "reasoning": {"effort": "xhigh"}
+    }
+)
+
+print(completion.choices[0].message.content)
+```
+
+---
+
+## 4. Controlling Thinking Content in the Chat Unified Interface
+
+In the OpenAI-compatible interface, `reasoning` supports a `display` field to control whether thinking summaries are returned.
+
+**Claude Opus 4.7 does not return thinking content by default. Set** `"display": "summarized" `**to enable it.**
+
+| Field | Value | Description |
+| :-- | :-- | :-- |
+| `display` | _(omitted)_ | Thinking content not returned (default) |
+| `display` | `"summarized"` | Returns a thinking summary |
+
+#### **Opus 4.7 — Thinking Summary Example**
+
+```text
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://aihubmix.com/v1",
+    api_key="<AIHUBMIX_API_KEY>",
+)
+
+completion = client.chat.completions.create(
+    model="claude-opus-4-7",
+    messages=[
+        {
+            "role": "user",
+            "content": "A snail is at the bottom of a 10-meter well. Each day it climbs 3 meters, but each night it slides back 2 meters. How many days does it take to reach the top?"
+        }
+    ],
+    extra_body={
+        "reasoning": {"effort": "xhigh", "display": "summarized"}
+    }
+)
+
+print(completion.choices[0].message.content)
+```
+
+---
+
+_For further details, refer to the [AIHubmix documentation](https://docs.aihubmix.com/en) or the [Anthropic official docs](https://docs.anthropic.com/)_
