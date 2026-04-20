@@ -1,0 +1,54 @@
+name: Auto Translate Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cn/**/*.mdx"
+      - "cn/**/*.md"
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get changed cn/ files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only HEAD~1 HEAD -- 'cn/**/*.mdx' 'cn/**/*.md' | tr '\n' ' ')
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+          echo "Changed files: $FILES"
+
+      - name: Set up Python
+        if: steps.changed.outputs.files != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        if: steps.changed.outputs.files != ''
+        run: pip install anthropic
+
+      - name: Translate changed files
+        if: steps.changed.outputs.files != ''
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/translate.py ${{ steps.changed.outputs.files }}
+
+      - name: Commit translations
+        if: steps.changed.outputs.files != ''
+        run: |
+          git config user.name "inferera-translate-bot"
+          git config user.email "bot@inferera.ai"
+          git add en/ jp/ ko/ zh-Hant/ fr/ de/ es/ pt/
+          git diff --staged --quiet && echo "No translation changes to commit" || \
+            git commit -m "chore(i18n): auto-translate from cn updates [skip ci]"
+          git push
