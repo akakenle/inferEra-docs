@@ -1,6 +1,5 @@
 ---
 title: "LLM 联网搜索"
-description: " "
 icon: "globe"
 ---
 
@@ -12,23 +11,20 @@ icon: "globe"
 ✅ **降低幻觉风险**：基于实时网络搜索的事实回答，大幅减少 AI 已读乱回的可能性\
 ✅ **提升决策质量**：基于最新事实的分析和建议，让你的决策更有把握
 
-**支持的模型：**
-目前支持 OpenAI 和 Gemini 大模型系列，包含两种接入方式：
+**支持的模型：** 目前支持 OpenAI 和 Gemini 大模型系列，包含两种接入方式：
 
-**1. 原生搜索能力模型：**
-**Gemini 系列** (Ground with Google search)：
+**1. 原生搜索能力模型：** **Gemini 系列** (Ground with Google search)：
 
-- gemini-2.0-pro-exp-02-05-search
-- gemini-2.0-flash-exp-search
-- gemini-2.0-flash-search
+- gemini-3.1-pro-preview-search
+- gemini-3-flash-preview-search
+- gemini-2.5-pro-search
 
 **OpenAI 系列** (Bing search)：
 
-- gpt-4o-search-preview
-- gpt-4o-mini-search-preview
+- gpt-5.4
+- gpt-5.2
 
-**2. 参数支持方式：**
-只需增加参数`web_search_options={}`，即可为所有 gemini、OpenAI 大模型开启联网能力。Gemini 系列的搜索费率为 35 美元/千次；
+**2. 参数支持方式：** 只需增加参数`web_search_options={}`，即可为所有 gemini、OpenAI 大模型开启联网能力。Gemini 系列的搜索费率为 35 美元/千次；
 
 ### 使用方法
 
@@ -66,7 +62,6 @@ chat_completion = client.chat.completions.create(
 print(chat_completion.choices[0].message.content)
 ```
 
-
 ```ts Typescript
 import OpenAI from 'openai';
 
@@ -98,7 +93,6 @@ async function main() {
 
 main().catch(console.error);
 ```
-
 
 ```shell Curl
 curl "https://aihubmix.com/v1/chat/completions" \
