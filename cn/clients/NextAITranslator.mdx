@@ -1,0 +1,103 @@
+---
+title: "在 NextAI Translator 中使用"
+description: "本文介绍如何在 NextAI Translator（曾用名 OpenAI Translator）中配置 AIHubMix API，实现 AI 驱动的划词翻译、截图翻译和文本润色。"
+keywords: "nextai translator, chatgpt translator, ai language translator, translate api, nextai translator github, deepl translator"
+icon: "comment-text"
+---
+
+[NextAI Translator](https://github.com/nextai-translator/nextai-translator)（曾用名 **OpenAI Translator**）是一款开源的 AI 翻译工具，支持浏览器插件和桌面客户端，具备划词翻译、截图 OCR、文本润色、摘要生成等功能，支持 55 种以上语言互译。
+
+接入 AIHubMix 后，可使用 Claude、Gemini、DeepSeek 等数百个模型进行翻译， 比传统的 Google Translate 或 DeepL Translator等更加方便快捷。
+
+---
+
+## 安装 NextAI Translator
+
+前往 Chrome 应用商店搜索 **NextAI Translator** 并安装：
+
+[→ Chrome Web Store 安装地址](https://chromewebstore.google.com/detail/nextai-translator/...)
+
+### 方式二：桌面客户端
+
+前往 GitHub Releases 页面下载对应系统版本：
+
+[→ 下载桌面客户端](https://github.com/nextai-translator/nextai-translator/releases)
+
+支持 Windows、macOS、Linux。
+
+### 方式三：源码构建
+
+适合希望自定义功能或参与开发的用户，GitHub 仓库见： [nextai-translator/nextai-translator](https://github.com/nextai-translator/nextai-translator)
+
+> **版本提示（2026-04-21）：** 当前最新版本为 `v0.6.14`。 如果您使用的是 `v0.4.33` 或 `v0.4.34` 且无法加载模型， 请回退至：[v0.4.32](https://github.com/openai-translator/openai-translator/releases/tag/v0.4.32)
+
+---
+
+## 配置 AiHubMix
+
+### 第一步：获取 API Key
+
+登录 [AiHubMix 控制台](https://aihubmix.com)，充值创建并复制一个 API Key。
+
+### 第二步：设置API服务商
+
+打开 NextAI Translator，进入设置页面。
+
+- **默认服务提供商**：选择 `OpenAI (`AIHubMix 提供与 OpenAI 完全兼容的原生接口`)`
+- **API 密钥**：填入您的 AIHubMix API Key（[aihubmix.com](https://aihubmix.com)获取）
+- **API URL**：`https://aihubmix.com`（结尾不要带 `/`） NextAI Translator，进入**设置页面**。
+
+<Frame>
+  ![Image](/images/image-33.png)
+</Frame>
+
+## 模型加载问题排查
+
+### 问题：下拉列表刷不出模型
+
+**方法一：勾选"无模型 API 支持"选项**
+
+在设置页面找到该选项并勾选，然后从 [AiHubMix 模型列表页](https://aihubmix.com/models) 复制模型名称， 手动粘贴到模型输入框中。
+
+<Frame>
+  ![Image](/images/image-34.png)
+</Frame>
+
+**方法二：回退版本**
+
+若为 `v0.4.33` / `v0.4.34` 版本，请下载 [v0.4.32](https://github.com/openai-translator/openai-translator/releases/tag/v0.4.32) 并重新配置。
+
+---
+
+## 使用方法
+
+- **划词翻译**：选中任意网页文字，插件自动弹出翻译结果
+- **截图翻译**：点击截图按钮，框选区域即可识别并翻译
+- **输入翻译**：点击图标，在输入框中粘贴文字进行翻译
+- **文本润色**：切换到润色模式，对英文写作进行语法和表达优化
+  <Frame>
+    ![Image](/images/image-36.png)
+  </Frame>
+
+## 常见问题
+
+**和 DeepL Translator、Google Translate 有什么区别？** 
+
+DeepL 和 Google Translate 使用固定翻译引擎，NextAI Translator 通过 AI 大模型翻译， 支持自由切换模型，在专业术语、长句理解上表现更好。
+
+**支持哪些语言？** 
+
+支持中文、英文、日文、韩文、法文、德文、西班牙文等 55 种以上语言互译。
+
+**翻译报错 / 无响应怎么办？**
+
+1. 检查 API Key 是否填写正确，无多余空格
+2. 确认 API URL 为 `https://aihubmix.com`，结尾无 `/`
+3. 检查 AiHubMix 账户余额是否充足
+
+---
+
+## 相关资源
+
+- [NextAI Translator GitHub](https://github.com/nextai-translator/nextai-translator)
+- [AiHubMix 模型列表](https://aihubmix.com/models)

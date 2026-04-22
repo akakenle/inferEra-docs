@@ -156,7 +156,9 @@
               "cn/clients/On-CS",
               "cn/clients/Oulu",
               "cn/clients/FeelFish",
-              "cn/clients/GCMP"
+              "cn/clients/GCMP",
+              "cn/clients/lobe-hub",
+              "cn/clients/NextAITranslator"
             ]
           },
           {
