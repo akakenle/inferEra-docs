@@ -128,6 +128,7 @@
             "tab": "使用场景",
             "pages": [
               "cn/clients/AHM-mcp",
+              "cn/clients/ai-agent-tool-cc-connect",
               "cn/clients/Cherry-Studio",
               "cn/clients/Lobe-Chat",
               "cn/clients/OpenAI-Translator",
@@ -158,8 +159,7 @@
               "cn/clients/FeelFish",
               "cn/clients/GCMP",
               "cn/clients/lobe-hub",
-              "cn/clients/NextAITranslator",
-              "cn/clients/ai-agent-tool-cc-connect"
+              "cn/clients/NextAITranslator"
             ]
           },
           {
