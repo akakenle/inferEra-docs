@@ -158,7 +158,8 @@
               "cn/clients/FeelFish",
               "cn/clients/GCMP",
               "cn/clients/lobe-hub",
-              "cn/clients/NextAITranslator"
+              "cn/clients/NextAITranslator",
+              "cn/clients/ai-agent-tool-cc-connect"
             ]
           },
           {
