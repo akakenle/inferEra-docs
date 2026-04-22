@@ -1,5 +1,5 @@
 ---
-title: "AI Agent 桥接工具 ——cc-connect 使用指南"
+title: "AI Agents 桥接工具 ——cc-connect 使用指南"
 icon: "bell-on"
 keywords: ["ai agent", "ai tools", "claude code", "cc-connect", "AIHubMix API"]
 description: "cc-connect 是开源 AI Agent 桥接工具，将 Claude Code、Codex、Gemini CLI 等本地 Agent 接入飞书、Telegram、Slack 等 11 个平台，无需公网 IP。含 Claude Code × 飞书 × AIHubMix 完整接入教程。"
@@ -342,23 +342,23 @@ cc-connect 支持语音消息输入（自动转文字后传递给 Agent）以及
 
 ## 常见问题（Q&A）
 
-**Q: cc-connect 与 Claude Code Channels 是否可以同时使用？** 
+**Q: cc-connect 与 Claude Code Channels 是否可以同时使用？**
 
 A: 可以。两者互不冲突，本质上均为向本地 Claude Code 进程传递指令，仅接入渠道不同。
 
-**Q: AIHubMix 是否有地域访问限制？** 
+**Q: AIHubMix 是否有地域访问限制？**
 
 A: 无。AIHubMix 基于谷歌云集群运行，全球均可访问。
 
-**Q: cc-connect 是否会将代码内容上传至第三方？** 
+**Q: cc-connect 是否会将代码内容上传至第三方？**
 
 A: 不会。cc-connect 仅承担消息转发职责，代码内容由本地 AI Agent 处理。AIHubMix 作为模型 API 提供商，提供的是推理接口，不会主动存储用户的项目代码。
 
-**Q: 飞书群聊和私聊均可使用吗？** 
+**Q: 飞书群聊和私聊均可使用吗？**
 
 A: 均可。飞书平台支持机器人私聊（单聊）和群聊中的 `@提及` 两种交互方式。
 
-**Q: 已有 Anthropic 官方账号，是否仍需要 AIHubMix？** 
+**Q: 已有 Anthropic 官方账号，是否仍需要 AIHubMix？**
 
 A: 不强制。若仅使用 Claude Code 单一 Agent，可直接使用 Anthropic 官方账号。若需同时驱动 Claude Code、Gemini CLI 等多个 Agent，或需要更高并发上限，AIHubMix 的统一 Key 方案可显著降低运维成本。
 
