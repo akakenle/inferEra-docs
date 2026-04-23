@@ -203,6 +203,7 @@
                   "en/quick-start",
                   "en/api/OpenClaw",
                   "en/api/Claude-Code",
+                  "en/api/claude-desktop",
                   "en/api/AISDK",
                   "en/api/Data-Pravicy"
                 ]
