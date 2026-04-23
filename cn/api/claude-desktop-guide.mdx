@@ -1,0 +1,205 @@
+---
+title: "Claude Desktop × AIHubMix Setup Guide"
+icon: "apple-core"
+---
+
+> Applies to: Claude Desktop 1.3883.0 (Updated: April 23, 2026)\
+> Level: Beginner — no command line required, fully click-based, no Anthropic account needed
+
+## Introduction
+
+**Claude Desktop** (enterprise version known as Claude Cowork) supports connecting to third-party LLM gateways, letting you use the client without an Anthropic subscription.
+
+This guide walks you through configuring AIHubMix as the API provider for Claude Desktop, enabling:
+
+- No Anthropic account required — bypasses phone number / email registration restrictions
+- Access to Claude, GPT, Gemini, DeepSeek, and more through a single AIHubMix key
+- Pay-as-you-go billing, flexible and cost-controlled
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **Operating System:** macOS 13.0 (Ventura) or later, or Windows 10 / 11
+- **AIHubMix Account:** Register and top up at [aihubmix.com](https://aihubmix.com)
+
+---
+
+## Step 1: Get Your AIHubMix API Key
+
+1. Visit [aihubmix.com](https://aihubmix.com) and log in
+2. Go to the console → **API Keys** page
+3. Click **Create New Key**, enter a name (e.g. `claude-desktop`)
+4. Copy the generated key (format: `sk-xxxxxxxxxxxxxxxx`)
+
+> **Security notice:** The API Key is only shown once. Save it somewhere safe immediately.
+
+---
+
+## Step 2: Download and Install Claude Desktop
+
+1. Visit the official download page: [claude.ai/download](https://claude.ai/download)
+2. Download the installer for your operating system
+
+**macOS:**
+
+- Open the downloaded `.dmg` file
+- Drag `Claude.app` into the `Applications` folder
+- Open Claude from Launchpad or the Applications folder
+
+**Windows:**
+
+- Run the downloaded `.msix` installer
+- Follow the on-screen prompts to complete installation
+- Open Claude from the Start menu
+
+> **Note: You do not need to log in to an Anthropic account after opening. Proceed directly to the next step.**
+
+---
+
+## Step 3: Enable Developer Mode and Configure AIHubMix
+
+You need to enable Developer Mode before connecting a third-party API:
+
+1. Open the Claude Desktop app
+2. Click **Help** in the top menu bar
+3. Select **Troubleshooting**
+4. Click **Enable Developer mode**
+   <Frame>
+     ![Image](/images/image-48.png)
+   </Frame>
+5. Once enabled, a new **Developer** menu will appear in the top menu bar.
+
+<Frame>
+  ![Image](/images/image-49.png)
+</Frame>
+
+6. Click **Developer** in the menu bar, then select **Configure third-party inference**
+
+<Frame>
+  ![Image](/images/image-53.png)
+</Frame>
+
+7. **Fill in the following fields in the configuration dialog:**
+
+**Connection** — Gateway (Anthropic-compatible)
+
+**Gateway Base URL** — AIHubMix service endpoint
+
+```text
+https://aihubmix.com
+```
+
+**Gateway API Key** — Your AIHubMix API Key
+
+```text
+sk-xxxxxxxxxxxxxxxx
+```
+
+<Frame>
+  ![Image](/images/image-54.png)
+</Frame>
+
+8. **Click Apply locally → Relaunch**
+
+<Frame>
+  ![Img V3 02111 1bf57885 9883 46d1 81b1 4a1c4b45bb1g](/images/img_v3_02111_1bf57885-9883-46d1-81b1-4a1c4b45bb1g-1.png)
+</Frame>
+
+9. After restarting, select **Continue with Gateway** on the screen below
+
+<Frame>
+  ![Img V3 02111 E41b4400 E68c 4c63 Ac88 434d2e69693g](/images/img_v3_02111_e41b4400-e68c-4c63-ac88-434d2e69693g.jpg)
+</Frame>
+
+10. **Configuration complete — select a model**
+
+Available models include `gpt5.4`, `coding-glm-5.1-free`, `gpt-4.1-free`, `qwen3.6-27b`, and more.
+
+<Frame>
+  ![Img V3 02111 0ad06803 3f3e 4a9f A51e E4b6becbdb2g](/images/img_v3_02111_0ad06803-3f3e-4a9f-a51e-e4b6becbdb2g.jpg)
+</Frame>
+
+> **Note: The default model is Claude Opus 4.7, which has higher pricing** and can lead to significant costs for everyday use. We recommend switching to another model. AIHubMix offers a wide range of cost-effective and free models — view the full list at [aihubmix.com/models](https://aihubmix.com/models).
+
+<Frame>
+  ![Img V3 02111 1d93066c 3352 4d83 9463 99268b04d52g](/images/img_v3_02111_1d93066c-3352-4d83-9463-99268b04d52g.jpg)
+</Frame>
+
+---
+
+## Step 4: Verify the Installation
+
+After restarting Claude Desktop, check the following to confirm setup is working:
+
+- The **Cowork** tab appears in the left navigation panel
+- You can send messages and receive responses normally
+- The model name shown in the bottom-right corner matches your selection
+  <Frame>
+    ![Img V3 02111 A2dc364d Fcaa 4a8b B222 2b3cd540fa0g](/images/img_v3_02111_a2dc364d-fcaa-4a8b-b222-2b3cd540fa0g-1.jpg)
+  </Frame>
+
+If everything looks good — congratulations! You're now using Claude Desktop powered by AIHubMix.
+
+---
+
+## Troubleshooting
+
+### Error on Launch / Cannot Connect
+
+**Checklist:**
+
+1. Confirm the connection type is set to `gateway` (not `bedrock` / `vertex`)
+2. Check that the Base URL is `https://aihubmix.com` (no trailing slash)
+3. Verify the API Key was copied in full (must start with `sk-`)
+4. Make sure your AIHubMix account has sufficient balance
+
+**View logs:**
+
+- macOS: Open **Console.app**, filter by `Claude`
+- Windows: Open **Event Viewer**
+
+---
+
+### Model Not Found Error
+
+Make sure the model ID you entered is available on AIHubMix. You can query the available model list via API:
+
+```bash
+curl https://aihubmix.com/v1/models \
+  -H "Authorization: Bearer sk-your-api-key"
+```
+
+---
+
+### Which Auth Scheme Should I Use?
+
+AIHubMix uses the `x-api-key` authentication header. If you encounter a 401 error, try switching to `bearer`.
+
+---
+
+## Advanced: Export Configuration File (Optional)
+
+After completing setup, you can export the configuration for backup or team distribution:
+
+**macOS** — Click **Export** in the config UI to download a `.mobileconfig` file\
+**Windows** — Click **Export** in the config UI to download a `.reg` registry file
+
+---
+
+## Related Resources
+
+- [AIHubMix Documentation](https://docs.aihubmix.com)
+- [AIHubMix Claude Native API Reference](https://docs.aihubmix.com/en/api/Claude-Native)
+- [Claude Desktop Official Third-Party Platform Guide](https://support.anthropic.com/en/articles/claude-cowork-with-third-party-platforms)
+- [Claude Desktop Download Page](https://claude.ai/download)
+
+---
+
+_Last updated: April 23, 2026 | Based on Anthropic official docs + AIHubMix API documentation_
+
+<Frame>
+  ![Image](/images/image-56.png)
+</Frame>

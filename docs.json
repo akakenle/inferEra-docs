@@ -118,6 +118,7 @@
               "cn/api/Opencode",
               "cn/api/OpenClaw",
               "cn/api/Claude-Code",
+              "cn/api/claude-desktop-1",
               "cn/api/Cline",
               "cn/api/Kilo-Code",
               "cn/api/Gemini-Cli",
