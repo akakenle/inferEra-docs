@@ -1,0 +1,205 @@
+---
+title: "Claude Desktop × AIHubMix 新手配置指南"
+---
+
+> 适用版本：Claude Desktop 1.3883.0\+，AIHubMix API（更新时间：2026 年 4 月 23日）\
+> 难度：新手向，无需命令行，全程点击操作，无需 Anthropic 账号登陆
+
+---
+
+## 简介
+
+**AIHubMix** 我们支持通过统一接口调用 Claude。\
+**Claude Desktop**（企业版称 Claude Cowork）支持接入第三方 LLM 网关，无需 Anthropic 账号订阅，即可驱动客户端。
+
+本指南教你将 AIHubMix 配置为 Claude Desktop 的API 服务商，实现：
+
+- 无需 Anthropic 账号登陆，解决手机号/邮箱难登陆的问题
+- 通过 AIHubMix 使用 Claude、GPT、Gemini、DeepSeek 等多系列模型
+- 按量计费，灵活可控
+
+---
+
+## 准备工作
+
+在开始之前，请确认以下条件：
+
+- **操作系统：** macOS 13.0 (Ventura) 及以上，或 Windows 10 / 11
+- **AIHubMix 账号：** 在 [aihubmix.com](https://aihubmix.com) 注册并充值
+
+---
+
+## 第一步：获取 AIHubMix API Key
+
+1. 访问 [aihubmix.com](https://aihubmix.com) 并登录账号
+2. 进入控制台 → **API Keys** 页面
+3. 点击 **创建新 Key**，填写名称（如 `claude-desktop`）
+4. 复制生成的 Key（格式：`sk-xxxxxxxxxxxxxxxx`）
+
+> **安全提示：** API Key 只显示一次，请立即保存到安全的地方。
+
+---
+
+## 第二步：下载并安装 Claude Desktop
+
+1. 访问官方下载页 [claude.ai/download](https://claude.ai/download)
+2. 根据系统下载对应安装包
+
+**macOS：**
+
+- 打开下载的 `.dmg` 文件
+- 将 `Claude.app` 拖入 `Applications（应用程序）` 文件夹
+- 从启动台或 Applications 打开 Claude
+
+**Windows：**
+
+- 运行下载的 `.msix` 安装包
+- 按屏幕提示完成安装
+- 从开始菜单打开 Claude
+
+> **注意： 打开后无需登录 Anthropic 账号，直接进行下一步配置。**
+
+---
+
+## 第三步：启用开发者模式
+
+第三方配置需要先开启开发者模式：
+
+1. 打开 Claude Desktop 应用
+2. 点击顶部菜单栏 **Help（帮助）**
+3. 选择 **Troubleshooting（故障排查）**
+4. 点击 **Enable Developer mode（启用开发者模式）**
+   <Frame>
+     ![Image](/images/image-48.png)
+   </Frame>
+5. 启用后，顶部菜单栏会出现新的 **Developer（开发者）** 菜单。
+
+<Frame>
+  ![Image](/images/image-49.png)
+</Frame>
+
+6. 点击菜单栏 **Developer（开发者）**，选择 **Configure third-party inference（接入第三方服务）**
+
+<Frame>
+  ![Image](/images/image-53.png)
+</Frame>
+
+7. **在弹出的配置界面中填写以下内容：**
+
+**Connection** — Gateway（Anthropic-compatible）
+
+**Gateway Base URL** — AIHubMix 服务地址
+
+```text
+https://aihubmix.com
+```
+
+**Gateway API Key** — 你的 AIHubMix API Key
+
+```text
+sk-xxxxxxxxxxxxxxxx
+```
+
+<Frame>
+  ![Image](/images/image-54.png)
+</Frame>
+
+8. **点击 Apply locally (本地应用)-Relaunch (重启)**
+
+<Frame>
+  ![Img V3 02111 1bf57885 9883 46d1 81b1 4a1c4b45bb1g](/images/img_v3_02111_1bf57885-9883-46d1-81b1-4a1c4b45bb1g-1.png)
+</Frame>
+
+9. 重启后，进入下图界面，选择 **Continue with Gateway**
+
+<Frame>
+  ![Img V3 02111 E41b4400 E68c 4c63 Ac88 434d2e69693g](/images/img_v3_02111_e41b4400-e68c-4c63-ac88-434d2e69693g.jpg)
+</Frame>
+
+10. **配置成功，选择模型**
+
+可选模型 gpt5.4 ，coding-glm-5.1-free ，gpt-4.1-free  ，qwen3.6-27b 等
+
+<Frame>
+  ![Img V3 02111 0ad06803 3f3e 4a9f A51e E4b6becbdb2g](/images/img_v3_02111_0ad06803-3f3e-4a9f-a51e-e4b6becbdb2g.jpg)
+</Frame>
+
+> **注意： 默认模型为Claude Opus 4.7 ，该模型定价较高**，日常使用成本显著。建议选择其他模型。AIHubMix 还提供多款高性价比乃至免费的模型，可在 [aihubmix.com](https://aihubmix.com) 查看模型详细参数。
+
+<Frame>
+  ![Img V3 02111 1d93066c 3352 4d83 9463 99268b04d52g](/images/img_v3_02111_1d93066c-3352-4d83-9463-99268b04d52g.jpg)
+</Frame>
+
+---
+
+## 第五步：验证安装
+
+重启 Claude Desktop 后，检查以下几点确认配置成功：
+
+- 左侧导航栏出现 **Cowork** 标签
+- 可以正常发送消息并收到 Claude 的回复
+- 顶部显示的模型名称为你配置的模型
+  <Frame>
+    ![Img V3 02111 A2dc364d Fcaa 4a8b B222 2b3cd540fa0g](/images/img_v3_02111_a2dc364d-fcaa-4a8b-b222-2b3cd540fa0g-1.jpg)
+  </Frame>
+
+如果配置成功，恭喜！你已经可以通过 AIHubMix 使用 Claude Desktop 了。
+
+---
+
+## 常见问题排查
+
+### 启动时报错 / 无法连接
+
+**检查清单：**
+
+1. 确认 `inferenceProvider` 填写的是 `gateway`（不是 `bedrock` / `vertex`）
+2. 检查 Base URL 是否为 `https://aihubmix.com`（无尾部斜杠）
+3. 核对 API Key 是否完整复制（`sk-` 开头）
+4. 确认 AIHubMix 账号有余额
+
+**查看日志：**
+
+- macOS：打开「控制台（Console.app）」，筛选 `Claude`
+- Windows：打开「事件查看器（Event Viewer）」
+
+---
+
+### 模型无法调用 / 报错 model not found
+
+确认填写的模型 ID 在 AIHubMix 中可用。你可以通过 API 查询可用模型列表：
+
+```bash
+curl https://aihubmix.com/v1/models \
+  -H "Authorization: Bearer sk-你的API Key"
+```
+
+---
+
+### Auth Scheme 应该选哪个？
+
+AIHubMix 使用 `x-api-key` 认证头，选择 `x-api-key` 即可。如果遇到 401 错误，可尝试切换为 `bearer`。
+
+---
+
+## 高级：导出配置文件（可选）
+
+配置完成后，可以导出配置文件方便备份或分发给团队：
+
+**macOS** — 在配置 UI 中点击 **Export** 下载 `.mobileconfig` 文件\
+**Windows** — 在配置 UI 中点击 **Export** 下载 `.reg` 注册表文件
+
+## 相关资源
+
+- [AIHubMix 官方文档](https://docs.aihubmix.com)
+- [AIHubMix Claude 原生接口说明](https://docs.aihubmix.com/cn/api/Claude-Native.md)
+- [Claude Desktop 官方第三方平台配置指南](https://support.anthropic.com/en/articles/claude-cowork-with-third-party-platforms)
+- [Claude Desktop 下载页](https://claude.ai/download)
+
+---
+
+_最后更新：2026 年 4 月  23日 | 基于 Anthropic 官方文档 \+ AIHubMix API 文档整理_
+
+<Frame>
+  ![Image](/images/image-56.png)
+</Frame>

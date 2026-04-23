@@ -21,7 +21,7 @@
         "tabs": [
           {
             "tab": "用户指南",
-            "groups": [
+            "pages": [
               {
                 "group": "基础",
                 "pages": [
@@ -31,7 +31,9 @@
                   "cn/api/OpenClaw",
                   "cn/api/Claude-Code",
                   "cn/api/AISDK",
-                  "cn/api/Data-Pravicy"
+                  "cn/api/Data-Pravicy",
+                  "cn/api/cc-switch",
+                  "cn/api/claude-code"
                 ]
               },
               {
@@ -106,7 +108,8 @@
                   "cn/terms-and-privacy/Terms",
                   "cn/terms-and-privacy/Privacy"
                 ]
-              }
+              },
+              "untitled-page"
             ]
           },
           {

@@ -1,0 +1,289 @@
+---
+title: "CC Switch 完整使用教程 | Claude Code 多模型一键切换神器"
+---
+
+> 想用 AI 帮你写代码、改文档、做项目，却发现每换一个工具就要重新折腾一堆设置？CC Switch 是一款免费的桌面应用，让你在 Claude Code、Codex、Gemini CLI 等主流 AI 编程工具之间一键切换，不用动任何配置文件。
+
+<Frame>
+  ![Image](/images/image-45.png)
+</Frame>
+
+## 一、CC Switch 是什么？
+
+**CC Switch**（项目地址：[github.com/farion1231/cc-switch](https://github.com/farion1231/cc-switch)）是由开发者 **Jason Young（farion1231）** 开发的一款开源跨平台桌面应用，专为 AI 编程 CLI 工具设计的统一管理器。
+
+对于同时使用多个 AI 编程工具的用户特别是开发者而言，以下问题或许并不陌生：
+
+- 每次切换 Provider，都需要手动编辑 `~/.claude/settings.json` 或重新设置环境变量
+- 多台设备之间配置无法同步，换一台机器就要从头配置
+- WSL 与 Windows 环境各自维护一套配置，管理成本持续叠加
+
+CC Switch 正是为解决上述问题而设计。它是一款轻量的桌面应用，安装后常驻在系统托盘，无论你是开发者还是普通用户，只需点击几下，就能完成 AI 工具和服务商的切换，全程不需要接触任何代码或配置文件。基于 **Tauri 2 \+ Rust** 构建，安装包体积轻巧，支持 Windows、macOS 与 Linux 全平台，并提供系统托盘常驻入口，让多 Provider 的切换与管理变得高效、直观。
+
+**支持的 5 大 CLI 工具：**
+
+> CLI（Command Line Interface，命令行界面）工具是一类通过文字命令操作的程序，不需要图形界面，常用于开发环境。下表中的工具都属于此类，CC Switch 可以统一管理它们的配置。
+
+| 工具名称 | 开发方 | 简介 |
+| --- | --- | --- |
+| Claude Code | Anthropic | 由 Claude 模型驱动的 AI 编程助手，可在终端中直接对话、写代码、改 Bug |
+| Codex | OpenAI | OpenAI 推出的代码生成工具，支持多种编程语言的自动补全与生成 |
+| Gemini CLI | Google | Google Gemini 模型的命令行版本，适合与 Google 生态集成的开发者 |
+| OpenCode | 开源社区 | 开源的 AI 编程命令行工具，支持接入多种 AI 模型 |
+| OpenClaw | 开源社区 | 开源的 AI 命令行工具，可灵活切换不同的 AI 服务商（Provider） |
+
+---
+
+## 二、核心功能
+
+### 2.1 Provider 管理
+
+CC Switch 内置 **50\+ 预设配置**，覆盖主流 AI API 服务商，包括 Anthropic、OpenRouter、AIHubMix、AWS Bedrock 等。你可以：
+
+- 为每个 CLI 工具创建多个 Provider 配置
+- 拖拽排序，把最常用的置顶
+- 一键切换当前激活的 Provider，无需重启 CLI
+- 通过 **Shared Config Snippet** （共享配置）功能，切换服务商时自动保留插件数据与自定义设置——换了 API 不等于一切归零
+
+### 2.2  MCP 服务器统一管理
+
+如果你在多个 CLI 工具中都用到了 MCP（Model Context Protocol）服务器，CC Switch 提供统一的 MCP 管理面板，支持跨应用配置同步，不用在每个工具的配置文件里重复填写。
+
+### 2.3 技能（Skills）安装
+
+CC Switch 支持从 GitHub 仓库或 ZIP 文件安装技能包（Skills），通过 symlink 方式挂载，方便团队共享和版本管理。
+
+### 2.4 用量统计 Dashboard
+
+内置使用量看板，可追踪：
+
+- 每日/每周 API 消费金额
+- 请求次数与 Token 用量
+- 趋势图可视化
+
+对于同时接入多个 Provider 的用户，这个功能能帮你清楚掌握每个渠道的实际消耗。
+
+### 2.5 云同步
+
+配置数据支持同步到以下云存储：
+
+- Dropbox
+- OneDrive
+- iCloud（macOS）
+- WebDAV 自建服务器
+
+多设备开发者再也不用手动导出导入配置了。
+
+---
+
+## 三、安装教程
+
+### 3.1 Windows
+
+**方式一：Winget（推荐）**
+
+```bash
+winget install --id=farion1231.CC-Switch -e
+```
+
+**方式二：手动安装**
+
+前往 [GitHub Releases 页面](https://github.com/farion1231/cc-switch/releases) 下载最新版 `.msi` 安装包或便携版 `.zip`，解压后直接运行。
+
+**系统要求：** Windows 10 及以上
+
+### 3.2 macOS
+
+**方式一：Homebrew（推荐）**
+
+```bash
+brew tap farion1231/ccswitch
+brew install --cask cc-switch
+```
+
+**方式二：手动安装**
+
+从 Releases 页面下载已公证的 `.dmg` 文件，挂载后拖入 Applications 文件夹即可。
+
+**系统要求：** macOS 12（Monterey）及以上
+
+### 3.3 Linux
+
+根据你的发行版选择对应包格式：
+
+```bash
+# Debian / Ubuntu
+sudo dpkg -i cc-switch_x.x.x_amd64.deb
+
+# Fedora / RHEL
+sudo rpm -i cc-switch-x.x.x.x86_64.rpm
+
+# 通用（AppImage）
+chmod +x cc-switch_x.x.x_amd64.AppImage
+./cc-switch_x.x.x_amd64.AppImage
+
+# Arch Linux（AUR）
+paru -S cc-switch-bin
+```
+
+**系统要求：** Ubuntu 22.04\+ / Debian 11\+ / Fedora 34\+
+
+### 3.4 WSL 集成（（Windows 用户）
+
+CC Switch 对 WSL（Windows Subsystem for Linux）有专项支持。在 Windows 主机上安装 CC Switch 后，可以直接管理 WSL 内的 Claude Code 等 CLI 工具的配置，无需在 WSL 环境内单独安装。
+
+配置完成后，CC Switch 会通过本地代理桥接 WSL 与 Windows 之间的网络请求，实现统一管理。
+
+---
+
+## 四、配置 Claude Code 接入 AIHubMix
+
+### 4.1 为什么选择 AIHubMix？
+
+[AIHubMix](https://aihubmix.com) 是一个 AI API 聚合平台，兼容 OpenAI 接口格式，支持 Claude、GPT-4o、Gemini 等主流模型，并提供：
+
+- 按量计费，无月费压力
+- 统一的 API Key 管理多模型
+
+对于 Claude Code 用户来说，通过 AIHubMix 接入可以有效降低使用成本，同时保持与 OpenRouter 类似的灵活性。
+
+### 4.2 获取 AIHubMix API Key
+
+1. 注册并登录 [AIHubMix 控制台](https://aihubmix.com)
+2. 进入「API Keys」页面，创建一个新的 Key
+3. 复制 Key 备用（格式类似 `sk-xxxxxx`）
+
+### 4.3 在 CC Switch 中添加 AIHubMix Provider
+
+打开 CC Switch，进入 **Claude Code** 的 Provider 管理页面：
+
+1. 点击右上角「**\+ 添加 Provider**」
+2. 填写以下信息：
+
+| 字段 | 填写内容 |
+| --- | --- |
+| 名称 | AIHubMix（自定义） |
+| API Base URL | `https://aihubmix.com/v1` |
+| API Key | 你的 AIHubMix Key |
+| 模型 | `claude-sonnet-4-5`（或其他可用模型） |
+
+3. 点击「**保存**」，然后点击「**设为当前**」即可激活
+
+切换后无需重启 Claude Code，新的 Provider 立即生效。
+
+### 4.4 验证连接
+
+在终端中运行 Claude Code，发起一次简单的对话请求，如果响应正常，说明已成功接入 AIHubMix。
+
+---
+
+## 五、在 VSCode 中使用
+
+Claude Code 有官方 VSCode 扩展，CC Switch 与其完全兼容。配置步骤如下：
+
+### 5.1 安装 Claude Code VSCode 扩展
+
+在 VSCode 扩展市场搜索「**Claude Code**」并安装。
+
+### 5.2 配合 CC Switch 使用
+
+CC Switch 安装后会在系统托盘常驻。当你在 VSCode 中使用 Claude Code 时，可以：
+
+1. 点击系统托盘中的 CC Switch 图标
+2. 在弹出菜单中选择目标 Provider（如从 Anthropic 切到 AIHubMix）
+3. 切换立即生效，不影响当前 VSCode 会话
+
+这意味着你可以在不关闭 VSCode 的情况下，随时切换底层的 AI 服务商——比如白天用 Claude Sonnet 做代码审查，晚上切到更便宜的模型跑批量任务。
+
+### 5.3 多工作区场景
+
+如果你同时打开了多个 VSCode 工作区，所有窗口共享同一个 CC Switch 配置，切换一次全局生效。
+
+---
+
+## 六、搭配其他 CLI 工具使用
+
+CC Switch 不只是 Claude Code 的管理器，它对另外四个主流 AI 编程 CLI 工具同样有完整支持。
+
+### 6.1 搭配 Codex
+
+OpenAI Codex CLI 用户可以在 CC Switch 中单独管理 Codex 的 Provider 配置，支持接入 OpenAI 官方、Azure OpenAI 或第三方兼容接口。切换模型时无需手动修改 `OPENAI_API_KEY` 环境变量。
+
+### 6.2 搭配 Gemini CLI
+
+Google Gemini CLI 配置较为分散，CC Switch 将其整合进统一界面，支持多 Google 账号或多个 Gemini API Key 的快速切换，适合需要频繁在不同项目间切换的团队。
+
+### 6.3 搭配 OpenCode
+
+OpenCode 是一个开源的 AI 编程 CLI，兼容多种 Provider。CC Switch 内置对 OpenCode 的支持，可以直接管理其配置文件，免去手动编辑 TOML/JSON 配置的麻烦。
+
+### 6.4 搭配 OpenClaw
+
+OpenClaw 是兼容 OpenAI 接口的开源 CLI 工具，适合需要自定义模型路由的高级用户。CC Switch 与 OpenClaw 的搭配使用方式：
+
+1. 在 CC Switch 中为 OpenClaw 创建独立的 Provider 组
+2. 将 AIHubMix、OpenRouter 等聚合平台配置为 OpenClaw 的上游
+3. 通过 CC Switch 的热切换功能，在不同的 OpenClaw 上游之间快速跳转
+
+这种组合特别适合需要对比不同 API 服务商响应质量的开发者——在 CC Switch 中切换 Provider，OpenClaw 侧无需做任何修改。
+
+---
+
+## 七、CC Switch vs Claude Code Router 对比
+
+市面上另一个常被提到的工具是 **Claude Code Router**，不少用户会问：我该用哪个？
+
+| 对比维度 | CC Switch | Claude Code Router |
+| --- | --- | --- |
+| 形态 | 桌面 GUI 应用 | CLI / 配置工具 |
+| 支持的 CLI 工具 | 5 个（Claude Code、Codex、Gemini、OpenCode、OpenClaw） | 主要针对 Claude Code |
+| Provider 预设 | 50\+ | 依赖手动配置 |
+| 本地代理 | 内置，支持热切换 \+ 故障转移 | 需手动配置 |
+| MCP 管理 | 统一管理界面 | 不支持 |
+| WSL 支持 | 专项支持 | 有限支持 |
+| 云同步 | 支持（Dropbox / iCloud / WebDAV） | 不支持 |
+| 用量统计 | 内置 Dashboard | 无 |
+| 上手难度 | 低（GUI 操作） | 中（需熟悉配置文件） |
+| 适合人群 | 多工具用户 / 追求效率者 | 轻量配置需求 / 纯 CLI 爱好者 |
+
+**结论：** 如果你只用 Claude Code 且习惯命令行操作，Claude Code Router 足够用；如果你同时使用多个 AI 编程工具，或者希望有一个可视化的统一管理入口，CC Switch 是更好的选择。
+
+---
+
+## 八、常见问题 FAQ
+
+**Q：CC Switch 本身免费吗？**
+
+A：完全免费，MIT 开源协议，[代码托管在 GitHub](https://github.com/farion1231/cc-switch)。使用过程中产生的 API 费用由你选择的 Provider 决定。
+
+**Q：在 WSL 中如何让 CC Switch 生效？**
+
+A：CC Switch 安装在 Windows 侧，通过本地代理桥接 WSL 内的请求。确保 WSL 的代理设置指向 CC Switch 的本地监听端口即可。具体端口号可在 CC Switch 的代理设置页面查看。
+
+**Q：切换 Provider 后 Claude Code 需要重启吗？**
+
+A：不需要。CC Switch 的热切换功能在激活新 Provider 后立即生效，当前终端会话无需重启。
+
+**Q：配置数据存储在哪里？**
+
+A：本地数据库存储在 `~/.cc-switch/cc-switch.db`，设置文件为 `~/.cc-switch/settings.json`，CC Switch 会自动保留最近 10 个备份版本。
+
+**Q：我可以通过 URL 导入别人的 Provider 配置吗？**
+
+A：可以。CC Switch 支持 Deep Link（`ccswitch://` 协议），团队成员可以通过分享一个链接快速导入统一的 Provider 配置，适合团队统一管理 API 接入。
+
+**Q：CC Switch 支持 AWS Bedrock 吗？**
+
+A：支持，内置 AWS Bedrock 预设，并支持跨区域推断（Cross-Region Inference），适合企业用户通过 Bedrock 接入 Claude 模型。
+
+---
+
+## 结语
+
+CC Switch 把原本分散在各个配置文件里的 AI 编程工具管理工作，整合进了一个轻量的桌面应用。无论你是 Claude Code 的重度用户，还是同时使用 Codex、Gemini CLI 的多工具开发者，它都能让你的工作流更顺畅。
+
+最新版本 **v3.12.0** 已稳定发布，欢迎前往 [github.com/farion1231/cc-switch](https://github.com/farion1231/cc-switch) 查看完整文档和 Release Notes。
+
+<Frame>
+  ![Image](/images/image-46.png)
+</Frame>
