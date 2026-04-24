@@ -5,49 +5,6 @@ icon: "face-glasses"
 
 为了简化不同模型供应商（OpenAI, Anthropic, Google, DeepSeek 等）对推理/思考过程的处理逻辑，AIHubMix 现已对接**统一推理参数规范**。开发者可以通过一套标准接口控制模型的思考强度并获取详细的推理链路，控制 claude、Gemini、glm-5、minimax、等模型的思考开关及强度。
 
-# 渠道与模型兼容性列表 (OpenAI API 兼容)
-
-AIHubMix 已深度适配以下主流渠道。所有模型均支持通过标准 OpenAI SDK 调用，并已完成推理令牌（Reasoning Tokens）的标准化下发。
-
-<kbd>已验证渠道与模型对照表</kbd>
-
-| **渠道供应商** | **支持模型 ID** | **特色支持** | **状态** |
-| :-- | :-- | :-- | :-- |
-| **字节跳动 (豆包)** | doubao-seed-2-0-lite-260215 | 最新 2.0 种子模型 | ✅ |
-| **小米 (Xiaomi)** | xiaomi-mimo-v2-pro, xiaomi-mimo-v2-omni | 智能家居/多模态优化 | ✅ |
-| **DeepSeek** | deepseek-chat, deepseek-coder | 官方原生 API 适配 | ✅ |
-| **SiliconFlow (硅基流动)** | sf-kimi-k2-thinking, siliconflow-qwen3-235b-a22b, siliconflow-deepseek-v3.2, sf-qwen3.5-4b | **深度思考型 (Reasoning)** | ✅ |
-| **百度 (Baidu)** | baidu-glm-5, baidu-deepseek-v3.2, baidu-deepseek-v3.2-think, baidu-kimi-k2.5, ernie-5.0-thinking-preview | 文心一言 & 推理预览版 | ✅ |
-| **MiniMax** | mm-minimax-m2.5 | 角色扮演与上下文优化 | ✅ |
-| **阿里 (AliCloud)** | alicloud-qwen3.5-397b-a17b, alicloud-minimax-m2.5, alicloud-glm-5, alicloud-kimi-k2.5, alicloud-deepseek-v3.2, alicloud-qwen3-235b-a22b | 全系列通义千问与第三方分发 | ✅ |
-| **算能平台 (SophNet)** | sophnet-qwen3.5-397b-a17b, sophnet-minimax-m2.5, sophnet-glm-5, sophnet-kimi-k2.5, sophnet-deepseek-v3.2, s-kimi-k2-thinking | 高性价比推理集群 | ✅ |
-| **DeepInfra** | deepinfra-glm-5 | 国际化模型分发 | ✅ |
-
-# **供应商渠道类型映射**
-
-## 已适配渠道映射表
-
-由于不同供应商对推理参数（Reasoning Tokens）的实现协议各异，AIHubMix 现已针对各大主流渠道进行了专项适配。**请务必根据实际供应商选择对应的渠道类型**。如果使用通用的“OpenAI”类型配置非 OpenAI 原厂渠道，推理相关的开关与强度参数将无法生效。
-
-| **实际供应商 (Upstream)** | **建议选择的“渠道类型”** | **特别说明** |
-| :-- | :-- | :-- |
-| **Siliconflow (硅基流动)** | Siliconflow | 支持 Kimi/DeepSeek/Qwen 推理流 |
-| **Sophnet (算能平台)** | Sophnet | \[新增\] 针对算能集群优化 |
-| **阿里云百炼 (官网)** | 阿里云百炼OpenAI兼容 | \[新增\] 需配合百炼专用 API Key |
-| **Xiaomi (小米)** | Xiaomi MIMO | \[新增\] 支持 MIMO 官方推理协议 |
-| **字节跳动 (火山方舟)** | 字节跳动豆包 | 适配 Doubao-Seed 推理链路 |
-| **DeepSeek (官网)** | DeepSeek | 原生支持 reasoning\_content |
-| **MiniMax (官网)** | MiniMax | 适配 mm-minimax 系列推理 |
-| **智谱 AI** | 智谱ChatGLM | 支持 GLM-5 及以上推理模型 |
-| **百度文心千帆** | 百度文心千帆 | 适配 Ernie-Thinking 预览版 |
-| **DeepInfra** | OpenAI | 默认兼容，暂无需切换 |
-
-## 代理/分销渠道配置规范
-
-如果您使用的渠道是经过二次代理的（例如 `zeka-***` 或其他中转服务），请根据其**底层调用的实际供应商**进行配置：
-
-- **案例**：若 zeka 渠道最终转发至阿里百炼，则**必须**配置为 `阿里云百炼OpenAI兼容` 类型，否则 `reasoning` 参数将无法透传给底层模型。
-
 # **统一参数定义**
 
 ## 开启思考`reasoning`
