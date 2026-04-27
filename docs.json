@@ -7,6 +7,10 @@
     "light": "#7298FF",
     "dark": "#2563EB"
   },
+  "footer": {
+    "text": ""
+  },
+  "css": "footer a[href*='mintlify'] { display: none !important; }",
   "contextual": {
     "options": [
       "copy",
