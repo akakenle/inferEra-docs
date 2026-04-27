@@ -32,7 +32,7 @@ icon: "terminal"
 
 1. 使用 Node.js 安装
 
-```
+```text
 # 使用 CURL 脚本快速安装
 curl -fsSL https://opencode.ai/install | bash
 
@@ -53,7 +53,7 @@ yarn global add opencode-ai
 
 2. 使用 Homebrew（macOS / Linux）
 
-```
+```text
 brew install sst/tap/opencode
 ```
 
@@ -61,7 +61,7 @@ brew install sst/tap/opencode
 
 3. 使用 Paru（Arch Linux）
 
-```
+```text
 paru -S opencode-bin
 ```
 
@@ -71,7 +71,7 @@ paru -S opencode-bin
 
 Windows 用户可通过以下方式安装 OpenCode：
 
-```
+```text
 # Chocolatey
 choco install opencode
 
@@ -124,7 +124,7 @@ opencode auth login
 
 可通过以下命令验证 OpenCode 是否安装并配置成功：
 
-```
+```text
 opencode
 ```
 
@@ -141,15 +141,114 @@ opencode
 ## 四、在 OpenCode 客户端使用
 
 1. 下载 OpenCode 桌面端：[https://opencode.ai/download](https://opencode.ai/download。) 。
-2. 打开 OpenCode，输入`/model` -\> `Connet provider`  -\> 搜索`aihubmix`  -\> 输入 API Key -\> `Submit` 。
+2. 打开 OpenCode，输入`/model` -\> `Connet provider`  -\> 搜索`aihubmix`  -\> 输入 API Key -\> `Submit` 。 <img src="/public/en/opencode-5.jpg" alt="Opencode 5" />
+3. 在模型选择栏搜`aihubmix` ，选择需要使用的模型即可使用。 <img src="/public/cn/opencode-6.jpg" alt="Opencode 6" />
 
-   ![Opencode 5](/public/en/opencode-5.jpg)
-3. 在模型选择栏搜`aihubmix` ，选择需要使用的模型即可使用。
+## 五、模型更新
 
-   ![Opencode 6](/public/cn/opencode-6.jpg)
+### 方式一：手动配置
 
-## 五、常见问题与提示
+以添加 **DeepSeek V4 Pro** 为例。
+
+#### 第一步：确认模型 ID
+
+在 [AIHubMix ](https://aihubmix.com/models)模型界面找到目标模型，复制 ID。
+
+也可以通过 API 直接查询：
+
+```bash
+curl https://aihubmix.com/v1/models \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  | python3 -m json.tool | grep "id"
+```
+
+#### 第二步：打开配置文件
+
+根据你的系统，在终端运行对应命令：
+
+**Mac**
+
+```bash
+mkdir -p ~/.config/opencode && open -a TextEdit ~/.config/opencode/opencode.json
+```
+
+**Linux**
+
+```bash
+mkdir -p ~/.config/opencode && nano ~/.config/opencode/opencode.json
+```
+
+**Windows**（在 PowerShell 中运行）
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.config\opencode"
+notepad "$env:USERPROFILE\.config\opencode\opencode.json"
+```
+
+文件打开后，你会看到一个空文件或已有的 JSON 内容。
+
+#### 第三步：写入配置
+
+**如果是空文件**，直接粘贴以下内容：
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "aihubmix": {
+      "models": {
+        "deepseek-v4-pro": {
+          "name": "DeepSeek-V4-Pro",
+          "contextLength": 131072,
+          "type": "language"
+        }
+      }
+    }
+  }
+}
+```
+
+**如果文件已有内容**，只需在 `"models"` 里追加新模型，每个模型之间用逗号隔开：
+
+```json
+"models": {
+  "deepseek-v4-pro": {
+    "name": "DeepSeek-V4-Pro",
+    "contextLength": 131072,
+    "type": "language"
+  },
+  "deepseek-v4-flash-think": {
+    "name": "DeepSeek-V4-Flash-Think",
+    "contextLength": 131072,
+    "type": "language"
+  }
+}
+```
+
+> **注意**：最后一个模型后面不加逗号，否则文件格式会出错。
+
+保存文件：Mac 按 `Command + S`，Windows 按 `Ctrl + S`。
+
+**字段说明：**
+
+| 字段 | 说明 |
+| --- | --- |
+| `name` | 模型ID |
+| `contextLength` | 上下文长度（token数） |
+| `type` | 模型类型，文本对话填 `"language"` |
+
+#### 第四步：重启 OpenCode
+
+保存配置文件后，**完全退出 OpenCode 并重新启动**，新模型才会加载。
+
+#### 第五步：验证
+
+打开模型选择（默认快捷键 `;`），搜索 `V4` 或 `DeepSeek`，确认 `DeepSeek-V4-Pro` 已出现在列表中。
+
+## 六、常见问题与提示
 
 - 若API Key无法通过验证，请重新登录[AIHubMix](https://console.aihubmix.com/token)并检查密钥有效性。
 - 查看帮助文档：`opencode` -\>`/help`。
 - opencode官方文档：[https://opencode.ai/docs/](https://opencode.ai/docs/。) 。
+
+最新更新日期： 2026年4月27日
